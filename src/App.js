@@ -403,9 +403,8 @@ function ProtectionApp() {
     <label style={{ fontSize: 12 }}>Початок вегетації (дата висадки):</label>
     <input
       type="date"
-      value={harvestDate}
-      disabled={useForecast}
-      onChange={(e) => setHarvestDate(e.target.value)}
+      value={plantingDate}
+      onChange={(e) => setPlantingDate(e.target.value)}
       style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc" }}
     />
   </div>
@@ -414,11 +413,12 @@ function ProtectionApp() {
     <label style={{ fontSize: 12 }}>Збір врожаю (для історичних даних):</label>
     <input
       type="date"
-      value={plantingDate}
-      onChange={(e) => setPlantingDate(e.target.value)}
+      value={harvestDate}
+      disabled={useForecast}
+      onChange={(e) => setHarvestDate(e.target.value)}
       style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc" }}
     />
-  </div>
+  </div>  
 </div>
 
 
