@@ -327,11 +327,7 @@ function ProtectionApp() {
   const [lastRainUrl, setLastRainUrl] = useState("");
   const [inputValue, setInputValue] = useState("");
 
-  useEffect(() => {
-  if (region?.name) setInputValue(region.name);
-}, [region]);
-
-
+  
   const generate = async () => {
     setError(""); setDiagnostics([]); setWeeklyPlan([]); setSprayDates([]); setLastUrl(""); setLastRainUrl("");
     if (!region) { setError("Будь ласка, оберіть регіон."); return; }
@@ -385,19 +381,19 @@ function ProtectionApp() {
   <div>
     <label style={{ fontSize: 12 }}>Регіон:</label>
     <input
-      type="text"
-      value={inputValue}
-      onChange={(e) => {
-        const val = e.target.value;
-        setInputValue(val);
-        const match = regions.find(c => c.name.toLowerCase().includes(val.toLowerCase()));
-        if (match) setRegion(match);
-        else setRegion(null);
-      }}
-      list="city-options"
-      placeholder="Введіть місто"
-      style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc" }}
-    />
+  type="text"
+  value={inputValue}
+  onChange={(e) => setInputValue(e.target.value)}
+  onBlur={() => {
+    const match = regions.find(c => c.name.toLowerCase() === inputValue.toLowerCase().trim());
+    if (match) setRegion(match);
+    else setRegion(null);
+  }}
+  list="city-options"
+  placeholder="Введіть місто"
+  style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc" }}
+/>
+
     <datalist id="city-options">
       {regions.map(c => <option key={c.name} value={c.name} />)}
     </datalist>
