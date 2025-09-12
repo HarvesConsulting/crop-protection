@@ -400,7 +400,7 @@ function ProtectionApp() {
   </div>
 
   <div>
-    <label style={{ fontSize: 12 }}>Збір врожаю (для історичних даних):</label>
+    <label style={{ fontSize: 12 }}>Початок вегетації (дата висадки):</label>
     <input
       type="date"
       value={harvestDate}
@@ -411,7 +411,7 @@ function ProtectionApp() {
   </div>
 
   <div>
-    <label style={{ fontSize: 12 }}>Початок вегетації (дата висадки):</label>
+    <label style={{ fontSize: 12 }}>Збір врожаю (для історичних даних):</label>
     <input
       type="date"
       value={plantingDate}
