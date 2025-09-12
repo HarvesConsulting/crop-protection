@@ -400,7 +400,7 @@ function ProtectionApp() {
   </div>
 
   <div>
-    <label style={{ fontSize: 12 }}>Початок вегетації (дата висадки):</label>
+    <label style={{ fontSize: 12 }}>Початок вегетації (або поточна дата для прогнозу обприскувань на два тижні):</label>
     <input
       type="date"
       value={plantingDate}
