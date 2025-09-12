@@ -417,7 +417,7 @@ function ProtectionApp() {
 
       {/* Рекомендації */}
       <div style={{ background: "#fff", borderRadius: 12, padding: 16, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", marginBottom: 16 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>Рекомендовані внесення за новою логікою (RH≥90% & 13–&lt;28°C, ≥3 год/доба)</h2>
+        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>Рекомендовані внесення </h2>
         {sprayDates.length > 0 ? (
           <ol style={{ marginLeft: 18 }}>
             {sprayDates.map((d, i) => <li key={i} style={{ marginBottom: 4 }}>{d} — {rotationProducts[i % rotationProducts.length]}</li>)}
