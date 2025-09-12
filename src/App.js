@@ -376,16 +376,24 @@ function ProtectionApp() {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <div>
             <label style={{ fontSize: 12 }}>Регіон:</label>
-            <select value={region?.name || ""} onChange={(e) => setRegion(regions.find(r => r.name === e.target.value) || null)} style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc" }}>
-              <option value="" disabled>Оберіть регіон</option>
-              {regions.map(r => <option key={r.name} value={r.name}>{r.name}</option>)}
-            </select>
-          </div>
-          <div>
-            <label style={{ fontSize: 12 }}>Культура/хвороба:</label>
-            <select value={disease.crop} onChange={(e) => setDisease(diseaseOptions.find(d => d.crop === e.target.value) || diseaseOptions[0])} style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc" }}>
-              {diseaseOptions.map(d => <option key={d.crop} value={d.crop}>{d.crop} — {d.disease} ({d.pathogen})</option>)}
-            </select>
+            <input
+  type="text"
+  value={region?.name || inputValue}
+  onChange={(e) => {
+    const val = e.target.value;
+    setInputValue(val);
+    const match = allCities.find(c => c.name.toLowerCase().startsWith(val.toLowerCase()));
+    if (match) setRegion(match);
+    else setRegion(null);
+  }}
+  list="city-options"
+  placeholder="Введіть місто"
+  style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc" }}
+/>
+<datalist id="city-options">
+  {allCities.map(c => <option key={c.name} value={c.name} />)}
+</datalist>
+
           </div>
           <div>
             <label style={{ fontSize: 12 }}>Початок вегетації (дата висадки):</label>
