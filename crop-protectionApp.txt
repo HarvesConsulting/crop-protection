@@ -1,0 +1,524 @@
+// Захист овочевих культур від грибкових хвороб
+// Повна робоча версія (історичні дані NASA POWER + 14-денний прогноз Open‑Meteo)
+// Логіка обробок (нова):
+//  • Тригер доби: RH ≥ 90% і 13 ≤ T < 28 °C сумарно ≥ 3 год
+//  • Перше внесення: перший день, який задовольняє тригер
+//  • Кожне наступне: не раніше 7-го дня після попереднього;
+//      – якщо у дні 1–7 після попереднього хоча б раз були умови → рівно на 7-й день
+//      – інакше → перший тригер-день після 7-го дня
+//  • Збережено діагностику DSV (BLITECAST-подібну) та щотижневу таблицю для довідки
+
+import React, { useState } from 'react';
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem
+} from "@/components/ui/select";
+import { format, isValid as isValidDate, parseISO, differenceInDays } from 'date-fns';
+
+// ---------------- Константи ----------------
+const RH_WET_THRESHOLD = 90; // для діагностики RH≥90%
+const COND_RH = 90;            // RH ≥ 90%
+const COND_T_MIN = 13;         // °C включно
+const COND_T_MAX = 28;         // °C виключно
+const COND_HOURS_TRIGGER = 3;  // ≥ 3 год/доба
+const NEXT_SPRAY_MAX_GAP = 7;  // днів
+const TIME_STANDARD = 'lst';   // NASA POWER: utc|lst
+const RAIN_HIGH_THRESHOLD_MM = 12.7;
+const DEFAULT_DSV_THRESHOLD = 15;
+
+// DSV (для довідкової діагностики)
+const DSV_RULES = [
+  { tempMin: 21, tempMax: 27, bands: [ { h: 6, dsv: 2 }, { h: 8, dsv: 3 }, { h: 10, dsv: 4 } ] },
+  { tempMin: 13, tempMax: 21, bands: [ { h: 6, dsv: 1 }, { h: 8, dsv: 2 }, { h: 10, dsv: 3 }, { h: 12, dsv: 4 } ] },
+  { tempMin: 7,  tempMax: 13, bands: [ { h: 6, dsv: 1 }, { h: 8, dsv: 1 }, { h: 10, dsv: 2 }, { h: 12, dsv: 3 }, { h: 14, dsv: 4 } ] },
+  { tempMin: 27, tempMax: 40, bands: [ { h: 6, dsv: 1 }, { h: 8, dsv: 2 }, { h: 10, dsv: 3 } ] },
+];
+
+// Ротація препаратів
+const rotationProducts = [
+  'Зорвек Інкантія',
+  'Ридоміл Голд',
+  'Танос',
+  'Акробат МЦ',
+  'Орондіс Ультра',
+  'Ранман ТОП',
+  'Ревус',
+  'Курзат Р',
+  'Інфініто',
+];
+
+// Регіони (прикладовий перелік основних міст; можна розширити)
+const regions = [
+  { name: 'Київ', lat: 50.4501, lon: 30.5234 },
+  { name: 'Львів', lat: 49.8397, lon: 24.0297 },
+  { name: 'Одеса', lat: 46.4825, lon: 30.7233 },
+  { name: 'Харків', lat: 49.9935, lon: 36.2304 },
+  { name: 'Дніпро', lat: 48.4647, lon: 35.0462 },
+  { name: 'Запоріжжя', lat: 47.8388, lon: 35.1396 },
+  { name: 'Полтава', lat: 49.5883, lon: 34.5514 },
+  { name: 'Черкаси', lat: 49.4444, lon: 32.0598 },
+  { name: 'Чернігів', lat: 51.4982, lon: 31.2893 },
+  { name: 'Миколаїв', lat: 46.9750, lon: 31.9946 },
+  { name: 'Херсон', lat: 46.6350, lon: 32.6160 },
+];
+
+// Культури/хвороби (список з вимоги)
+const diseaseOptions = [
+  { crop: 'Огірки',  disease: 'Пероноспороз', pathogen: 'Pseudoperonospora cubensis' },
+  { crop: 'Цибуля',  disease: 'Пероноспороз', pathogen: 'Peronospora destructor' },
+  { crop: 'Салат',   disease: 'Пероноспороз', pathogen: 'Bremia lactucae' },
+  { crop: 'Капуста', disease: 'Пероноспороз', pathogen: 'Hyaloperonospora parasitica' },
+  { crop: 'Шпинат',  disease: 'Пероноспороз', pathogen: 'Peronospora farinosa f. sp. spinaciae' },
+  { crop: 'Морква',  disease: 'Пероноспороз', pathogen: 'Pseudoperonospora spp.' },
+  { crop: 'Томати',  disease: 'Фітофтороз',   pathogen: 'Phytophthora infestans' },
+  { crop: 'Картопля',disease: 'Фітофтороз',   pathogen: 'Phytophthora infestans' },
+];
+
+// ---------------- Хелпери дат ----------------
+function toYYYYMMDD(date: string | Date | null) {
+  if (!date) return null;
+  const d = date instanceof Date ? date : parseISO(String(date));
+  if (!isValidDate(d)) return null;
+  return format(d, 'yyyyMMdd');
+}
+function keyToISODate(key: string) {
+  try {
+    const raw = String(key);
+    if (raw.includes('-')) return raw.split('T')[0];
+    if (raw.includes('T') && !raw.includes('-')) {
+      const d = raw.split('T')[0];
+      return `${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}`;
+    }
+    const d = raw.replace(/[^0-9]/g, '').slice(0,8);
+    if (d.length !== 8) return null;
+    return `${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}`;
+  } catch { return null; }
+}
+
+// ---------------- Трансформації/обчислення ----------------
+function dsvFromWet(wetHours:number, wetTempAvg:number) {
+  if (!Number.isFinite(wetHours) || !Number.isFinite(wetTempAvg)) return 0;
+  if (wetHours < 6) return 0;
+  for (const rule of DSV_RULES) {
+    if (wetTempAvg >= rule.tempMin && wetTempAvg < rule.tempMax) {
+      const bands = [...rule.bands].sort((a,b)=>b.h - a.h);
+      for (const b of bands) { if (wetHours >= b.h) return b.dsv; }
+    }
+  }
+  return 0;
+}
+
+function computeDSVSchedule(daily:Array<any>, dsvThreshold = DEFAULT_DSV_THRESHOLD) {
+  const rows = daily.map(d => ({ ...d, DSV: Math.min(dsvFromWet(d.wetHours, d.wetTempAvg), 4) }));
+  const schedule: Array<{date:Date; accBefore:number}> = [];
+  let acc = 0; let lastSpray: Date | null = null;
+  for (const r of rows) {
+    acc += r.DSV;
+    const canSpray = !lastSpray || differenceInDays(r.date, lastSpray) >= 5;
+    if (acc >= dsvThreshold && canSpray) { schedule.push({ date: r.date, accBefore: acc }); acc = acc - dsvThreshold; lastSpray = r.date; }
+  }
+  return { rows, schedule };
+}
+
+function computeMultiSpraySchedule(rows: Array<{date:Date; condHours:number}>) {
+  const hasCond = (r:any) => Number(r.condHours||0) >= COND_HOURS_TRIGGER;
+  const sprays: Date[] = [];
+  const first = rows.find(hasCond)?.date || null;
+  if (!first) return sprays;
+  sprays.push(first);
+  const dayMs = 86400000;
+  let cursor = first;
+  while (true) {
+    const earliestAllowed = new Date(cursor.getTime() + (NEXT_SPRAY_MAX_GAP * dayMs));
+    const windowStart = new Date(cursor.getTime() + dayMs);
+    const windowEnd   = earliestAllowed;
+    const hadCondWithin7 = rows.some(r => r.date >= windowStart && r.date <= windowEnd && hasCond(r));
+    let next: Date | null = null;
+    if (hadCondWithin7) next = earliestAllowed; else next = rows.find(r => r.date >= earliestAllowed && hasCond(r))?.date || null;
+    if (next) { sprays.push(next); cursor = next; } else break;
+  }
+  return sprays;
+}
+
+// ---------------- NASA POWER (історія) ----------------
+function buildNASAUrl({ lat, lon, start, end }:{lat:number,lon:number,start:string,end:string}) {
+  const startDate = toYYYYMMDD(start); const endDate = toYYYYMMDD(end);
+  if (!startDate || !endDate) throw new Error('Невірний формат дат');
+  const params = new URLSearchParams({ parameters: 'T2M,RH2M', start: startDate, end: endDate, latitude: String(lat), longitude: String(lon), community: 'ag', 'time-standard': TIME_STANDARD, format: 'JSON' });
+  return `https://power.larc.nasa.gov/api/temporal/hourly/point?${params.toString()}`;
+}
+function buildNASADailyUrl({ lat, lon, start, end }:{lat:number,lon:number,start:string,end:string}) {
+  const startDate = toYYYYMMDD(start); const endDate = toYYYYMMDD(end);
+  if (!startDate || !endDate) throw new Error('Невірний формат дат');
+  const params = new URLSearchParams({ parameters: 'PRECTOTCORR', start: startDate, end: endDate, latitude: String(lat), longitude: String(lon), community: 'ag', format: 'JSON' });
+  return `https://power.larc.nasa.gov/api/temporal/daily/point?${params.toString()}`;
+}
+function transformNASAResponse(json: any) {
+  const p = json?.properties?.parameter; if (!p) return [] as Array<any>;
+  const t = p.T2M || {}; const rh = p.RH2M || {};
+  const keys = Array.from(new Set([...Object.keys(t), ...Object.keys(rh)]));
+  const perDay = new Map<string, { allTemp:number[]; wetTemp:number[]; wetHours:number; condHours:number }>();
+  for (const k of keys) {
+    const iso = keyToISODate(k); if (!iso) continue;
+    const rec = perDay.get(iso) || { allTemp: [], wetTemp: [], wetHours: 0, condHours: 0 };
+    const tv = Number(t[k]); const rv = Number(rh[k]);
+    if (Number.isFinite(tv)) rec.allTemp.push(tv);
+    if (Number.isFinite(tv) && Number.isFinite(rv)) {
+      if (rv >= RH_WET_THRESHOLD) { rec.wetTemp.push(tv); rec.wetHours += 1; }
+      if (rv >= COND_RH && tv >= COND_T_MIN && tv < COND_T_MAX) { rec.condHours += 1; }
+    }
+    perDay.set(iso, rec);
+  }
+  const out: Array<{date:Date; wetHours:number; wetTempAvg:number; allTempAvg:number; condHours:number}> = [];
+  for (const [iso, r] of perDay.entries()) {
+    const allAvg = r.allTemp.length ? r.allTemp.reduce((a,b)=>a+b,0)/r.allTemp.length : NaN;
+    const wetAvg = r.wetTemp.length ? r.wetTemp.reduce((a,b)=>a+b,0)/r.wetTemp.length : NaN;
+    out.push({ date: new Date(iso), wetHours: r.wetHours, wetTempAvg: wetAvg, allTempAvg: allAvg, condHours: r.condHours });
+  }
+  out.sort((a,b)=>a.date.getTime()-b.date.getTime());
+  return out;
+}
+async function fetchWeatherFromNASA(lat:number, lon:number, start:string, end:string) {
+  let url = '';
+  try {
+    url = buildNASAUrl({ lat, lon, start, end });
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) { const txt = await res.text().catch(()=> ''); return { daily: [], error: `HTTP ${res.status}${txt?': '+txt.slice(0,160):''}`, url }; }
+    const json = await res.json();
+    return { daily: transformNASAResponse(json), error: '', url };
+  } catch (e:any) { return { daily: [], error: String(e), url }; }
+}
+async function fetchDailyRainFromNASA(lat:number, lon:number, start:string, end:string) {
+  let url = '';
+  try {
+    url = buildNASADailyUrl({ lat, lon, start, end });
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) { const txt = await res.text().catch(()=> ''); return { daily: [], error: `HTTP ${res.status}${txt?': '+txt.slice(0,160):''}`, url }; }
+    const json = await res.json();
+    const pr = json?.properties?.parameter?.PRECTOTCORR || {};
+    const daily = Object.keys(pr).map(k => ({
+      date: new Date(`${k.slice(0,4)}-${k.slice(4,6)}-${k.slice(6,8)}`),
+      rain: Number(pr[k]) || 0
+    })).sort((a,b)=>a.date.getTime() - b.date.getTime());
+    return { daily, error: '', url };
+  } catch (e:any) { return { daily: [], error: String(e), url }; }
+}
+
+// ---------------- Open‑Meteo (прогноз) ----------------
+function buildOpenMeteoHourly(lat:number, lon:number, startISO:string, days:number = 14) {
+  const params = new URLSearchParams({ latitude: String(lat), longitude: String(lon), timezone: 'auto' });
+  params.set('hourly', 'temperature_2m,relative_humidity_2m');
+  const end = format(new Date(new Date(startISO).getTime() + (days-1)*86400000), 'yyyy-MM-dd');
+  params.set('start_date', startISO); params.set('end_date', end);
+  return `https://api.open-meteo.com/v1/forecast?${params.toString()}`;
+}
+function buildOpenMeteoDaily(lat:number, lon:number, startISO:string, days:number = 14) {
+  const params = new URLSearchParams({ latitude: String(lat), longitude: String(lon), timezone: 'auto' });
+  params.set('daily', 'precipitation_sum');
+  const end = format(new Date(new Date(startISO).getTime() + (days-1)*86400000), 'yyyy-MM-dd');
+  params.set('start_date', startISO); params.set('end_date', end);
+  return `https://api.open-meteo.com/v1/forecast?${params.toString()}`;
+}
+function transformOpenMeteoHourly(json:any) {
+  const h = json?.hourly; if (!h) return [] as Array<any>;
+  const times:string[] = h.time || [];
+  const temps:number[] = h.temperature_2m || [];
+  const rhs:number[] = h.relative_humidity_2m || [];
+  const perDay = new Map<string, { allTemp:number[]; wetTemp:number[]; wetHours:number; condHours:number }>();
+  for (let i=0;i<times.length;i++) {
+    const ts = times[i]; const tv = Number(temps[i]); const rv = Number(rhs[i]);
+    const iso = ts.split('T')[0];
+    const rec = perDay.get(iso) || { allTemp: [], wetTemp: [], wetHours: 0, condHours: 0 };
+    if (Number.isFinite(tv)) rec.allTemp.push(tv);
+    if (Number.isFinite(tv) && Number.isFinite(rv)) {
+      if (rv >= RH_WET_THRESHOLD) { rec.wetTemp.push(tv); rec.wetHours += 1; }
+      if (rv >= COND_RH && tv >= COND_T_MIN && tv < COND_T_MAX) { rec.condHours += 1; }
+    }
+    perDay.set(iso, rec);
+  }
+  const out: Array<{date:Date; wetHours:number; wetTempAvg:number; allTempAvg:number; condHours:number}> = [];
+  for (const [iso, r] of perDay.entries()) {
+    const allAvg = r.allTemp.length ? r.allTemp.reduce((a,b)=>a+b,0)/r.allTemp.length : NaN;
+    const wetAvg = r.wetTemp.length ? r.wetTemp.reduce((a,b)=>a+b,0)/r.wetTemp.length : NaN;
+    out.push({ date: new Date(iso), wetHours: r.wetHours, wetTempAvg: wetAvg, allTempAvg: allAvg, condHours: r.condHours });
+  }
+  out.sort((a,b)=>a.date.getTime()-b.date.getTime());
+  return out;
+}
+function transformOpenMeteoDaily(json:any) {
+  const d = json?.daily; if (!d) return [] as Array<{date:Date; rain:number}>;
+  const times:string[] = d.time || []; const pr:number[] = d.precipitation_sum || [];
+  const out = times.map((t,idx)=> ({ date: new Date(t), rain: Number(pr[idx]||0) }));
+  out.sort((a,b)=>a.date.getTime()-b.date.getTime());
+  return out;
+}
+async function fetchForecastHourly(lat:number, lon:number, startISO:string, days:number = 14) {
+  const url = buildOpenMeteoHourly(lat, lon, startISO, days);
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return { daily: [], error: `HTTP ${res.status}`, url };
+    const json = await res.json();
+    return { daily: transformOpenMeteoHourly(json), error: '', url };
+  } catch (e:any) { return { daily: [], error: String(e), url }; }
+}
+async function fetchForecastDailyRain(lat:number, lon:number, startISO:string, days:number = 14) {
+  const url = buildOpenMeteoDaily(lat, lon, startISO, days);
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return { daily: [], error: `HTTP ${res.status}`, url };
+    const json = await res.json();
+    return { daily: transformOpenMeteoDaily(json), error: '', url };
+  } catch (e:any) { return { daily: [], error: String(e), url }; }
+}
+
+// ---------------- Щотижневий план (BLITECAST-діагностика) ----------------
+function makeWeeklyPlan(
+  rows: Array<any>,
+  rainDaily: Array<{date: Date; rain: number}>,
+  startISO: any,
+  rainThreshold: number,
+  horizonDays?: number
+) {
+  const safeRows = Array.isArray(rows) ? rows : [];
+  const safeRain = Array.isArray(rainDaily) ? rainDaily : [];
+  const normStart = (val: any, fb?: Date) => {
+    try {
+      if (typeof val === 'string' && /\d{4}-\d{2}-\d{2}/.test(val)) return val.slice(0, 10);
+      if (fb instanceof Date && !isNaN(fb.getTime())) return format(fb, 'yyyy-MM-dd');
+    } catch {}
+    return format(new Date(), 'yyyy-MM-dd');
+  };
+  const startStr = normStart(startISO, safeRows[0]?.date);
+  const start = parseISO(startStr);
+
+  // Безпечна стоп-лінія для історичних даних
+  const lastRowDate = (safeRows.length && safeRows[safeRows.length - 1]?.date instanceof Date)
+    ? safeRows[safeRows.length - 1].date
+    : (safeRain.length && safeRain[safeRain.length - 1]?.date instanceof Date)
+      ? safeRain[safeRain.length - 1].date
+      : new Date(start.getTime() + 6 * 86400000);
+
+  const stopDate = horizonDays
+    ? new Date(start.getTime() + horizonDays * 86400000)
+    : lastRowDate;
+
+  const weeks: Array<{ startStr: string; endStr: string; weeklyDSV: number; rainSum: number; rec: string }> = [];
+  let cur = new Date(start);
+  while (cur <= stopDate) {
+    const end = new Date(Math.min(cur.getTime() + 6 * 86400000, stopDate.getTime()));
+    const wkRows = safeRows.filter((r) => r?.date instanceof Date && r.date >= cur && r.date <= end);
+    const weeklyDSV = wkRows.reduce((a: number, b: any) => a + Math.min(dsvFromWet(Number(b?.wetHours ?? 0), Number(b?.wetTempAvg ?? 0)), 4), 0);
+    const wkRain = safeRain.filter((r) => r?.date instanceof Date && r.date >= cur && r.date <= end).reduce((a: number, b: any) => a + Number(b?.rain ?? 0), 0);
+    let rec: string = 'No spray';
+    if (weeklyDSV >= 7) rec = 'Heavy spray'; else if (weeklyDSV >= 5) rec = 'Moderate spray'; else if (weeklyDSV >= 3) rec = 'Alert';
+    weeks.push({ startStr: format(cur,'dd.MM.yyyy'), endStr: format(end,'dd.MM.yyyy'), weeklyDSV: Number(weeklyDSV)||0, rainSum: Number(wkRain)||0, rec });
+    cur = new Date(end.getTime() + 86400000);
+  }
+  return weeks;
+}
+
+// ---------------- Обмеження історичних даних рамками сезону ----------------
+function filterRowsBySeason(rows: Array<any>, planting: string, harvest: string) {
+  if (!planting || !harvest) return rows;
+  const start = parseISO(planting);
+  const end = parseISO(harvest);
+  return rows.filter(r => r.date >= start && r.date <= end);
+}
+
+// ---------------- Компонент UI ----------------
+export default function ProtectionApp() {
+  const [region, setRegion] = useState<{name:string;lat:number;lon:number} | null>(null);
+  const [disease, setDisease] = useState(diseaseOptions[0]);
+  const [plantingDate, setPlantingDate] = useState<string>("");
+  const [harvestDate, setHarvestDate] = useState<string>("");
+  const [useForecast, setUseForecast] = useState<boolean>(false);
+  const [showDiag, setShowDiag] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
+  const [diagnostics, setDiagnostics] = useState<Array<any>>([]);
+  const [weeklyPlan, setWeeklyPlan] = useState<Array<any>>([]);
+  const [sprayDates, setSprayDates] = useState<string[]>([]);
+  const [lastUrl, setLastUrl] = useState<string>('');
+  const [lastRainUrl, setLastRainUrl] = useState<string>('');
+
+  const generate = async () => {
+    setError(''); setDiagnostics([]); setWeeklyPlan([]); setSprayDates([]); setLastUrl(''); setLastRainUrl('');
+    if (!region) { setError('Будь ласка, оберіть регіон.'); return; }
+    if (useForecast) { if (!plantingDate) { setError('Увімкнено прогноз: вкажіть дату висадки.'); return; } }
+    else { if (!plantingDate || !harvestDate) { setError('Для історичних даних вкажіть дати початку та завершення.'); return; } }
+
+    setLoading(true);
+    try {
+      let wx:any, rain:any;
+      if (useForecast) {
+        wx = await fetchForecastHourly(region.lat, region.lon, plantingDate, 14);
+        rain = await fetchForecastDailyRain(region.lat, region.lon, plantingDate, 14);
+        setLastUrl(wx.url||''); setLastRainUrl(rain.url||'');
+      } else {
+        [wx, rain] = await Promise.all([
+          fetchWeatherFromNASA(region.lat, region.lon, plantingDate, harvestDate),
+          fetchDailyRainFromNASA(region.lat, region.lon, plantingDate, harvestDate)
+        ]);
+        setLastUrl(wx.url||''); setLastRainUrl(rain.url||'');
+      }
+      if (wx.error) { setError(`Помилка погоди: ${wx.error}`); return; }
+      if (!wx.daily.length) { setError('Не отримано погодних даних.'); return; }
+
+      let rows = wx.daily; // містять: date, wetHours, wetTempAvg, condHours
+      if (!useForecast) rows = filterRowsBySeason(rows, plantingDate, harvestDate);
+
+      const sprays = computeMultiSpraySchedule(rows);
+      setSprayDates(sprays.map(d => format(d,'dd.MM.yyyy')));
+
+      const comp = computeDSVSchedule(rows, DEFAULT_DSV_THRESHOLD);
+      setDiagnostics(comp.rows);
+
+      const startForWeeksISO = typeof plantingDate === 'string' && plantingDate ? plantingDate : (rows[0]?.date ? format(rows[0].date,'yyyy-MM-dd') : format(new Date(),'yyyy-MM-dd'));
+      const plan = makeWeeklyPlan(comp.rows, (rain?.daily||[]), startForWeeksISO, RAIN_HIGH_THRESHOLD_MM, useForecast ? 14 : undefined);
+      setWeeklyPlan(plan);
+    } catch (e:any) {
+      setError(`Помилка при побудові моделі: ${e?.message || String(e)}`);
+    } finally { setLoading(false); }
+  };
+
+  return (
+    <div className="p-4 max-w-5xl mx-auto">
+      <h1 className="text-xl font-bold mb-4">Захист овочевих культур від грибкових хвороб</h1>
+      <Card className="mb-4">
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <Select onValueChange={val => setRegion(regions.find(r => r.name === val) || null)}>
+              <SelectTrigger><SelectValue placeholder="Оберіть регіон" /></SelectTrigger>
+              <SelectContent>{regions.map(r => <SelectItem key={r.name} value={r.name}>{r.name}</SelectItem>)}</SelectContent>
+            </Select>
+            <Select value={disease.crop} onValueChange={val => setDisease(diseaseOptions.find(d => d.crop === val) || diseaseOptions[0])}>
+              <SelectTrigger><SelectValue placeholder="Оберіть культуру та хворобу" /></SelectTrigger>
+              <SelectContent>{diseaseOptions.map(d => <SelectItem key={d.crop} value={d.crop}>{d.crop} — {d.disease} ({d.pathogen})</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label className="text-sm">Початок вегетації (дата висадки):</label>
+              <Input type="date" value={plantingDate} onChange={e => setPlantingDate(e.target.value)} />
+            </div>
+            <div>
+              <label className="text-sm">Збір врожаю (для історичних даних):</label>
+              <Input type="date" value={harvestDate} onChange={e => setHarvestDate(e.target.value)} disabled={useForecast} />
+            </div>
+          </div>
+          <div className="flex items-center gap-3 flex-wrap">
+            <Button onClick={generate} disabled={loading}>{loading ? 'Обчислення…' : (useForecast ? 'Сформувати прогноз (14 днів від висадки)' : 'Створити модель (історичні дані)')}</Button>
+            <label className="text-sm flex items-center gap-2"><input type="checkbox" checked={useForecast} onChange={e => setUseForecast(e.target.checked)} />Використовувати прогноз (Open‑Meteo)</label>
+            <label className="text-sm flex items-center gap-2"><input type="checkbox" checked={showDiag} onChange={e => setShowDiag(e.target.checked)} />Показати діагностику</label>
+          </div>
+          {error && <div className="text-red-600 text-sm whitespace-pre-wrap">{error}</div>}
+          {lastUrl && <div className="text-xs text-gray-500 break-all">URL (годинні T,RH): {lastUrl}</div>}
+          {lastRainUrl && <div className="text-xs text-gray-500 break-all">URL (добові опади): {lastRainUrl}</div>}
+        </CardContent>
+      </Card>
+
+      {/* Рекомендації */}
+      <div className="bg-white p-4 rounded-xl shadow mb-4">
+        <h2 className="text-lg font-semibold mb-2">Рекомендовані внесення за новою логікою (RH≥90% & 13–&lt;28°C, ≥3 год/доба)</h2>
+        {sprayDates.length > 0 ? (
+          <ol className="list-decimal ml-6 space-y-1">
+            {sprayDates.map((d,i)=> (
+              <li key={i}>{d} — {rotationProducts[i % rotationProducts.length]}</li>
+            ))}
+          </ol>
+        ) : <p className="text-sm">—</p>}
+        <p className="text-xs text-gray-500 mt-2">Правило: доба з ≥3 год RH≥90% і 13≤T&lt;28. Наступні внесення: якщо в перші 7 днів після попереднього були сприятливі умови — рівно на 7-й; якщо ні — перший день із умовами після 7-го.</p>
+      </div>
+
+      {/* Діагностика */}
+      {showDiag && diagnostics.length > 0 && (
+        <div className="bg-white p-4 rounded-xl shadow overflow-x-auto">
+          <h3 className="font-semibold mb-2">Діагностика по днях (RH ≥ {RH_WET_THRESHOLD}%{useForecast? ', прогноз' : ', LST'})</h3>
+          <table className="w-full text-sm mb-6">
+            <thead>
+              <tr className="text-left">
+                <th className="py-1 pr-3">Дата</th>
+                <th className="py-1 pr-3">Год RH≥{RH_WET_THRESHOLD}%</th>
+                <th className="py-1 pr-3">Год RH≥90% & 13–&lt;28°C</th>
+                <th className="py-1 pr-3">Tavg (вологі год), °C</th>
+                <th className="py-1 pr-3">DSV (діагн.)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {diagnostics.map((d, i) => (
+                <tr key={i} className="border-t">
+                  <td className="py-1 pr-3">{format(d.date, 'dd.MM.yyyy')}</td>
+                  <td className="py-1 pr-3">{d.wetHours}</td>
+                  <td className="py-1 pr-3">{d.condHours ?? 0}</td>
+                  <td className="py-1 pr-3">{Number.isFinite(d.wetTempAvg) ? d.wetTempAvg.toFixed(1) : '—'}</td>
+                  <td className="py-1 pr-3">{Math.min(dsvFromWet(d.wetHours, d.wetTempAvg),4)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {weeklyPlan.length > 0 && (
+            <div>
+              <h3 className="font-semibold mb-2">Щотижневі підсумки (діагностика BLITECAST)</h3>
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-left">
+                    <th className="py-1 pr-3">Тиждень</th>
+                    <th className="py-1 pr-3">DSV за тиждень</th>
+                    <th className="py-1 pr-3">Опади, мм</th>
+                    <th className="py-1 pr-3">Рекомендація</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {weeklyPlan.map((w:any,i:number)=> (
+                    <tr key={i} className="border-t">
+                      <td className="py-1 pr-3">{w.startStr} – {w.endStr}</td>
+                      <td className="py-1 pr-3">{Number(w.weeklyDSV||0)}</td>
+                      <td className="py-1 pr-3">{Number(w.rainSum||0).toFixed(1)}</td>
+                      <td className="py-1 pr-3">{w.rec}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------------- Консольні тести ----------------
+try {
+  console.log('[test] toYYYYMMDD', toYYYYMMDD('2025-05-07') === '20250507');
+  console.log('[test] keyToISODate', ['20250501T00','20250501:00','2025-05-01T12','2025050100','20250501'].map(s=>[s, keyToISODate(s)]));
+  const base = new Date('2025-09-11');
+  const mk = (d:number, cond:boolean) => ({ date: new Date(base.getTime()+d*86400000), condHours: cond?3:0, wetHours: cond?6:0, wetTempAvg: cond?18:10 });
+  const rows = [mk(0,true), mk(2,true), mk(7,false), mk(8,true), mk(15,true), mk(22,true)];
+  const spraysTest = computeMultiSpraySchedule(rows) || [];
+  if (Array.isArray(spraysTest)) {
+    console.log('[test] sprays', spraysTest.map(s=>format(s,'yyyy-MM-dd')));
+  } else {
+    console.warn('[test] sprays not array', spraysTest);
+  }
+} catch (e) { /* ignore */ }
+
+try {
+  const empty = computeMultiSpraySchedule([]);
+  console.log('[test] sprays empty is array & length 0', Array.isArray(empty) && empty.length===0);
+  const base2 = new Date('2025-06-01');
+  const mk2 = (d:number, cond:boolean) => ({ date: new Date(base2.getTime()+d*86400000), condHours: cond?3:0, wetHours: cond?6:0, wetTempAvg: cond?18:10 });
+  const rows2 = [mk2(0,false), mk2(7,true), mk2(14,true)];
+  const st2 = computeMultiSpraySchedule(rows2) || [];
+  if (Array.isArray(st2)) {
+    console.log('[test] sprays case2', st2.map(s => format(s, 'yyyy-MM-dd')));
+  } else {
+    console.error('st2 is not an array:', st2);
+  }
+} catch (e) { /* ignore */ }
