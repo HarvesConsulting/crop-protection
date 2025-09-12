@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { format, isValid as isValidDate, parseISO, differenceInDays } from "date-fns";
 
 // ---------------- Константи ----------------
@@ -11,6 +11,8 @@ const NEXT_SPRAY_MAX_GAP = 7;
 const TIME_STANDARD = "lst";
 const RAIN_HIGH_THRESHOLD_MM = 12.7;
 const DEFAULT_DSV_THRESHOLD = 15;
+
+
 
 // DSV (для довідкової діагностики)
 const DSV_RULES = [
@@ -323,6 +325,12 @@ function ProtectionApp() {
   const [sprayDates, setSprayDates] = useState([]);
   const [lastUrl, setLastUrl] = useState("");
   const [lastRainUrl, setLastRainUrl] = useState("");
+  const [inputValue, setInputValue] = useState("");
+
+  useEffect(() => {
+  if (region?.name) setInputValue(region.name);
+}, [region]);
+
 
   const generate = async () => {
     setError(""); setDiagnostics([]); setWeeklyPlan([]); setSprayDates([]); setLastUrl(""); setLastRainUrl("");
@@ -378,11 +386,11 @@ function ProtectionApp() {
             <label style={{ fontSize: 12 }}>Регіон:</label>
             <input
   type="text"
-  value={region?.name || inputValue}
+  value={inputValue}
   onChange={(e) => {
     const val = e.target.value;
     setInputValue(val);
-    const match = allCities.find(c => c.name.toLowerCase().startsWith(val.toLowerCase()));
+    const match = regions.find(c => c.name.toLowerCase().startsWith(val.toLowerCase()));
     if (match) setRegion(match);
     else setRegion(null);
   }}
@@ -391,7 +399,7 @@ function ProtectionApp() {
   style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc" }}
 />
 <datalist id="city-options">
-  {allCities.map(c => <option key={c.name} value={c.name} />)}
+  {regions.map(c => <option key={c.name} value={c.name} />)}
 </datalist>
 
           </div>
