@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { regions } from "./regions";
 import { format, isValid as isValidDate, parseISO, differenceInDays } from "date-fns";
 
 // ---------------- Константи ----------------
@@ -27,20 +28,6 @@ const rotationProducts = [
   "Зорвек Інкантія","Ридоміл Голд","Танос","Акробат МЦ","Орондіс Ультра","Ранман ТОП","Ревус","Курзат Р","Інфініто",
 ];
 
-// Регіони
-const regions = [
-  { name: "Київ", lat: 50.4501, lon: 30.5234 },
-  { name: "Львів", lat: 49.8397, lon: 24.0297 },
-  { name: "Одеса", lat: 46.4825, lon: 30.7233 },
-  { name: "Харків", lat: 49.9935, lon: 36.2304 },
-  { name: "Дніпро", lat: 48.4647, lon: 35.0462 },
-  { name: "Запоріжжя", lat: 47.8388, lon: 35.1396 },
-  { name: "Полтава", lat: 49.5883, lon: 34.5514 },
-  { name: "Черкаси", lat: 49.4444, lon: 32.0598 },
-  { name: "Чернігів", lat: 51.4982, lon: 31.2893 },
-  { name: "Миколаїв", lat: 46.975, lon: 31.9946 },
-  { name: "Херсон", lat: 46.635, lon: 32.616 },
-];
 
 // Культури/хвороби
 const diseaseOptions = [
