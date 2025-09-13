@@ -366,25 +366,54 @@ function ProtectionApp() {
       <div style={{ background: "#fff", borderRadius: 12, padding: 16, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", marginBottom: 16 }}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
   <div>
-    <label style={{ fontSize: 12 }}>Регіон:</label>
-    <input
-  type="text"
-  value={inputValue}
-  onChange={(e) => setInputValue(e.target.value)}
-  onBlur={() => {
-    const match = regions.find(c => c.name.toLowerCase() === inputValue.toLowerCase().trim());
-    if (match) setRegion(match);
-    else setRegion(null);
-  }}
-  list="city-options"
-  placeholder="Введіть місто"
-  style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc" }}
-/>
+  <label style={{ fontSize: 12 }}>Регіон:</label>
+  <input
+    type="text"
+    value={inputValue}
+    onChange={(e) => {
+      setInputValue(e.target.value);
+      const match = regions.find(c => c.name.toLowerCase() === e.target.value.toLowerCase().trim());
+      if (match) setRegion(match);
+      else setRegion(null);
+    }}
+    placeholder="Введіть місто"
+    style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc" }}
+  />
 
-    <datalist id="city-options">
-      {regions.map(c => <option key={c.name} value={c.name} />)}
-    </datalist>
-  </div>
+  {/* Підказки */}
+  {inputValue.length >= 2 && (
+    <div style={{
+      border: "1px solid #ccc",
+      borderRadius: 8,
+      marginTop: 4,
+      maxHeight: 200,
+      overflowY: "auto",
+      background: "#fff",
+      position: "absolute",
+      zIndex: 10,
+      width: "90%"
+    }}>
+      {regions
+        .filter(c => c.name.toLowerCase().includes(inputValue.toLowerCase()))
+        .slice(0, 20) // максимум 20 варіантів
+        .map(c => (
+          <div
+            key={c.name}
+            onClick={() => {
+              setInputValue(c.name);
+              setRegion(c);
+            }}
+            style={{ padding: 8, cursor: "pointer" }}
+            onMouseEnter={(e) => (e.target.style.background = "#eee")}
+            onMouseLeave={(e) => (e.target.style.background = "#fff")}
+          >
+            {c.name}
+          </div>
+        ))}
+    </div>
+  )}
+</div>
+
 
   <div>
     <label style={{ fontSize: 12 }}>Початок вегетації (або поточна дата для прогнозу обприскувань на два тижні):</label>
