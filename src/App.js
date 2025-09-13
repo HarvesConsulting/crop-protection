@@ -13,8 +13,6 @@ const TIME_STANDARD = "lst";
 const RAIN_HIGH_THRESHOLD_MM = 12.7;
 const DEFAULT_DSV_THRESHOLD = 15;
 
-
-
 // DSV (для довідкової діагностики)
 const DSV_RULES = [
   { tempMin: 21, tempMax: 27, bands: [{ h: 6, dsv: 2 }, { h: 8, dsv: 3 }, { h: 10, dsv: 4 }] },
@@ -27,7 +25,6 @@ const DSV_RULES = [
 const rotationProducts = [
   "Зорвек Інкантія","Ридоміл Голд","Танос","Акробат МЦ","Орондіс Ультра","Ранман ТОП","Ревус","Курзат Р","Інфініто",
 ];
-
 
 // Культури/хвороби
 const diseaseOptions = [
@@ -297,6 +294,27 @@ function filterRowsBySeason(rows, planting, harvest) {
   return rows.filter(r => r.date >= start && r.date <= end);
 }
 
+function norm(s) {
+  return String(s || "")
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, ""); // прибрати діакритику
+}
+
+// зібрати всі назви, які можуть бути в об'єкті
+function searchTextFor(r) {
+  const alt =
+    r.alt || r.alts || r.alt_names || []; // якщо згенерований дамп має альтернативи
+  const fields = [
+    r.name,
+    r["name:uk"], r.name_uk, r.uk,
+    r["name:ru"], r.name_ru, r.ru,
+    r["name:en"], r.name_en, r.en,
+    ...alt,
+  ].filter(Boolean);
+  return norm(fields.join(" | "));
+}
+
 // ---------------- Компонент UI ----------------
 function ProtectionApp() {
   const [region, setRegion] = useState(null);
@@ -313,6 +331,25 @@ function ProtectionApp() {
   const [lastUrl, setLastUrl] = useState("");
   const [lastRainUrl, setLastRainUrl] = useState("");
   const [inputValue, setInputValue] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [active, setActive] = useState(-1);
+
+  useEffect(() => {
+  const q = norm(inputValue.trim());
+  if (q.length < 2) { setSuggestions([]); setActive(-1); return; }
+
+  // попередньо пораховуємо пошукові рядки один раз
+  const res = regions
+  .map(r => ({ r, s: searchTextFor(r) }))
+  .filter(o => o.s.startsWith(q))   // тільки якщо назва починається з введеного тексту
+  .slice(0, 30)
+  .map(o => o.r);
+
+  setSuggestions(res);
+  setActive(res.length ? 0 : -1);
+}, [inputValue]);
+
+
 
   
   const generate = async () => {
@@ -365,51 +402,73 @@ function ProtectionApp() {
 
       <div style={{ background: "#fff", borderRadius: 12, padding: 16, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", marginBottom: 16 }}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
-  <div>
+  <div style={{ position: "relative" }}>
   <label style={{ fontSize: 12 }}>Регіон:</label>
   <input
     type="text"
     value={inputValue}
     onChange={(e) => {
-      setInputValue(e.target.value);
-      const match = regions.find(c => c.name.toLowerCase() === e.target.value.toLowerCase().trim());
-      if (match) setRegion(match);
-      else setRegion(null);
+      const v = e.target.value;
+      setInputValue(v);
+
+      // нормалізуємо
+      const q = norm(v.trim());
+
+      // перевіряємо лише ТОЧНИЙ збіг серед усіх назв
+      const exact = regions.find(r => searchTextFor(r) === q);
+      setRegion(exact || null);
     }}
-    placeholder="Введіть місто"
+    onKeyDown={(e) => {
+      if (!suggestions.length) return;
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setActive(i => Math.min(i + 1, suggestions.length - 1));
+      }
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setActive(i => Math.max(i - 1, 0));
+      }
+      if (e.key === "Enter" && active >= 0) {
+        const pick = suggestions[active];
+        setInputValue(pick.name);
+        setRegion(pick);
+        setSuggestions([]);
+      }
+      if (e.key === "Escape") setSuggestions([]);
+    }}
+    placeholder="Почни вводити (мін. 2 букви)"
+    autoComplete="off"
     style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc" }}
   />
 
   {/* Підказки */}
-  {inputValue.length >= 2 && (
+  {inputValue.trim().length >= 2 && (
     <div style={{
-      border: "1px solid #ccc",
-      borderRadius: 8,
-      marginTop: 4,
-      maxHeight: 200,
-      overflowY: "auto",
-      background: "#fff",
-      position: "absolute",
-      zIndex: 10,
-      width: "90%"
+      position: "absolute", zIndex: 10, background: "#fff",
+      border: "1px solid #ddd", borderRadius: 8, marginTop: 4,
+      maxHeight: 240, overflowY: "auto", width: "100%"
     }}>
-      {regions
-        .filter(c => c.name.toLowerCase().includes(inputValue.toLowerCase()))
-        .slice(0, 20) // максимум 20 варіантів
-        .map(c => (
-          <div
-            key={c.name}
-            onClick={() => {
-              setInputValue(c.name);
-              setRegion(c);
-            }}
-            style={{ padding: 8, cursor: "pointer" }}
-            onMouseEnter={(e) => (e.target.style.background = "#eee")}
-            onMouseLeave={(e) => (e.target.style.background = "#fff")}
-          >
-            {c.name}
-          </div>
-        ))}
+      {suggestions.length === 0 ? (
+        <div style={{ padding: 8, color: "#666" }}>Немає збігів</div>
+      ) : suggestions.map((c, i) => (
+        <div
+          key={`${c.name}-${c.lat}-${c.lon}`}
+          onMouseDown={(e) => { // щоб не втрачати фокус до кліку
+            e.preventDefault();
+            setInputValue(c.name);
+            setRegion(c);
+            setSuggestions([]);
+          }}
+          onMouseEnter={() => setActive(i)}
+          style={{
+            padding: 8,
+            cursor: "pointer",
+            background: i === active ? "#f2f2f2" : "#fff"
+          }}
+        >
+          {c.name}
+        </div>
+      ))}
     </div>
   )}
 </div>
