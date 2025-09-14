@@ -450,48 +450,44 @@ function ProtectionApp() {
   <div style={{ position: "relative" }}>
   <label style={{ fontSize: 12 }}>Регіон:</label>
   <input
-    type="text"
-    value={inputValue}
-    onChange={(e) => {
-      const v = e.target.value;
-      setInputValue(v);
-
-      // нормалізуємо
-      const q = norm(v.trim());
-
-      // перевіряємо лише ТОЧНИЙ збіг серед усіх назв
-      const exact = regions.find(r => searchTextFor(r) === q);
-      setRegion(exact || null);
-    }}
-    onKeyDown={(e) => {
-      if (!suggestions.length) return;
-      if (e.key === "ArrowDown") {
-        e.preventDefault();
-        setActive(i => Math.min(i + 1, suggestions.length - 1));
+  type="text"
+  value={inputValue}
+  onChange={(e) => {
+    const v = e.target.value;
+    setInputValue(v);
+    const q = norm(v.trim());
+    const exact = regions.find(r => searchTextFor(r) === q);
+    setRegion(exact || null);
+  }}
+  onKeyDown={(e) => {
+    if (!suggestions.length) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActive(i => Math.min(i + 1, suggestions.length - 1));
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActive(i => Math.max(i - 1, 0));
+    }
+    if (e.key === "Enter") {
+      let pick = null;
+      if (active >= 0) {
+        pick = suggestions[active];
+      } else if (suggestions.length === 1) {
+        pick = suggestions[0];
       }
-      if (e.key === "ArrowUp") {
-        e.preventDefault();
-        setActive(i => Math.max(i - 1, 0));
+      if (pick) {
+        setInputValue(pick.name);
+        setRegion(pick);
+        setSuggestions([]);
+        setActive(-1);
       }
-      if (e.key === "Enter") {
-  let pick = null;
-  if (active >= 0) {
-    pick = suggestions[active];
-  } else if (suggestions.length === 1) {
-    pick = suggestions[0];
-  }
-  if (pick) {
-    setInputValue(pick.name);
-    setRegion(pick);
-    setSuggestions([]);
-    setActive(-1);
-  }
-}
-
-    placeholder="Почни вводити (мін. 2 букви)"
-    autoComplete="off"
-    style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc" }}
-  />
+    }
+  }}
+  placeholder="Почни вводити (мін. 2 букви)"
+  autoComplete="off"
+  style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc" }}
+/>
 
   {/* Підказки */}
   {inputValue.trim().length >= 2 && (
