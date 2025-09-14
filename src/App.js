@@ -93,29 +93,49 @@ const canSpray = !lastSpray || differenceInDays(curDate, lastDate) >= 5;
   }
   return { rows, schedule };
 }
-function computeMultiSpraySchedule(rows) {
+function computeMultiSpraySchedule(rows, rainRows = []) {
   const hasCond = (r) => Number(r.condHours || 0) >= COND_HOURS_TRIGGER;
   const sprays = [];
+  const dayMs = 86400000;
 
   const first = rows.find(hasCond)?.date || null;
   if (!first) return sprays;
   sprays.push(first);
 
-  const dayMs = 86400000;
   let cursor = first;
 
   while (true) {
-    const minNextDate = new Date(cursor.getTime() + 7 * dayMs); // не раніше ніж через 7 днів
+    const minNextDate = new Date(cursor.getTime() + 7 * dayMs);
 
-    const nextSprayDate = rows.find(r =>
-      r.date >= minNextDate && hasCond(r)
+    // 🔸 Перевірка на прогнозовані сильні опади
+    const criticalRainDate = rainRows.find(r =>
+      r.date > cursor && r.date <= minNextDate && r.rain >= 15
     )?.date;
 
-    if (nextSprayDate) {
-      sprays.push(nextSprayDate);
-      cursor = nextSprayDate;
+    if (criticalRainDate) {
+      const dayBefore = new Date(criticalRainDate.getTime() - dayMs);
+      if (!sprays.find(d => d.getTime() === dayBefore.getTime())) {
+        sprays.push(dayBefore);
+      }
+      cursor = criticalRainDate;
+      continue;
+    }
+
+    // 🔸 Перевірка на кілька дощових днів підряд
+    const rainStreak = rainRows.filter(r => r.date > cursor && r.rain > 0);
+    const consecutiveRain = rainStreak.slice(0, 3).filter((r, i, arr) =>
+      i === 0 || (r.date.getTime() - arr[i - 1].date.getTime() === dayMs)
+    ).length >= 2;
+
+    const intervalDays = consecutiveRain ? 5 : 7;
+    const nextDate = new Date(cursor.getTime() + intervalDays * dayMs);
+    const next = rows.find(r => r.date >= nextDate && hasCond(r))?.date;
+
+    if (next) {
+      sprays.push(next);
+      cursor = next;
     } else {
-      break; // немає більше сприятливих умов після 7 днів
+      break;
     }
   }
 
@@ -412,7 +432,7 @@ function ProtectionApp() {
       let rows = wx.daily;
       if (!useForecast) rows = filterRowsBySeason(rows, plantingDate, harvestDate);
 
-      const sprays = computeMultiSpraySchedule(rows);
+      const sprays = computeMultiSpraySchedule(rows, rain?.daily || []);
       setSprayDates(sprays.map(d => format(d, "dd.MM.yyyy")));
 
       const comp = computeDSVSchedule(rows, DEFAULT_DSV_THRESHOLD);
