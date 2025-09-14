@@ -614,7 +614,13 @@ function ProtectionApp() {
             <input type="checkbox" checked={showDiag} onChange={(e) => setShowDiag(e.target.checked)} /> Показати діагностику
           </label>
         </div>
-     
+
+        {error && (
+  <div style={{ color: "#b91c1c", fontSize: 13, marginTop: 8, whiteSpace: "pre-wrap" }}>
+    {error}
+  </div>
+)}
+
       {/* Рекомендації */}
       <div style={{ background: "#fff", borderRadius: 12, padding: 16, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", marginBottom: 16 }}>
         <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>Рекомендовані внесення </h2>
