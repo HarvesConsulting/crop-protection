@@ -453,42 +453,14 @@ function ProtectionApp() {
   };
 
   return (
-    <div
-  style={{
-    maxWidth: "100%",
-    width: "100%",
-    padding: 16,
-    margin: "0 auto",
-    fontFamily: "system-ui, Arial",
-    boxSizing: "border-box",
-  }}
->
+    <div className="main-container">
+
 
       <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 12 }}>Система захисту томатів від Фітофторозу by Harvestconsulting</h1>
 
-      <div style={{ background: "#fff", borderRadius: 12, padding: 16, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", marginBottom: 16 }}>
-        <button
-  onClick={() => {
-    const kyiv = regions.find(r => r.name.includes("Київ"));
-    if (kyiv) {
-      setRegion(kyiv);
-      setInputValue(kyiv.name);
-      setPlantingDate("2025-05-01");
-      setHarvestDate("2025-08-15");
-      setUseForecast(false);
-    }
-  }}
-  style={{
-    padding: "6px 12px", borderRadius: 6, border: "1px solid #aaa",
-    background: "#f9f9f9", cursor: "pointer", marginBottom: 12
-  }}
->
-  Приклад: Київ, 01.05 – 15.08
-</button>
-</div>
   <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
   <div style={{ position: "relative" }}>
-  <label style={{ fontSize: 12 }}>Регіон:</label>
+  <label style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Регіон:</label>
   <input
   type="text"
   value={inputValue}
@@ -573,7 +545,7 @@ function ProtectionApp() {
 )}
 
   <div>
-    <label style={{ fontSize: 12 }}>Початок вегетації (або дата останнього внесення фунгіцида):</label>
+    <label style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Початок вегетації (або дата останнього внесення фунгіцида):</label>
     <input
       type="date"
       value={plantingDate}
@@ -583,7 +555,7 @@ function ProtectionApp() {
   </div>
 
   <div>
-    <label style={{ fontSize: 12 }}>Збір врожаю (для історичних даних):</label>
+    <label style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Збір врожаю (для історичних даних):</label>
     <input
       type="date"
       value={harvestDate}
@@ -598,7 +570,7 @@ function ProtectionApp() {
         <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", marginTop: 12 }}>
           </div>
 
-          <button onClick={generate} disabled={loading} style={{ padding: "8px 14px", borderRadius: 10, border: "1px solid #222", background: "#222", color: "#fff", cursor: "pointer" }}>
+          <button onClick={generate} disabled={loading} style={{ padding: "8px 14px",fontSize: 16,fontWeight: 600, borderRadius: 10, border: "1px solid #222", background: "#222", color: "#fff", cursor: "pointer" }}>
             {loading ? "Обчислення…" : (useForecast ? "Сформувати прогноз (14 днів)" : "Створити модель (історія)")}
           </button>
           <button
@@ -617,10 +589,10 @@ function ProtectionApp() {
   Очистити дати
 </button>
 
-          <label style={{ fontSize: 14 }}>
+          <label style={{ fontSize: 16 }}>
             <input type="checkbox" checked={useForecast} onChange={(e) => setUseForecast(e.target.checked)} /> Використовувати прогноз (Open-Meteo)
           </label>
-          <label style={{ fontSize: 14 }}>
+          <label style={{ fontSize: 16 }}>
             <input type="checkbox" checked={showDiag} onChange={(e) => setShowDiag(e.target.checked)} /> Показати діагностику
           </label>
         </div>

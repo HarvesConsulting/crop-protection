@@ -3,3 +3,52 @@
   font-family: Arial, sans-serif;
   background: #f5f5f5;
 }
+/* Глобальні базові стилі */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, Arial, sans-serif;
+  background: #f8f8f8;
+}
+
+/* Контейнер головного контенту */
+.main-container {
+  max-width: 100%;
+  width: 100%;
+  padding: 16px 20px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+/* Кнопка, що плаває внизу екрана */
+.floating-button {
+  position: fixed;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  z-index: 100;
+  padding: 12px;
+  border-radius: 12px;
+  background: #222;
+  color: #fff;
+  border: none;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* 📱 Адаптація під маленькі екрани */
+@media (max-width: 480px) {
+  .main-container {
+    padding: 12px 10px;
+  }
+
+  .floating-button {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
