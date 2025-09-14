@@ -557,19 +557,33 @@ function ProtectionApp() {
       type="date"
       value={plantingDate}
       onChange={(e) => setPlantingDate(e.target.value)}
-      style={{ width: "100%", padding: "12px 14px", borderRadius: 8, border: "1px solid #ccc" }}
+      style={{
+    width: "100%",
+    padding: "12px 14px",
+    borderRadius: 8,
+    border: "1px solid #ccc",
+    fontSize: 16,
+    minHeight: 48
+  }}
     />
   </div>
 
   <div>
     <label style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Збір врожаю (для історичних даних):</label>
     <input
-      type="date"
-      value={harvestDate}
-      disabled={useForecast}
-      onChange={(e) => setHarvestDate(e.target.value)}
-      style={{ width: "100%", "12px 14px", borderRadius: 8, border: "1px solid #ccc" }}
-    />
+  type="date"
+  value={harvestDate}
+  disabled={useForecast}
+  onChange={(e) => setHarvestDate(e.target.value)}
+  style={{
+    width: "100%",
+    padding: "12px 14px",
+    borderRadius: 8,
+    border: "1px solid #ccc",
+    fontSize: 16,
+    minHeight: 48
+  }}
+/>
   </div>  
 </div>
 
