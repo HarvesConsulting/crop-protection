@@ -460,7 +460,7 @@ function ProtectionApp() {
 
   <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
   <div style={{ position: "relative" }}>
-  <label style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Регіон:</label>
+  <label style={{ fontSize: 16, fontWeight: 500, marginBottom: 4 }}>Регіон:</label>
   <input
   type="text"
   value={inputValue}
