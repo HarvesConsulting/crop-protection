@@ -93,47 +93,39 @@ const canSpray = !lastSpray || differenceInDays(curDate, lastDate) >= 5;
   }
   return { rows, schedule };
 }
-function computeMultiSpraySchedule(rows, rainRows = []) {
+function computeMultiSpraySchedule(rows, rainDaily) {
   const hasCond = (r) => Number(r.condHours || 0) >= COND_HOURS_TRIGGER;
   const sprays = [];
-  const dayMs = 86400000;
 
   const first = rows.find(hasCond)?.date || null;
   if (!first) return sprays;
   sprays.push(first);
 
+  const dayMs = 86400000;
   let cursor = first;
 
   while (true) {
-    const minNextDate = new Date(cursor.getTime() + 7 * dayMs);
+    // шукаємо, чи був дощ ≥15мм у наступні 7 днів після внесення
+    const rainsAfterSpray = rainDaily.filter(r =>
+      r.date > cursor && r.date <= new Date(cursor.getTime() + 7 * dayMs)
+    );
+    const hadHeavyRain = rainsAfterSpray.some(r => r.rain >= 15);
 
-    // 🔸 Перевірка на прогнозовані сильні опади
-    const criticalRainDate = rainRows.find(r =>
-      r.date > cursor && r.date <= minNextDate && r.rain >= 15
+    // якщо був дощ ≥15мм — зменшуємо мінімальний інтервал до 5 діб
+    const minGap = hadHeavyRain ? 5 : 7;
+
+    const windowStart = new Date(cursor.getTime() + minGap * dayMs);
+    const windowEnd = new Date(cursor.getTime() + NEXT_SPRAY_MAX_GAP * dayMs);
+
+    const nextDay = rows.find(r =>
+      r.date >= windowStart &&
+      r.date <= windowEnd &&
+      hasCond(r)
     )?.date;
 
-    if (criticalRainDate) {
-      const dayBefore = new Date(criticalRainDate.getTime() - dayMs);
-      if (!sprays.find(d => d.getTime() === dayBefore.getTime())) {
-        sprays.push(dayBefore);
-      }
-      cursor = criticalRainDate;
-      continue;
-    }
-
-    // 🔸 Перевірка на кілька дощових днів підряд
-    const rainStreak = rainRows.filter(r => r.date > cursor && r.rain > 0);
-    const consecutiveRain = rainStreak.slice(0, 3).filter((r, i, arr) =>
-      i === 0 || (r.date.getTime() - arr[i - 1].date.getTime() === dayMs)
-    ).length >= 2;
-
-    const intervalDays = consecutiveRain ? 5 : 7;
-    const nextDate = new Date(cursor.getTime() + intervalDays * dayMs);
-    const next = rows.find(r => r.date >= nextDate && hasCond(r))?.date;
-
-    if (next) {
-      sprays.push(next);
-      cursor = next;
+    if (nextDay) {
+      sprays.push(nextDay);
+      cursor = nextDay;
     } else {
       break;
     }
