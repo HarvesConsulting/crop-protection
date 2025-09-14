@@ -475,8 +475,8 @@ function ProtectionApp() {
 >
   Приклад: Київ, 01.05 – 15.08
 </button>
-
-        <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
+</div>
+  <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
   <div style={{ position: "relative" }}>
   <label style={{ fontSize: 12 }}>Регіон:</label>
   <input
