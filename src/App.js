@@ -38,6 +38,11 @@ const diseaseOptions = [
   { crop: "Картопля",disease: "Фітофтороз",   pathogen: "Phytophthora infestans" },
 ];
 
+function placeKey(r) {
+  return `${r.name}|${r.lat}|${r.lon}`;
+}
+
+
 // ---------------- Хелпери дат ----------------
 function toYYYYMMDD(date) {
   if (!date) return null;
@@ -77,7 +82,10 @@ function computeDSVSchedule(daily, dsvThreshold = DEFAULT_DSV_THRESHOLD) {
   let acc = 0; let lastSpray = null;
   for (const r of rows) {
     acc += r.DSV;
-    const canSpray = !lastSpray || differenceInDays(r.date, lastSpray) >= 5;
+    const curDate = r.date instanceof Date ? r.date : parseISO(String(r.date));
+const lastDate = lastSpray instanceof Date ? lastSpray : parseISO(String(lastSpray));
+const canSpray = !lastSpray || differenceInDays(curDate, lastDate) >= 5;
+
     if (acc >= dsvThreshold && canSpray) {
       schedule.push({ date: r.date, accBefore: acc });
       acc = acc - dsvThreshold; lastSpray = r.date;
@@ -336,21 +344,39 @@ function ProtectionApp() {
 
   useEffect(() => {
   const q = norm(inputValue.trim());
-  if (q.length < 2) { setSuggestions([]); setActive(-1); return; }
 
-  // попередньо пораховуємо пошукові рядки один раз
-  const res = regions
-  .map(r => ({ r, s: searchTextFor(r) }))
-  .filter(o => o.s.startsWith(q))   // тільки якщо назва починається з введеного тексту
-  .slice(0, 30)
-  .map(o => o.r);
+  // 1) короткий запит — нічого не показуємо
+  if (q.length < 2) { 
+    setSuggestions([]); 
+    setActive(-1); 
+    return; 
+  }
 
-  setSuggestions(res);
+  // 2) якщо є точний збіг — ховаємо підказки
+  const exact = regions.find(r => searchTextFor(r) === q);
+  if (exact) {
+    setSuggestions([]);
+    setActive(-1);
+    return;
+  }
+
+  // 3) шукаємо та де-дуплікуємо
+  const seen = new Set();
+  const res = [];
+  for (const r of regions) {
+    const s = searchTextFor(r);
+    if (s.startsWith(q)) {
+      const key = placeKey(r);
+      if (!seen.has(key)) {
+        seen.add(key);
+        res.push(r);
+      }
+    }
+  }
+
+  setSuggestions(res.slice(0, 30));
   setActive(res.length ? 0 : -1);
 }, [inputValue]);
-
-
-
   
   const generate = async () => {
     setError(""); setDiagnostics([]); setWeeklyPlan([]); setSprayDates([]); setLastUrl(""); setLastRainUrl("");
@@ -401,6 +427,25 @@ function ProtectionApp() {
       <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 12 }}>Захист овочевих культур від грибкових хвороб</h1>
 
       <div style={{ background: "#fff", borderRadius: 12, padding: 16, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", marginBottom: 16 }}>
+        <button
+  onClick={() => {
+    const kyiv = regions.find(r => r.name.includes("Київ"));
+    if (kyiv) {
+      setRegion(kyiv);
+      setInputValue(kyiv.name);
+      setPlantingDate("2025-05-01");
+      setHarvestDate("2025-08-15");
+      setUseForecast(false);
+    }
+  }}
+  style={{
+    padding: "6px 12px", borderRadius: 6, border: "1px solid #aaa",
+    background: "#f9f9f9", cursor: "pointer", marginBottom: 12
+  }}
+>
+  Приклад: Київ, 01.05 – 15.08
+</button>
+
         <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
   <div style={{ position: "relative" }}>
   <label style={{ fontSize: 12 }}>Регіон:</label>
@@ -428,14 +473,21 @@ function ProtectionApp() {
         e.preventDefault();
         setActive(i => Math.max(i - 1, 0));
       }
-      if (e.key === "Enter" && active >= 0) {
-        const pick = suggestions[active];
-        setInputValue(pick.name);
-        setRegion(pick);
-        setSuggestions([]);
-      }
-      if (e.key === "Escape") setSuggestions([]);
-    }}
+      if (e.key === "Enter") {
+  let pick = null;
+  if (active >= 0) {
+    pick = suggestions[active];
+  } else if (suggestions.length === 1) {
+    pick = suggestions[0];
+  }
+  if (pick) {
+    setInputValue(pick.name);
+    setRegion(pick);
+    setSuggestions([]);
+    setActive(-1);
+  }
+}
+
     placeholder="Почни вводити (мін. 2 букви)"
     autoComplete="off"
     style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc" }}
@@ -443,36 +495,46 @@ function ProtectionApp() {
 
   {/* Підказки */}
   {inputValue.trim().length >= 2 && (
-    <div style={{
-      position: "absolute", zIndex: 10, background: "#fff",
-      border: "1px solid #ddd", borderRadius: 8, marginTop: 4,
-      maxHeight: 240, overflowY: "auto", width: "100%"
-    }}>
-      {suggestions.length === 0 ? (
-        <div style={{ padding: 8, color: "#666" }}>Немає збігів</div>
-      ) : suggestions.map((c, i) => (
+  <div
+    tabIndex={-1}
+    onBlur={() => setTimeout(() => setSuggestions([]), 100)}
+    style={{
+      position: "absolute",
+      zIndex: 10,
+      background: "#fff",
+      border: "1px solid #ddd",
+      borderRadius: 8,
+      marginTop: 4,
+      maxHeight: 240,
+      overflowY: "auto",
+      width: "100%",
+    }}
+  >
+    {suggestions.length === 0 ? (
+      <div style={{ padding: 8, color: "#666" }}>Немає збігів</div>
+    ) : (
+      suggestions.map((c, i) => (
         <div
           key={`${c.name}-${c.lat}-${c.lon}`}
-          onMouseDown={(e) => { // щоб не втрачати фокус до кліку
+          onMouseDown={(e) => {
             e.preventDefault();
             setInputValue(c.name);
             setRegion(c);
             setSuggestions([]);
+            setActive(-1);
           }}
-          onMouseEnter={() => setActive(i)}
           style={{
             padding: 8,
+            background: active === i ? "#eef" : "#fff",
             cursor: "pointer",
-            background: i === active ? "#f2f2f2" : "#fff"
           }}
         >
           {c.name}
         </div>
-      ))}
-    </div>
-  )}
-</div>
-
+      ))
+    )}
+  </div>
+)}
 
   <div>
     <label style={{ fontSize: 12 }}>Початок вегетації (або поточна дата для прогнозу обприскувань на два тижні):</label>
@@ -524,8 +586,11 @@ function ProtectionApp() {
           </ol>
         ) : <p style={{ fontSize: 14, margin: 0 }}>—</p>}
         <p style={{ fontSize: 12, color: "#666", marginTop: 8 }}>
-          Увага: програма веде два типи розрахунків: !-ий - дає прогноз на дві послідовні обробки фунгіцидами відносно дати висадки або заданої дати; 2-ий - будує систему захисту в кінці сезону на основі архіву погоду (для перевірки факичної системи захисту з розрахунковою)
-        </p>
+  Увага: програма підтримує два режими:
+  <br />1) <b>Прогноз</b> — моделює 14 днів після висадки на основі Open-Meteo (фокус на майбутні ризики).
+  <br />2) <b>Історія</b> — аналізує сезон за архівом NASA POWER (для оцінки ефективності системи захисту).
+</p>
+
       </div>
 
       {/* Діагностика */}
