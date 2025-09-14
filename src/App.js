@@ -569,6 +569,21 @@ function ProtectionApp() {
           <button onClick={generate} disabled={loading} style={{ padding: "8px 14px", borderRadius: 10, border: "1px solid #222", background: "#222", color: "#fff", cursor: "pointer" }}>
             {loading ? "Обчислення…" : (useForecast ? "Сформувати прогноз (14 днів)" : "Створити модель (історія)")}
           </button>
+          <button
+  onClick={() => {
+    setPlantingDate("");
+    setHarvestDate("");
+  }}
+  style={{
+    padding: "8px 14px",
+    borderRadius: 10,
+    border: "1px solid #ccc",
+    background: "#f3f3f3",
+    cursor: "pointer"
+  }}
+>
+  Очистити дати
+</button>
 
           <label style={{ fontSize: 14 }}>
             <input type="checkbox" checked={useForecast} onChange={(e) => setUseForecast(e.target.checked)} /> Використовувати прогноз (Open-Meteo)
