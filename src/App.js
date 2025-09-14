@@ -453,7 +453,17 @@ function ProtectionApp() {
   };
 
   return (
-    <div style={{ maxWidth: 980, margin: "0 auto", padding: 16, fontFamily: "system-ui, Arial" }}>
+    <div
+  style={{
+    maxWidth: "100%",
+    width: "100%",
+    padding: 16,
+    margin: "0 auto",
+    fontFamily: "system-ui, Arial",
+    boxSizing: "border-box",
+  }}
+>
+ }}>
       <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 12 }}>Система захисту томатів від Фітофторозу by Harvestconsulting</h1>
 
       <div style={{ background: "#fff", borderRadius: 12, padding: 16, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", marginBottom: 16 }}>
@@ -563,7 +573,7 @@ function ProtectionApp() {
 )}
 
   <div>
-    <label style={{ fontSize: 12 }}>Початок вегетації (або дата останнього внесення фунгіцидц):</label>
+    <label style={{ fontSize: 12 }}>Початок вегетації (або дата останнього внесення фунгіцида):</label>
     <input
       type="date"
       value={plantingDate}
