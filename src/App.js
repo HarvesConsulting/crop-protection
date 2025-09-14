@@ -471,6 +471,14 @@ function ProtectionApp() {
     const exact = regions.find(r => searchTextFor(r) === q);
     setRegion(exact || null);
   }}
+  style={{
+    width: "100%",
+    padding: "12px 14px",   // ↑ більше місця всередині
+    borderRadius: 8,
+    border: "1px solid #ccc",
+    fontSize: 16,           // ↑ більший текст
+    minHeight: 48           // ↑ завжди більша висота
+  }}
   onKeyDown={(e) => {
     if (!suggestions.length) return;
     if (e.key === "ArrowDown") {
@@ -550,7 +558,7 @@ function ProtectionApp() {
       type="date"
       value={plantingDate}
       onChange={(e) => setPlantingDate(e.target.value)}
-      style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc" }}
+      style={{ width: "100%", padding: "12px 14px", borderRadius: 8, border: "1px solid #ccc" }}
     />
   </div>
 
@@ -561,7 +569,7 @@ function ProtectionApp() {
       value={harvestDate}
       disabled={useForecast}
       onChange={(e) => setHarvestDate(e.target.value)}
-      style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc" }}
+      style={{ width: "100%", "12px 14px", borderRadius: 8, border: "1px solid #ccc" }}
     />
   </div>  
 </div>
