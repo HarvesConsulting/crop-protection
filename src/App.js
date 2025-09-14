@@ -503,7 +503,7 @@ function ProtectionApp() {
 />
 
   {/* Підказки */}
-  {inputValue.trim().length >= 2 && (
+  {inputValue.trim().length >= 2 && !region && (
   <div
     tabIndex={-1}
     onBlur={() => setTimeout(() => setSuggestions([]), 100)}
@@ -525,13 +525,13 @@ function ProtectionApp() {
       suggestions.map((c, i) => (
         <div
           key={`${c.name}-${c.lat}-${c.lon}`}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            setInputValue(c.name);
-            setRegion(c);
-            setSuggestions([]);
-            setActive(-1);
-          }}
+          onClick={() => {
+  setInputValue(c.name);
+  setRegion(c);
+  setSuggestions([]);
+  setActive(-1);
+}}
+
           style={{
             padding: 8,
             background: active === i ? "#eef" : "#fff",
