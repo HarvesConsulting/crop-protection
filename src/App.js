@@ -96,21 +96,34 @@ const canSpray = !lastSpray || differenceInDays(curDate, lastDate) >= 5;
 function computeMultiSpraySchedule(rows) {
   const hasCond = (r) => Number(r.condHours || 0) >= COND_HOURS_TRIGGER;
   const sprays = [];
+
   const first = rows.find(hasCond)?.date || null;
   if (!first) return sprays;
   sprays.push(first);
+
   const dayMs = 86400000;
   let cursor = first;
+
   while (true) {
-    const earliestAllowed = new Date(cursor.getTime() + NEXT_SPRAY_MAX_GAP * dayMs);
-    const windowStart = new Date(cursor.getTime() + dayMs);
-    const windowEnd = earliestAllowed;
-    const hadCondWithin7 = rows.some(r => r.date >= windowStart && r.date <= windowEnd && hasCond(r));
-    let next = null;
-    if (hadCondWithin7) next = earliestAllowed;
-    else next = rows.find(r => r.date >= earliestAllowed && hasCond(r))?.date || null;
-    if (next) { sprays.push(next); cursor = next; } else break;
+    // Вікно пошуку наступного внесення: через 1–7 днів
+    const windowStart = new Date(cursor.getTime() + dayMs); // +1 день
+    const windowEnd = new Date(cursor.getTime() + NEXT_SPRAY_MAX_GAP * dayMs); // +7 днів
+
+    // Знайти перший день у цьому вікні з умовами
+    const nextDay = rows.find(r =>
+      r.date >= windowStart &&
+      r.date <= windowEnd &&
+      hasCond(r)
+    )?.date || null;
+
+    if (nextDay) {
+      sprays.push(nextDay);
+      cursor = nextDay;
+    } else {
+      break; // немає більше днів з умовами
+    }
   }
+
   return sprays;
 }
 
@@ -556,6 +569,8 @@ function ProtectionApp() {
 
 
         <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", marginTop: 12 }}>
+          </div>
+
           <button onClick={generate} disabled={loading} style={{ padding: "8px 14px", borderRadius: 10, border: "1px solid #222", background: "#222", color: "#fff", cursor: "pointer" }}>
             {loading ? "Обчислення…" : (useForecast ? "Сформувати прогноз (14 днів)" : "Створити модель (історія)")}
           </button>
