@@ -471,14 +471,6 @@ function ProtectionApp() {
     const exact = regions.find(r => searchTextFor(r) === q);
     setRegion(exact || null);
   }}
-  style={{
-    width: "100%",
-    padding: "12px 14px",   // ↑ більше місця всередині
-    borderRadius: 8,
-    border: "1px solid #ccc",
-    fontSize: 16,           // ↑ більший текст
-    minHeight: 48           // ↑ завжди більша висота
-  }}
   onKeyDown={(e) => {
     if (!suggestions.length) return;
     if (e.key === "ArrowDown") {
@@ -506,7 +498,7 @@ function ProtectionApp() {
   }}
   placeholder="Почни вводити (мін. 2 букви)"
   autoComplete="off"
-  style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc" }}
+  style={{ width: "100%", padding: "12px 14px", borderRadius: 8, border: "1px solid #ccc", fontSize: 16, minHeight: 48 }}
 />
 
   {/* Підказки */}
