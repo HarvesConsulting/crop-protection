@@ -603,8 +603,20 @@ function ProtectionApp() {
         <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>Рекомендовані внесення </h2>
         {sprayDates.length > 0 ? (
           <ol style={{ marginLeft: 18 }}>
-            {sprayDates.map((d, i) => <li key={i} style={{ marginBottom: 4 }}>{d} — {rotationProducts[i % rotationProducts.length]}</li>)}
-          </ol>
+  {sprayDates.map((d, i) => {
+    const cur = parseISO(d.split(".").reverse().join("-")); // dd.MM.yyyy → ISO
+    const prev = i > 0 ? parseISO(sprayDates[i - 1].split(".").reverse().join("-")) : null;
+    const gap = prev ? differenceInDays(cur, prev) : null;
+
+    return (
+      <li key={i} style={{ marginBottom: 4 }}>
+        {d} — {rotationProducts[i % rotationProducts.length]}
+        {gap !== null && <span style={{ color: "#555" }}> ({gap} діб після попередньої)</span>}
+      </li>
+    );
+  })}
+</ol>
+
         ) : <p style={{ fontSize: 14, margin: 0 }}>—</p>}
         <p style={{ fontSize: 12, color: "#666", marginTop: 8 }}>
   Увага: програма підтримує два режими:
