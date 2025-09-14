@@ -105,22 +105,27 @@ function computeMultiSpraySchedule(rows) {
   let cursor = first;
 
   while (true) {
-    // Вікно пошуку наступного внесення: через 1–7 днів
     const windowStart = new Date(cursor.getTime() + dayMs); // +1 день
     const windowEnd = new Date(cursor.getTime() + NEXT_SPRAY_MAX_GAP * dayMs); // +7 днів
 
-    // Знайти перший день у цьому вікні з умовами
     const nextDay = rows.find(r =>
       r.date >= windowStart &&
       r.date <= windowEnd &&
       hasCond(r)
-    )?.date || null;
+    )?.date;
 
     if (nextDay) {
       sprays.push(nextDay);
       cursor = nextDay;
     } else {
-      break; // немає більше днів з умовами
+      // якщо немає днів з умовами у вікні — шукаємо ПЕРШИЙ день після 7 днів з умовами
+      const fallbackDay = rows.find(r => r.date > windowEnd && hasCond(r))?.date;
+      if (fallbackDay) {
+        sprays.push(fallbackDay);
+        cursor = fallbackDay;
+      } else {
+        break; // кінець: більше умов немає
+      }
     }
   }
 
