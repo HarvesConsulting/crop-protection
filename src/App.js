@@ -5,7 +5,7 @@ import { format, isValid as isValidDate, parseISO, differenceInDays } from "date
 // ---------------- Константи ----------------
 const RH_WET_THRESHOLD = 90;
 const COND_RH = 90;
-const COND_T_MIN = 13;
+const COND_T_MIN = 10;
 const COND_T_MAX = 28;
 const COND_HOURS_TRIGGER = 3;
 const NEXT_SPRAY_MAX_GAP = 7;
