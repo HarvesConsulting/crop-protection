@@ -498,7 +498,14 @@ function ProtectionApp() {
   }}
   placeholder="Почни вводити (мін. 2 букви)"
   autoComplete="off"
-  style={{ width: "100%", padding: "12px 14px", borderRadius: 8, border: "1px solid #ccc", fontSize: 16, minHeight: 48 }}
+  style={{
+    width: "100%",
+    padding: "12px 14px",   // ↑ збільшили висоту
+    borderRadius: 8,
+    border: "1px solid #ccc",
+    fontSize: 16,           // ↑ більший текст
+    minHeight: 48           // ↑ більша висота
+  }}
 />
 
   {/* Підказки */}
