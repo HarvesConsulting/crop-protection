@@ -105,27 +105,17 @@ function computeMultiSpraySchedule(rows) {
   let cursor = first;
 
   while (true) {
-    const windowStart = new Date(cursor.getTime() + dayMs); // +1 день
-    const windowEnd = new Date(cursor.getTime() + NEXT_SPRAY_MAX_GAP * dayMs); // +7 днів
+    const minNextDate = new Date(cursor.getTime() + 7 * dayMs); // не раніше ніж через 7 днів
 
-    const nextDay = rows.find(r =>
-      r.date >= windowStart &&
-      r.date <= windowEnd &&
-      hasCond(r)
+    const nextSprayDate = rows.find(r =>
+      r.date >= minNextDate && hasCond(r)
     )?.date;
 
-    if (nextDay) {
-      sprays.push(nextDay);
-      cursor = nextDay;
+    if (nextSprayDate) {
+      sprays.push(nextSprayDate);
+      cursor = nextSprayDate;
     } else {
-      // якщо немає днів з умовами у вікні — шукаємо ПЕРШИЙ день після 7 днів з умовами
-      const fallbackDay = rows.find(r => r.date > windowEnd && hasCond(r))?.date;
-      if (fallbackDay) {
-        sprays.push(fallbackDay);
-        cursor = fallbackDay;
-      } else {
-        break; // кінець: більше умов немає
-      }
+      break; // немає більше сприятливих умов після 7 днів
     }
   }
 
