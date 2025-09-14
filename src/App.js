@@ -454,7 +454,7 @@ function ProtectionApp() {
 
   return (
     <div style={{ maxWidth: 980, margin: "0 auto", padding: 16, fontFamily: "system-ui, Arial" }}>
-      <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 12 }}>Система захисту томатів від Фітофторозу від Harvestconsulting</h1>
+      <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 12 }}>Система захисту томатів від Фітофторозу by Harvestconsulting</h1>
 
       <div style={{ background: "#fff", borderRadius: 12, padding: 16, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", marginBottom: 16 }}>
         <button
@@ -616,8 +616,8 @@ function ProtectionApp() {
         </div>
 
         {error && <div style={{ color: "#b91c1c", fontSize: 13, marginTop: 8, whiteSpace: "pre-wrap" }}>{error}</div>}
-        {lastUrl && <div style={{ fontSize: 12, color: "#666", marginTop: 6, wordBreak: "break-all" }}>URL (годинні T,RH): {lastUrl}</div>}
-        {lastRainUrl && <div style={{ fontSize: 12, color: "#666", wordBreak: "break-all" }}>URL (добові опади): {lastRainUrl}</div>}
+        //{lastUrl && <div style={{ fontSize: 12, color: "#666", marginTop: 6, wordBreak: "break-all" }}>URL (годинні T,RH): {lastUrl}</div>}
+        //{lastRainUrl && <div style={{ fontSize: 12, color: "#666", wordBreak: "break-all" }}>URL (добові опади): {lastRainUrl}</div>}
       </div>
 
       {/* Рекомендації */}
