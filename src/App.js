@@ -616,8 +616,8 @@ function ProtectionApp() {
         </div>
 
         {error && <div style={{ color: "#b91c1c", fontSize: 13, marginTop: 8, whiteSpace: "pre-wrap" }}>{error}</div>}
-        {/*{lastUrl && <div style={{ fontSize: 12, color: "#666", marginTop: 6, wordBreak: "break-all" }}>URL (годинні T,RH): {lastUrl}</div>}
-        {/*{lastRainUrl && <div style={{ fontSize: 12, color: "#666", wordBreak: "break-all" }}>URL (добові опади): {lastRainUrl}</div>}
+        {lastUrl && <div style={{ fontSize: 12, color: "#666", marginTop: 6, wordBreak: "break-all" }}>URL (годинні T,RH): {lastUrl}</div>}
+        {lastRainUrl && <div style={{ fontSize: 12, color: "#666", wordBreak: "break-all" }}>URL (добові опади): {lastRainUrl}</div>}
       </div>
 
       {/* Рекомендації */}
