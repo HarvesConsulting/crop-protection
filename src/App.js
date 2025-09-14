@@ -93,42 +93,52 @@ const canSpray = !lastSpray || differenceInDays(curDate, lastDate) >= 5;
   }
   return { rows, schedule };
 }
-function computeMultiSpraySchedule(rows, rainDaily) {
+function computeMultiSpraySchedule(rows, rainDaily = []) {
   const hasCond = (r) => Number(r.condHours || 0) >= COND_HOURS_TRIGGER;
   const sprays = [];
+  const dayMs = 86400000;
 
+  // 1) перше внесення — перший день з умовами
   const first = rows.find(hasCond)?.date || null;
   if (!first) return sprays;
   sprays.push(first);
 
-  const dayMs = 86400000;
   let cursor = first;
 
   while (true) {
-    // шукаємо, чи був дощ ≥15мм у наступні 7 днів після внесення
-    const rainsAfterSpray = rainDaily.filter(r =>
-      r.date > cursor && r.date <= new Date(cursor.getTime() + 7 * dayMs)
+    const d1 = new Date(cursor.getTime() + 1 * dayMs);
+    const d5 = new Date(cursor.getTime() + 5 * dayMs);
+    const d7 = new Date(cursor.getTime() + 7 * dayMs);
+
+    // був дощ ≥15 мм у (cursor; cursor+7] ?
+    const hadHeavyRain = (rainDaily || []).some(
+      (r) => r.date > cursor && r.date <= d7 && Number(r.rain) >= 15
     );
-    const hadHeavyRain = rainsAfterSpray.some(r => r.rain >= 15);
 
-    // якщо був дощ ≥15мм — зменшуємо мінімальний інтервал до 5 діб
-    const minGap = hadHeavyRain ? 5 : 7;
+    let next = null;
 
-    const windowStart = new Date(cursor.getTime() + minGap * dayMs);
-    const windowEnd = new Date(cursor.getTime() + NEXT_SPRAY_MAX_GAP * dayMs);
-
-    const nextDay = rows.find(r =>
-      r.date >= windowStart &&
-      r.date <= windowEnd &&
-      hasCond(r)
-    )?.date;
-
-    if (nextDay) {
-      sprays.push(nextDay);
-      cursor = nextDay;
+    if (hadHeavyRain) {
+      // змив — плануємо на 5-й день
+      next = d5;
     } else {
-      break;
+      // якщо були умови у перші 7 днів — рівно на 7-й
+      const hadCondWithin7 = rows.some(
+        (r) => r.date >= d1 && r.date <= d7 && hasCond(r)
+      );
+      if (hadCondWithin7) {
+        next = d7;
+      } else {
+        // інакше — перший тригер-день після 7-го
+        next = rows.find((r) => r.date > d7 && hasCond(r))?.date || null;
+      }
     }
+
+    if (!next) break;
+    // запобігаємо зацикленню
+    if (sprays.length && next.getTime() <= sprays[sprays.length - 1].getTime()) break;
+
+    sprays.push(next);
+    cursor = next;
   }
 
   return sprays;
