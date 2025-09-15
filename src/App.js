@@ -430,14 +430,14 @@ const generate = async () => {
     return;
   }
 
+  // useForecast === false → ПРОГНОЗ (Open-Meteo)
+  // useForecast === true  → МОДЕЛЬ/ІСТОРІЯ (NASA POWER)
   if (!useForecast) {
-    // Прогноз (Open-Meteo)
     if (!plantingDate) {
       setError("Увімкнено прогноз: вкажіть дату висадки.");
       return;
     }
   } else {
-    // Історія (NASA POWER) — Модель системи захисту
     if (!plantingDate || !harvestDate) {
       setError("Для історичних даних вкажіть дати початку та завершення.");
       return;
@@ -449,7 +449,7 @@ const generate = async () => {
     let wx, rain;
 
     if (useForecast) {
-      // Модель (історія) зараз під useForecast === true
+      // ІСТОРІЯ (NASA POWER) — модель системи захисту
       [wx, rain] = await Promise.all([
         fetchWeatherFromNASA(region.lat, region.lon, plantingDate, harvestDate),
         fetchDailyRainFromNASA(region.lat, region.lon, plantingDate, harvestDate),
@@ -457,21 +457,31 @@ const generate = async () => {
       setLastUrl(wx.url || "");
       setLastRainUrl(rain.url || "");
     } else {
-      // Прогноз (Open-Meteo) — 14 днів від дати висадки
-      const startISO = toISODate(plantingDate);
+      // ПРОГНОЗ (Open-Meteo) — 14 днів від дати висадки
+      const startISO = plantingDate; // input[type=date] вже дає yyyy-MM-dd
       wx = await fetchForecastHourly(region.lat, region.lon, startISO, 14);
       rain = await fetchForecastDailyRain(region.lat, region.lon, startISO, 14);
       setLastUrl(wx.url || "");
       setLastRainUrl(rain.url || "");
     }
 
-    if (wx.error) { setError(`Помилка погоди: ${wx.error}`); return; }
-    if (!wx.daily.length) { setError("Не отримано погодних даних."); return; }
+    if (wx.error) {
+      setError(`Помилка погоди: ${wx.error}`);
+      return;
+    }
+    if (!Array.isArray(wx.daily) || wx.daily.length === 0) {
+      setError("Не отримано погодних даних.");
+      return;
+    }
 
+    // Ряди погодних даних
     let rows = wx.daily;
-    // Фільтруємо за сезоном лише для ІСТОРІЇ (коли useForecast === true)
-    if (useForecast) rows = filterRowsBySeason(rows, plantingDate, harvestDate);
+    // Для історії можна додатково відфільтрувати за сезоном (на випадок запасу по датах)
+    if (useForecast) {
+      rows = filterRowsBySeason(rows, plantingDate, harvestDate);
+    }
 
+    // Розрахунки
     const sprays = computeMultiSpraySchedule(rows, rain?.daily || []);
     setSprayDates(sprays.map(d => format(d, "dd.MM.yyyy")));
 
@@ -483,7 +493,7 @@ const generate = async () => {
         ? plantingDate
         : (rows[0]?.date ? format(rows[0].date, "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"));
 
-    // Горизонт 14 днів — лише для ПРОГНОЗУ (!useForecast)
+    // Горизонт 14 днів — лише для ПРОГНОЗУ
     const plan = makeWeeklyPlan(
       comp.rows,
       (rain?.daily || []),
@@ -492,13 +502,13 @@ const generate = async () => {
       !useForecast ? 14 : undefined
     );
     setWeeklyPlan(plan);
-
   } catch (e) {
     setError(`Помилка при побудові моделі: ${e?.message || String(e)}`);
   } finally {
     setLoading(false);
   }
 };
+
   return (
     <div className="main-container">
 
@@ -654,8 +664,27 @@ const generate = async () => {
     cursor: "pointer"
   }}
 >
+  
   Очистити дати
 </button>
+{/* DEBUG-блок для перевірки URL і результатів */}
+{(lastUrl || lastRainUrl) && (
+  <div style={{ fontSize: 12, color: "#666", marginTop: 8 }}>
+    {lastUrl && (
+      <div>Погода URL: <a href={lastUrl} target="_blank" rel="noreferrer">{lastUrl}</a></div>
+    )}
+    {lastRainUrl && (
+      <div>Опади URL: <a href={lastRainUrl} target="_blank" rel="noreferrer">{lastRainUrl}</a></div>
+    )}
+  </div>
+)}
+
+{!loading && !error && diagnostics.length === 0 && sprayDates.length === 0 && (
+  <div style={{ fontSize: 13, color: "#555", marginTop: 8 }}>
+    Дані оброблено, але тригерних умов для внесень не знайдено (або прогноз без ризиків на обрані дати).
+  </div>
+)}
+
 
           <label style={{ fontSize: 16 }}>
            <input type="checkbox" checked={useForecast} onChange={(e) => setUseForecast(e.target.checked)} /> Модель системи захисту
