@@ -568,31 +568,31 @@ function ProtectionApp() {
     />
   </div>
 
+ {useForecast && (
   <div>
     <label style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Збір врожаю (для історичних даних):</label>
     <input
-  type="date"
-  value={harvestDate}
-  disabled={useForecast}
-  onChange={(e) => setHarvestDate(e.target.value)}
-  style={{
-    width: "100%",
-    padding: "12px 14px",
-    borderRadius: 8,
-    border: "1px solid #ccc",
-    fontSize: 16,
-    minHeight: 48
-  }}
-/>
-  </div>  
+      type="date"
+      value={harvestDate}
+      onChange={(e) => setHarvestDate(e.target.value)}
+      style={{
+        width: "100%",
+        padding: "12px 14px",
+        borderRadius: 8,
+        border: "1px solid #ccc",
+        fontSize: 16,
+        minHeight: 48
+      }}
+    />
+  </div>
+)}
 </div>
-
 
         <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", marginTop: 12 }}>
           </div>
 
           <button onClick={generate} disabled={loading} style={{ padding: "8px 14px",fontSize: 16,fontWeight: 600, borderRadius: 10, border: "1px solid #222", background: "#222", color: "#fff", cursor: "pointer" }}>
-            {loading ? "Обчислення…" : (useForecast ? "Сформувати прогноз (14 днів)" : "Створити модель (історія)")}
+            {loading ? "Обчислення…" : (useForecast ? "Створити модель (історія)" : "Сформувати прогноз (14 днів)")}
           </button>
           <button
   onClick={() => {
@@ -611,7 +611,7 @@ function ProtectionApp() {
 </button>
 
           <label style={{ fontSize: 16 }}>
-            <input type="checkbox" checked={useForecast} onChange={(e) => setUseForecast(e.target.checked)} /> Використовувати прогноз (Open-Meteo)
+           <input type="checkbox" checked={useForecast} onChange={(e) => setUseForecast(e.target.checked)} /> Модель системи захисту
           </label>
           <label style={{ fontSize: 16 }}>
             <input type="checkbox" checked={showDiag} onChange={(e) => setShowDiag(e.target.checked)} /> Показати діагностику
