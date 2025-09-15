@@ -513,7 +513,38 @@ const generate = async () => {
     <div className="main-container">
 
 
-      <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 12 }}>Система захисту томатів від Фітофторозу by Harvestconsulting</h1>
+      <div
+  style={{
+    textAlign: "center",
+    padding: "16px 20px",
+    background: "linear-gradient(135deg, #f8f9fa, #e9ecef)",
+    borderRadius: 12,
+    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+    marginBottom: 20,
+  }}
+>
+  <h1
+    style={{
+      fontSize: 24,
+      fontWeight: 700,
+      margin: 0,
+      color: "#2d6cdf",
+    }}
+  >
+    Система захисту томатів від{" "}
+    <span style={{ color: "#d62828" }}>Фітофторозу</span>
+  </h1>
+  <p
+    style={{
+      margin: 0,
+      fontSize: 16,
+      fontWeight: 500,
+      color: "#555",
+    }}
+  >
+    by Harvestconsulting
+  </p>
+</div>
 
   <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
   <div style={{ position: "relative" }}>
