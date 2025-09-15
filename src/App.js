@@ -667,25 +667,6 @@ const generate = async () => {
   
   Очистити дати
 </button>
-{/* DEBUG-блок для перевірки URL і результатів */}
-{(lastUrl || lastRainUrl) && (
-  <div style={{ fontSize: 12, color: "#666", marginTop: 8 }}>
-    {lastUrl && (
-      <div>Погода URL: <a href={lastUrl} target="_blank" rel="noreferrer">{lastUrl}</a></div>
-    )}
-    {lastRainUrl && (
-      <div>Опади URL: <a href={lastRainUrl} target="_blank" rel="noreferrer">{lastRainUrl}</a></div>
-    )}
-  </div>
-)}
-
-{!loading && !error && diagnostics.length === 0 && sprayDates.length === 0 && (
-  <div style={{ fontSize: 13, color: "#555", marginTop: 8 }}>
-    Дані оброблено, але тригерних умов для внесень не знайдено (або прогноз без ризиків на обрані дати).
-  </div>
-)}
-
-
           <label style={{ fontSize: 16 }}>
            <input type="checkbox" checked={useForecast} onChange={(e) => setUseForecast(e.target.checked)} /> Модель системи захисту
           </label>
