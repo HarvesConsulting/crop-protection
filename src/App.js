@@ -648,31 +648,73 @@ const generate = async () => {
         <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", marginTop: 12 }}>
           </div>
 
-          <button onClick={generate} disabled={loading} style={{ padding: "8px 14px",fontSize: 16,fontWeight: 600, borderRadius: 10, border: "1px solid #222", background: "#222", color: "#fff", cursor: "pointer" }}>
-            {loading ? "Обчислення…" : (useForecast ? "Створити модель (історія)" : "Сформувати прогноз (14 днів)")}
-          </button>
-          <button
-  onClick={() => {
-    setPlantingDate("");
-    setHarvestDate("");
-  }}
-  style={{
-    padding: "8px 14px",
-    borderRadius: 10,
-    border: "1px solid #ccc",
-    background: "#f3f3f3",
-    cursor: "pointer"
-  }}
->
-  
-  Очистити дати
-</button>
-          <label style={{ fontSize: 16 }}>
-           <input type="checkbox" checked={useForecast} onChange={(e) => setUseForecast(e.target.checked)} /> Модель системи захисту
-          </label>
-          <label style={{ fontSize: 16 }}>
-            <input type="checkbox" checked={showDiag} onChange={(e) => setShowDiag(e.target.checked)} /> Показати діагностику
-          </label>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 16 }}>
+  {/* Кнопка прогноз/модель */}
+  <button
+    onClick={generate}
+    disabled={loading}
+    style={{
+      flex: "1 1 auto",
+      padding: "12px 18px",
+      fontSize: 16,
+      fontWeight: 600,
+      borderRadius: 8,
+      border: "none",
+      background: loading ? "#555" : "#2d6cdf",
+      color: "#fff",
+      cursor: loading ? "not-allowed" : "pointer",
+      transition: "background 0.3s",
+    }}
+    onMouseOver={(e) => !loading && (e.target.style.background = "#1b4ba5")}
+    onMouseOut={(e) => !loading && (e.target.style.background = "#2d6cdf")}
+  >
+    {loading ? "Обчислення…" : (useForecast ? "Створити модель (історія)" : "Сформувати прогноз (14 днів)")}
+  </button>
+
+  {/* Кнопка очистки */}
+  <button
+    onClick={() => {
+      setPlantingDate("");
+      setHarvestDate("");
+    }}
+    style={{
+      flex: "0 0 auto",
+      padding: "12px 18px",
+      fontSize: 15,
+      borderRadius: 8,
+      border: "1px solid #ccc",
+      background: "#f8f8f8",
+      cursor: "pointer",
+      transition: "background 0.3s",
+    }}
+    onMouseOver={(e) => (e.target.style.background = "#e6e6e6")}
+    onMouseOut={(e) => (e.target.style.background = "#f8f8f8")}
+  >
+    Очистити дати
+  </button>
+</div>
+
+{/* Чекбокси */}
+<div style={{ display: "flex", gap: 20, marginTop: 12, alignItems: "center", flexWrap: "wrap" }}>
+  <label style={{ fontSize: 15, display: "flex", alignItems: "center", gap: 6 }}>
+    <input
+      type="checkbox"
+      checked={useForecast}
+      onChange={(e) => setUseForecast(e.target.checked)}
+    />
+    Модель системи захисту
+  </label>
+
+  <label style={{ fontSize: 15, display: "flex", alignItems: "center", gap: 6 }}>
+    <input
+      type="checkbox"
+      checked={showDiag}
+      onChange={(e) => setShowDiag(e.target.checked)}
+    />
+    Показати діагностику
+  </label>
+</div>
+
         </div>
 
         {error && (
