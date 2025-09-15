@@ -418,64 +418,88 @@ function ProtectionApp() {
 }
 
 const generate = async () => {
-    setError(""); setDiagnostics([]); setWeeklyPlan([]); setSprayDates([]); setLastUrl(""); setLastRainUrl("");
-    if (!region) { setError("Будь ласка, оберіть місто."); return; }
-    if (!useForecast) {
-  // Прогноз (без моделі)
-  if (!plantingDate) {
-    setError("Увімкнено прогноз: вкажіть дату висадки.");
-    return;
-  
-} else {
-  // Модель системи захисту (історичні дані)
-  if (!plantingDate || !harvestDate) {
-    setError("Для історичних даних вкажіть дати початку та завершення.");
+  setError("");
+  setDiagnostics([]);
+  setWeeklyPlan([]);
+  setSprayDates([]);
+  setLastUrl("");
+  setLastRainUrl("");
+
+  if (!region) {
+    setError("Будь ласка, оберіть місто.");
     return;
   }
-}
 
-    setLoading(true);
-    try {
-      let wx, rain;
-      if (useForecast) {
-  const startISO = toISODate(plantingDate);
-  wx = await fetchForecastHourly(region.lat, region.lon, startISO, 14);
-  rain = await fetchForecastDailyRain(region.lat, region.lon, startISO, 14);
-  setLastUrl(wx.url || "");
-  setLastRainUrl(rain.url || "");
-}
-      } else {
-        [wx, rain] = await Promise.all([
-          fetchWeatherFromNASA(region.lat, region.lon, plantingDate, harvestDate),
-          fetchDailyRainFromNASA(region.lat, region.lon, plantingDate, harvestDate),
-        ]);
-        setLastUrl(wx.url || ""); setLastRainUrl(rain.url || "");
-      }
-      if (wx.error) { setError(`Помилка погоди: ${wx.error}`); return; }
-      if (!wx.daily.length) { setError("Не отримано погодних даних."); return; }
+  if (!useForecast) {
+    // Прогноз (Open-Meteo)
+    if (!plantingDate) {
+      setError("Увімкнено прогноз: вкажіть дату висадки.");
+      return;
+    }
+  } else {
+    // Історія (NASA POWER) — Модель системи захисту
+    if (!plantingDate || !harvestDate) {
+      setError("Для історичних даних вкажіть дати початку та завершення.");
+      return;
+    }
+  }
 
-      let rows = wx.daily;
-      if (!useForecast) rows = filterRowsBySeason(rows, plantingDate, harvestDate);
+  setLoading(true);
+  try {
+    let wx, rain;
 
-      const sprays = computeMultiSpraySchedule(rows, rain?.daily || []);
-      setSprayDates(sprays.map(d => format(d, "dd.MM.yyyy")));
+    if (useForecast) {
+      // Модель (історія) зараз під useForecast === true
+      [wx, rain] = await Promise.all([
+        fetchWeatherFromNASA(region.lat, region.lon, plantingDate, harvestDate),
+        fetchDailyRainFromNASA(region.lat, region.lon, plantingDate, harvestDate),
+      ]);
+      setLastUrl(wx.url || "");
+      setLastRainUrl(rain.url || "");
+    } else {
+      // Прогноз (Open-Meteo) — 14 днів від дати висадки
+      const startISO = toISODate(plantingDate);
+      wx = await fetchForecastHourly(region.lat, region.lon, startISO, 14);
+      rain = await fetchForecastDailyRain(region.lat, region.lon, startISO, 14);
+      setLastUrl(wx.url || "");
+      setLastRainUrl(rain.url || "");
+    }
 
-      const comp = computeDSVSchedule(rows, DEFAULT_DSV_THRESHOLD);
-      setDiagnostics(comp.rows);
+    if (wx.error) { setError(`Помилка погоди: ${wx.error}`); return; }
+    if (!wx.daily.length) { setError("Не отримано погодних даних."); return; }
 
-      const startForWeeksISO =
-        typeof plantingDate === "string" && plantingDate
-          ? plantingDate
-          : (rows[0]?.date ? format(rows[0].date, "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"));
+    let rows = wx.daily;
+    // Фільтруємо за сезоном лише для ІСТОРІЇ (коли useForecast === true)
+    if (useForecast) rows = filterRowsBySeason(rows, plantingDate, harvestDate);
 
-      const plan = makeWeeklyPlan(comp.rows, (rain?.daily || []), startForWeeksISO, RAIN_HIGH_THRESHOLD_MM, useForecast ? 14 : undefined);
-      setWeeklyPlan(plan);
-    } catch (e) {
-      setError(`Помилка при побудові моделі: ${e?.message || String(e)}`);
-    } finally { setLoading(false); }
-  };
+    const sprays = computeMultiSpraySchedule(rows, rain?.daily || []);
+    setSprayDates(sprays.map(d => format(d, "dd.MM.yyyy")));
 
-  
+    const comp = computeDSVSchedule(rows, DEFAULT_DSV_THRESHOLD);
+    setDiagnostics(comp.rows);
+
+    const startForWeeksISO =
+      typeof plantingDate === "string" && plantingDate
+        ? plantingDate
+        : (rows[0]?.date ? format(rows[0].date, "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"));
+
+    // Горизонт 14 днів — лише для ПРОГНОЗУ (!useForecast)
+    const plan = makeWeeklyPlan(
+      comp.rows,
+      (rain?.daily || []),
+      startForWeeksISO,
+      RAIN_HIGH_THRESHOLD_MM,
+      !useForecast ? 14 : undefined
+    );
+    setWeeklyPlan(plan);
+
+  } catch (e) {
+    setError(`Помилка при побудові моделі: ${e?.message || String(e)}`);
+  } finally {
+    setLoading(false);
+  }
+};
+  return (
     <div className="main-container">
 
 
@@ -678,7 +702,10 @@ const generate = async () => {
       {/* Діагностика */}
       {showDiag && diagnostics.length > 0 && (
         <div style={{ background: "#fff", borderRadius: 12, padding: 16, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", overflowX: "auto" }}>
-          <h3 style={{ fontWeight: 600, marginBottom: 8 }}>Діагностика по днях (RH ≥ {RH_WET_THRESHOLD}%{useForecast ? ", прогноз" : ", LST"})</h3>
+          <h3>
+  Діагностика по днях (RH ≥ {RH_WET_THRESHOLD}%{useForecast ? ", LST" : ", прогноз"})
+</h3>
+
           <table style={{ width: "100%", fontSize: 14, marginBottom: 16 }}>
             <thead>
               <tr>
