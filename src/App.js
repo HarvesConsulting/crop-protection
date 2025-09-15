@@ -425,7 +425,7 @@ const generate = async () => {
   if (!plantingDate) {
     setError("Увімкнено прогноз: вкажіть дату висадки.");
     return;
-  }
+  
 } else {
   // Модель системи захисту (історичні дані)
   if (!plantingDate || !harvestDate) {
