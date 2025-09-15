@@ -410,7 +410,7 @@ function ProtectionApp() {
   
   const generate = async () => {
     setError(""); setDiagnostics([]); setWeeklyPlan([]); setSprayDates([]); setLastUrl(""); setLastRainUrl("");
-    if (!region) { setError("Будь ласка, оберіть регіон."); return; }
+    if (!region) { setError("Будь ласка, оберіть місто."); return; }
     if (useForecast) { if (!plantingDate) { setError("Увімкнено прогноз: вкажіть дату висадки."); return; } }
     else { if (!plantingDate || !harvestDate) { setError("Для історичних даних вкажіть дати початку та завершення."); return; } }
 
@@ -460,7 +460,7 @@ function ProtectionApp() {
 
   <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
   <div style={{ position: "relative" }}>
-  <label style={{ fontSize: 16, fontWeight: 500, marginBottom: 4 }}>Регіон:</label>
+  <label style={{ fontSize: 16, fontWeight: 500, marginBottom: 4 }}>Оберіть місто:</label>
   <input
   type="text"
   value={inputValue}
