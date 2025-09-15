@@ -408,7 +408,16 @@ function ProtectionApp() {
   setActive(res.length ? 0 : -1);
 }, [inputValue]);
   
-  const generate = async () => {
+  function toISODate(date) {
+  if (!date) return "";
+  if (typeof date === "string" && /^\d{2}\.\d{2}\.\d{4}$/.test(date)) {
+    const [day, month, year] = date.split(".");
+    return `${year}-${month}-${day}`;
+  }
+  return date;
+}
+
+const generate = async () => {
     setError(""); setDiagnostics([]); setWeeklyPlan([]); setSprayDates([]); setLastUrl(""); setLastRainUrl("");
     if (!region) { setError("Будь ласка, оберіть місто."); return; }
     if (!useForecast) {
@@ -429,9 +438,12 @@ function ProtectionApp() {
     try {
       let wx, rain;
       if (useForecast) {
-        wx = await fetchForecastHourly(region.lat, region.lon, plantingDate, 14);
-        rain = await fetchForecastDailyRain(region.lat, region.lon, plantingDate, 14);
-        setLastUrl(wx.url || ""); setLastRainUrl(rain.url || "");
+  const startISO = toISODate(plantingDate);
+  wx = await fetchForecastHourly(region.lat, region.lon, startISO, 14);
+  rain = await fetchForecastDailyRain(region.lat, region.lon, startISO, 14);
+  setLastUrl(wx.url || "");
+  setLastRainUrl(rain.url || "");
+}
       } else {
         [wx, rain] = await Promise.all([
           fetchWeatherFromNASA(region.lat, region.lon, plantingDate, harvestDate),
