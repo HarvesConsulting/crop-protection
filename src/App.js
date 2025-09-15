@@ -411,8 +411,19 @@ function ProtectionApp() {
   const generate = async () => {
     setError(""); setDiagnostics([]); setWeeklyPlan([]); setSprayDates([]); setLastUrl(""); setLastRainUrl("");
     if (!region) { setError("Будь ласка, оберіть місто."); return; }
-    if (useForecast) { if (!plantingDate) { setError("Увімкнено прогноз: вкажіть дату висадки."); return; } }
-    else { if (!plantingDate || !harvestDate) { setError("Для історичних даних вкажіть дати початку та завершення."); return; } }
+    if (!useForecast) {
+  // Прогноз (без моделі)
+  if (!plantingDate) {
+    setError("Увімкнено прогноз: вкажіть дату висадки.");
+    return;
+  }
+} else {
+  // Модель системи захисту (історичні дані)
+  if (!plantingDate || !harvestDate) {
+    setError("Для історичних даних вкажіть дати початку та завершення.");
+    return;
+  }
+}
 
     setLoading(true);
     try {
