@@ -475,7 +475,7 @@ const generate = async () => {
     } finally { setLoading(false); }
   };
 
-  return (
+  
     <div className="main-container">
 
 
