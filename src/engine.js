@@ -225,7 +225,14 @@ export async function fetchWeatherFromNASA(region, plantingDate, harvestDate) {
 const end = format(new Date(harvestDate), "yyyyMMdd");
 
     const url = `https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M,RH2M&community=AG&longitude=${region.lon}&latitude=${region.lat}&start=${start}&end=${end}&format=JSON`;
-console.log("NASA Rain URL:", url);
+console.log("NASA request params:", {
+  lat: region.lat,
+  lon: region.lon,
+  start,
+  end,
+  url,
+});
+
     const res = await fetch(url, { headers: { Accept: "application/json" } });
     if (!res.ok) throw new Error(`NASA API error: ${res.status}`);
 
@@ -258,7 +265,14 @@ const end = format(new Date(harvestDate), "yyyyMMdd");
 
 
     const url = `https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=${region.lon}&latitude=${region.lat}&start=${start}&end=${end}&format=JSON`;
-console.log("NASA Rain URL:", url);
+console.log("NASA request params:", {
+  lat: region.lat,
+  lon: region.lon,
+  start,
+  end,
+  url,
+});
+
     const res = await fetch(url, { headers: { Accept: "application/json" } });
     if (!res.ok) throw new Error(`NASA API error: ${res.status}`);
 
