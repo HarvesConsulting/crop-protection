@@ -34,16 +34,16 @@ export default function Step3Run({
       let wx, rain;
 
       if (useForecast) {
-        // ІСТОРИЧНА МОДЕЛЬ
-        [wx, rain] = await Promise.all([
-          fetchWeatherFromNASA(region.lat, region.lon, plantingDate, harvestDate),
-          fetchDailyRainFromNASA(region.lat, region.lon, plantingDate, harvestDate),
-        ]);
-      } else {
-        // ПРОГНОЗ НА 14 ДНІВ
-        wx = await fetchForecastHourly(region.lat, region.lon, plantingDate, 14);
-        rain = await fetchForecastDailyRain(region.lat, region.lon, plantingDate, 14);
-      }
+  // ІСТОРИЧНА МОДЕЛЬ
+  [wx, rain] = await Promise.all([
+    fetchWeatherFromNASA(region, plantingDate, harvestDate),
+    fetchDailyRainFromNASA(region, plantingDate, harvestDate),
+  ]);
+} else {
+  // ПРОГНОЗ НА 14 ДНІВ
+  wx = await fetchForecastHourly(region.lat, region.lon, plantingDate, 14);
+  rain = await fetchForecastDailyRain(region.lat, region.lon, plantingDate, 14);
+}
 
       if (wx.error) {
         setError(`Помилка погоди: ${wx.error}`);
