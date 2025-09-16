@@ -123,12 +123,102 @@ export function makeWeeklyPlan(rows, rainDaily, startISO, rainThreshold, horizon
 }
 
 // Заглушки API (ти заміниш на повні функції пізніше)
-export async function fetchForecastHourly() {
-  return { daily: [], error: "STUB: fetchForecastHourly not implemented" };
+export async function fetchForecastHourly(lat, lon, startISO, days = 14) {
+  const params = new URLSearchParams({
+    latitude: String(lat),
+    longitude: String(lon),
+    timezone: "auto",
+    hourly: "temperature_2m,relative_humidity_2m",
+    start_date: startISO,
+    end_date: format(new Date(new Date(startISO).getTime() + (days - 1) * 86400000), "yyyy-MM-dd"),
+  });
+
+  const url = `https://api.open-meteo.com/v1/forecast?${params.toString()}`;
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+
+    const h = json?.hourly;
+    if (!h) return { daily: [], error: "No data" };
+
+    const times = h.time || [];
+    const temps = h.temperature_2m || [];
+    const rhs = h.relative_humidity_2m || [];
+    const perDay = new Map();
+
+    for (let i = 0; i < times.length; i++) {
+      const ts = times[i];
+      const tv = Number(temps[i]);
+      const rv = Number(rhs[i]);
+      const iso = ts.split("T")[0];
+
+      const rec = perDay.get(iso) || { allTemp: [], wetTemp: [], wetHours: 0, condHours: 0 };
+      if (Number.isFinite(tv)) rec.allTemp.push(tv);
+      if (Number.isFinite(tv) && Number.isFinite(rv)) {
+        if (rv >= RH_WET_THRESHOLD) {
+          rec.wetTemp.push(tv);
+          rec.wetHours += 1;
+        }
+        if (rv >= COND_RH && tv >= COND_T_MIN && tv < COND_T_MAX) {
+          rec.condHours += 1;
+        }
+      }
+      perDay.set(iso, rec);
+    }
+
+    const out = [];
+    for (const [iso, r] of perDay.entries()) {
+      const allAvg = r.allTemp.length ? r.allTemp.reduce((a, b) => a + b, 0) / r.allTemp.length : NaN;
+      const wetAvg = r.wetTemp.length ? r.wetTemp.reduce((a, b) => a + b, 0) / r.wetTemp.length : NaN;
+      out.push({
+        date: new Date(iso),
+        wetHours: r.wetHours,
+        wetTempAvg: wetAvg,
+        allTempAvg: allAvg,
+        condHours: r.condHours,
+      });
+    }
+
+    out.sort((a, b) => a.date.getTime() - b.date.getTime());
+    return { daily: out, error: "" };
+  } catch (e) {
+    return { daily: [], error: e.message || "Unknown error" };
+  }
 }
-export async function fetchForecastDailyRain() {
-  return { daily: [], error: "STUB: fetchForecastDailyRain not implemented" };
+
+export async function fetchForecastDailyRain(lat, lon, startISO, days = 14) {
+  const params = new URLSearchParams({
+    latitude: String(lat),
+    longitude: String(lon),
+    timezone: "auto",
+    daily: "precipitation_sum",
+    start_date: startISO,
+    end_date: format(new Date(new Date(startISO).getTime() + (days - 1) * 86400000), "yyyy-MM-dd"),
+  });
+
+  const url = `https://api.open-meteo.com/v1/forecast?${params.toString()}`;
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+
+    const t = json?.daily?.time || [];
+    const r = json?.daily?.precipitation_sum || [];
+
+    const out = t.map((iso, i) => ({
+      date: new Date(iso),
+      rain: Number(r[i]),
+    }));
+
+    return { daily: out, error: "" };
+  } catch (e) {
+    return { daily: [], error: e.message || "Unknown error" };
+  }
 }
+
 export async function fetchWeatherFromNASA() {
   return { daily: [], error: "STUB: fetchWeatherFromNASA not implemented" };
 }
