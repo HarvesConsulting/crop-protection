@@ -219,9 +219,38 @@ export async function fetchForecastDailyRain(lat, lon, startISO, days = 14) {
   }
 }
 
-export async function fetchWeatherFromNASA() {
-  return { daily: [], error: "STUB: fetchWeatherFromNASA not implemented" };
+export async function fetchWeatherFromNASA(region, plantingDate, harvestDate) {
+  try {
+    const res = await fetch(
+      `https://api.nasa.gov/some-endpoint?lat=${region.lat}&lon=${region.lon}&start=${plantingDate}&end=${harvestDate}&api_key=YOUR_API_KEY`
+    );
+    const data = await res.json();
+
+    // Обробка даних і перетворення у формат { daily: [...] }
+    return { daily: data };
+  } catch (e) {
+    return { daily: [], error: e.message };
+  }
 }
-export async function fetchDailyRainFromNASA() {
-  return { daily: [], error: "STUB: fetchDailyRainFromNASA not implemented" };
+
+export async function fetchDailyRainFromNASA(region, plantingDate, harvestDate) {
+  try {
+    const res = await fetch(
+      `https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=${region.lon}&latitude=${region.lat}&start=${plantingDate}&end=${harvestDate}&format=JSON`
+    );
+    const json = await res.json();
+
+    const values = json?.properties?.parameter?.PRECTOTCORR ?? {};
+    const dates = Object.keys(values).sort();
+
+    const daily = dates.map(d => ({
+      date: new Date(d),
+      rain: values[d],
+    }));
+
+    return { daily };
+  } catch (e) {
+    return { daily: [], error: e.message };
+  }
 }
+
