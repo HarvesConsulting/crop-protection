@@ -235,16 +235,22 @@ export async function fetchWeatherFromNASA(region, plantingDate, harvestDate) {
 
 export async function fetchDailyRainFromNASA(region, plantingDate, harvestDate) {
   try {
-    const res = await fetch(
-      `https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=${region.lon}&latitude=${region.lat}&start=${plantingDate}&end=${harvestDate}&format=JSON`
-    );
+    // перетворюємо дату у формат YYYYMMDD
+    const start = plantingDate.replaceAll("-", "");
+    const end = harvestDate.replaceAll("-", "");
+
+    const url = `https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=${region.lon}&latitude=${region.lat}&start=${start}&end=${end}&format=JSON`;
+
+    const res = await fetch(url, { headers: { Accept: "application/json" } });
+    if (!res.ok) throw new Error(`NASA API error: ${res.status}`);
+
     const json = await res.json();
 
     const values = json?.properties?.parameter?.PRECTOTCORR ?? {};
     const dates = Object.keys(values).sort();
 
     const daily = dates.map(d => ({
-      date: new Date(d),
+      date: new Date(`${d.slice(0, 4)}-${d.slice(4, 6)}-${d.slice(6, 8)}`),
       rain: values[d],
     }));
 
