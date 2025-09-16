@@ -19,45 +19,49 @@ export default function App() {
   const back = () => setStep((s) => Math.max(s - 1, 1));
 
   return (
-    <div className="main-container" style={{ maxWidth: 800, margin: "0 auto", padding: 20 }}>
-      <ProgressBar step={step} />
+  <div className="main-container" style={{ maxWidth: 800, margin: "0 auto", padding: 20 }}>
+    <ProgressBar step={step} />
 
-      {step === 1 && (
-        <Step1Region region={region} setRegion={setRegion} onNext={next} />
-      )}
+    {/* ВСТАВКА опису тільки на першому кроці */}
+    {step === 1 && <AppIntro />}
 
-      {step === 2 && (
-        <Step2Season
-          plantingDate={plantingDate}
-          setPlantingDate={setPlantingDate}
-          harvestDate={harvestDate}
-          setHarvestDate={setHarvestDate}
-          useForecast={useForecast}
-          setUseForecast={setUseForecast}
-          onNext={next}
-          onBack={back}
-        />
-      )}
+    {step === 1 && (
+      <Step1Region region={region} setRegion={setRegion} onNext={next} />
+    )}
 
-      {step === 3 && (
-        <Step3Run
-          region={region}
-          plantingDate={plantingDate}
-          harvestDate={harvestDate}
-          useForecast={useForecast}
-          onResult={(res) => {
-            setResult(res);
-            next();
-          }}
-          onBack={back}
-        />
-      )}
+    {step === 2 && (
+      <Step2Season
+        plantingDate={plantingDate}
+        setPlantingDate={setPlantingDate}
+        harvestDate={harvestDate}
+        setHarvestDate={setHarvestDate}
+        useForecast={useForecast}
+        setUseForecast={setUseForecast}
+        onNext={next}
+        onBack={back}
+      />
+    )}
 
-      {step === 4 && (
-        <Step4Results result={result} onRestart={() => setStep(1)} />
-      )}
-    </div>
-  );
+    {step === 3 && (
+      <Step3Run
+        region={region}
+        plantingDate={plantingDate}
+        harvestDate={harvestDate}
+        useForecast={useForecast}
+        onResult={(res) => {
+          setResult(res);
+          next();
+        }}
+        onBack={back}
+      />
+    )}
+
+    {step === 4 && (
+      <Step4Results result={result} onRestart={() => setStep(1)} />
+    )}
+  </div>
+);
+
 }
 
 function ProgressBar({ step }) {
