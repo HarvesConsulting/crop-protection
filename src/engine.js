@@ -1,6 +1,7 @@
 // engine.js
 import { format, parseISO, differenceInDays } from "date-fns";
 
+// ---------------- Константи ----------------
 const RH_WET_THRESHOLD = 90;
 const COND_RH = 90;
 const COND_T_MIN = 10;
@@ -9,14 +10,15 @@ const COND_HOURS_TRIGGER = 3;
 const DEFAULT_DSV_THRESHOLD = 15;
 const RAIN_HIGH_THRESHOLD_MM = 12.7;
 
-// ---------------- DSV ----------------
+// ---------------- DSV правила ----------------
 const DSV_RULES = [
   { tempMin: 21, tempMax: 27, bands: [{ h: 6, dsv: 2 }, { h: 8, dsv: 3 }, { h: 10, dsv: 4 }] },
   { tempMin: 13, tempMax: 21, bands: [{ h: 6, dsv: 1 }, { h: 8, dsv: 2 }, { h: 10, dsv: 3 }, { h: 12, dsv: 4 }] },
-  { tempMin: 7, tempMax: 13,  bands: [{ h: 6, dsv: 1 }, { h: 8, dsv: 1 }, { h: 10, dsv: 2 }, { h: 12, dsv: 3 }, { h: 14, dsv: 4 }] },
+  { tempMin: 7, tempMax: 13, bands: [{ h: 6, dsv: 1 }, { h: 8, dsv: 1 }, { h: 10, dsv: 2 }, { h: 12, dsv: 3 }, { h: 14, dsv: 4 }] },
   { tempMin: 27, tempMax: 40, bands: [{ h: 6, dsv: 1 }, { h: 8, dsv: 2 }, { h: 10, dsv: 3 }] },
 ];
 
+// ---------------- DSV функції ----------------
 export function dsvFromWet(wetHours, wetTempAvg) {
   if (!Number.isFinite(wetHours) || !Number.isFinite(wetTempAvg)) return 0;
   if (wetHours < 6) return 0;
@@ -55,6 +57,7 @@ export function computeMultiSpraySchedule(rows, rainDaily = []) {
   const hasCond = (r) => Number(r.condHours || 0) >= COND_HOURS_TRIGGER;
   const sprays = [];
   const dayMs = 86400000;
+
   const first = rows.find(hasCond)?.date || null;
   if (!first) return sprays;
   sprays.push(first);
@@ -122,7 +125,132 @@ export function makeWeeklyPlan(rows, rainDaily, startISO, rainThreshold, horizon
   return weeks;
 }
 
-// Заглушки API (ти заміниш на повні функції пізніше)
+// ---------------- NASA helper ----------------
+function buildNASAUrl({ lat, lon, start, end }) {
+  const startDate = format(new Date(start), "yyyyMMdd");
+  const endDate = format(new Date(end), "yyyyMMdd");
+  const params = new URLSearchParams({
+    parameters: "T2M,RH2M",
+    start: startDate,
+    end: endDate,
+    latitude: String(lat),
+    longitude: String(lon),
+    community: "ag",
+    "time-standard": "lst",
+    format: "JSON"
+  });
+  return `https://power.larc.nasa.gov/api/temporal/hourly/point?${params.toString()}`;
+}
+
+function buildNASADailyUrl({ lat, lon, start, end }) {
+  const startDate = format(new Date(start), "yyyyMMdd");
+  const endDate = format(new Date(end), "yyyyMMdd");
+  const params = new URLSearchParams({
+    parameters: "PRECTOTCORR",
+    start: startDate,
+    end: endDate,
+    latitude: String(lat),
+    longitude: String(lon),
+    community: "ag",
+    format: "JSON"
+  });
+  return `https://power.larc.nasa.gov/api/temporal/daily/point?${params.toString()}`;
+}
+
+function transformNASAResponse(json) {
+  const p = json?.properties?.parameter;
+  if (!p) return [];
+  const t = p.T2M || {};
+  const rh = p.RH2M || {};
+  const perDay = new Map();
+
+  for (const k of Object.keys(t)) {
+    const iso = `${k.slice(0,4)}-${k.slice(4,6)}-${k.slice(6,8)}`;
+    const rec = perDay.get(iso) || { allTemp: [], wetTemp: [], wetHours: 0, condHours: 0 };
+    const tv = Number(t[k]);
+    const rv = Number(rh[k]);
+    if (Number.isFinite(tv)) rec.allTemp.push(tv);
+    if (Number.isFinite(tv) && Number.isFinite(rv)) {
+      if (rv >= RH_WET_THRESHOLD) {
+        rec.wetTemp.push(tv);
+        rec.wetHours += 1;
+      }
+      if (rv >= COND_RH && tv >= COND_T_MIN && tv < COND_T_MAX) {
+        rec.condHours += 1;
+      }
+    }
+    perDay.set(iso, rec);
+  }
+
+  const out = [];
+  for (const [iso, r] of perDay.entries()) {
+    const allAvg = r.allTemp.length ? r.allTemp.reduce((a, b) => a + b, 0) / r.allTemp.length : NaN;
+    const wetAvg = r.wetTemp.length ? r.wetTemp.reduce((a, b) => a + b, 0) / r.wetTemp.length : NaN;
+    out.push({
+      date: new Date(iso),
+      wetHours: r.wetHours,
+      wetTempAvg: wetAvg,
+      allTempAvg: allAvg,
+      condHours: r.condHours
+    });
+  }
+  out.sort((a, b) => a.date - b.date);
+  return out;
+}
+
+// ---------------- Open-Meteo helper ----------------
+function transformOpenMeteoHourly(json) {
+  const h = json?.hourly;
+  if (!h) return [];
+  const times = h.time || [];
+  const temps = h.temperature_2m || [];
+  const rhs = h.relative_humidity_2m || [];
+  const perDay = new Map();
+
+  for (let i = 0; i < times.length; i++) {
+    const iso = times[i].split("T")[0];
+    const tv = Number(temps[i]);
+    const rv = Number(rhs[i]);
+    const rec = perDay.get(iso) || { allTemp: [], wetTemp: [], wetHours: 0, condHours: 0 };
+    if (Number.isFinite(tv)) rec.allTemp.push(tv);
+    if (Number.isFinite(tv) && Number.isFinite(rv)) {
+      if (rv >= RH_WET_THRESHOLD) {
+        rec.wetTemp.push(tv);
+        rec.wetHours += 1;
+      }
+      if (rv >= COND_RH && tv >= COND_T_MIN && tv < COND_T_MAX) {
+        rec.condHours += 1;
+      }
+    }
+    perDay.set(iso, rec);
+  }
+
+  const out = [];
+  for (const [iso, r] of perDay.entries()) {
+    const allAvg = r.allTemp.length ? r.allTemp.reduce((a, b) => a + b, 0) / r.allTemp.length : NaN;
+    const wetAvg = r.wetTemp.length ? r.wetTemp.reduce((a, b) => a + b, 0) / r.wetTemp.length : NaN;
+    out.push({
+      date: new Date(iso),
+      wetHours: r.wetHours,
+      wetTempAvg: wetAvg,
+      allTempAvg: allAvg,
+      condHours: r.condHours
+    });
+  }
+  out.sort((a, b) => a.date - b.date);
+  return out;
+}
+
+function transformOpenMeteoDaily(json) {
+  const d = json?.daily;
+  if (!d) return [];
+  return (d.time || []).map((iso, i) => ({
+    date: new Date(iso),
+    rain: Number(d.precipitation_sum[i]) || 0
+  }));
+}
+
+// ---------------- Fetch API ----------------
 export async function fetchForecastHourly(lat, lon, startISO, days = 14) {
   const params = new URLSearchParams({
     latitude: String(lat),
@@ -132,59 +260,15 @@ export async function fetchForecastHourly(lat, lon, startISO, days = 14) {
     start_date: startISO,
     end_date: format(new Date(new Date(startISO).getTime() + (days - 1) * 86400000), "yyyy-MM-dd"),
   });
-
   const url = `https://api.open-meteo.com/v1/forecast?${params.toString()}`;
 
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
-
-    const h = json?.hourly;
-    if (!h) return { daily: [], error: "No data" };
-
-    const times = h.time || [];
-    const temps = h.temperature_2m || [];
-    const rhs = h.relative_humidity_2m || [];
-    const perDay = new Map();
-
-    for (let i = 0; i < times.length; i++) {
-      const ts = times[i];
-      const tv = Number(temps[i]);
-      const rv = Number(rhs[i]);
-      const iso = ts.split("T")[0];
-
-      const rec = perDay.get(iso) || { allTemp: [], wetTemp: [], wetHours: 0, condHours: 0 };
-      if (Number.isFinite(tv)) rec.allTemp.push(tv);
-      if (Number.isFinite(tv) && Number.isFinite(rv)) {
-        if (rv >= RH_WET_THRESHOLD) {
-          rec.wetTemp.push(tv);
-          rec.wetHours += 1;
-        }
-        if (rv >= COND_RH && tv >= COND_T_MIN && tv < COND_T_MAX) {
-          rec.condHours += 1;
-        }
-      }
-      perDay.set(iso, rec);
-    }
-
-    const out = [];
-    for (const [iso, r] of perDay.entries()) {
-      const allAvg = r.allTemp.length ? r.allTemp.reduce((a, b) => a + b, 0) / r.allTemp.length : NaN;
-      const wetAvg = r.wetTemp.length ? r.wetTemp.reduce((a, b) => a + b, 0) / r.wetTemp.length : NaN;
-      out.push({
-        date: new Date(iso),
-        wetHours: r.wetHours,
-        wetTempAvg: wetAvg,
-        allTempAvg: allAvg,
-        condHours: r.condHours,
-      });
-    }
-
-    out.sort((a, b) => a.date.getTime() - b.date.getTime());
-    return { daily: out, error: "" };
+    return { daily: transformOpenMeteoHourly(json), error: "", url };
   } catch (e) {
-    return { daily: [], error: e.message || "Unknown error" };
+    return { daily: [], error: String(e), url };
   }
 }
 
@@ -197,98 +281,83 @@ export async function fetchForecastDailyRain(lat, lon, startISO, days = 14) {
     start_date: startISO,
     end_date: format(new Date(new Date(startISO).getTime() + (days - 1) * 86400000), "yyyy-MM-dd"),
   });
-
   const url = `https://api.open-meteo.com/v1/forecast?${params.toString()}`;
 
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
-
-    const t = json?.daily?.time || [];
-    const r = json?.daily?.precipitation_sum || [];
-
-    const out = t.map((iso, i) => ({
-      date: new Date(iso),
-      rain: Number(r[i]),
-    }));
-
-    return { daily: out, error: "" };
+    return { daily: transformOpenMeteoDaily(json), error: "", url };
   } catch (e) {
-    return { daily: [], error: e.message || "Unknown error" };
+    return { daily: [], error: String(e), url };
   }
 }
 
-export async function fetchWeatherFromNASA(region, plantingDate, harvestDate) {
+export async function fetchWeatherFromNASA(lat, lon, start, end) {
+  let url = "";
   try {
-    const start = format(new Date(plantingDate), "yyyyMMdd");
-const end = format(new Date(harvestDate), "yyyyMMdd");
+    url = buildNASAUrl({ lat, lon, start, end });
+    let res = await fetch(url, { headers: { Accept: "application/json" } });
 
-    const url = `https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M,RH2M&community=AG&longitude=${region.lon}&latitude=${region.lat}&start=${start}&end=${end}&format=JSON`;
-console.log("NASA request params:", {
-  lat: region.lat,
-  lon: region.lon,
-  start,
-  end,
-  url,
-});
+    if (res.ok) {
+      const json = await res.json();
+      const daily = transformNASAResponse(json);
+      if (daily.length > 0) return { daily, error: "", url };
+    }
 
-    const res = await fetch(url, { headers: { Accept: "application/json" } });
-    if (!res.ok) throw new Error(`NASA API error: ${res.status}`);
+    // fallback: Open-Meteo ERA5
+    const params = new URLSearchParams({
+      latitude: String(lat),
+      longitude: String(lon),
+      hourly: "temperature_2m,relative_humidity_2m",
+      start_date: format(new Date(start), "yyyy-MM-dd"),
+      end_date: format(new Date(end), "yyyy-MM-dd"),
+      timezone: "auto",
+    });
+    const omUrl = `https://archive-api.open-meteo.com/v1/era5?${params.toString()}`;
+    res = await fetch(omUrl);
+    if (!res.ok) throw new Error(`ERA5 error ${res.status}`);
+    const json2 = await res.json();
+    return { daily: transformOpenMeteoHourly(json2), error: "", url: omUrl };
 
-    const json = await res.json();
-
-    const t = json?.properties?.parameter?.T2M ?? {};
-    const rh = json?.properties?.parameter?.RH2M ?? {};
-    const dates = Object.keys(t).sort();
-
-    const daily = dates.map(d => ({
-      date: new Date(`${d.slice(0, 4)}-${d.slice(4, 6)}-${d.slice(6, 8)}`),
-      allTempAvg: t[d],
-      wetTempAvg: t[d], // можна окремо рахувати для вологих годин
-      condHours: rh[d] >= 90 ? 3 : 0, // спрощено
-      wetHours: rh[d] >= 90 ? 5 : 0,  // спрощено
-    }));
-
-    return { daily, error: "" };
   } catch (e) {
-    return { daily: [], error: e.message };
+    return { daily: [], error: String(e), url };
   }
 }
 
-
-export async function fetchDailyRainFromNASA(region, plantingDate, harvestDate) {
+export async function fetchDailyRainFromNASA(lat, lon, start, end) {
+  let url = "";
   try {
-    // перетворюємо дату у формат YYYYMMDD
-    const start = format(new Date(plantingDate), "yyyyMMdd");
-const end = format(new Date(harvestDate), "yyyyMMdd");
+    url = buildNASADailyUrl({ lat, lon, start, end });
+    let res = await fetch(url, { headers: { Accept: "application/json" } });
 
+    if (res.ok) {
+      const json = await res.json();
+      const pr = json?.properties?.parameter?.PRECTOTCORR || {};
+      const daily = Object.keys(pr).map(k => ({
+        date: new Date(`${k.slice(0, 4)}-${k.slice(4, 6)}-${k.slice(6, 8)}`),
+        rain: Number(pr[k]) || 0
+      }));
+      if (daily.length > 0) return { daily, error: "", url };
+    }
 
-    const url = `https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=${region.lon}&latitude=${region.lat}&start=${start}&end=${end}&format=JSON`;
-console.log("NASA request params:", {
-  lat: region.lat,
-  lon: region.lon,
-  start,
-  end,
-  url,
-});
+    // fallback: Open-Meteo ERA5 daily
+    const params = new URLSearchParams({
+      latitude: String(lat),
+      longitude: String(lon),
+      daily: "precipitation_sum",
+      start_date: format(new Date(start), "yyyy-MM-dd"),
+      end_date: format(new Date(end), "yyyy-MM-dd"),
+      timezone: "auto",
+    });
+    const omUrl = `https://archive-api.open-meteo.com/v1/era5?${params.toString()}`;
+    res = await fetch(omUrl);
+    if (!res.ok) throw new Error(`ERA5 rain error ${res.status}`);
+    const json2 = await res.json();
+    return { daily: transformOpenMeteoDaily(json2), error: "", url: omUrl };
 
-    const res = await fetch(url, { headers: { Accept: "application/json" } });
-    if (!res.ok) throw new Error(`NASA API error: ${res.status}`);
-
-    const json = await res.json();
-
-    const values = json?.properties?.parameter?.PRECTOTCORR ?? {};
-    const dates = Object.keys(values).sort();
-
-    const daily = dates.map(d => ({
-      date: new Date(`${d.slice(0, 4)}-${d.slice(4, 6)}-${d.slice(6, 8)}`),
-      rain: values[d],
-    }));
-
-    return { daily };
   } catch (e) {
-    return { daily: [], error: e.message };
+    return { daily: [], error: String(e), url };
   }
 }
 
