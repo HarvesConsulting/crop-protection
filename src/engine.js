@@ -160,17 +160,26 @@ export function computeMultiSpraySchedule(rows, rainDaily = []) {
   return sprays;
 }
 
-export function makeWeeklyPlan(rows, rainDaily, startISO, rainThreshold, horizonDays = 14) {
+export function makeWeeklyPlan(rows, rainDaily, startISO, rainThreshold, horizonDays) {
   // старт беремо з параметра, або з першого дня даних, або з сьогодні
   let start = asDate(startISO);
   const safeRows = Array.isArray(rows) ? rows.filter(r => r?.date instanceof Date || asDate(r?.date)) : [];
-  const normRows = safeRows.map(r => ({ ...r, date: r.date instanceof Date ? r.date : asDate(r.date) }))
-                           .filter(r => r.date && isValidDate(r.date));
+  const normRows = safeRows
+    .map(r => ({ ...r, date: r.date instanceof Date ? r.date : asDate(r.date) }))
+    .filter(r => r.date && isValidDate(r.date));
 
   if (!start) start = normRows[0]?.date || new Date();
   if (!isValidDate(start)) return [];
 
-  const stopDate = new Date(start.getTime() + (Number(horizonDays || 14)) * 86400000);
+  // ✅ Виправлена логіка кінцевої дати
+  let stopDate;
+  if (horizonDays) {
+    // Прогноз → обмежуємо горизонт (наприклад, 14 днів)
+    stopDate = new Date(start.getTime() + horizonDays * 86400000);
+  } else {
+    // Історія → до останнього дня з даних
+    stopDate = normRows.length ? normRows[normRows.length - 1].date : start;
+  }
 
   // нормалізуємо опади
   const rain = Array.isArray(rainDaily)
@@ -184,9 +193,12 @@ export function makeWeeklyPlan(rows, rainDaily, startISO, rainThreshold, horizon
 
   while (cur <= stopDate) {
     const end = new Date(Math.min(cur.getTime() + 6 * 86400000, stopDate.getTime()));
-    const wkRows = normRows.filter((r) => r.date >= cur && r.date <= end);
-    const wkRain = rain.filter((r) => r.date >= cur && r.date <= end).reduce((a, b) => a + Number(b?.rain || 0), 0);
-    const weeklyDSV = wkRows.reduce((a, b) => a + Math.min(dsvFromWet(Number(b?.wetHours || 0), Number(b?.wetTempAvg || NaN)), 4), 0);
+    const wkRows = normRows.filter(r => r.date >= cur && r.date <= end);
+    const wkRain = rain.filter(r => r.date >= cur && r.date <= end).reduce((a, b) => a + Number(b?.rain || 0), 0);
+    const weeklyDSV = wkRows.reduce(
+      (a, b) => a + Math.min(dsvFromWet(Number(b?.wetHours || 0), Number(b?.wetTempAvg || NaN)), 4),
+      0
+    );
 
     let rec = "No spray";
     if (weeklyDSV >= 7) rec = "Heavy spray";
