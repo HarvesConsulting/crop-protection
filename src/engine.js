@@ -221,17 +221,34 @@ export async function fetchForecastDailyRain(lat, lon, startISO, days = 14) {
 
 export async function fetchWeatherFromNASA(region, plantingDate, harvestDate) {
   try {
-    const res = await fetch(
-      `https://api.nasa.gov/some-endpoint?lat=${region.lat}&lon=${region.lon}&start=${plantingDate}&end=${harvestDate}&api_key=YOUR_API_KEY`
-    );
-    const data = await res.json();
+    const start = plantingDate.replaceAll("-", "");
+    const end = harvestDate.replaceAll("-", "");
 
-    // Обробка даних і перетворення у формат { daily: [...] }
-    return { daily: data };
+    const url = `https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M,RH2M&community=AG&longitude=${region.lon}&latitude=${region.lat}&start=${start}&end=${end}&format=JSON`;
+
+    const res = await fetch(url, { headers: { Accept: "application/json" } });
+    if (!res.ok) throw new Error(`NASA API error: ${res.status}`);
+
+    const json = await res.json();
+
+    const t = json?.properties?.parameter?.T2M ?? {};
+    const rh = json?.properties?.parameter?.RH2M ?? {};
+    const dates = Object.keys(t).sort();
+
+    const daily = dates.map(d => ({
+      date: new Date(`${d.slice(0, 4)}-${d.slice(4, 6)}-${d.slice(6, 8)}`),
+      allTempAvg: t[d],
+      wetTempAvg: t[d], // можна окремо рахувати для вологих годин
+      condHours: rh[d] >= 90 ? 3 : 0, // спрощено
+      wetHours: rh[d] >= 90 ? 5 : 0,  // спрощено
+    }));
+
+    return { daily, error: "" };
   } catch (e) {
     return { daily: [], error: e.message };
   }
 }
+
 
 export async function fetchDailyRainFromNASA(region, plantingDate, harvestDate) {
   try {
