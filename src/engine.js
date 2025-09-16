@@ -223,6 +223,7 @@ export async function fetchWeatherFromNASA(region, plantingDate, harvestDate) {
   try {
     const start = format(new Date(plantingDate), "yyyyMMdd");
 const end = format(new Date(harvestDate), "yyyyMMdd");
+console.log("NASA Rain URL:", url);
 
     const url = `https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M,RH2M&community=AG&longitude=${region.lon}&latitude=${region.lat}&start=${start}&end=${end}&format=JSON`;
 
@@ -255,6 +256,7 @@ export async function fetchDailyRainFromNASA(region, plantingDate, harvestDate) 
     // перетворюємо дату у формат YYYYMMDD
     const start = format(new Date(plantingDate), "yyyyMMdd");
 const end = format(new Date(harvestDate), "yyyyMMdd");
+console.log("NASA Rain URL:", url);
 
     const url = `https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=${region.lon}&latitude=${region.lat}&start=${start}&end=${end}&format=JSON`;
 
