@@ -41,6 +41,9 @@ export default function Step1Region({ region, setRegion, onNext }) {
   return (
     <div>
       <h2>Крок 1: Оберіть ваше місто</h2>
+      <p className="text-sm text-gray-600 mb-4">
+  Оберіть населений пункт, для якого потрібно розрахувати захист. Ви можете вводити назву українською або англійською.
+</p>
 
       <label>Населений пункт:</label>
       <input

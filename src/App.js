@@ -1,3 +1,4 @@
+import AppIntro from "./components/AppIntro";
 import React, { useState } from "react";
 import Step1Region from "./steps/Step1Region";
 import Step2Season from "./steps/Step2Season";

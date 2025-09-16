@@ -14,6 +14,9 @@ export default function Step4Results({ result, onRestart }) {
   return (
     <div>
       <h2>Крок 4: Результати</h2>
+      <p className="text-sm text-gray-600 mb-4">
+  Нижче показано графік із накопиченими DSV, рекомендовані дати обробки та тижнева оцінка ризику. Зверніть увагу на кольори й порогові значення.
+</p>
 
       <div style={{ marginBottom: 24 }}>
         <h3>Рекомендовані внесення</h3>
