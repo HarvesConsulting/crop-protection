@@ -81,39 +81,43 @@ export default function Step4Results({ result, onRestart }) {
       </div>
 
       {/* Обробки проти фітофторозу */}
-      <div style={{ marginBottom: 24 }}>
-        <h3>Рекомендовані внесення (проти фітофторозу)</h3>
-        {sprayDates.length > 0 ? (
-          <table>
-            <thead>
-              <tr>
-                <th>Дата</th>
-                <th>Препарат</th>
-                <th>Інтервал</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sprayDates.map((d, i) => {
-                const cur = parseISO(d.split(".").reverse().join("-"));
-                const prev =
-                  i > 0
-                    ? parseISO(sprayDates[i - 1].split(".").reverse().join("-"))
-                    : null;
-                const gap = prev ? differenceInDays(cur, prev) : null;
-                return (
-                  <tr key={i}>
-                    <td>{d}</td>
-                    <td>{rotationProducts[i % rotationProducts.length]}</td>
-                    <td>{gap !== null ? `${gap} діб після попередньої` : "—"}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        ) : (
-          <p>—</p>
-        )}
-      </div>
+      {/* Обробки проти фітофторозу */}
+<div style={{ marginBottom: 24 }}>
+  <h3>Рекомендовані внесення (проти фітофторозу)</h3>
+  {sprayDates.length > 0 ? (
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Дата</th>
+          <th>Препарат</th>
+          <th>Інтервал</th>
+        </tr>
+      </thead>
+      <tbody>
+        {sprayDates.map((d, i) => {
+          const cur = parseISO(d.split(".").reverse().join("-"));
+          const prev =
+            i > 0
+              ? parseISO(sprayDates[i - 1].split(".").reverse().join("-"))
+              : null;
+          const gap = prev ? differenceInDays(cur, prev) : null;
+          return (
+            <tr key={i}>
+              <td>{i + 1}</td>
+              <td>{d}</td>
+              <td>{rotationProducts[i % rotationProducts.length]}</td>
+              <td>{gap !== null ? `${gap} діб після попередньої` : "—"}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  ) : (
+    <p>—</p>
+  )}
+</div>
+
 
       {/* Обробки по іншим хворобам */}
       {diseaseSummary &&
@@ -131,31 +135,34 @@ export default function Step4Results({ result, onRestart }) {
           return (
             <div key={name} style={{ marginBottom: 24 }}>
               <h3>Рекомендовані внесення (проти: {name})</h3>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Дата</th>
-                    <th>Препарат</th>
-                    <th>Інтервал</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {treatments.map((item, i) => (
-                    <tr key={i}>
-                      <td>{item.date.toLocaleDateString("uk-UA")}</td>
-                      <td>{rotation[i % rotation.length]}</td>
-                      <td>
-                        {i === 0
-                          ? "—"
-                          : `${differenceInDays(
-                              item.date,
-                              treatments[i - 1].date
-                            )} діб після попередньої`}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+             <table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Дата</th>
+      <th>Препарат</th>
+      <th>Інтервал</th>
+    </tr>
+  </thead>
+  <tbody>
+    {treatments.map((item, i) => (
+      <tr key={i}>
+        <td>{i + 1}</td>
+        <td>{item.date.toLocaleDateString("uk-UA")}</td>
+        <td>{rotation[i % rotation.length]}</td>
+        <td>
+          {i === 0
+            ? "—"
+            : `${differenceInDays(
+                item.date,
+                treatments[i - 1].date
+              )} діб після попередньої`}
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
             </div>
           );
         })}
