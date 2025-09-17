@@ -134,8 +134,12 @@ export default function Step4Results({ result, onRestart }) {
                   <tr key={i}>
                     <td>{item.date.toLocaleDateString("uk-UA")}</td>
                     <td>{rotation[i % rotation.length]}</td>
-                    <td>{item.gap} діб після попередньої</td>
-                  </tr>
+                    <td>
+  {i === 0
+    ? "—"
+    : `${differenceInDays(item.date, treatments[i - 1].date)} діб після попередньої`}
+</td>
+
                 ))}
               </tbody>
             </table>
