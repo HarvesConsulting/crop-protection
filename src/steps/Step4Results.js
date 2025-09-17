@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { parseISO, differenceInDays } from "date-fns";
 
-const rotationPhytophthora = [
+// Ротації препаратів
+const rotationProducts = [
   "Зорвек Інкантія", "Ридоміл Голд", "Танос", "Акробат МЦ",
   "Орондіс Ультра", "Ранман ТОП", "Ревус", "Курзат Р", "Інфініто",
 ];
@@ -10,13 +11,30 @@ const rotationGrayMold = [
   "Луна Експірієнс", "Сігнум", "Скала", "Тельдор", "Скор", "Натіво",
 ];
 
-const rotationAlternaria = [
-  "Сігнум", "Скала", "Скор", "Луна Експірієнс", "Тельдор", "Натіво",
-];
+const rotationAlternaria = rotationGrayMold;
 
 const rotationBacteriosis = [
   "Медян Екстра", "Казумін", "Серенада",
 ];
+
+// ➕ Вибір дат обробки з інтервалом (7 днів)
+function getFilteredTreatments(riskDates, minGapDays = 7) {
+  const sorted = [...riskDates]
+    .map(d => (d instanceof Date ? d : new Date(d)))
+    .sort((a, b) => a - b);
+
+  const selected = [];
+  for (let i = 0; i < sorted.length; i++) {
+    const d = sorted[i];
+    if (
+      selected.length === 0 ||
+      (d.getTime() - selected[selected.length - 1].getTime()) / (1000 * 60 * 60 * 24) >= minGapDays
+    ) {
+      selected.push(d);
+    }
+  }
+  return selected;
+}
 
 export default function Step4Results({ result, onRestart }) {
   const [blitecastMode, setBlitecastMode] = useState(false);
@@ -25,71 +43,6 @@ export default function Step4Results({ result, onRestart }) {
 
   const { sprayDates, diagnostics, weeklyPlan, diseaseSummary } = result;
 
-  const renderTreatmentPlan = () => {
-    if (!sprayDates.length) return <p>—</p>;
-
-    return (
-      <ol>
-        {sprayDates.map((d, i) => {
-          const cur = parseISO(d.split(".").reverse().join("-"));
-          const prev = i > 0 ? parseISO(sprayDates[i - 1].split(".").reverse().join("-")) : null;
-          const gap = prev ? differenceInDays(cur, prev) : null;
-
-          const product = rotationPhytophthora[i % rotationPhytophthora.length];
-
-          return (
-            <li key={i} style={{ marginBottom: 4 }}>
-              {d} — {product}
-              {gap !== null && (
-                <span style={{ color: "#555" }}> ({gap} діб після попередньої)</span>
-              )}
-            </li>
-          );
-        })}
-      </ol>
-    );
-  };
-
-  const renderDiseaseRisks = () => {
-    if (!diseaseSummary?.length) return null;
-
-    return (
-      <div style={{ marginBottom: 24 }}>
-        <h3>⚠️ Дні з ризиком розвитку хвороб</h3>
-        <ul>
-          {diseaseSummary.map((d, index) => {
-            const rotation = {
-              "Сіра гниль": rotationGrayMold,
-              "Альтернаріоз": rotationAlternaria,
-              "Бактеріоз": rotationBacteriosis,
-            }[d.name] || [];
-
-            const productsStr = rotation.length
-              ? rotation.join(", ")
-              : "—";
-
-            return (
-              <li key={index} style={{ marginBottom: 8 }}>
-                <strong>{d.name}:</strong>{" "}
-                {d.riskDates.length > 0
-                  ? d.riskDates.map((dt) =>
-                      dt instanceof Date
-                        ? dt.toLocaleDateString("uk-UA")
-                        : String(dt)
-                    ).join(", ")
-                  : "—"}
-                <br />
-                <span style={{ fontSize: 14, color: "#555" }}>
-                  Рекомендовані препарати: {productsStr}
-                </span>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-    );
-  };
-
   return (
     <div>
       <h2>Крок 4: Результати</h2>
@@ -97,6 +50,7 @@ export default function Step4Results({ result, onRestart }) {
         Нижче показано рекомендовані дати обробки. Ви можете увімкнути розширений режим BLITECAST для діагностики.
       </p>
 
+      {/* Кнопка BLITECAST */}
       <div style={{ marginBottom: 16 }}>
         <button
           onClick={() => setBlitecastMode(!blitecastMode)}
@@ -114,13 +68,59 @@ export default function Step4Results({ result, onRestart }) {
         </button>
       </div>
 
+      {/* Обробки проти фітофторозу */}
       <div style={{ marginBottom: 24 }}>
         <h3>Рекомендовані внесення (проти фітофторозу)</h3>
-        {renderTreatmentPlan()}
+        {sprayDates.length > 0 ? (
+          <ol>
+            {sprayDates.map((d, i) => {
+              const cur = parseISO(d.split(".").reverse().join("-"));
+              const prev = i > 0 ? parseISO(sprayDates[i - 1].split(".").reverse().join("-")) : null;
+              const gap = prev ? differenceInDays(cur, prev) : null;
+
+              return (
+                <li key={i} style={{ marginBottom: 4 }}>
+                  {d} — {rotationProducts[i % rotationProducts.length]}
+                  {gap !== null && (
+                    <span style={{ color: "#555" }}> ({gap} діб після попередньої)</span>
+                  )}
+                </li>
+              );
+            })}
+          </ol>
+        ) : (
+          <p>—</p>
+        )}
       </div>
 
-      {renderDiseaseRisks()}
+      {/* 🔁 Обробки по іншим хворобам */}
+      {diseaseSummary && diseaseSummary.map((disease) => {
+        const { name, riskDates } = disease;
 
+        const rotation = {
+          "Сіра гниль": rotationGrayMold,
+          "Альтернаріоз": rotationAlternaria,
+          "Бактеріоз": rotationBacteriosis,
+        }[name] || [];
+
+        const treatments = getFilteredTreatments(riskDates, 7);
+        if (!treatments.length) return null;
+
+        return (
+          <div key={name} style={{ marginBottom: 24 }}>
+            <h3>Рекомендовані внесення (проти: {name})</h3>
+            <ol>
+              {treatments.map((date, i) => (
+                <li key={i}>
+                  {date.toLocaleDateString("uk-UA")} — {rotation[i % rotation.length]}
+                </li>
+              ))}
+            </ol>
+          </div>
+        );
+      })}
+
+      {/* 🔬 BLITECAST: розширена діагностика */}
       {blitecastMode && (
         <>
           <div style={{ marginBottom: 24 }}>
@@ -179,6 +179,7 @@ export default function Step4Results({ result, onRestart }) {
         </>
       )}
 
+      {/* 🔁 Кнопка перезапуску */}
       <div style={{ marginTop: 32 }}>
         <button
           onClick={onRestart}
@@ -199,7 +200,7 @@ export default function Step4Results({ result, onRestart }) {
   );
 }
 
-// DSV логіка для BLITECAST
+// Функція DSV — якщо потрібно дублювати (або імпортуй)
 function dsvFromWet(wetHours, wetTempAvg) {
   if (!Number.isFinite(wetHours) || !Number.isFinite(wetTempAvg)) return 0;
   if (wetHours < 6) return 0;
@@ -207,7 +208,7 @@ function dsvFromWet(wetHours, wetTempAvg) {
   const DSV_RULES = [
     { tempMin: 21, tempMax: 27, bands: [{ h: 6, dsv: 2 }, { h: 8, dsv: 3 }, { h: 10, dsv: 4 }] },
     { tempMin: 13, tempMax: 21, bands: [{ h: 6, dsv: 1 }, { h: 8, dsv: 2 }, { h: 10, dsv: 3 }, { h: 12, dsv: 4 }] },
-    { tempMin: 7,  tempMax: 13,  bands: [{ h: 6, dsv: 1 }, { h: 8, dsv: 1 }, { h: 10, dsv: 2 }, { h: 12, dsv: 3 }, { h: 14, dsv: 4 }] },
+    { tempMin: 7, tempMax: 13,  bands: [{ h: 6, dsv: 1 }, { h: 8, dsv: 1 }, { h: 10, dsv: 2 }, { h: 12, dsv: 3 }, { h: 14, dsv: 4 }] },
     { tempMin: 27, tempMax: 40, bands: [{ h: 6, dsv: 1 }, { h: 8, dsv: 2 }, { h: 10, dsv: 3 }] },
   ];
 
