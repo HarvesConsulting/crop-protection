@@ -1,12 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
 import { parseISO, differenceInDays } from "date-fns";
-
-// Препарати — словник по хворобах
-const diseaseProducts = {
-  "Сіра гниль": ["Луна Експірієнс", "Сігнум", "Скала", "Тельдор", "Скор", "Натіво"],
-  "Альтернаріоз": ["Луна Експірієнс", "Сігнум", "Скала", "Тельдор", "Скор", "Натіво"],
-  "Бактеріоз": ["Медян Екстра", "Казумін", "Серенада"],
-};
 
 const rotationProducts = [
   "Зорвек Інкантія", "Ридоміл Голд", "Танос", "Акробат МЦ",
@@ -14,21 +7,38 @@ const rotationProducts = [
 ];
 
 export default function Step4Results({ result, onRestart }) {
+  const [blitecastMode, setBlitecastMode] = useState(false);
+
   if (!result) return <p>Дані відсутні</p>;
 
-  const { sprayDates, diagnostics, weeklyPlan, diseaseSummary = [] } = result;
+  const { sprayDates, diagnostics, weeklyPlan, diseaseSummary } = result;
 
   return (
     <div>
       <h2>Крок 4: Результати</h2>
-
       <p className="text-sm text-gray-600 mb-4">
-        Нижче показано графік із накопиченими DSV, рекомендовані дати обробки, ризики інших хвороб та щотижнева оцінка ризику.
+        Нижче показано рекомендовані дати обробки. Ви можете увімкнути розширений режим BLITECAST для діагностики.
       </p>
 
-      {/* ✅ Внесення */}
+      <div style={{ marginBottom: 16 }}>
+        <button
+          onClick={() => setBlitecastMode(!blitecastMode)}
+          style={{
+            padding: "8px 16px",
+            fontSize: "14px",
+            borderRadius: "6px",
+            border: "1px solid #2d6cdf",
+            background: blitecastMode ? "#2d6cdf" : "#fff",
+            color: blitecastMode ? "#fff" : "#2d6cdf",
+            cursor: "pointer",
+          }}
+        >
+          {blitecastMode ? "🔽 Сховати BLITECAST" : "🔬 Показати BLITECAST"}
+        </button>
+      </div>
+
       <div style={{ marginBottom: 24 }}>
-        <h3>Рекомендовані внесення (фітофтороз)</h3>
+        <h3>Рекомендовані внесення</h3>
         {sprayDates.length > 0 ? (
           <ol>
             {sprayDates.map((d, i) => {
@@ -51,92 +61,65 @@ export default function Step4Results({ result, onRestart }) {
         )}
       </div>
 
-      {/* ✅ Додано: Хвороби */}
-      {diseaseSummary.length > 0 && (
-        <div style={{ marginBottom: 32 }}>
-          <h3>Прогноз розвитку інших хвороб</h3>
-          {diseaseSummary.map((d, i) => (
-            <div key={i} style={{ marginBottom: 20 }}>
-              <h4 style={{ marginBottom: 6 }}>{d.name}</h4>
+      {/* ✅ BLITECAST: розширена діагностика */}
+      {blitecastMode && (
+        <>
+          <div style={{ marginBottom: 24 }}>
+            <h3>Діагностика по днях</h3>
+            <table style={{ width: "100%", fontSize: 14, borderCollapse: "collapse" }}>
+              <thead>
+                <tr>
+                  <th align="left">Дата</th>
+                  <th>RH ≥ 90%</th>
+                  <th>RH ≥ 90% & T 10–28°C</th>
+                  <th>Tavg (вологі), °C</th>
+                  <th>DSV</th>
+                </tr>
+              </thead>
+              <tbody>
+                {diagnostics.map((d, i) => (
+                  <tr key={i}>
+                    <td>{d.date.toLocaleDateString("uk-UA")}</td>
+                    <td align="center">{d.wetHours}</td>
+                    <td align="center">{d.condHours ?? 0}</td>
+                    <td align="center">
+                      {Number.isFinite(d.wetTempAvg) ? d.wetTempAvg.toFixed(1) : "—"}
+                    </td>
+                    <td align="center">
+                      {Math.min(dsvFromWet(d.wetHours, d.wetTempAvg), 4)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-              <p style={{ fontStyle: "italic", marginBottom: 6 }}>
-                Ризик виявлено у {d.riskDates.length} днів:
-              </p>
-              {d.riskDates.length > 0 ? (
-                <ul>
-                  {d.riskDates.map((date, j) => (
-                    <li key={j}>{new Date(date).toLocaleDateString("uk-UA")}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p style={{ color: "green" }}>Ризику не виявлено</p>
-              )}
-
-              <p style={{ marginTop: 6 }}>
-                <strong>Рекомендовані препарати:</strong> {diseaseProducts[d.name]?.join(", ") || "Немає даних"}
-              </p>
-            </div>
-          ))}
-        </div>
+          <div style={{ marginBottom: 24 }}>
+            <h3>Щотижневі підсумки</h3>
+            <table style={{ width: "100%", fontSize: 14, borderCollapse: "collapse" }}>
+              <thead>
+                <tr>
+                  <th align="left">Тиждень</th>
+                  <th align="center">DSV</th>
+                  <th align="center">Опади, мм</th>
+                  <th align="left">Рекомендація</th>
+                </tr>
+              </thead>
+              <tbody>
+                {weeklyPlan.map((w, i) => (
+                  <tr key={i}>
+                    <td>{w.startStr} – {w.endStr}</td>
+                    <td align="center">{w.weeklyDSV}</td>
+                    <td align="center">{w.rainSum.toFixed(1)}</td>
+                    <td>{w.rec}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
 
-      {/* ✅ Діагностика */}
-      <div style={{ marginBottom: 24 }}>
-        <h3>Діагностика по днях (фітофтороз)</h3>
-        <table style={{ width: "100%", fontSize: 14, borderCollapse: "collapse" }}>
-          <thead>
-            <tr>
-              <th align="left">Дата</th>
-              <th>RH ≥ 90%</th>
-              <th>RH ≥ 90% & T 10–28°C</th>
-              <th>Tavg (вологі), °C</th>
-              <th>DSV</th>
-            </tr>
-          </thead>
-          <tbody>
-            {diagnostics.map((d, i) => (
-              <tr key={i}>
-                <td>{d.date.toLocaleDateString("uk-UA")}</td>
-                <td align="center">{d.wetHours}</td>
-                <td align="center">{d.condHours ?? 0}</td>
-                <td align="center">
-                  {Number.isFinite(d.wetTempAvg) ? d.wetTempAvg.toFixed(1) : "—"}
-                </td>
-                <td align="center">
-                  {Math.min(dsvFromWet(d.wetHours, d.wetTempAvg), 4)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* ✅ Щотижневі підсумки */}
-      <div>
-        <h3>Щотижневі підсумки</h3>
-        <table style={{ width: "100%", fontSize: 14, borderCollapse: "collapse" }}>
-          <thead>
-            <tr>
-              <th align="left">Тиждень</th>
-              <th align="center">DSV</th>
-              <th align="center">Опади, мм</th>
-              <th align="left">Рекомендація</th>
-            </tr>
-          </thead>
-          <tbody>
-            {weeklyPlan.map((w, i) => (
-              <tr key={i}>
-                <td>{w.startStr} – {w.endStr}</td>
-                <td align="center">{w.weeklyDSV}</td>
-                <td align="center">{w.rainSum.toFixed(1)}</td>
-                <td>{w.rec}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* 🔁 Перезапуск */}
       <div style={{ marginTop: 32 }}>
         <button
           onClick={onRestart}
@@ -157,7 +140,6 @@ export default function Step4Results({ result, onRestart }) {
   );
 }
 
-// Потрібна ця функція — додай або імпортуй
 function dsvFromWet(wetHours, wetTempAvg) {
   if (!Number.isFinite(wetHours) || !Number.isFinite(wetTempAvg)) return 0;
   if (wetHours < 6) return 0;
