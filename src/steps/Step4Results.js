@@ -17,28 +17,18 @@ const rotationBacteriosis = [
   "Медян Екстра", "Казумін", "Серенада",
 ];
 
-// Обчислення інтервалу для обробок по інших хворобах
-function getAdvancedTreatments(riskDates, minGap = 7, shortGap = 5) {
-  const sorted = [...riskDates].map(d => new Date(d)).sort((a, b) => a - b);
+function getFilteredTreatments(riskDates, minGapDays = 7) {
+  const sorted = [...riskDates].map(d => (d instanceof Date ? d : new Date(d))).sort((a, b) => a - b);
   const selected = [];
-  let i = 0;
-
-  while (i < sorted.length) {
-    const current = sorted[i];
-    if (!selected.length || differenceInDays(current, selected[selected.length - 1].date) >= selected[selected.length - 1].gap) {
-      // Перевірка 4+ днів підряд
-      let streak = 1;
-      let j = i + 1;
-      while (j < sorted.length && differenceInDays(sorted[j], sorted[j - 1]) === 1) {
-        streak++;
-        j++;
-      }
-      const gap = streak >= 4 ? shortGap : minGap;
-      selected.push({ date: current, gap });
+  for (let i = 0; i < sorted.length; i++) {
+    const d = sorted[i];
+    if (
+      selected.length === 0 ||
+      (d.getTime() - selected[selected.length - 1].getTime()) / (1000 * 60 * 60 * 24) >= minGapDays
+    ) {
+      selected.push(d);
     }
-    i++;
   }
-
   return selected;
 }
 
@@ -56,7 +46,6 @@ export default function Step4Results({ result, onRestart }) {
         Нижче показано рекомендовані дати обробки. Ви можете увімкнути розширений режим BLITECAST для діагностики.
       </p>
 
-      {/* Кнопка BLITECAST */}
       <div style={{ marginBottom: 16 }}>
         <button
           onClick={() => setBlitecastMode(!blitecastMode)}
@@ -75,66 +64,70 @@ export default function Step4Results({ result, onRestart }) {
       </div>
 
       {/* Обробки проти фітофторозу */}
-      <div style={{ marginBottom: 24 }}>
-        <h3>Рекомендовані внесення (проти фітофторозу)</h3>
-        {sprayDates.length > 0 ? (
-          <table>
-            <thead>
-              <tr>
-                <th>Дата</th>
-                <th>Препарат</th>
-                <th>Інтервал</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sprayDates.map((d, i) => {
-                const cur = parseISO(d.split(".").reverse().join("-"));
-                const prev = i > 0 ? parseISO(sprayDates[i - 1].split(".").reverse().join("-")) : null;
-                const gap = prev ? differenceInDays(cur, prev) : null;
-                return (
-                  <tr key={i}>
-                    <td>{d}</td>
-                    <td>{rotationProducts[i % rotationProducts.length]}</td>
-                    <td>{gap !== null ? `${gap} діб після попередньої` : "—"}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        ) : (
-          <p>—</p>
-        )}
+      <div className="overflow-x-auto mb-8">
+        <h3 className="text-lg font-semibold mb-2">Рекомендовані внесення (проти фітофторозу)</h3>
+        <table className="min-w-full divide-y divide-gray-300 border border-gray-300 rounded-lg text-sm text-gray-800">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="px-4 py-2 text-left font-semibold">Дата</th>
+              <th className="px-4 py-2 text-left font-semibold">Препарат</th>
+              <th className="px-4 py-2 text-left font-semibold">Інтервал</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {sprayDates.map((d, i) => {
+              const cur = parseISO(d.split(".").reverse().join("-"));
+              const prev = i > 0 ? parseISO(sprayDates[i - 1].split(".").reverse().join("-")) : null;
+              const gap = prev ? differenceInDays(cur, prev) : null;
+              const intervalStr = gap !== null ? `${gap} діб після попередньої` : "—";
+              return (
+                <tr key={i} className="hover:bg-gray-50">
+                  <td className="px-4 py-2 whitespace-nowrap">{d}</td>
+                  <td className="px-4 py-2 whitespace-nowrap">{rotationProducts[i % rotationProducts.length]}</td>
+                  <td className="px-4 py-2 whitespace-nowrap">{intervalStr}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
 
-      {/* Обробки по іншим хворобам */}
+      {/* Інші хвороби */}
       {diseaseSummary && diseaseSummary.map((disease) => {
         const { name, riskDates } = disease;
+
         const rotation = {
           "Сіра гниль": rotationGrayMold,
           "Альтернаріоз": rotationAlternaria,
           "Бактеріоз": rotationBacteriosis,
         }[name] || [];
 
-        const treatments = getAdvancedTreatments(riskDates);
+        const filtered = getFilteredTreatments(riskDates, 7);
+        const treatments = filtered.map((date, i) => {
+          const prev = i > 0 ? filtered[i - 1] : null;
+          const intervalStr = prev ? `${differenceInDays(date, prev)} діб після попередньої` : "—";
+          return { date, intervalStr };
+        });
+
         if (!treatments.length) return null;
 
         return (
-          <div key={name} style={{ marginBottom: 24 }}>
-            <h3>Рекомендовані внесення (проти: {name})</h3>
-            <table>
-              <thead>
+          <div key={name} className="overflow-x-auto mb-8">
+            <h3 className="text-lg font-semibold mb-2">Рекомендовані внесення (проти: {name})</h3>
+            <table className="min-w-full divide-y divide-gray-300 border border-gray-300 rounded-lg text-sm text-gray-800">
+              <thead className="bg-gray-100">
                 <tr>
-                  <th>Дата</th>
-                  <th>Препарат</th>
-                  <th>Інтервал</th>
+                  <th className="px-4 py-2 text-left font-semibold">Дата</th>
+                  <th className="px-4 py-2 text-left font-semibold">Препарат</th>
+                  <th className="px-4 py-2 text-left font-semibold">Інтервал</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gray-200">
                 {treatments.map((item, i) => (
-                  <tr key={i}>
-                    <td>{item.date.toLocaleDateString("uk-UA")}</td>
-                    <td>{rotation[i % rotation.length]}</td>
-                    <td>{item.gap} діб після попередньої</td>
+                  <tr key={i} className="hover:bg-gray-50">
+                    <td className="px-4 py-2 whitespace-nowrap">{item.date.toLocaleDateString("uk-UA")}</td>
+                    <td className="px-4 py-2 whitespace-nowrap">{rotation[i % rotation.length]}</td>
+                    <td className="px-4 py-2 whitespace-nowrap">{item.intervalStr}</td>
                   </tr>
                 ))}
               </tbody>
@@ -143,53 +136,52 @@ export default function Step4Results({ result, onRestart }) {
         );
       })}
 
-      {/* BLITECAST */}
       {blitecastMode && (
         <>
-          <div style={{ marginBottom: 24 }}>
-            <h3>Діагностика по днях</h3>
-            <table style={{ width: "100%", fontSize: 14, borderCollapse: "collapse" }}>
-              <thead>
+          <div className="overflow-x-auto mb-6">
+            <h3 className="text-lg font-semibold mb-2">Діагностика по днях</h3>
+            <table className="min-w-full divide-y divide-gray-300 border border-gray-300 rounded-lg text-sm text-gray-800">
+              <thead className="bg-gray-100">
                 <tr>
-                  <th align="left">Дата</th>
-                  <th>RH ≥ 90%</th>
-                  <th>RH ≥ 90% & T 10–28°C</th>
-                  <th>Tavg (вологі), °C</th>
-                  <th>DSV</th>
+                  <th className="px-4 py-2 text-left font-semibold">Дата</th>
+                  <th className="px-4 py-2 text-center font-semibold">RH ≥ 90%</th>
+                  <th className="px-4 py-2 text-center font-semibold">RH ≥ 90% & T 10–28°C</th>
+                  <th className="px-4 py-2 text-center font-semibold">Tavg (вологі), °C</th>
+                  <th className="px-4 py-2 text-center font-semibold">DSV</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gray-200">
                 {diagnostics.map((d, i) => (
-                  <tr key={i}>
-                    <td>{d.date.toLocaleDateString("uk-UA")}</td>
-                    <td align="center">{d.wetHours}</td>
-                    <td align="center">{d.condHours ?? 0}</td>
-                    <td align="center">{Number.isFinite(d.wetTempAvg) ? d.wetTempAvg.toFixed(1) : "—"}</td>
-                    <td align="center">{Math.min(dsvFromWet(d.wetHours, d.wetTempAvg), 4)}</td>
+                  <tr key={i} className="hover:bg-gray-50">
+                    <td className="px-4 py-2 whitespace-nowrap">{d.date.toLocaleDateString("uk-UA")}</td>
+                    <td className="px-4 py-2 text-center">{d.wetHours}</td>
+                    <td className="px-4 py-2 text-center">{d.condHours ?? 0}</td>
+                    <td className="px-4 py-2 text-center">{Number.isFinite(d.wetTempAvg) ? d.wetTempAvg.toFixed(1) : "—"}</td>
+                    <td className="px-4 py-2 text-center">{Math.min(dsvFromWet(d.wetHours, d.wetTempAvg), 4)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
 
-          <div style={{ marginBottom: 24 }}>
-            <h3>Щотижневі підсумки</h3>
-            <table style={{ width: "100%", fontSize: 14, borderCollapse: "collapse" }}>
-              <thead>
+          <div className="overflow-x-auto mb-6">
+            <h3 className="text-lg font-semibold mb-2">Щотижневі підсумки</h3>
+            <table className="min-w-full divide-y divide-gray-300 border border-gray-300 rounded-lg text-sm text-gray-800">
+              <thead className="bg-gray-100">
                 <tr>
-                  <th align="left">Тиждень</th>
-                  <th align="center">DSV</th>
-                  <th align="center">Опади, мм</th>
-                  <th align="left">Рекомендація</th>
+                  <th className="px-4 py-2 text-left font-semibold">Тиждень</th>
+                  <th className="px-4 py-2 text-center font-semibold">DSV</th>
+                  <th className="px-4 py-2 text-center font-semibold">Опади, мм</th>
+                  <th className="px-4 py-2 text-left font-semibold">Рекомендація</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gray-200">
                 {weeklyPlan.map((w, i) => (
-                  <tr key={i}>
-                    <td>{w.startStr} – {w.endStr}</td>
-                    <td align="center">{w.weeklyDSV}</td>
-                    <td align="center">{w.rainSum.toFixed(1)}</td>
-                    <td>{w.rec}</td>
+                  <tr key={i} className="hover:bg-gray-50">
+                    <td className="px-4 py-2 whitespace-nowrap">{w.startStr} – {w.endStr}</td>
+                    <td className="px-4 py-2 text-center">{w.weeklyDSV}</td>
+                    <td className="px-4 py-2 text-center">{w.rainSum.toFixed(1)}</td>
+                    <td className="px-4 py-2">{w.rec}</td>
                   </tr>
                 ))}
               </tbody>
@@ -198,7 +190,6 @@ export default function Step4Results({ result, onRestart }) {
         </>
       )}
 
-      {/* Перезапуск */}
       <div style={{ marginTop: 32 }}>
         <button
           onClick={onRestart}
@@ -219,7 +210,6 @@ export default function Step4Results({ result, onRestart }) {
   );
 }
 
-// Функція DSV
 function dsvFromWet(wetHours, wetTempAvg) {
   if (!Number.isFinite(wetHours) || !Number.isFinite(wetTempAvg)) return 0;
   if (wetHours < 6) return 0;
