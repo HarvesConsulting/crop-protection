@@ -11,9 +11,13 @@ export function isAlternariaRisk(day) {
 // models based on Kim et al. (2014)
 
 export function isBacterialRisk(day, rainValue) {
-  const strongRain = rainValue >= 5;
-  const heavyDew = day.wetHours >= 8;
-  const tempOK = day.allTempAvg >= 24 && day.allTempAvg <= 32;
+  const wet = Number(day.wetHours) || 0;
+  const temp = Number(day.allTempAvg) || 0;
+
+  const strongRain = rainValue >= 3;       // трохи слабший поріг
+  const heavyDew = wet >= 5;                // 5 годин вологості листя
+
+  const tempOK = temp >= 20 && temp <= 32;  // температура нижча межа
 
   return tempOK && (strongRain || heavyDew);
 }
