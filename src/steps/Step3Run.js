@@ -8,9 +8,15 @@ import {
   computeDSVSchedule,
   makeWeeklyPlan,
   dsvFromWet,
-} from "../engine"; // ТУТ: заміни на свій файл з логікою (можливо, потрібно перенести всі функції в engine.js або utils.js)
+} from "../engine";
 
-import { format, parseISO } from "date-fns";
+import {
+  isGrayMoldRisk,
+  isAlternariaRisk,
+  isBacterialRisk,
+} from "../diseases"; // додай цей файл окремо (або імпортуй з engine, якщо вставиш туди)
+
+import { format } from "date-fns";
 
 const DEFAULT_DSV_THRESHOLD = 15;
 const RAIN_HIGH_THRESHOLD_MM = 12.7;
@@ -20,6 +26,7 @@ export default function Step3Run({
   plantingDate,
   harvestDate,
   useForecast,
+  diseases,
   onResult,
   onBack,
 }) {
@@ -33,18 +40,15 @@ export default function Step3Run({
     try {
       let wx, rain;
 
-     if (useForecast) {
-  // ІСТОРИЧНА МОДЕЛЬ
-  [wx, rain] = await Promise.all([
-    fetchWeatherFromNASA(region.lat, region.lon, plantingDate, harvestDate),
-    fetchDailyRainFromNASA(region.lat, region.lon, plantingDate, harvestDate),
-  ]);
-} else {
-  // ПРОГНОЗ НА 14 ДНІВ
-  wx = await fetchForecastHourly(region.lat, region.lon, plantingDate, 14);
-  rain = await fetchForecastDailyRain(region.lat, region.lon, plantingDate, 14);
-}
-
+      if (useForecast) {
+        [wx, rain] = await Promise.all([
+          fetchWeatherFromNASA(region.lat, region.lon, plantingDate, harvestDate),
+          fetchDailyRainFromNASA(region.lat, region.lon, plantingDate, harvestDate),
+        ]);
+      } else {
+        wx = await fetchForecastHourly(region.lat, region.lon, plantingDate, 14);
+        rain = await fetchForecastDailyRain(region.lat, region.lon, plantingDate, 14);
+      }
 
       if (wx.error) {
         setError(`Помилка погоди: ${wx.error}`);
@@ -71,10 +75,34 @@ export default function Step3Run({
         useForecast ? undefined : 14
       );
 
+      // 🔍 Розрахунок ризиків по кожній обраній хворобі
+      const diseaseSummary = [];
+
+      if (diseases?.includes("grayMold")) {
+        const riskDates = rows.filter(isGrayMoldRisk).map((d) => d.date);
+        diseaseSummary.push({ name: "Сіра гниль", riskDates });
+      }
+
+      if (diseases?.includes("alternaria")) {
+        const riskDates = rows.filter(isAlternariaRisk).map((d) => d.date);
+        diseaseSummary.push({ name: "Альтернаріоз", riskDates });
+      }
+
+      if (diseases?.includes("bacteriosis")) {
+        const riskDates = rows.filter((d) => {
+          const rainVal = (rain?.daily || []).find((r) =>
+            r.date.getTime() === d.date.getTime()
+          )?.rain || 0;
+          return isBacterialRisk(d, rainVal);
+        }).map((d) => d.date);
+        diseaseSummary.push({ name: "Бактеріоз", riskDates });
+      }
+
       const result = {
         sprayDates: sprays.map((d) => format(d, "dd.MM.yyyy")),
         diagnostics: comp.rows,
         weeklyPlan: weekly,
+        diseaseSummary, // ✅ Додаємо
       };
 
       onResult(result);

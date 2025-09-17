@@ -1,6 +1,13 @@
 import React from "react";
 import { parseISO, differenceInDays } from "date-fns";
 
+// Препарати — словник по хворобах
+const diseaseProducts = {
+  "Сіра гниль": ["Луна Експірієнс", "Сігнум", "Скала", "Тельдор", "Скор", "Натіво"],
+  "Альтернаріоз": ["Луна Експірієнс", "Сігнум", "Скала", "Тельдор", "Скор", "Натіво"],
+  "Бактеріоз": ["Медян Екстра", "Казумін", "Серенада"],
+};
+
 const rotationProducts = [
   "Зорвек Інкантія", "Ридоміл Голд", "Танос", "Акробат МЦ",
   "Орондіс Ультра", "Ранман ТОП", "Ревус", "Курзат Р", "Інфініто",
@@ -9,21 +16,23 @@ const rotationProducts = [
 export default function Step4Results({ result, onRestart }) {
   if (!result) return <p>Дані відсутні</p>;
 
-  const { sprayDates, diagnostics, weeklyPlan } = result;
+  const { sprayDates, diagnostics, weeklyPlan, diseaseSummary = [] } = result;
 
   return (
     <div>
       <h2>Крок 4: Результати</h2>
-      <p className="text-sm text-gray-600 mb-4">
-  Нижче показано графік із накопиченими DSV, рекомендовані дати обробки та тижнева оцінка ризику. Зверніть увагу на кольори й порогові значення.
-</p>
 
+      <p className="text-sm text-gray-600 mb-4">
+        Нижче показано графік із накопиченими DSV, рекомендовані дати обробки, ризики інших хвороб та щотижнева оцінка ризику.
+      </p>
+
+      {/* ✅ Внесення */}
       <div style={{ marginBottom: 24 }}>
-        <h3>Рекомендовані внесення</h3>
+        <h3>Рекомендовані внесення (фітофтороз)</h3>
         {sprayDates.length > 0 ? (
           <ol>
             {sprayDates.map((d, i) => {
-              const cur = parseISO(d.split(".").reverse().join("-")); // dd.MM.yyyy → ISO
+              const cur = parseISO(d.split(".").reverse().join("-"));
               const prev = i > 0 ? parseISO(sprayDates[i - 1].split(".").reverse().join("-")) : null;
               const gap = prev ? differenceInDays(cur, prev) : null;
 
@@ -42,8 +51,38 @@ export default function Step4Results({ result, onRestart }) {
         )}
       </div>
 
+      {/* ✅ Додано: Хвороби */}
+      {diseaseSummary.length > 0 && (
+        <div style={{ marginBottom: 32 }}>
+          <h3>Прогноз розвитку інших хвороб</h3>
+          {diseaseSummary.map((d, i) => (
+            <div key={i} style={{ marginBottom: 20 }}>
+              <h4 style={{ marginBottom: 6 }}>{d.name}</h4>
+
+              <p style={{ fontStyle: "italic", marginBottom: 6 }}>
+                Ризик виявлено у {d.riskDates.length} днів:
+              </p>
+              {d.riskDates.length > 0 ? (
+                <ul>
+                  {d.riskDates.map((date, j) => (
+                    <li key={j}>{new Date(date).toLocaleDateString("uk-UA")}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p style={{ color: "green" }}>Ризику не виявлено</p>
+              )}
+
+              <p style={{ marginTop: 6 }}>
+                <strong>Рекомендовані препарати:</strong> {diseaseProducts[d.name]?.join(", ") || "Немає даних"}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ✅ Діагностика */}
       <div style={{ marginBottom: 24 }}>
-        <h3>Діагностика по днях</h3>
+        <h3>Діагностика по днях (фітофтороз)</h3>
         <table style={{ width: "100%", fontSize: 14, borderCollapse: "collapse" }}>
           <thead>
             <tr>
@@ -72,6 +111,7 @@ export default function Step4Results({ result, onRestart }) {
         </table>
       </div>
 
+      {/* ✅ Щотижневі підсумки */}
       <div>
         <h3>Щотижневі підсумки</h3>
         <table style={{ width: "100%", fontSize: 14, borderCollapse: "collapse" }}>
@@ -96,6 +136,7 @@ export default function Step4Results({ result, onRestart }) {
         </table>
       </div>
 
+      {/* 🔁 Перезапуск */}
       <div style={{ marginTop: 32 }}>
         <button
           onClick={onRestart}
