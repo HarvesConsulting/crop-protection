@@ -1,9 +1,21 @@
 import React, { useState } from "react";
 import { parseISO, differenceInDays } from "date-fns";
 
-const rotationProducts = [
+const rotationPhytophthora = [
   "Зорвек Інкантія", "Ридоміл Голд", "Танос", "Акробат МЦ",
   "Орондіс Ультра", "Ранман ТОП", "Ревус", "Курзат Р", "Інфініто",
+];
+
+const rotationGrayMold = [
+  "Луна Експірієнс", "Сігнум", "Скала", "Тельдор", "Скор", "Натіво",
+];
+
+const rotationAlternaria = [
+  "Сігнум", "Скала", "Скор", "Луна Експірієнс", "Тельдор", "Натіво",
+];
+
+const rotationBacteriosis = [
+  "Медян Екстра", "Казумін", "Серенада",
 ];
 
 export default function Step4Results({ result, onRestart }) {
@@ -12,6 +24,71 @@ export default function Step4Results({ result, onRestart }) {
   if (!result) return <p>Дані відсутні</p>;
 
   const { sprayDates, diagnostics, weeklyPlan, diseaseSummary } = result;
+
+  const renderTreatmentPlan = () => {
+    if (!sprayDates.length) return <p>—</p>;
+
+    return (
+      <ol>
+        {sprayDates.map((d, i) => {
+          const cur = parseISO(d.split(".").reverse().join("-"));
+          const prev = i > 0 ? parseISO(sprayDates[i - 1].split(".").reverse().join("-")) : null;
+          const gap = prev ? differenceInDays(cur, prev) : null;
+
+          const product = rotationPhytophthora[i % rotationPhytophthora.length];
+
+          return (
+            <li key={i} style={{ marginBottom: 4 }}>
+              {d} — {product}
+              {gap !== null && (
+                <span style={{ color: "#555" }}> ({gap} діб після попередньої)</span>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    );
+  };
+
+  const renderDiseaseRisks = () => {
+    if (!diseaseSummary?.length) return null;
+
+    return (
+      <div style={{ marginBottom: 24 }}>
+        <h3>⚠️ Дні з ризиком розвитку хвороб</h3>
+        <ul>
+          {diseaseSummary.map((d, index) => {
+            const rotation = {
+              "Сіра гниль": rotationGrayMold,
+              "Альтернаріоз": rotationAlternaria,
+              "Бактеріоз": rotationBacteriosis,
+            }[d.name] || [];
+
+            const productsStr = rotation.length
+              ? rotation.join(", ")
+              : "—";
+
+            return (
+              <li key={index} style={{ marginBottom: 8 }}>
+                <strong>{d.name}:</strong>{" "}
+                {d.riskDates.length > 0
+                  ? d.riskDates.map((dt) =>
+                      dt instanceof Date
+                        ? dt.toLocaleDateString("uk-UA")
+                        : String(dt)
+                    ).join(", ")
+                  : "—"}
+                <br />
+                <span style={{ fontSize: 14, color: "#555" }}>
+                  Рекомендовані препарати: {productsStr}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    );
+  };
 
   return (
     <div>
@@ -38,51 +115,12 @@ export default function Step4Results({ result, onRestart }) {
       </div>
 
       <div style={{ marginBottom: 24 }}>
-        <h3>Рекомендовані внесення</h3>
-        {sprayDates.length > 0 ? (
-          <ol>
-            {sprayDates.map((d, i) => {
-              const cur = parseISO(d.split(".").reverse().join("-"));
-              const prev = i > 0 ? parseISO(sprayDates[i - 1].split(".").reverse().join("-")) : null;
-              const gap = prev ? differenceInDays(cur, prev) : null;
-
-              return (
-                <li key={i} style={{ marginBottom: 4 }}>
-                  {d} — {rotationProducts[i % rotationProducts.length]}
-                  {gap !== null && (
-                    <span style={{ color: "#555" }}> ({gap} діб після попередньої)</span>
-                  )}
-                </li>
-              );
-            })}
-          </ol>
-        ) : (
-          <p>—</p>
-        )}
+        <h3>Рекомендовані внесення (проти фітофторозу)</h3>
+        {renderTreatmentPlan()}
       </div>
 
-      {/* ✅ Вивід днів з ризиком розвитку хвороб */}
-      {diseaseSummary?.length > 0 && (
-        <div style={{ marginBottom: 24 }}>
-          <h3>⚠️ Дні з ризиком розвитку хвороб</h3>
-          <ul>
-            {diseaseSummary.map((d) => (
-              <li key={d.name}>
-                <strong>{d.name}:</strong>{" "}
-                {d.riskDates.length > 0
-                  ? d.riskDates.map((dt) =>
-                      dt instanceof Date
-                        ? dt.toLocaleDateString("uk-UA")
-                        : String(dt)
-                    ).join(", ")
-                  : "—"}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {renderDiseaseRisks()}
 
-      {/* ✅ BLITECAST: розширена діагностика */}
       {blitecastMode && (
         <>
           <div style={{ marginBottom: 24 }}>
@@ -161,6 +199,7 @@ export default function Step4Results({ result, onRestart }) {
   );
 }
 
+// DSV логіка для BLITECAST
 function dsvFromWet(wetHours, wetTempAvg) {
   if (!Number.isFinite(wetHours) || !Number.isFinite(wetTempAvg)) return 0;
   if (wetHours < 6) return 0;
@@ -183,3 +222,4 @@ function dsvFromWet(wetHours, wetTempAvg) {
 
   return 0;
 }
+
