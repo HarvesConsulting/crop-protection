@@ -39,7 +39,7 @@ export default function Step2Season({
 
       {/* Дата початку */}
       <div style={{ marginBottom: 12 }}>
-        <label>Дата початку вегетації:</label>
+        <label>Дата початку вегетації або дата останньої обробки:</label>
         <input
           type="date"
           value={plantingDate}

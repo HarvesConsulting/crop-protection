@@ -61,6 +61,27 @@ export default function Step4Results({ result, onRestart }) {
         )}
       </div>
 
+      {/* ✅ Вивід днів з ризиком розвитку хвороб */}
+      {diseaseSummary?.length > 0 && (
+        <div style={{ marginBottom: 24 }}>
+          <h3>⚠️ Дні з ризиком розвитку хвороб</h3>
+          <ul>
+            {diseaseSummary.map((d) => (
+              <li key={d.name}>
+                <strong>{d.name}:</strong>{" "}
+                {d.riskDates.length > 0
+                  ? d.riskDates.map((dt) =>
+                      dt instanceof Date
+                        ? dt.toLocaleDateString("uk-UA")
+                        : String(dt)
+                    ).join(", ")
+                  : "—"}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {/* ✅ BLITECAST: розширена діагностика */}
       {blitecastMode && (
         <>
@@ -147,7 +168,7 @@ function dsvFromWet(wetHours, wetTempAvg) {
   const DSV_RULES = [
     { tempMin: 21, tempMax: 27, bands: [{ h: 6, dsv: 2 }, { h: 8, dsv: 3 }, { h: 10, dsv: 4 }] },
     { tempMin: 13, tempMax: 21, bands: [{ h: 6, dsv: 1 }, { h: 8, dsv: 2 }, { h: 10, dsv: 3 }, { h: 12, dsv: 4 }] },
-    { tempMin: 7, tempMax: 13,  bands: [{ h: 6, dsv: 1 }, { h: 8, dsv: 1 }, { h: 10, dsv: 2 }, { h: 12, dsv: 3 }, { h: 14, dsv: 4 }] },
+    { tempMin: 7,  tempMax: 13,  bands: [{ h: 6, dsv: 1 }, { h: 8, dsv: 1 }, { h: 10, dsv: 2 }, { h: 12, dsv: 3 }, { h: 14, dsv: 4 }] },
     { tempMin: 27, tempMax: 40, bands: [{ h: 6, dsv: 1 }, { h: 8, dsv: 2 }, { h: 10, dsv: 3 }] },
   ];
 
