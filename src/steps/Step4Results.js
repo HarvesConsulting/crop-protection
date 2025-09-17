@@ -25,11 +25,17 @@ function getAdvancedTreatments(riskDates, minGap = 7, shortGap = 5) {
 
   while (i < sorted.length) {
     const current = sorted[i];
-    if (!selected.length || differenceInDays(current, selected[selected.length - 1].date) >= selected[selected.length - 1].gap) {
+    if (
+      !selected.length ||
+      differenceInDays(current, selected[selected.length - 1].date) >= selected[selected.length - 1].gap
+    ) {
       // Перевірка 4+ днів підряд
       let streak = 1;
       let j = i + 1;
-      while (j < sorted.length && differenceInDays(sorted[j], sorted[j - 1]) === 1) {
+      while (
+        j < sorted.length &&
+        differenceInDays(sorted[j], sorted[j - 1]) === 1
+      ) {
         streak++;
         j++;
       }
@@ -89,7 +95,10 @@ export default function Step4Results({ result, onRestart }) {
             <tbody>
               {sprayDates.map((d, i) => {
                 const cur = parseISO(d.split(".").reverse().join("-"));
-                const prev = i > 0 ? parseISO(sprayDates[i - 1].split(".").reverse().join("-")) : null;
+                const prev =
+                  i > 0
+                    ? parseISO(sprayDates[i - 1].split(".").reverse().join("-"))
+                    : null;
                 const gap = prev ? differenceInDays(cur, prev) : null;
                 return (
                   <tr key={i}>
@@ -107,52 +116,62 @@ export default function Step4Results({ result, onRestart }) {
       </div>
 
       {/* Обробки по іншим хворобам */}
-      {diseaseSummary && diseaseSummary.map((disease) => {
-        const { name, riskDates } = disease;
-        const rotation = {
-          "Сіра гниль": rotationGrayMold,
-          "Альтернаріоз": rotationAlternaria,
-          "Бактеріоз": rotationBacteriosis,
-        }[name] || [];
+      {diseaseSummary &&
+        diseaseSummary.map((disease) => {
+          const { name, riskDates } = disease;
+          const rotation = {
+            "Сіра гниль": rotationGrayMold,
+            "Альтернаріоз": rotationAlternaria,
+            "Бактеріоз": rotationBacteriosis,
+          }[name] || [];
 
-        const treatments = getAdvancedTreatments(riskDates);
-        if (!treatments.length) return null;
+          const treatments = getAdvancedTreatments(riskDates);
+          if (!treatments.length) return null;
 
-        return (
-          <div key={name} style={{ marginBottom: 24 }}>
-            <h3>Рекомендовані внесення (проти: {name})</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>Дата</th>
-                  <th>Препарат</th>
-                  <th>Інтервал</th>
-                </tr>
-              </thead>
-              <tbody>
-                {treatments.map((item, i) => (
-                  <tr key={i}>
-                    <td>{item.date.toLocaleDateString("uk-UA")}</td>
-                    <td>{rotation[i % rotation.length]}</td>
-                    <td>
-  {i === 0
-    ? "—"
-    : `${differenceInDays(item.date, treatments[i - 1].date)} діб після попередньої`}
-</td>
-
-                ))}
-              </tbody>
-            </table>
-          </div>
-        );
-      })}
+          return (
+            <div key={name} style={{ marginBottom: 24 }}>
+              <h3>Рекомендовані внесення (проти: {name})</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Дата</th>
+                    <th>Препарат</th>
+                    <th>Інтервал</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {treatments.map((item, i) => (
+                    <tr key={i}>
+                      <td>{item.date.toLocaleDateString("uk-UA")}</td>
+                      <td>{rotation[i % rotation.length]}</td>
+                      <td>
+                        {i === 0
+                          ? "—"
+                          : `${differenceInDays(
+                              item.date,
+                              treatments[i - 1].date
+                            )} діб після попередньої`}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        })}
 
       {/* BLITECAST */}
       {blitecastMode && (
         <>
           <div style={{ marginBottom: 24 }}>
             <h3>Діагностика по днях</h3>
-            <table style={{ width: "100%", fontSize: 14, borderCollapse: "collapse" }}>
+            <table
+              style={{
+                width: "100%",
+                fontSize: 14,
+                borderCollapse: "collapse",
+              }}
+            >
               <thead>
                 <tr>
                   <th align="left">Дата</th>
@@ -168,8 +187,17 @@ export default function Step4Results({ result, onRestart }) {
                     <td>{d.date.toLocaleDateString("uk-UA")}</td>
                     <td align="center">{d.wetHours}</td>
                     <td align="center">{d.condHours ?? 0}</td>
-                    <td align="center">{Number.isFinite(d.wetTempAvg) ? d.wetTempAvg.toFixed(1) : "—"}</td>
-                    <td align="center">{Math.min(dsvFromWet(d.wetHours, d.wetTempAvg), 4)}</td>
+                    <td align="center">
+                      {Number.isFinite(d.wetTempAvg)
+                        ? d.wetTempAvg.toFixed(1)
+                        : "—"}
+                    </td>
+                    <td align="center">
+                      {Math.min(
+                        dsvFromWet(d.wetHours, d.wetTempAvg),
+                        4
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -178,7 +206,13 @@ export default function Step4Results({ result, onRestart }) {
 
           <div style={{ marginBottom: 24 }}>
             <h3>Щотижневі підсумки</h3>
-            <table style={{ width: "100%", fontSize: 14, borderCollapse: "collapse" }}>
+            <table
+              style={{
+                width: "100%",
+                fontSize: 14,
+                borderCollapse: "collapse",
+              }}
+            >
               <thead>
                 <tr>
                   <th align="left">Тиждень</th>
@@ -190,7 +224,9 @@ export default function Step4Results({ result, onRestart }) {
               <tbody>
                 {weeklyPlan.map((w, i) => (
                   <tr key={i}>
-                    <td>{w.startStr} – {w.endStr}</td>
+                    <td>
+                      {w.startStr} – {w.endStr}
+                    </td>
                     <td align="center">{w.weeklyDSV}</td>
                     <td align="center">{w.rainSum.toFixed(1)}</td>
                     <td>{w.rec}</td>
@@ -231,7 +267,7 @@ function dsvFromWet(wetHours, wetTempAvg) {
   const DSV_RULES = [
     { tempMin: 21, tempMax: 27, bands: [{ h: 6, dsv: 2 }, { h: 8, dsv: 3 }, { h: 10, dsv: 4 }] },
     { tempMin: 13, tempMax: 21, bands: [{ h: 6, dsv: 1 }, { h: 8, dsv: 2 }, { h: 10, dsv: 3 }, { h: 12, dsv: 4 }] },
-    { tempMin: 7, tempMax: 13,  bands: [{ h: 6, dsv: 1 }, { h: 8, dsv: 1 }, { h: 10, dsv: 2 }, { h: 12, dsv: 3 }, { h: 14, dsv: 4 }] },
+    { tempMin: 7, tempMax: 13, bands: [{ h: 6, dsv: 1 }, { h: 8, dsv: 1 }, { h: 10, dsv: 2 }, { h: 12, dsv: 3 }, { h: 14, dsv: 4 }] },
     { tempMin: 27, tempMax: 40, bands: [{ h: 6, dsv: 1 }, { h: 8, dsv: 2 }, { h: 10, dsv: 3 }] },
   ];
 
