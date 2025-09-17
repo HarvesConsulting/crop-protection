@@ -9,9 +9,11 @@ export function isAlternariaRisk(day) {
 }
 
 export function isBacterialRisk(day, rainValue) {
-  return (
-    rainValue >= 3 &&
-    day.allTempAvg >= 22 && day.allTempAvg <= 32 &&
-    day.wetHours >= 4
-  );
+  const hasRain = rainValue >= 1.5; // легкий дощ або зрошення
+  const tempOK = day.allTempAvg >= 22 && day.allTempAvg <= 32;
+  const nightTempOK = !day.minTemp || day.minTemp >= 17; // якщо є minTemp — нічна температура не повинна бути низькою
+  const wetnessOK =
+    (day.condHours ?? 0) >= 2 || (day.wetHours ?? 0) >= 4;
+
+  return hasRain && tempOK && wetnessOK && nightTempOK;
 }
