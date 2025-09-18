@@ -7,7 +7,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyACJlN464hqO0cpR26_7cn_prh9h1DB7jk",
   authDomain: "crop-protection-44cdc.firebaseapp.com",
   projectId: "crop-protection-44cdc",
-  storageBucket: "crop-protection-44cdc.firebasestorage.app",
+  storageBucket: "crop-protection-44cdc.appspot.com", // ✅ виправлено
   messagingSenderId: "794080731363",
   appId: "1:794080731363:web:5eb6df85ee19b14037a5d6"
 };
