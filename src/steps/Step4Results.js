@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { parseISO, differenceInDays } from "date-fns";
+import "./Step4Results.css";
 
-// Ротації препаратів
 const rotationProducts = [
   "Зорвек Інкантія", "Ридоміл Голд", "Танос", "Акробат МЦ",
   "Орондіс Ультра", "Ранман ТОП", "Ревус", "Курзат Р", "Інфініто",
@@ -17,7 +17,6 @@ const rotationBacteriosis = [
   "Медян Екстра", "Казумін", "Серенада",
 ];
 
-// Обчислення інтервалу для обробок по інших хворобах
 function getAdvancedTreatments(riskDates, minGap = 7, shortGap = 5) {
   const sorted = [...riskDates].map(d => new Date(d)).sort((a, b) => a - b);
   const selected = [];
@@ -31,7 +30,10 @@ function getAdvancedTreatments(riskDates, minGap = 7, shortGap = 5) {
     ) {
       let streak = 1;
       let j = i + 1;
-      while (j < sorted.length && differenceInDays(sorted[j], sorted[j - 1]) === 1) {
+      while (
+        j < sorted.length &&
+        differenceInDays(sorted[j], sorted[j - 1]) === 1
+      ) {
         streak++;
         j++;
       }
@@ -44,17 +46,17 @@ function getAdvancedTreatments(riskDates, minGap = 7, shortGap = 5) {
   return selected;
 }
 
-function MobileCard({ title, entries }) {
+function CardView({ title, entries }) {
   return (
-    <div className="md:hidden flex flex-col gap-4 mb-6">
-      <h3 className="text-lg font-semibold mb-2">{title}</h3>
+    <div className="card-section">
+      <h3>{title}</h3>
       {entries.map((item, i) => (
-        <div key={i} className="bg-white border rounded-lg shadow p-4">
-          <p className="text-sm font-medium text-gray-600 mb-1">#{i + 1}</p>
+        <div key={i} className="card">
+          <div className="card-index">#{i + 1}</div>
           {Object.entries(item).map(([key, value]) => (
-            <p key={key} className="text-sm">
-              <span className="font-semibold">{key}: </span>{value}
-            </p>
+            <div key={key} className="card-row">
+              <strong>{key}:</strong> {value}
+            </div>
           ))}
         </div>
       ))}
@@ -116,64 +118,30 @@ export default function Step4Results({ result, onRestart }) {
   }));
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-2">Крок 4: Результати</h2>
-      <p className="text-sm text-gray-600 mb-4">
+    <div className="container">
+      <h2>Крок 4: Результати</h2>
+      <p className="description">
         Нижче показано рекомендовані дати обробки. Ви можете увімкнути розширений режим BLITECAST для діагностики.
       </p>
 
-      <div className="mb-4">
-        <button
-          onClick={() => setBlitecastMode(!blitecastMode)}
-          className={`px-4 py-2 text-sm rounded border font-medium ${blitecastMode ? "bg-blue-600 text-white" : "bg-white text-blue-600 border-blue-600"}`}
-        >
-          {blitecastMode ? "🔽 Сховати BLITECAST" : "🔬 Показати BLITECAST"}
-        </button>
-      </div>
+      <button className="toggle-button" onClick={() => setBlitecastMode(!blitecastMode)}>
+        {blitecastMode ? "🔽 Сховати BLITECAST" : "🔬 Показати BLITECAST"}
+      </button>
 
-      <div className="hidden md:block mb-6 overflow-x-auto">
-        <h3 className="text-lg font-semibold mb-2">Рекомендовані внесення (проти фітофторозу)</h3>
-        <table className="min-w-full divide-y divide-gray-200 border border-gray-300 rounded-lg overflow-hidden text-sm">
-          <thead className="bg-blue-100 text-gray-700">
-            <tr>
-              <th className="px-4 py-2 text-left">#</th>
-              <th className="px-4 py-2">Дата</th>
-              <th className="px-4 py-2">Препарат</th>
-              <th className="px-4 py-2">Інтервал</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {sprayData.map((item, i) => (
-              <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                <td className="px-4 py-2">{i + 1}</td>
-                <td className="px-4 py-2">{item["Дата"]}</td>
-                <td className="px-4 py-2">{item["Препарат"]}</td>
-                <td className="px-4 py-2">{item["Інтервал"]}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <CardView title="Рекомендовані внесення (проти фітофторозу)" entries={sprayData} />
 
-      <MobileCard title="Рекомендовані внесення (проти фітофторозу)" entries={sprayData} />
-
-      {diseaseCards && <MobileCard title="Обробки по хворобах" entries={diseaseCards} />}
+      {diseaseCards && <CardView title="Обробки по хворобах" entries={diseaseCards} />}
 
       {blitecastMode && (
         <>
-          <MobileCard title="Діагностика по днях" entries={diagnosticsData} />
-          <MobileCard title="Щотижневі підсумки" entries={weeklyCards} />
+          <CardView title="Діагностика по днях" entries={diagnosticsData} />
+          <CardView title="Щотижневі підсумки" entries={weeklyCards} />
         </>
       )}
 
-      <div className="mt-8">
-        <button
-          onClick={onRestart}
-          className="px-6 py-3 text-white font-bold bg-blue-600 rounded hover:bg-blue-700"
-        >
-          🔄 Почати спочатку
-        </button>
-      </div>
+      <button className="restart-button" onClick={onRestart}>
+        🔄 Почати спочатку
+      </button>
     </div>
   );
 }
