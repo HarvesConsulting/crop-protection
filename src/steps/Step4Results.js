@@ -29,13 +29,9 @@ function getAdvancedTreatments(riskDates, minGap = 7, shortGap = 5) {
       !selected.length ||
       differenceInDays(current, selected[selected.length - 1].date) >= selected[selected.length - 1].gap
     ) {
-      // Перевірка 4+ днів підряд
       let streak = 1;
       let j = i + 1;
-      while (
-        j < sorted.length &&
-        differenceInDays(sorted[j], sorted[j - 1]) === 1
-      ) {
+      while (j < sorted.length && differenceInDays(sorted[j], sorted[j - 1]) === 1) {
         streak++;
         j++;
       }
@@ -48,6 +44,24 @@ function getAdvancedTreatments(riskDates, minGap = 7, shortGap = 5) {
   return selected;
 }
 
+function MobileCard({ title, entries }) {
+  return (
+    <div className="md:hidden flex flex-col gap-4 mb-6">
+      <h3 className="text-lg font-semibold mb-2">{title}</h3>
+      {entries.map((item, i) => (
+        <div key={i} className="bg-white border rounded-lg shadow p-4">
+          <p className="text-sm font-medium text-gray-600 mb-1">#{i + 1}</p>
+          {Object.entries(item).map(([key, value]) => (
+            <p key={key} className="text-sm">
+              <span className="font-semibold">{key}: </span>{value}
+            </p>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function Step4Results({ result, onRestart }) {
   const [blitecastMode, setBlitecastMode] = useState(false);
 
@@ -55,209 +69,107 @@ export default function Step4Results({ result, onRestart }) {
 
   const { sprayDates, diagnostics, weeklyPlan, diseaseSummary } = result;
 
+  const sprayData = sprayDates.map((d, i) => {
+    const cur = parseISO(d.split(".").reverse().join("-"));
+    const prev = i > 0 ? parseISO(sprayDates[i - 1].split(".").reverse().join("-")) : null;
+    const gap = prev ? `${differenceInDays(cur, prev)} діб після попередньої` : "—";
+    return {
+      Дата: d,
+      Препарат: rotationProducts[i % rotationProducts.length],
+      Інтервал: gap,
+    };
+  });
+
+  const diseaseCards = diseaseSummary?.flatMap(({ name, riskDates }) => {
+    const rotation = {
+      "Сіра гниль": rotationGrayMold,
+      "Альтернаріоз": rotationAlternaria,
+      "Бактеріоз": rotationBacteriosis,
+    }[name] || [];
+    const treatments = getAdvancedTreatments(riskDates);
+    return treatments.map((item, i) => ({
+      Хвороба: name,
+      Дата: item.date.toLocaleDateString("uk-UA"),
+      Препарат: rotation[i % rotation.length],
+      Інтервал:
+        i === 0
+          ? "—"
+          : `${differenceInDays(item.date, treatments[i - 1].date)} діб після попередньої`,
+    }));
+  });
+
+  const diagnosticsData = diagnostics.map((d) => ({
+    Дата: d.date.toLocaleDateString("uk-UA"),
+    "RH ≥ 90%": d.wetHours,
+    "RH ≥ 90% & T 10–28°C": d.condHours ?? 0,
+    "Tavg (вологі), °C": Number.isFinite(d.wetTempAvg)
+      ? d.wetTempAvg.toFixed(1)
+      : "—",
+    DSV: Math.min(dsvFromWet(d.wetHours, d.wetTempAvg), 4),
+  }));
+
+  const weeklyCards = weeklyPlan.map((w) => ({
+    Тиждень: `${w.startStr} – ${w.endStr}`,
+    DSV: w.weeklyDSV,
+    "Опади, мм": w.rainSum.toFixed(1),
+    Рекомендація: w.rec,
+  }));
+
   return (
     <div>
-      <h2>Крок 4: Результати</h2>
+      <h2 className="text-2xl font-bold mb-2">Крок 4: Результати</h2>
       <p className="text-sm text-gray-600 mb-4">
         Нижче показано рекомендовані дати обробки. Ви можете увімкнути розширений режим BLITECAST для діагностики.
       </p>
 
-      {/* Кнопка BLITECAST */}
-      <div style={{ marginBottom: 16 }}>
+      <div className="mb-4">
         <button
           onClick={() => setBlitecastMode(!blitecastMode)}
-          style={{
-            padding: "8px 16px",
-            fontSize: "14px",
-            borderRadius: "6px",
-            border: "1px solid #2d6cdf",
-            background: blitecastMode ? "#2d6cdf" : "#fff",
-            color: blitecastMode ? "#fff" : "#2d6cdf",
-            cursor: "pointer",
-          }}
+          className={`px-4 py-2 text-sm rounded border font-medium ${blitecastMode ? "bg-blue-600 text-white" : "bg-white text-blue-600 border-blue-600"}`}
         >
           {blitecastMode ? "🔽 Сховати BLITECAST" : "🔬 Показати BLITECAST"}
         </button>
       </div>
 
-      {/* Обробки проти фітофторозу */}
-      {/* Обробки проти фітофторозу */}
-<div style={{ marginBottom: 24 }}>
-  <h3>Рекомендовані внесення (проти фітофторозу)</h3>
-  {sprayDates.length > 0 ? (
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Дата</th>
-          <th>Препарат</th>
-          <th>Інтервал</th>
-        </tr>
-      </thead>
-      <tbody>
-        {sprayDates.map((d, i) => {
-          const cur = parseISO(d.split(".").reverse().join("-"));
-          const prev =
-            i > 0
-              ? parseISO(sprayDates[i - 1].split(".").reverse().join("-"))
-              : null;
-          const gap = prev ? differenceInDays(cur, prev) : null;
-          return (
-            <tr key={i}>
-              <td>{i + 1}</td>
-              <td>{d}</td>
-              <td>{rotationProducts[i % rotationProducts.length]}</td>
-              <td>{gap !== null ? `${gap} діб після попередньої` : "—"}</td>
+      <div className="hidden md:block mb-6 overflow-x-auto">
+        <h3 className="text-lg font-semibold mb-2">Рекомендовані внесення (проти фітофторозу)</h3>
+        <table className="min-w-full divide-y divide-gray-200 border border-gray-300 rounded-lg overflow-hidden text-sm">
+          <thead className="bg-blue-100 text-gray-700">
+            <tr>
+              <th className="px-4 py-2 text-left">#</th>
+              <th className="px-4 py-2">Дата</th>
+              <th className="px-4 py-2">Препарат</th>
+              <th className="px-4 py-2">Інтервал</th>
             </tr>
-          );
-        })}
-      </tbody>
-    </table>
-  ) : (
-    <p>—</p>
-  )}
-</div>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {sprayData.map((item, i) => (
+              <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                <td className="px-4 py-2">{i + 1}</td>
+                <td className="px-4 py-2">{item["Дата"]}</td>
+                <td className="px-4 py-2">{item["Препарат"]}</td>
+                <td className="px-4 py-2">{item["Інтервал"]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
+      <MobileCard title="Рекомендовані внесення (проти фітофторозу)" entries={sprayData} />
 
-      {/* Обробки по іншим хворобам */}
-      {diseaseSummary &&
-        diseaseSummary.map((disease) => {
-          const { name, riskDates } = disease;
-          const rotation = {
-            "Сіра гниль": rotationGrayMold,
-            "Альтернаріоз": rotationAlternaria,
-            "Бактеріоз": rotationBacteriosis,
-          }[name] || [];
+      {diseaseCards && <MobileCard title="Обробки по хворобах" entries={diseaseCards} />}
 
-          const treatments = getAdvancedTreatments(riskDates);
-          if (!treatments.length) return null;
-
-          return (
-            <div key={name} style={{ marginBottom: 24 }}>
-              <h3>Рекомендовані внесення (проти: {name})</h3>
-             <table>
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Дата</th>
-      <th>Препарат</th>
-      <th>Інтервал</th>
-    </tr>
-  </thead>
-  <tbody>
-    {treatments.map((item, i) => (
-      <tr key={i}>
-        <td>{i + 1}</td>
-        <td>{item.date.toLocaleDateString("uk-UA")}</td>
-        <td>{rotation[i % rotation.length]}</td>
-        <td>
-          {i === 0
-            ? "—"
-            : `${differenceInDays(
-                item.date,
-                treatments[i - 1].date
-              )} діб після попередньої`}
-        </td>
-      </tr>
-    ))}
-  </tbody>
-</table>
-
-            </div>
-          );
-        })}
-
-      {/* BLITECAST */}
       {blitecastMode && (
         <>
-          <div style={{ marginBottom: 24 }}>
-            <h3>Діагностика по днях</h3>
-            <table
-              style={{
-                width: "100%",
-                fontSize: 14,
-                borderCollapse: "collapse",
-              }}
-            >
-              <thead>
-                <tr>
-                  <th align="left">Дата</th>
-                  <th>RH ≥ 90%</th>
-                  <th>RH ≥ 90% & T 10–28°C</th>
-                  <th>Tavg (вологі), °C</th>
-                  <th>DSV</th>
-                </tr>
-              </thead>
-              <tbody>
-                {diagnostics.map((d, i) => (
-                  <tr key={i}>
-                    <td>{d.date.toLocaleDateString("uk-UA")}</td>
-                    <td align="center">{d.wetHours}</td>
-                    <td align="center">{d.condHours ?? 0}</td>
-                    <td align="center">
-                      {Number.isFinite(d.wetTempAvg)
-                        ? d.wetTempAvg.toFixed(1)
-                        : "—"}
-                    </td>
-                    <td align="center">
-                      {Math.min(
-                        dsvFromWet(d.wetHours, d.wetTempAvg),
-                        4
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <div style={{ marginBottom: 24 }}>
-            <h3>Щотижневі підсумки</h3>
-            <table
-              style={{
-                width: "100%",
-                fontSize: 14,
-                borderCollapse: "collapse",
-              }}
-            >
-              <thead>
-                <tr>
-                  <th align="left">Тиждень</th>
-                  <th align="center">DSV</th>
-                  <th align="center">Опади, мм</th>
-                  <th align="left">Рекомендація</th>
-                </tr>
-              </thead>
-              <tbody>
-                {weeklyPlan.map((w, i) => (
-                  <tr key={i}>
-                    <td>
-                      {w.startStr} – {w.endStr}
-                    </td>
-                    <td align="center">{w.weeklyDSV}</td>
-                    <td align="center">{w.rainSum.toFixed(1)}</td>
-                    <td>{w.rec}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <MobileCard title="Діагностика по днях" entries={diagnosticsData} />
+          <MobileCard title="Щотижневі підсумки" entries={weeklyCards} />
         </>
       )}
 
-      {/* Перезапуск */}
-      <div style={{ marginTop: 32 }}>
+      <div className="mt-8">
         <button
           onClick={onRestart}
-          style={{
-            padding: "12px 20px",
-            fontSize: "16px",
-            fontWeight: "bold",
-            background: "#2d6cdf",
-            color: "#fff",
-            borderRadius: "8px",
-            cursor: "pointer",
-          }}
+          className="px-6 py-3 text-white font-bold bg-blue-600 rounded hover:bg-blue-700"
         >
           🔄 Почати спочатку
         </button>
@@ -266,7 +178,6 @@ export default function Step4Results({ result, onRestart }) {
   );
 }
 
-// Функція DSV
 function dsvFromWet(wetHours, wetTempAvg) {
   if (!Number.isFinite(wetHours) || !Number.isFinite(wetTempAvg)) return 0;
   if (wetHours < 6) return 0;
