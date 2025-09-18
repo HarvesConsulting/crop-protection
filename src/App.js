@@ -1,3 +1,4 @@
+import AdminPanel from "./components/AdminPanel";
 import LogoutButton from "./components/LogoutButton";
 import AppIntro from "./components/AppIntro";
 import React, { useState, useEffect } from "react";
@@ -29,6 +30,11 @@ export default function App() {
 
   // 🔐 Якщо не авторизований — показати логін
   if (!user) return <LoginPage onLogin={setUser} />;
+
+// ❗️ Твій email як "суперадмін"
+if (user.email === "lashyn.aleksandr@gmail.com") {
+  return <AdminPanel />;
+}
 
   // 👉 Функції переходу
   const next = () => setStep((s) => Math.min(s + 1, 4));
