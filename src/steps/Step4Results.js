@@ -3,18 +3,32 @@ import { parseISO, differenceInDays } from "date-fns";
 import "./Step4Results.css";
 
 const rotationProducts = [
-  "Зорвек Інкантія", "Ридоміл Голд", "Танос", "Акробат МЦ",
-  "Орондіс Ультра", "Ранман ТОП", "Ревус", "Курзат Р", "Інфініто",
+  { name: "Зорвек Інкантія", rate: "0,5л/га" },
+  { name: "Ридоміл Голд", rate: "2,5кг/га" },
+  { name: "Танос", rate: "0,6кг/га" },
+  { name: "Акробат МЦ", rate: "2кг/га" },
+  { name: "Орондіс Ультра", rate: "0,4л/га" },
+  { name: "Ранман ТОП", rate: "0,5л/га" },
+  { name: "Ревус ТОП", rate: "0,6л/га" },
+  { name: "Курзат Р", rate: "2,5кг/га" },
+  { name: "Інфініто", rate: "1,6л/га" },
 ];
 
 const rotationGrayMold = [
-  "Луна Експірієнс", "Сігнум", "Скала", "Тельдор", "Скор", "Натіво",
+  { name: "Луна Експірієнс", rate: "0,75л/га" },
+  { name: "Сігнум", rate: "1,5кг/га" },
+  { name: "Скала", rate: "2л/га" },
+  { name: "Тельдор", rate: "1,5кг/га" },
+  { name: "Скор", rate: "0,6л/га" },
+  { name: "Натіво", rate: "0,4кг/га" },
 ];
 
 const rotationAlternaria = rotationGrayMold;
 
 const rotationBacteriosis = [
-  "Медян Екстра", "Казумін", "Серенада",
+  { name: "Медян Екстра", rate: "2л/га" },
+  { name: "Казумін", rate: "1,5-3л/га" },
+  { name: "Серенада", rate: "2л/га" },
 ];
 
 function getAdvancedTreatments(riskDates, minGap = 7, shortGap = 5) {
@@ -75,29 +89,35 @@ export default function Step4Results({ result, onRestart }) {
     const cur = parseISO(d.split(".").reverse().join("-"));
     const prev = i > 0 ? parseISO(sprayDates[i - 1].split(".").reverse().join("-")) : null;
     const gap = prev ? `${differenceInDays(cur, prev)} діб після попередньої` : "—";
+    const product = rotationProducts[i % rotationProducts.length];
     return {
       Дата: d,
-      Препарат: rotationProducts[i % rotationProducts.length],
+      Препарат: product.name,
+      "Норма, л/кг/га": product.rate,
       Інтервал: gap,
     };
   });
 
-  const diseaseCards = diseaseSummary?.flatMap(({ name, riskDates }) => {
+  const diseaseCardsGrouped = diseaseSummary?.map(({ name, riskDates }) => {
     const rotation = {
       "Сіра гниль": rotationGrayMold,
       "Альтернаріоз": rotationAlternaria,
       "Бактеріоз": rotationBacteriosis,
     }[name] || [];
     const treatments = getAdvancedTreatments(riskDates);
-    return treatments.map((item, i) => ({
-      Хвороба: name,
-      Дата: item.date.toLocaleDateString("uk-UA"),
-      Препарат: rotation[i % rotation.length],
-      Інтервал:
-        i === 0
-          ? "—"
-          : `${differenceInDays(item.date, treatments[i - 1].date)} діб після попередньої`,
-    }));
+    const entries = treatments.map((item, i) => {
+      const product = rotation[i % rotation.length];
+      return {
+        Дата: item.date.toLocaleDateString("uk-UA"),
+        Препарат: product.name,
+        "Норма, л/кг/га": product.rate,
+        Інтервал:
+          i === 0
+            ? "—"
+            : `${differenceInDays(item.date, treatments[i - 1].date)} діб після попередньої`,
+      };
+    });
+    return { name, entries };
   });
 
   const diagnosticsData = diagnostics.map((d) => ({
@@ -130,7 +150,10 @@ export default function Step4Results({ result, onRestart }) {
 
       <CardView title="Рекомендовані внесення (проти фітофторозу)" entries={sprayData} />
 
-      {diseaseCards && <CardView title="Обробки по хворобах" entries={diseaseCards} />}
+      {diseaseCardsGrouped &&
+        diseaseCardsGrouped.map(({ name, entries }) => (
+          <CardView key={name} title={`Рекомендовані внесення (проти: ${name})`} entries={entries} />
+        ))}
 
       {blitecastMode && (
         <>
