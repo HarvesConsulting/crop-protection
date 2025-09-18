@@ -20,32 +20,45 @@ const productInfo = {
   "Натіво": "0,4кг/га",
   "Медян Екстра": "2л/га",
   "Казумін": "1,5-3л/га",
-  "Серенада": "2л/га"
+  "Серенада": "2л/га",
 };
 
 const rotationProducts = [
-  "Зорвек Інкантія", "Ридоміл Голд", "Танос", "Акробат МЦ",
-  "Орондіс Ультра", "Ранман ТОП", "Ревус ТОП", "Курзат Р", "Інфініто",
+  "Зорвек Інкантія",
+  "Ридоміл Голд",
+  "Танос",
+  "Акробат МЦ",
+  "Орондіс Ультра",
+  "Ранман ТОП",
+  "Ревус ТОП",
+  "Курзат Р",
+  "Інфініто",
 ];
 
 const rotationGrayMold = [
-  "Луна Експірієнс", "Сігнум", "Скала", "Тельдор", "Скор", "Натіво",
+  "Луна Експірієнс",
+  "Сігнум",
+  "Скала",
+  "Тельдор",
+  "Скор",
+  "Натіво",
 ];
 
 const rotationAlternaria = rotationGrayMold;
-
-const rotationBacteriosis = [
-  "Медян Екстра", "Казумін", "Серенада",
-];
+const rotationBacteriosis = ["Медян Екстра", "Казумін", "Серенада"];
 
 function getAdvancedTreatments(riskDates, minGap = 7, shortGap = 5) {
-  const sorted = [...riskDates].map(d => new Date(d)).sort((a, b) => a - b);
+  const sorted = [...riskDates].map((d) => new Date(d)).sort((a, b) => a - b);
   const selected = [];
   let i = 0;
 
   while (i < sorted.length) {
     const current = sorted[i];
-    if (!selected.length || differenceInDays(current, selected[selected.length - 1].date) >= selected[selected.length - 1].gap) {
+    if (
+      !selected.length ||
+      differenceInDays(current, selected[selected.length - 1].date) >=
+        selected[selected.length - 1].gap
+    ) {
       let streak = 1;
       let j = i + 1;
       while (j < sorted.length && differenceInDays(sorted[j], sorted[j - 1]) === 1) {
@@ -79,85 +92,71 @@ function CardView({ title, entries }) {
 }
 
 export default function Step4Results({ result, onRestart }) {
-  const [showIntegratedPlan, setShowIntegratedPlan] = useState(false);
+  const [showIntegrated, setShowIntegrated] = useState(false);
 
   if (!result) return <p>Дані відсутні</p>;
-
-  const { sprayDates, diagnostics, weeklyPlan, diseaseSummary } = result;
+  const { sprayDates, diseaseSummary } = result;
 
   const sprayData = sprayDates.map((d, i) => {
-    const product = rotationProducts[i % rotationProducts.length];
     const cur = parseISO(d.split(".").reverse().join("-"));
     const prev = i > 0 ? parseISO(sprayDates[i - 1].split(".").reverse().join("-")) : null;
     const gap = prev ? `${differenceInDays(cur, prev)} діб після попередньої` : "—";
+    const product = rotationProducts[i % rotationProducts.length];
     return {
       Дата: d,
-      Препарат: `${product} (${productInfo[product]})`,
+      Препарат: `${product} (${productInfo[product] || "—"})`,
       Інтервал: gap,
     };
   });
 
-  const diseaseBlocks = (diseaseSummary || []).map(({ name, riskDates }) => {
+  const diseaseCardsGrouped = diseaseSummary?.map(({ name, riskDates }) => {
     const rotation = {
       "Сіра гниль": rotationGrayMold,
       "Альтернаріоз": rotationAlternaria,
       "Бактеріоз": rotationBacteriosis,
     }[name] || [];
+
     const treatments = getAdvancedTreatments(riskDates);
-    return {
-      title: `Рекомендовані внесення (проти: ${name})`,
-      entries: treatments.map((item, i) => {
-        const product = rotation[i % rotation.length];
-        return {
-          Дата: item.date.toLocaleDateString("uk-UA"),
-          Препарат: `${product} (${productInfo[product]})`,
-          Інтервал: i === 0 ? "—" : `${differenceInDays(item.date, treatments[i - 1].date)} діб після попередньої`
-        };
-      })
-    };
+    const entries = treatments.map((item, i) => {
+      const product = rotation[i % rotation.length];
+      return {
+        Дата: item.date.toLocaleDateString("uk-UA"),
+        Препарат: `${product} (${productInfo[product] || "—"})`,
+        Інтервал:
+          i === 0 ? "—" : `${differenceInDays(item.date, treatments[i - 1].date)} діб після попередньої`,
+      };
+    });
+
+    return { name, entries };
   });
 
-  const integratedPlan = [
-    ...sprayData.map(d => ({ ...d, Хвороба: "Фітофтороз" })),
-    ...diseaseBlocks.flatMap(b => b.entries.map(e => ({ ...e, Хвороба: b.title.replace("Рекомендовані внесення (проти: ", "").replace(")", "") })))
-  ].sort((a, b) => parseISO(a["Дата"].split(".").reverse().join("-")) - parseISO(b["Дата"].split(".").reverse().join("-")));
-
-  const diagnosticsData = diagnostics.map((d) => ({
-    Дата: d.date.toLocaleDateString("uk-UA"),
-    "RH ≥ 90%": d.wetHours,
-    "RH ≥ 90% & T 10–28°C": d.condHours ?? 0,
-    "Tavg (вологі), °C": Number.isFinite(d.wetTempAvg) ? d.wetTempAvg.toFixed(1) : "—",
-    DSV: Math.min(dsvFromWet(d.wetHours, d.wetTempAvg), 4),
-  }));
-
-  const weeklyCards = weeklyPlan.map((w) => ({
-    Тиждень: `${w.startStr} – ${w.endStr}`,
-    DSV: w.weeklyDSV,
-    "Опади, мм": w.rainSum.toFixed(1),
-    Рекомендація: w.rec,
-  }));
+  const integratedSystem = [...sprayData];
+  diseaseCardsGrouped?.forEach(({ entries }) => integratedSystem.push(...entries));
+  integratedSystem.sort((a, b) => parseISO(a.Дата.split(".").reverse().join("-")) - parseISO(b.Дата.split(".").reverse().join("-")));
 
   return (
     <div className="container">
       <h2>Крок 4: Результати</h2>
-      <p className="description">Нижче показано рекомендовані дати обробки.</p>
+      <p className="description">
+        Нижче показано рекомендовані дати обробки. Ви можете сформувати інтегровану систему захисту.
+      </p>
 
-      <button className="toggle-button" onClick={() => setShowIntegratedPlan(!showIntegratedPlan)}>
-        {showIntegratedPlan ? "🔽 Сховати інтегровану систему захисту" : "🧪 Сформувати інтегровану систему захисту"}
+      <button className="toggle-button" onClick={() => setShowIntegrated(!showIntegrated)}>
+        {showIntegrated ? "🔽 Сховати інтегровану систему" : "🧪 Сформувати інтегровану систему захисту"}
       </button>
 
-      {showIntegratedPlan && <CardView title="Інтегрована система захисту" entries={integratedPlan} />}
-
-      {!showIntegratedPlan && <CardView title="Рекомендовані внесення (проти фітофторозу)" entries={sprayData} />}
-
-      {!showIntegratedPlan && diseaseBlocks.map((block, i) => (
-        <CardView key={i} title={block.title} entries={block.entries} />
-      ))}
-
-      {!showIntegratedPlan && (
+      {showIntegrated ? (
+        <CardView title="Інтегрована система захисту" entries={integratedSystem} />
+      ) : (
         <>
-          <CardView title="Діагностика по днях" entries={diagnosticsData} />
-          <CardView title="Щотижневі підсумки" entries={weeklyCards} />
+          <CardView title="Рекомендовані внесення (проти фітофторозу)" entries={sprayData} />
+          {diseaseCardsGrouped?.map(({ name, entries }) => (
+            <CardView
+              key={name}
+              title={`Рекомендовані внесення (проти: ${name})`}
+              entries={entries}
+            />
+          ))}
         </>
       )}
 
