@@ -24,6 +24,27 @@ const productInfo = {
   "Серенада": "2л/га",
 };
 
+const productLinks = {
+  "Зорвек Інкантія": "https://www.corteva.com.ua/products-and-solutions/crop-protection/zorvec-encantia.html",
+  "Ридоміл Голд": "https://www.syngenta.ua/product/crop-protection/ridomil-gold-mz-68-wg-v-g",
+  "Танос": "https://www.kz.corteva.com/products-and-solutions/crop-protection/tanos.html",
+  "Акробат МЦ": "https://www.agro.basf.ua/uk/",
+  "Орондіс Ультра": "https://www.syngenta.ua/product/crop-protection/orondisr-ultra-280-sc-k-s",
+  "Ранман ТОП": "https://summit-agro.com.ua/product/zagalnij-katalog-produktiv/ranman-top-ks",
+  "Ревус ТОП": "https://www.syngenta.ua/product/crop-protection/revus-top-500-es-k-s",
+  "Курзат Р": "https://www.corteva.com.ua/products-and-solutions/crop-protection/curzate-r.html",
+  "Інфініто": "https://www.cropscience.bayer.ua/Products/Fungicides/Infinito.aspx",
+  "Луна Експірієнс": "https://www.cropscience.bayer.ua/Products/Fungicides/LunaExperience.aspx",
+  "Сігнум": "https://www.agro.basf.ua/uk",
+  "Скала": "https://www.cropscience.bayer.ua/Products/Fungicides/Scala.aspx",
+  "Тельдор": "https://www.cropscience.bayer.ua/Products/Fungicides/Teldor.aspx",
+  "Скор": "https://www.syngenta.ua/product/crop-protection/skor-250-es-k-e",
+  "Натіво": "https://www.cropscience.bayer.ua/Products/Fungicides/Nativo.aspx",
+  "Медян Екстра": "https://www.summit-agro.com.ua/product/organik-standart/medyan-ekstra-350-sc-ks",
+  "Казумін": "https://summit-agro.com.ua/product/zagalnij-katalog-produktiv/kazumin-2l",
+  "Серенада": "https://www.cropscience.bayer.ua/Products/Fungicides/Serenada.aspx",
+};
+
 const rotationProducts = [
   "Зорвек Інкантія",
   "Ридоміл Голд",
@@ -106,6 +127,7 @@ export default function Step4Results({ result, onRestart }) {
     return {
       Дата: d,
       Препарат: `${product} (${productInfo[product] || "—"})`,
+      Рекомендація: productLinks[product] ? <a href={productLinks[product]} target="_blank" rel="noreferrer">Перейти</a> : "—",
       Інтервал: gap,
     };
   });
@@ -123,6 +145,7 @@ export default function Step4Results({ result, onRestart }) {
       return {
         Дата: item.date.toLocaleDateString("uk-UA"),
         Препарат: `${product} (${productInfo[product] || "—"})`,
+        Рекомендація: productLinks[product] ? <a href={productLinks[product]} target="_blank" rel="noreferrer">Перейти</a> : "—",
         Інтервал:
           i === 0 ? "—" : `${differenceInDays(item.date, treatments[i - 1].date)} діб після попередньої`,
       };
@@ -131,16 +154,21 @@ export default function Step4Results({ result, onRestart }) {
     return { name, entries };
   });
 
-  const integratedSystem = [...sprayData.map(({ Дата, Препарат }) => ({ Дата, Препарат }))];
+  const integratedSystem = [...sprayData.map(({ Дата, Препарат, Рекомендація }) => ({ Дата, Препарат, Рекомендація }))];
   diseaseCardsGrouped?.forEach(({ entries }) => {
-    entries.forEach(({ Дата, Препарат }) => {
-      integratedSystem.push({ Дата, Препарат });
+    entries.forEach(({ Дата, Препарат, Рекомендація }) => {
+      integratedSystem.push({ Дата, Препарат, Рекомендація });
     });
   });
   integratedSystem.sort((a, b) => parseISO(a.Дата.split(".").reverse().join("-")) - parseISO(b.Дата.split(".").reverse().join("-")));
 
   const exportToExcel = () => {
-    const ws = XLSX.utils.json_to_sheet(integratedSystem);
+    const simplified = integratedSystem.map(({ Дата, Препарат, Рекомендація }) => ({
+      Дата,
+      Препарат,
+      Рекомендація: typeof Рекомендація === 'string' ? Рекомендація : Рекомендація?.props?.href || ''
+    }));
+    const ws = XLSX.utils.json_to_sheet(simplified);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Захист");
     XLSX.writeFile(wb, "Інтегрована_система_захисту.xlsx");
