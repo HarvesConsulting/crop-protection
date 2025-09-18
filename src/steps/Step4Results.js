@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { parseISO, differenceInDays } from "date-fns";
 import "./Step4Results.css";
+import * as XLSX from "xlsx";
 
 const productInfo = {
   "Зорвек Інкантія": "0,5л/га",
@@ -130,9 +131,20 @@ export default function Step4Results({ result, onRestart }) {
     return { name, entries };
   });
 
-  const integratedSystem = [...sprayData];
-  diseaseCardsGrouped?.forEach(({ entries }) => integratedSystem.push(...entries));
+  const integratedSystem = [...sprayData.map(({ Дата, Препарат }) => ({ Дата, Препарат }))];
+  diseaseCardsGrouped?.forEach(({ entries }) => {
+    entries.forEach(({ Дата, Препарат }) => {
+      integratedSystem.push({ Дата, Препарат });
+    });
+  });
   integratedSystem.sort((a, b) => parseISO(a.Дата.split(".").reverse().join("-")) - parseISO(b.Дата.split(".").reverse().join("-")));
+
+  const exportToExcel = () => {
+    const ws = XLSX.utils.json_to_sheet(integratedSystem);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Захист");
+    XLSX.writeFile(wb, "Інтегрована_система_захисту.xlsx");
+  };
 
   return (
     <div className="container">
@@ -145,9 +157,14 @@ export default function Step4Results({ result, onRestart }) {
         {showIntegrated ? "🔽 Сховати інтегровану систему" : "🧪 Сформувати інтегровану систему захисту"}
       </button>
 
-      {showIntegrated ? (
-        <CardView title="Інтегрована система захисту" entries={integratedSystem} />
-      ) : (
+      {showIntegrated && (
+        <>
+          <CardView title="Інтегрована система захисту" entries={integratedSystem} />
+          <button onClick={exportToExcel} className="toggle-button">⬇️ Експорт в Excel</button>
+        </>
+      )}
+
+      {!showIntegrated && (
         <>
           <CardView title="Рекомендовані внесення (проти фітофторозу)" entries={sprayData} />
           {diseaseCardsGrouped?.map(({ name, entries }) => (
