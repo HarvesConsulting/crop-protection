@@ -27,7 +27,7 @@ const productInfo = {
 const productLinks = {
   "Зорвек Інкантія": "https://www.corteva.com.ua/products-and-solutions/crop-protection/zorvec-encantia.html",
   "Ридоміл Голд": "https://www.syngenta.ua/product/crop-protection/ridomil-gold-mz-68-wg-v-g",
-  "Танос": "https://www.kz.corteva.com/products-and-solutions/crop-protection/tanos.html",
+  "Танос": "https://www.corteva.com.ua/products-and-solutions/crop-protection/tanos.html",
   "Акробат МЦ": "https://www.agro.basf.ua/uk/",
   "Орондіс Ультра": "https://www.syngenta.ua/product/crop-protection/orondisr-ultra-280-sc-k-s",
   "Ранман ТОП": "https://summit-agro.com.ua/product/zagalnij-katalog-produktiv/ranman-top-ks",
