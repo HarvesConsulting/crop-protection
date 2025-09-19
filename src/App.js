@@ -6,6 +6,7 @@ import Step2Season from "./steps/Step2Season";
 import Step3Run from "./steps/Step3Run";
 import Step4Results from "./steps/Step4Results";
 import LoginPage from "./components/LoginPage";
+import CalendarView from "./components/CalendarView";
 
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase";
@@ -32,6 +33,12 @@ export default function App() {
   // 🔁 Переходи між кроками
   const next = () => setStep((s) => Math.min(s + 1, 4));
   const back = () => setStep((s) => Math.max(s - 1, 1));
+
+  // 🔘 Події для календаря (можна буде замінити на реальні)
+  const mockEvents = [
+    { date: "20.09.2025", title: "Обробка 1", description: "Фітофтороз: Зорвек Інкантія" },
+    { date: "25.09.2025", title: "Обробка 2", description: "Сіра гниль: Сігнум" },
+  ];
 
   return (
     <div className="main-container" style={{ maxWidth: 800, margin: "0 auto", padding: 20 }}>
@@ -84,9 +91,14 @@ export default function App() {
         />
       )}
 
-      {/* Крок 4 — Результати */}
+      {/* Крок 4 — Результати та календар */}
       {step === 4 && (
-        <Step4Results result={result} onRestart={() => setStep(1)} />
+        <>
+          <Step4Results result={result} onRestart={() => setStep(1)} />
+
+          <h3 style={{ marginTop: 40 }}>Календар обробок</h3>
+          <CalendarView events={mockEvents} />
+        </>
       )}
     </div>
   );
