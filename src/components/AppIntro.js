@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 export default function AppIntro() {
-  const [showInfo, setShowInfo] = useState(true);
+  const [showInfo, setShowInfo] = useState(false); // ❗ За замовчуванням сховано
 
   return (
     <div
