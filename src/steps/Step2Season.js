@@ -10,7 +10,8 @@ export default function Step2Season({
   onNext,
   onBack,
 }) {
-  const [diseases, setDiseases] = useState(["lateBlight"]); // за замовчуванням — фітофтора
+  const [diseases, setDiseases] = useState(["lateBlight"]);
+  const [showInfo, setShowInfo] = useState(false); // 👈 стан для опису
 
   const toggleDisease = (disease) => {
     setDiseases((prev) =>
@@ -22,10 +23,29 @@ export default function Step2Season({
 
   return (
     <div>
-      <h2>Крок 2: Дані про сезон</h2>
-      <p className="text-sm text-gray-600 mb-4">
-        Вкажіть початкову дату сезону або дату останньої обробки фунгіцидом та оберіть режим: прогноз на 14 днів або моделювання за архівними даними. За замовчуванням стоїть розрахунок прогнозу на 14 діб. Для моделювання сезонної системи захисту оберіть Використати історичну модель.
-      </p>
+      {/* Заголовок + іконка ℹ️ */}
+      <h2 style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        Крок 2: Дані про сезон{" "}
+        <span
+          onClick={() => setShowInfo(!showInfo)}
+          style={{
+            cursor: "pointer",
+            fontSize: "18px",
+            color: "#2d6cdf",
+            userSelect: "none"
+          }}
+          title={showInfo ? "Сховати опис" : "Показати опис"}
+        >
+          ℹ️
+        </span>
+      </h2>
+
+      {/* Опис — показується лише якщо showInfo === true */}
+      {showInfo && (
+        <p className="text-sm text-gray-600 mb-4" style={{ marginTop: -10 }}>
+          Вкажіть початкову дату сезону або дату останньої обробки фунгіцидом та оберіть режим: прогноз на 14 днів або моделювання за архівними даними. За замовчуванням стоїть розрахунок прогнозу на 14 діб. Для моделювання сезонної системи захисту оберіть "Використати історичну модель".
+        </p>
+      )}
 
       {/* Перемикач режиму */}
       <label style={{ display: "block", marginBottom: 12 }}>
@@ -54,7 +74,7 @@ export default function Step2Season({
         />
       </div>
 
-      {/* Дата завершення — тільки якщо модель */}
+      {/* Дата завершення — якщо обрано історичну модель */}
       {useForecast && (
         <div style={{ marginBottom: 12 }}>
           <label>Дата збору врожаю:</label>
@@ -73,49 +93,29 @@ export default function Step2Season({
         </div>
       )}
 
-      {/* 🔽 Вибір хвороб */}
+      {/* Вибір хвороб */}
       <div style={{ marginBottom: 20 }}>
         <label><strong>Оберіть хвороби для моделювання:</strong></label>
         <div style={{ paddingLeft: 10, marginTop: 8 }}>
-          <label>
-            <input
-              type="checkbox"
-              checked={diseases.includes("lateBlight")}
-              onChange={() => toggleDisease("lateBlight")}
-            />{" "}
-            Фітофтороз
-          </label>
-          <br />
-          <label>
-            <input
-              type="checkbox"
-              checked={diseases.includes("grayMold")}
-              onChange={() => toggleDisease("grayMold")}
-            />{" "}
-            Сіра гниль
-          </label>
-          <br />
-          <label>
-            <input
-              type="checkbox"
-              checked={diseases.includes("alternaria")}
-              onChange={() => toggleDisease("alternaria")}
-            />{" "}
-            Альтернаріоз
-          </label>
-          <br />
-          <label>
-            <input
-              type="checkbox"
-              checked={diseases.includes("bacteriosis")}
-              onChange={() => toggleDisease("bacteriosis")}
-            />{" "}
-            Бактеріоз
-          </label>
+          {[
+            { id: "lateBlight", name: "Фітофтороз" },
+            { id: "grayMold", name: "Сіра гниль" },
+            { id: "alternaria", name: "Альтернаріоз" },
+            { id: "bacteriosis", name: "Бактеріоз" },
+          ].map((disease) => (
+            <label key={disease.id} style={{ display: "block", marginBottom: 6 }}>
+              <input
+                type="checkbox"
+                checked={diseases.includes(disease.id)}
+                onChange={() => toggleDisease(disease.id)}
+              />{" "}
+              {disease.name}
+            </label>
+          ))}
         </div>
       </div>
 
-      {/* Кнопки навігації */}
+      {/* Кнопки */}
       <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
         <button
           onClick={onBack}
