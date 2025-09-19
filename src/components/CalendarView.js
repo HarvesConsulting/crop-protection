@@ -6,17 +6,20 @@ import "./CalendarView.css";
 export default function CalendarView({ events = [] }) {
   const [selectedDate, setSelectedDate] = useState(null);
 
-  // 🔧 Парсимо дату з формату "дд.мм.рррр"
-  const parseStringToDate = (str) => {
-    const [day, month, year] = str.split(".");
-    return new Date(`${year}-${month}-${day}`);
+  // ✅ Працює і з рядками "дд.мм.рррр", і з Date-об'єктами
+  const normalizeDate = (input) => {
+    if (input instanceof Date) return input;
+    if (typeof input === "string") {
+      const [day, month, year] = input.split(".");
+      return new Date(`${year}-${month}-${day}`);
+    }
+    return null;
   };
 
-  // 🔧 Отримуємо список подій на дату
   const getEventsForDate = (date) => {
     return events.filter(
       (event) =>
-        parseStringToDate(event.date).toDateString() === date.toDateString()
+        normalizeDate(event.date)?.toDateString() === date.toDateString()
     );
   };
 
