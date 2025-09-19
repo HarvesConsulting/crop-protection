@@ -89,7 +89,8 @@ export default function LoginPage({ onLogin }) {
 const containerStyle = {
   background: "#f0f4f8",
   padding: "40px 20px",
-  minHeight: "100vh", // ✅ БЕЗ flex – краще працює на мобілках
+  height: "auto", // 🆕
+  minHeight: "100%", // 🆕
   boxSizing: "border-box",
 };
 
