@@ -1,3 +1,10 @@
+import {
+  rotationProducts,
+  rotationGrayMold,
+  rotationAlternaria,
+  rotationBacteriosis,
+  getAdvancedTreatments,
+} from "./data/productData";
 import React, { useState, useEffect } from "react";
 import LogoutButton from "./components/LogoutButton";
 import AppIntro from "./components/AppIntro";
@@ -97,7 +104,7 @@ export default function App() {
           <Step4Results result={result} onRestart={() => setStep(1)} />
 
           <h3 style={{ marginTop: 40 }}>Календар обробок</h3>
-          <CalendarView events={mockEvents} />
+          <CalendarView events={extractCalendarEvents(result)} />
         </>
       )}
     </div>
@@ -122,4 +129,39 @@ function ProgressBar({ step }) {
       ))}
     </div>
   );
+}
+function extractCalendarEvents(result) {
+  if (!result) return [];
+
+  const events = [];
+  const { sprayDates, diseaseSummary } = result;
+
+  // ➤ Обробки проти фітофторозу
+  sprayDates.forEach((dateStr, i) => {
+    events.push({
+      date: dateStr, // у форматі дд.мм.рррр
+      title: `Обробка ${i + 1}`,
+      description: `Фітофтороз: ${rotationProducts[i % rotationProducts.length]}`,
+    });
+  });
+
+  // ➤ Обробки проти інших хвороб
+  diseaseSummary?.forEach(({ name, riskDates }) => {
+    const rotation = {
+      "Сіра гниль": rotationGrayMold,
+      "Альтернаріоз": rotationAlternaria,
+      "Бактеріоз": rotationBacteriosis,
+    }[name] || [];
+
+    const selected = getAdvancedTreatments(riskDates);
+    selected.forEach((item, i) => {
+      events.push({
+        date: item.date.toLocaleDateString("uk-UA"), // дд.мм.рррр
+        title: `Обробка (${name})`,
+        description: `${rotation[i % rotation.length]}`,
+      });
+    });
+  });
+
+  return events;
 }
