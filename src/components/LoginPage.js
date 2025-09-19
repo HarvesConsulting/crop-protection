@@ -90,7 +90,7 @@ const containerStyle = {
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  minHeight: "100vh",
+  height: "100dvh", // 🆕 замість minHeight: "100vh"
   background: "#f0f4f8",
   padding: "20px",
 };
