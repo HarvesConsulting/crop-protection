@@ -34,99 +34,86 @@ export default function LoginPage({ onLogin }) {
   };
 
   return (
-    <div style={containerStyle}>
-      <div style={cardStyle}>
-        <h2 style={{ textAlign: "center", marginBottom: 20 }}>
-          {isRegistering ? "Реєстрація" : "Вхід"}
-        </h2>
+    <div style={wrapperStyle}>
+      <h2>{isRegistering ? "Реєстрація" : "Вхід"}</h2>
 
-        <input
-          type="email"
-          inputMode="email"
-          autoComplete="email"
-          autoCapitalize="none"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={inputStyle}
-        />
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        readOnly
+        onFocus={(e) => {
+          e.target.removeAttribute("readOnly");
+          console.log("🔵 Email focused");
+        }}
+        onChange={(e) => setEmail(e.target.value)}
+        style={inputStyle}
+      />
 
-        <input
-          type="password"
-          inputMode="text"
-          autoComplete="current-password"
-          autoCapitalize="none"
-          placeholder="Пароль"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={inputStyle}
-        />
+      <input
+        type="password"
+        placeholder="Пароль"
+        value={password}
+        readOnly
+        onFocus={(e) => {
+          e.target.removeAttribute("readOnly");
+          console.log("🟣 Password focused");
+        }}
+        onChange={(e) => setPassword(e.target.value)}
+        style={inputStyle}
+      />
 
-        <button onClick={handleAuth} style={buttonStyle}>
-          {isRegistering ? "Зареєструватись" : "Увійти"}
-        </button>
+      <button onClick={handleAuth} style={buttonStyle}>
+        {isRegistering ? "Зареєструватись" : "Увійти"}
+      </button>
 
-        <p
-          onClick={() => setIsRegistering(!isRegistering)}
-          style={toggleStyle}
-        >
-          {isRegistering
-            ? "У вас вже є акаунт? Увійти"
-            : "Немає акаунта? Зареєструйтесь"}
-        </p>
+      <p onClick={() => setIsRegistering(!isRegistering)} style={toggleStyle}>
+        {isRegistering ? "У вас вже є акаунт? Увійти" : "Немає акаунта? Зареєструйтесь"}
+      </p>
 
-        {error && (
-          <p style={{ color: "red", marginTop: 10, textAlign: "center" }}>
-            ⚠ {error}
-          </p>
-        )}
-      </div>
+      {error && <p style={errorStyle}>⚠ {error}</p>}
     </div>
   );
 }
 
-// ✅ Стилі (оновлені)
-const containerStyle = {
-  background: "#f0f4f8",
-  padding: "40px 20px",
-  height: "auto", // 🆕
-  minHeight: "100%", // 🆕
-  boxSizing: "border-box",
-};
-
-const cardStyle = {
+// Стилі
+const wrapperStyle = {
+  padding: 20,
   background: "#fff",
-  padding: "30px",
-  borderRadius: "10px",
-  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-  maxWidth: "400px",
-  margin: "0 auto",
+  maxWidth: 400,
+  margin: "40px auto",
+  fontFamily: "sans-serif",
 };
 
 const inputStyle = {
+  display: "block",
   width: "100%",
-  padding: "14px",
-  marginBottom: "14px",
-  border: "1px solid #ccc",
-  borderRadius: "6px",
-  fontSize: "16px",
+  padding: 12,
+  marginBottom: 12,
+  fontSize: 16,
 };
 
 const buttonStyle = {
   width: "100%",
-  padding: "14px",
+  padding: 14,
   backgroundColor: "#2d6cdf",
   color: "white",
   fontWeight: "bold",
   border: "none",
   borderRadius: "6px",
   cursor: "pointer",
-  fontSize: "16px",
+  fontSize: 16,
 };
 
 const toggleStyle = {
   textAlign: "center",
-  marginTop: "15px",
+  marginTop: 15,
   color: "#2d6cdf",
   cursor: "pointer",
+};
+
+const errorStyle = {
+  color: "red",
+  textAlign: "center",
+  marginTop: 10,
 };
