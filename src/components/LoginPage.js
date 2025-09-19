@@ -127,11 +127,11 @@ const cardStyle = {
 
 const inputStyle = {
   width: "100%",
-  padding: "14px",
-  marginBottom: "14px",
+  padding: "14px 16px", // 14px зверху/знизу, 16px зліва/справа
   border: "1px solid #ccc",
   borderRadius: "6px",
   fontSize: "16px",
+  boxSizing: "border-box",
 };
 
 const buttonStyle = {
