@@ -11,6 +11,7 @@ export default function LoginPage({ onLogin }) {
   const [password, setPassword] = useState("");
   const [isRegistering, setIsRegistering] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // 👈 новий стейт
 
   const handleAuth = async () => {
     try {
@@ -51,16 +52,24 @@ export default function LoginPage({ onLogin }) {
           style={inputStyle}
         />
 
-        <input
-          type="password"
-          inputMode="text"
-          autoComplete="current-password"
-          autoCapitalize="none"
-          placeholder="Пароль"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={inputStyle}
-        />
+        <div style={{ position: "relative" }}>
+          <input
+            type={showPassword ? "text" : "password"} // 👈 зміна типу
+            inputMode="text"
+            autoComplete="current-password"
+            autoCapitalize="none"
+            placeholder="Пароль"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={{ ...inputStyle, paddingRight: 40 }} // 👈 місце для іконки
+          />
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            style={eyeIconStyle}
+          >
+            {showPassword ? "🙈" : "👁️"}
+          </span>
+        </div>
 
         <button onClick={handleAuth} style={buttonStyle}>
           {isRegistering ? "Зареєструватись" : "Увійти"}
@@ -127,4 +136,14 @@ const toggleStyle = {
   marginTop: "15px",
   color: "#2d6cdf",
   cursor: "pointer",
+};
+
+const eyeIconStyle = {
+  position: "absolute",
+  right: 12,
+  top: "50%",
+  transform: "translateY(-50%)",
+  cursor: "pointer",
+  fontSize: 20,
+  userSelect: "none",
 };
