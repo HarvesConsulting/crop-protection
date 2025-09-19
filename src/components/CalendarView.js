@@ -1,43 +1,51 @@
 import React, { useState } from "react";
 import Calendar from "react-calendar";
-import 'react-calendar/dist/Calendar.css';
-import './CalendarView.css';
+import "react-calendar/dist/Calendar.css";
+import "./CalendarView.css";
 
 export default function CalendarView({ events = [] }) {
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(null);
 
-  const formattedDate = selectedDate.toLocaleDateString("uk-UA");
+  // 🔧 Парсимо дату з формату "дд.мм.рррр"
+  const parseStringToDate = (str) => {
+    const [day, month, year] = str.split(".");
+    return new Date(`${year}-${month}-${day}`);
+  };
 
-  const filteredEvents = events.filter(e => e.date === formattedDate);
-
-  const tileContent = ({ date, view }) => {
-    const day = date.toLocaleDateString("uk-UA");
-    const hasEvent = events.some(e => e.date === day);
-    return hasEvent ? <div className="dot" /> : null;
+  // 🔧 Отримуємо список подій на дату
+  const getEventsForDate = (date) => {
+    return events.filter(
+      (event) =>
+        parseStringToDate(event.date).toDateString() === date.toDateString()
+    );
   };
 
   return (
-    <div className="calendar-wrapper">
-      <Calendar
-        onChange={setSelectedDate}
-        value={selectedDate}
-        tileContent={tileContent}
-      />
+    <div style={{ marginTop: 40 }}>
+      <h2>📅 Календар обробок</h2>
+      <p className="text-sm text-gray-600">
+        Натисніть на дату, щоб побачити призначені обробки.
+      </p>
 
-      <div className="event-list">
-        <h3>Події на {formattedDate}:</h3>
-        {filteredEvents.length > 0 ? (
-          filteredEvents.map((e, i) => (
-            <div key={i}>
-              <strong>{e.title}</strong><br />
-              <small>{e.description}</small>
-              <hr />
-            </div>
-          ))
-        ) : (
-          <p>Немає подій</p>
-        )}
+      <div className="calendar-container">
+        <Calendar onClickDay={(value) => setSelectedDate(value)} />
       </div>
+
+      {selectedDate && (
+        <div className="event-list">
+          <h3>Обробки на {selectedDate.toLocaleDateString("uk-UA")}:</h3>
+          {getEventsForDate(selectedDate).length > 0 ? (
+            getEventsForDate(selectedDate).map((event, index) => (
+              <div key={index} className="event-card">
+                <strong>{event.title}</strong>
+                <p>{event.description}</p>
+              </div>
+            ))
+          ) : (
+            <p>Немає запланованих обробок</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
