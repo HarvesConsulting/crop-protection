@@ -52,24 +52,39 @@ export default function LoginPage({ onLogin }) {
           style={inputStyle}
         />
 
-        <div style={{ position: "relative" }}>
-          <input
-            type={showPassword ? "text" : "password"} // 👈 зміна типу
-            inputMode="text"
-            autoComplete="current-password"
-            autoCapitalize="none"
-            placeholder="Пароль"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={{ ...inputStyle, paddingRight: 40 }} // 👈 місце для іконки
-          />
-          <span
-            onClick={() => setShowPassword(!showPassword)}
-            style={eyeIconStyle}
-          >
-            {showPassword ? "🙈" : "👁️"}
-          </span>
-        </div>
+        <div style={{ position: "relative", marginBottom: "14px" }}>
+  <input
+    type={showPassword ? "text" : "password"}
+    inputMode="text"
+    autoComplete="current-password"
+    autoCapitalize="none"
+    placeholder="Пароль"
+    value={password}
+    onChange={(e) => setPassword(e.target.value)}
+    style={{
+      ...inputStyle,
+      paddingRight: 40,
+      marginBottom: 0, // прибираємо дублювання
+    }}
+  />
+  <span
+    onClick={() => setShowPassword(!showPassword)}
+    style={{
+      position: "absolute",
+      right: 12,
+      top: "50%",
+      transform: "translateY(-50%)",
+      cursor: "pointer",
+      fontSize: 20,
+      userSelect: "none",
+      lineHeight: 1,
+      color: "#444",
+    }}
+    title={showPassword ? "Сховати пароль" : "Показати пароль"}
+  >
+    {showPassword ? "🙈" : "👁️"}
+  </span>
+</div>
 
         <button onClick={handleAuth} style={buttonStyle}>
           {isRegistering ? "Зареєструватись" : "Увійти"}
