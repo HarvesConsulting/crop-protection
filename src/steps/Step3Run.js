@@ -7,8 +7,6 @@ import {
   computeMultiSpraySchedule,
   computeDSVSchedule,
   makeWeeklyPlan,
-  dsvFromWet,
-  extractSuitableHoursFromHourly, // ✅ ДОДАНО
 } from "../engine";
 
 import {
@@ -76,9 +74,37 @@ export default function Step3Run({
         useForecast ? undefined : 14
       );
 
-      // ✅ Отримуємо погодинні вікна внесення
-      const suitableHours = extractSuitableHoursFromHourly(wx.raw || wx); // залежить від того, як fetch повертає hourly
+      // ✅ Обчислення рекомендованих годин для кожної дати
+      const suitable = {};
+      for (const row of wx.daily) {
+        const hours = [];
+        if (!row?.date || !Array.isArray(row?.hourly)) continue;
 
+        for (let i = 0; i < row.hourly.length; i++) {
+          const h = row.hourly[i];
+          const t = h?.temp;
+          const rh = h?.rh;
+          const wind = h?.wind;
+          const rain = h?.rain;
+
+          if (
+            typeof t === "number" &&
+            typeof rh === "number" &&
+            typeof wind === "number" &&
+            typeof rain === "number" &&
+            t >= 10 && t <= 25 &&
+            wind <= 4 &&
+            rain === 0
+          ) {
+            hours.push(`${i}:00`);
+          }
+        }
+
+        const dateStr = format(row.date, "dd.MM.yyyy");
+        suitable[dateStr] = hours;
+      }
+
+      // 🔍 Ризики хвороб
       const diseaseSummary = [];
 
       if (diseases?.includes("grayMold")) {
@@ -92,12 +118,14 @@ export default function Step3Run({
       }
 
       if (diseases?.includes("bacteriosis")) {
-        const riskDates = rows.filter((d) => {
-          const rainVal = (rain?.daily || []).find((r) =>
-            r.date.getTime() === d.date.getTime()
-          )?.rain || 0;
-          return isBacterialRisk(d, rainVal);
-        }).map((d) => d.date);
+        const riskDates = rows
+          .filter((d) => {
+            const rainVal = (rain?.daily || []).find(
+              (r) => r.date.getTime() === d.date.getTime()
+            )?.rain || 0;
+            return isBacterialRisk(d, rainVal);
+          })
+          .map((d) => d.date);
         diseaseSummary.push({ name: "Бактеріоз", riskDates });
       }
 
@@ -106,7 +134,7 @@ export default function Step3Run({
         diagnostics: comp.rows,
         weeklyPlan: weekly,
         diseaseSummary,
-        suitableHours, // ✅ ДОДАНО
+        suitableHours: suitable, // ✅ додаємо години
       };
 
       onResult(result);
@@ -122,7 +150,8 @@ export default function Step3Run({
       <h2>Крок 3: Розрахунок</h2>
 
       <p>
-        Натисніть кнопку, щоб отримати {useForecast ? "модель захисту за історичними даними" : "14-денний прогноз"}.
+        Натисніть кнопку, щоб отримати{" "}
+        {useForecast ? "модель захисту за історичними даними" : "14-денний прогноз"}.
       </p>
 
       {error && (
