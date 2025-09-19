@@ -19,3 +19,10 @@
   background: #f4f4f4;
   border-radius: 6px;
 }
+/* Підсвічування днів з обробками */
+.react-calendar__tile.highlight {
+  background: #cce5ff !important;
+  border-radius: 50%;
+  font-weight: bold;
+  color: #003366;
+}

@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import "./CalendarView.css";
+import "./CalendarView.css"; // Додай стилі нижче
 
 export default function CalendarView({ events = [] }) {
   const [selectedDate, setSelectedDate] = useState(null);
 
-  // ✅ Працює і з рядками "дд.мм.рррр", і з Date-об'єктами
   const normalizeDate = (input) => {
     if (input instanceof Date) return input;
     if (typeof input === "string") {
@@ -31,7 +30,19 @@ export default function CalendarView({ events = [] }) {
       </p>
 
       <div className="calendar-container">
-        <Calendar onClickDay={(value) => setSelectedDate(value)} />
+        <Calendar
+          onClickDay={setSelectedDate}
+          tileClassName={({ date, view }) => {
+            if (view === "month") {
+              const hasEvent = events.some(
+                (event) =>
+                  normalizeDate(event.date)?.toDateString() ===
+                  date.toDateString()
+              );
+              return hasEvent ? "highlight" : null;
+            }
+          }}
+        />
       </div>
 
       {selectedDate && (
