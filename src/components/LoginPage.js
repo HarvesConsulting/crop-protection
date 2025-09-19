@@ -128,6 +128,7 @@ const cardStyle = {
 const inputStyle = {
   width: "100%",
   padding: "14px 16px", // 14px зверху/знизу, 16px зліва/справа
+  marginBottom: "20px",
   border: "1px solid #ccc",
   borderRadius: "6px",
   fontSize: "16px",
