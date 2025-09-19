@@ -8,13 +8,14 @@ import {
   computeDSVSchedule,
   makeWeeklyPlan,
   dsvFromWet,
+  extractSuitableHoursFromHourly, // ✅ ДОДАНО
 } from "../engine";
 
 import {
   isGrayMoldRisk,
   isAlternariaRisk,
   isBacterialRisk,
-} from "../diseases"; // додай цей файл окремо (або імпортуй з engine, якщо вставиш туди)
+} from "../diseases";
 
 import { format } from "date-fns";
 
@@ -75,7 +76,9 @@ export default function Step3Run({
         useForecast ? undefined : 14
       );
 
-      // 🔍 Розрахунок ризиків по кожній обраній хворобі
+      // ✅ Отримуємо погодинні вікна внесення
+      const suitableHours = extractSuitableHoursFromHourly(wx.raw || wx); // залежить від того, як fetch повертає hourly
+
       const diseaseSummary = [];
 
       if (diseases?.includes("grayMold")) {
@@ -102,7 +105,8 @@ export default function Step3Run({
         sprayDates: sprays.map((d) => format(d, "dd.MM.yyyy")),
         diagnostics: comp.rows,
         weeklyPlan: weekly,
-        diseaseSummary, // ✅ Додаємо
+        diseaseSummary,
+        suitableHours, // ✅ ДОДАНО
       };
 
       onResult(result);

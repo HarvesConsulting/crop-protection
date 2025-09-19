@@ -455,7 +455,7 @@ export async function fetchWeatherFromNASA(lat, lon, start, end) {
     const params = new URLSearchParams({
       latitude: String(la),
       longitude: String(lo),
-      hourly: "temperature_2m,relative_humidity_2m",
+      hourly: "temperature_2m,relative_humidity_2m,windspeed_10m,precipitation",
       start_date: toISOyyyy_mm_dd(s),
       end_date: toISOyyyy_mm_dd(e),
       timezone: "auto",
@@ -517,4 +517,30 @@ export async function fetchDailyRainFromNASA(lat, lon, start, end) {
     return { daily: [], error: String(e), url };
   }
 }
+export function extractSuitableHoursFromHourly(json) {
+  const h = json?.hourly;
+  if (!h) return {};
 
+  const times = h.time || [];
+  const temps = h.temperature_2m || [];
+  const winds = h.windspeed_10m || [];
+  const precs = h.precipitation || [];
+
+  const result = {};
+
+  for (let i = 0; i < times.length; i++) {
+    const ts = times[i]; // e.g. "2025-09-20T06:00"
+    const [date, hour] = ts.split("T");
+    const hNum = parseInt(hour.split(":")[0]);
+    const t = temps[i];
+    const w = winds[i];
+    const p = precs[i];
+
+    if (t >= 10 && t <= 25 && w <= 4 && p === 0) {
+      if (!result[date]) result[date] = [];
+      result[date].push(`${hNum}:00`);
+    }
+  }
+
+  return result; // { '2025-09-20': ['6:00', '7:00', ...] }
+}
