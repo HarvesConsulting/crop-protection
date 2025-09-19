@@ -78,8 +78,7 @@ function getAdvancedTreatments(riskDates, minGap = 7, shortGap = 5) {
     const current = sorted[i];
     if (
       !selected.length ||
-      differenceInDays(current, selected[selected.length - 1].date) >=
-        selected[selected.length - 1].gap
+      differenceInDays(current, selected[selected.length - 1].date) >= selected[selected.length - 1].gap
     ) {
       let streak = 1;
       let j = i + 1;
@@ -117,18 +116,24 @@ export default function Step4Results({ result, onRestart }) {
   const [showIntegrated, setShowIntegrated] = useState(false);
 
   if (!result) return <p>Дані відсутні</p>;
-  const { sprayDates, diseaseSummary } = result;
+
+  const { sprayDates, diseaseSummary, suitableHours = {} } = result;
 
   const sprayData = sprayDates.map((d, i) => {
     const cur = parseISO(d.split(".").reverse().join("-"));
     const prev = i > 0 ? parseISO(sprayDates[i - 1].split(".").reverse().join("-")) : null;
     const gap = prev ? `${differenceInDays(cur, prev)} діб після попередньої` : "—";
     const product = rotationProducts[i % rotationProducts.length];
+    const recommendedHours = suitableHours[d] || [];
+
     return {
       Дата: d,
       Препарат: `${product} (${productInfo[product] || "—"})`,
-      Рекомендація: productLinks[product] ? <a href={productLinks[product]} target="_blank" rel="noreferrer">Перейти</a> : "—",
+      Рекомендація: productLinks[product]
+        ? <a href={productLinks[product]} target="_blank" rel="noreferrer">Перейти</a>
+        : "—",
       Інтервал: gap,
+      "Рекомендовані години": recommendedHours.length ? recommendedHours.join(", ") : "—",
     };
   });
 
@@ -142,31 +147,43 @@ export default function Step4Results({ result, onRestart }) {
     const treatments = getAdvancedTreatments(riskDates);
     const entries = treatments.map((item, i) => {
       const product = rotation[i % rotation.length];
+      const dateStr = item.date.toLocaleDateString("uk-UA");
+      const recommendedHours = suitableHours[dateStr] || [];
+
       return {
-        Дата: item.date.toLocaleDateString("uk-UA"),
+        Дата: dateStr,
         Препарат: `${product} (${productInfo[product] || "—"})`,
-        Рекомендація: productLinks[product] ? <a href={productLinks[product]} target="_blank" rel="noreferrer">Перейти</a> : "—",
+        Рекомендація: productLinks[product]
+          ? <a href={productLinks[product]} target="_blank" rel="noreferrer">Перейти</a>
+          : "—",
         Інтервал:
           i === 0 ? "—" : `${differenceInDays(item.date, treatments[i - 1].date)} діб після попередньої`,
+        "Рекомендовані години": recommendedHours.length ? recommendedHours.join(", ") : "—",
       };
     });
 
     return { name, entries };
   });
 
-  const integratedSystem = [...sprayData.map(({ Дата, Препарат, Рекомендація }) => ({ Дата, Препарат, Рекомендація }))];
+  const integratedSystem = [
+    ...sprayData.map(({ Дата, Препарат, Рекомендація }) => ({ Дата, Препарат, Рекомендація }))
+  ];
+
   diseaseCardsGrouped?.forEach(({ entries }) => {
     entries.forEach(({ Дата, Препарат, Рекомендація }) => {
       integratedSystem.push({ Дата, Препарат, Рекомендація });
     });
   });
-  integratedSystem.sort((a, b) => parseISO(a.Дата.split(".").reverse().join("-")) - parseISO(b.Дата.split(".").reverse().join("-")));
+
+  integratedSystem.sort(
+    (a, b) => parseISO(a.Дата.split(".").reverse().join("-")) - parseISO(b.Дата.split(".").reverse().join("-"))
+  );
 
   const exportToExcel = () => {
     const simplified = integratedSystem.map(({ Дата, Препарат, Рекомендація }) => ({
       Дата,
       Препарат,
-      Рекомендація: typeof Рекомендація === 'string' ? Рекомендація : Рекомендація?.props?.href || ''
+      Рекомендація: typeof Рекомендація === 'string' ? Рекомендація : Rекомендація?.props?.href || ''
     }));
     const ws = XLSX.utils.json_to_sheet(simplified);
     const wb = XLSX.utils.book_new();
@@ -210,26 +227,4 @@ export default function Step4Results({ result, onRestart }) {
       </button>
     </div>
   );
-}
-
-function dsvFromWet(wetHours, wetTempAvg) {
-  if (!Number.isFinite(wetHours) || !Number.isFinite(wetTempAvg)) return 0;
-  if (wetHours < 6) return 0;
-
-  const DSV_RULES = [
-    { tempMin: 21, tempMax: 27, bands: [{ h: 6, dsv: 2 }, { h: 8, dsv: 3 }, { h: 10, dsv: 4 }] },
-    { tempMin: 13, tempMax: 21, bands: [{ h: 6, dsv: 1 }, { h: 8, dsv: 2 }, { h: 10, dsv: 3 }, { h: 12, dsv: 4 }] },
-    { tempMin: 7, tempMax: 13, bands: [{ h: 6, dsv: 1 }, { h: 8, dsv: 1 }, { h: 10, dsv: 2 }, { h: 12, dsv: 3 }, { h: 14, dsv: 4 }] },
-    { tempMin: 27, tempMax: 40, bands: [{ h: 6, dsv: 1 }, { h: 8, dsv: 2 }, { h: 10, dsv: 3 }] },
-  ];
-
-  for (const rule of DSV_RULES) {
-    if (wetTempAvg >= rule.tempMin && wetTempAvg < rule.tempMax) {
-      const bands = [...rule.bands].sort((a, b) => b.h - a.h);
-      for (const b of bands) {
-        if (wetHours >= b.h) return b.dsv;
-      }
-    }
-  }
-  return 0;
 }
