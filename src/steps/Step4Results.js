@@ -183,7 +183,10 @@ export default function Step4Results({ result, onRestart }) {
     const simplified = integratedSystem.map(({ Дата, Препарат, Рекомендація }) => ({
       Дата,
       Препарат,
-      Рекомендація: typeof Рекомендація === 'string' ? Рекомендація : Rекомендація?.props?.href || ''
+      Рекомендація: typeof Рекомендація === "string"
+  ? Рекомендація
+  : (Рекомендація?.props?.href || "")
+
     }));
     const ws = XLSX.utils.json_to_sheet(simplified);
     const wb = XLSX.utils.book_new();
