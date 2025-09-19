@@ -85,14 +85,12 @@ export default function LoginPage({ onLogin }) {
   );
 }
 
-// Стилі
+// ✅ Стилі (оновлені)
 const containerStyle = {
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  height: "100dvh", // 🆕 замість minHeight: "100vh"
   background: "#f0f4f8",
-  padding: "20px",
+  padding: "40px 20px",
+  minHeight: "100vh", // ✅ БЕЗ flex – краще працює на мобілках
+  boxSizing: "border-box",
 };
 
 const cardStyle = {
@@ -100,8 +98,8 @@ const cardStyle = {
   padding: "30px",
   borderRadius: "10px",
   boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-  width: "100%",
   maxWidth: "400px",
+  margin: "0 auto",
 };
 
 const inputStyle = {
