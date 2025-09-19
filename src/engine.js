@@ -388,7 +388,7 @@ export async function fetchForecastHourly(lat, lon, startISO, days = 14) {
     latitude: String(la),
     longitude: String(lo),
     timezone: "auto",
-    hourly: "temperature_2m,relative_humidity_2m",
+    hourly: "temperature_2m,relative_humidity_2m,windspeed_10m,precipitation",
     start_date: s,
     end_date: end,
   });
@@ -398,7 +398,12 @@ export async function fetchForecastHourly(lat, lon, startISO, days = 14) {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
-    return { daily: transformOpenMeteoHourly(json), error: "", url };
+    return {
+      daily: transformOpenMeteoHourly(json),
+      raw: json, // ✅ Додаємо сирі погодинні дані
+      error: "",
+      url,
+    };
   } catch (e) {
     return { daily: [], error: String(e), url };
   }
