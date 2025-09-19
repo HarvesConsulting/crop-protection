@@ -14,7 +14,7 @@ export default function AppIntro() {
     >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h2 style={{ marginBottom: "10px", color: "#2d6cdf" }}>
-          🌿 Crop Protection – Порадник обробок
+          🍅 Crop Protection – Порадник обробок
         </h2>
         <button
           onClick={() => setShowInfo(!showInfo)}
