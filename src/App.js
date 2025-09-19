@@ -127,7 +127,7 @@ export default function App() {
       {step === 4 && (
         <>
           <Step4Results result={result} onRestart={() => setStep(1)} />
-          <h3 style={{ marginTop: 40 }}>Календар обробок</h3>
+          
           <CalendarView events={extractCalendarEvents(result)} />
         </>
       )}
