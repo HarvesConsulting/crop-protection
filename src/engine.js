@@ -517,4 +517,23 @@ export async function fetchDailyRainFromNASA(lat, lon, start, end) {
     return { daily: [], error: String(e), url };
   }
 }
+export function extractSuitableHoursFromHourly(hourlyData) {
+  if (!Array.isArray(hourlyData)) return [];
+
+  return hourlyData.map((entry) => {
+    const { date, wetHours, wetTempAvg, allTempAvg, condHours } = entry;
+
+    // умовно кажемо: день "підходить", якщо є хоча б 3 години сприятливих умов
+    const isSuitable = condHours >= 3;
+
+    return {
+      date,
+      wetHours,
+      wetTempAvg,
+      allTempAvg,
+      condHours,
+      isSuitable,
+    };
+  });
+}
 
