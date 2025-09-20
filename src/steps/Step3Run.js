@@ -99,10 +99,17 @@ export default function Step3Run({
       const last = lastSprayDate ? new Date(lastSprayDate) : null;
       if (last) last.setHours(0, 0, 0, 0);
 
-      const rowsAfter = last ? wx.daily.filter(r => r?.date && r.date > last) : wx.daily;
-      const rainAfter = last
-        ? (rain?.daily || []).filter(r => r?.date && r.date > last)
-        : (rain?.daily || []);
+      let rowsAfter = wx.daily;
+let rainAfter = rain?.daily || [];
+
+if (last) {
+  const nextDay = new Date(last);
+  nextDay.setDate(nextDay.getDate() + 1); // наступний день після обробки
+  nextDay.setHours(0, 0, 0, 0);
+
+  rowsAfter = wx.daily.filter(r => r?.date && r.date >= nextDay);
+  rainAfter = (rain?.daily || []).filter(r => r?.date && r.date >= nextDay);
+}
 
       // ✅ розрахунки тільки з відсіченими даними
       const comp = computeDSVSchedule(rowsAfter, DEFAULT_DSV_THRESHOLD);
