@@ -486,7 +486,7 @@ export async function fetchArchiveHourlyExtras(lat, lon, startISO, endISO) {
     latitude: String(la),
     longitude: String(lo),
     timezone: "auto",
-    hourly: "temperature_2m,windspeed_10m,precipitation", // у ERA5 тільки 10м
+    hourly: "temperature_2m,windspeed_10m,precipitation", // у ERA5 зазвичай 10м
     start_date: s,
     end_date: e,
   });
@@ -496,42 +496,58 @@ export async function fetchArchiveHourlyExtras(lat, lon, startISO, endISO) {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
-
-    const h = json?.hourly || {};
-    const times = h.time || [];
-    const temps = h.temperature_2m || [];
-    const winds10m = h.windspeed_10m || [];
-    const rain = h.precipitation || [];
-
-    const n = Math.min(times.length, temps.length, winds10m.length, rain.length);
-    const out = [];
-
-    for (let i = 0; i < n; i++) {
-      const ts = times[i];
-      if (!ts || typeof ts !== "string") continue;
-
-      const [dateStr, hourStr] = ts.split("T");
-      const date = new Date(dateStr);
-      const hour = parseInt((hourStr || "0").split(":")[0], 10);
-
-      // ✅ Переводимо 10м → 2м
-      const windspeed2m = Number(winds10m[i]) * 0.75;
-
-      out.push({
-        date,
-        hour,
-        temperature: Number(temps[i]),
-        windspeed: windspeed2m,   // ← тепер завжди 2м
-        precipitation: Number(rain[i]),
-      });
-    }
-
-    return { hourly: out, error: "", url };
+    return { hourly: transformArchiveToHourlyData(json), error: "", url };
   } catch (e) {
     return { hourly: [], error: String(e), url };
   }
 }
 
+export async function fetchDailyRainFromNASA(lat, lon, start, end) {
+  const { ok, lat: la, lon: lo } = coerceLatLon(lat, lon);
+  if (!ok) return { daily: [], error: "Invalid lat/lon", url: "" };
+
+  const clamped = clampDateRange(start, end);
+  if (clamped.error) return { daily: [], error: clamped.error, url: "" };
+  const { start: s, end: e } = clamped;
+
+  let url = "";
+  try {
+    // 1) NASA POWER daily rain
+    url = buildNASADailyUrl({ lat: la, lon: lo, start: s, end: e });
+    let res = await fetch(url, { headers: { Accept: "application/json" } });
+
+    if (res.ok) {
+      const json = await res.json();
+      const pr = json?.properties?.parameter?.PRECTOTCORR || {};
+      const keys = Object.keys(pr).filter(k => /\d{8}/.test(k)).sort();
+      const daily = keys.map(k => {
+        const iso = `${k.slice(0, 4)}-${k.slice(4, 6)}-${k.slice(6, 8)}`;
+        const d = asDate(iso);
+        return d ? { date: d, rain: Number(pr[k]) || 0 } : null;
+      }).filter(Boolean);
+
+      if (daily.length > 0) return { daily, error: "", url };
+    }
+
+    // 2) Fallback → Open-Meteo ERA5 daily rain
+    const params = new URLSearchParams({
+      latitude: String(la),
+      longitude: String(lo),
+      daily: "precipitation_sum",
+      start_date: toISOyyyy_mm_dd(s),
+      end_date: toISOyyyy_mm_dd(e),
+      timezone: "auto",
+    });
+    const omUrl = `https://archive-api.open-meteo.com/v1/era5?${params.toString()}`;
+    res = await fetch(omUrl);
+    if (!res.ok) throw new Error(`ERA5 rain error ${res.status}`);
+    const json2 = await res.json();
+    return { daily: transformOpenMeteoDaily(json2), error: "", url: omUrl };
+
+  } catch (e) {
+    return { daily: [], error: String(e), url };
+  }
+}
 export function extractSuitableHoursFromHourly(hourlyData) {
   if (!Array.isArray(hourlyData)) return [];
 
