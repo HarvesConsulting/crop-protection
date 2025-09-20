@@ -284,19 +284,7 @@ integratedSystem.sort(
           ))}
         </>
       )}
-      <div style={{ marginTop: 40, textAlign: "center" }}>
-  <p style={{ fontSize: "18px", fontWeight: "bold", color: "#2d6cdf" }}>
-    🇺🇦 Україна
-  </p>
-  <a
-    href="https://www.instagram.com/harvest.consulting/"
-    target="_blank"
-    rel="noreferrer"
-    style={{ color: "#007bff", textDecoration: "underline" }}
-  >
-    Harvest Consulting в Instagram
-  </a>
-</div>
+      
       <button className="restart-button" onClick={onRestart}>
         🔄 Почати спочатку
       </button>
