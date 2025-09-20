@@ -1,3 +1,4 @@
+import { extractSuitableHoursFromHourly } from "../engine";
 import React, { useState } from "react";
 import {
   fetchForecastHourly,
@@ -7,7 +8,7 @@ import {
   computeMultiSpraySchedule,
   computeDSVSchedule,
   makeWeeklyPlan,
-  extractSuitableHoursFromHourly, // ✅ імпортуємо готову функцію
+  extractSuitableHoursFromHourly, // ✅ додано тут
 } from "../engine";
 
 import {
@@ -75,8 +76,8 @@ export default function Step3Run({
         useForecast ? undefined : 14
       );
 
-      // ✅ Використовуємо функцію з engine.js
-      const suitable = extractSuitableHoursFromHourly(wx.raw || {});
+      // ✅ Обчислення рекомендованих годин для кожної дати
+      const suitable = extractSuitableHoursFromHourly(wx.raw);
 
       // 🔍 Ризики хвороб
       const diseaseSummary = [];
@@ -108,10 +109,10 @@ export default function Step3Run({
         diagnostics: comp.rows,
         weeklyPlan: weekly,
         diseaseSummary,
-        suitableHours: suitable, // ✅ тепер правильні години
+        suitableHours: suitable, // ✅ додаємо години
       };
-
-      console.log("Step3Run → result:", result);
+      // 👇 лог тут
+console.log("Step3Run → result:", result);
       onResult(result);
     } catch (e) {
       setError(`Помилка обчислення: ${e?.message || e}`);
