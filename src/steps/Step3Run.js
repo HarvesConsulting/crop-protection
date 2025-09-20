@@ -7,7 +7,8 @@ import {
   computeMultiSpraySchedule,
   computeDSVSchedule,
   makeWeeklyPlan,
-  extractSuitableHoursFromHourly,
+  transformForecastToHourlyData,
+  extractSuitableSprayHours,
 } from "../engine";
 
 import {
@@ -46,7 +47,7 @@ export default function Step3Run({
 
       let weatherDaily = [];
       let rainDaily = [];
-      let rawHourly = [];
+      let hourlyForecastData = []; // погодинний масив для годин обприскування
 
       // ⏳ Архівна погода (до сьогодні)
       if (startDate < today) {
@@ -68,7 +69,11 @@ export default function Step3Run({
         ]);
         weatherDaily.push(...(forecastWx.daily || []));
         rainDaily.push(...(forecastRain.daily || []));
-        rawHourly = forecastWx.daily; // для рекомендованих годин
+
+        // ⚙️ Перетворення forecast raw → погодинний масив
+        if (forecastWx.raw) {
+          hourlyForecastData = transformForecastToHourlyData(forecastWx.raw);
+        }
       }
 
       if (weatherDaily.length === 0) {
@@ -100,7 +105,8 @@ export default function Step3Run({
         undefined
       );
 
-      const suitable = extractSuitableHoursFromHourly(rawHourly);
+      // 🕒 Рекомендовані години обприскування
+      const suitable = extractSuitableSprayHours(hourlyForecastData);
 
       // 🦠 Аналіз ризику хвороб
       const diseaseSummary = [];
@@ -135,6 +141,8 @@ export default function Step3Run({
         lastSprayDate: lastSprayDate
           ? format(new Date(lastSprayDate), "dd.MM.yyyy")
           : null,
+        plantingDate,
+        harvestDate,
       };
 
       console.log("Step3Run → result:", result);

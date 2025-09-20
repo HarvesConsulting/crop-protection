@@ -536,4 +536,67 @@ export function extractSuitableHoursFromHourly(hourlyData) {
     };
   });
 }
+export function extractSuitableSprayHours(hourlyData) {
+  if (!Array.isArray(hourlyData)) return {};
 
+  const suitableByDate = {};
+
+  hourlyData.forEach((entry) => {
+    const { date, hour, temperature, windspeed, precipitation } = entry;
+
+    const tempOK = temperature >= 10 && temperature <= 25;
+    const windOK = windspeed <= 4;
+    const rainOK = precipitation <= 0;
+
+    if (tempOK && windOK && rainOK) {
+      const dateStr = date instanceof Date ? date.toISOString().split("T")[0] : String(date);
+      const hourStr = String(hour).padStart(2, "0") + ":00";
+
+      if (!suitableByDate[dateStr]) suitableByDate[dateStr] = [];
+      suitableByDate[dateStr].push(hourStr);
+    }
+  });
+
+  return suitableByDate;
+}
+export function transformForecastToHourlyData(json) {
+  const h = json?.hourly;
+  if (!h) return [];
+
+  const times = h.time || [];
+  const temps = h.temperature_2m || [];
+  const winds = h.windspeed_10m || h.windspeed_2m || [];
+  const rain = h.precipitation || h.precipitation_sum || [];
+
+  const n = Math.min(times.length, temps.length, winds.length, rain.length);
+
+  const out = [];
+
+  for (let i = 0; i < n; i++) {
+    const ts = times[i]; // ISO string, e.g. "2025-09-20T14:00"
+    if (!ts || typeof ts !== "string") continue;
+
+    const [dateStr, hourStr] = ts.split("T");
+    const date = new Date(dateStr);
+    const hour = parseInt(hourStr?.split(":")[0] || "0");
+
+    const temperature = Number(temps[i]);
+    let windspeed = Number(winds[i]);
+    const precipitation = Number(rain[i]);
+
+    // 🌀 Якщо це windspeed_10m → коригуємо до 2м (приблизно)
+    if (h.windspeed_10m && !h.windspeed_2m) {
+      windspeed = windspeed * 0.75;
+    }
+
+    out.push({
+      date,
+      hour,
+      temperature,
+      windspeed,
+      precipitation,
+    });
+  }
+
+  return out;
+}
