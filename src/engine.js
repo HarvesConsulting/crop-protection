@@ -127,49 +127,49 @@ export function computeMultiSpraySchedule(rows, rainDaily = [], lastSprayDate = 
   // нормалізуємо опади
   const rain = Array.isArray(rainDaily)
     ? rainDaily
-        .map(x => ({ date: x?.date instanceof Date ? x.date : asDate(x?.date), rain: Number(x?.rain || 0) }))
+        .map(x => ({
+          date: x?.date instanceof Date ? x.date : asDate(x?.date),
+          rain: Number(x?.rain || 0),
+        }))
         .filter(x => x.date && isValidDate(x.date))
     : [];
 
-  // якщо задана остання обробка → починаємо з наступного дня
-  let cursor = null;
-  if (lastSprayDate) {
-    cursor = new Date(lastSprayDate);
-    cursor.setDate(cursor.getDate() + 1);
-    cursor.setHours(0, 0, 0, 0);
-  }
+  // ❗ Починаємо з останньої обробки
+  if (!lastSprayDate) return []; // Якщо її немає — не будуємо нічого
 
-  // перший день з умовами після останньої обробки
-  const firstObj = normRows.find(r => hasCond(r) && (!cursor || r.date >= cursor));
-  const first = firstObj?.date || null;
-  if (!first) return sprays;
-
-  sprays.push(first);
-  cursor = first;
+  let cursor = new Date(lastSprayDate);
+  cursor.setHours(0, 0, 0, 0);
+  sprays.push(new Date(cursor)); // Додаємо першу обробку
 
   while (true) {
-    const d1 = new Date(cursor.getTime() + 1 * dayMs);
     const d5 = new Date(cursor.getTime() + 5 * dayMs);
     const d7 = new Date(cursor.getTime() + 7 * dayMs);
 
+    // Чи були сильні дощі у вікні [cursor +1, cursor+7]
     const hadHeavyRain = rain.some(
-      (r) => r.date > cursor && r.date <= d7 && Number(r.rain) >= RAIN_HIGH_THRESHOLD_MM
+      (r) => r.date > cursor && r.date <= d7 && r.rain >= RAIN_HIGH_THRESHOLD_MM
     );
 
     let next = null;
+
     if (hadHeavyRain) {
       next = d5;
     } else {
-      const hadCondWithin7 = normRows.some((r) => r.date >= d1 && r.date <= d7 && hasCond(r));
-      if (hadCondWithin7) next = d7;
-      else next = normRows.find((r) => r.date > d7 && hasCond(r))?.date || null;
+      const hadCond = normRows.some(
+        (r) => r.date > cursor && r.date <= d7 && hasCond(r)
+      );
+      if (hadCond) {
+        next = d7;
+      }
     }
 
     if (!next) break;
+
+    // захист від зациклення
     if (sprays.length && next.getTime() <= sprays[sprays.length - 1].getTime()) break;
 
-    sprays.push(next);
-    cursor = next;
+    sprays.push(new Date(next));
+    cursor = new Date(next);
   }
 
   return sprays;
