@@ -61,9 +61,10 @@ export default function Step3Run({
 
         weatherDaily.push(...(historyWx.daily || []));
         rainDaily.push(...(historyRain.daily || []));
-        hourlyData.push(...(historyHourly || [])); // ✅ додаємо архівні години
-      }
-
+        if (Array.isArray(historyHourly?.hourly)) {
+  hourlyData.push(...historyHourly.hourly);
+}
+}
       /* ---------------- 📈 Прогноз ---------------- */
       if (endDate >= today) {
         const forecastStart = startDate > today ? startDate : today;
