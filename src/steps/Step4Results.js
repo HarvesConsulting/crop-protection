@@ -153,7 +153,8 @@ export default function Step4Results({ result, onRestart }) {
     const prev = i > 0 ? parseISO(sprayDates[i - 1].split(".").reverse().join("-")) : null;
     const gap = prev ? `${differenceInDays(cur, prev)} діб після попередньої` : "—";
     const product = rotationProducts[i % rotationProducts.length];
-    const recommendedHours = suitableHours[d] || [];
+    const dateStr = format(cur, "dd.MM.yyyy");
+const recommendedHours = suitableHours[dateStr] || [];
 
     return {
       Дата: d,
