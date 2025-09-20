@@ -486,7 +486,7 @@ export async function fetchArchiveHourlyExtras(lat, lon, startISO, endISO) {
     latitude: String(la),
     longitude: String(lo),
     timezone: "auto",
-    hourly: "temperature_2m,windspeed_10m,precipitation", // у ERA5 зазвичай 10м
+    hourly: "temperature_2m,windspeed_10m,precipitation", // ERA5 дає тільки 10м
     start_date: s,
     end_date: e,
   });
@@ -496,7 +496,38 @@ export async function fetchArchiveHourlyExtras(lat, lon, startISO, endISO) {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
-    return { hourly: transformArchiveToHourlyData(json), error: "", url };
+
+    const h = json?.hourly || {};
+    const times = h.time || [];
+    const temps = h.temperature_2m || [];
+    const winds10m = h.windspeed_10m || [];
+    const rain = h.precipitation || [];
+
+    const n = Math.min(times.length, temps.length, winds10m.length, rain.length);
+    const out = [];
+
+    for (let i = 0; i < n; i++) {
+      const ts = times[i];
+      if (!ts || typeof ts !== "string") continue;
+
+      const [dateStr, hourStr] = ts.split("T");
+      const date = new Date(dateStr);
+      const hour = parseInt((hourStr || "0").split(":")[0], 10);
+
+      // 🔽 Конвертація: 10м → 2м (емпірично через логарифмічний профіль)
+      const windspeed10m = Number(winds10m[i]);
+      const windspeed2m = windspeed10m * 0.75; // коефіцієнт ≈0.75 для z0=0.1
+
+      out.push({
+        date,
+        hour,
+        temperature: Number(temps[i]),
+        windspeed: windspeed2m,
+        precipitation: Number(rain[i]),
+      });
+    }
+
+    return { hourly: out, error: "", url };
   } catch (e) {
     return { hourly: [], error: String(e), url };
   }
