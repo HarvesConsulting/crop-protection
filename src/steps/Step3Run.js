@@ -41,14 +41,47 @@ export default function Step3Run({
       let wx, rain;
 
       if (useForecast) {
-        [wx, rain] = await Promise.all([
-          fetchWeatherFromNASA(region.lat, region.lon, plantingDate, harvestDate),
-          fetchDailyRainFromNASA(region.lat, region.lon, plantingDate, harvestDate),
-        ]);
-      } else {
-        wx = await fetchForecastHourly(region.lat, region.lon, plantingDate, 14);
-        rain = await fetchForecastDailyRain(region.lat, region.lon, plantingDate, 14);
-      }
+  // 🔹 ІСТОРІЯ: все як є
+  [wx, rain] = await Promise.all([
+    fetchWeatherFromNASA(region.lat, region.lon, plantingDate, harvestDate),
+    fetchDailyRainFromNASA(region.lat, region.lon, plantingDate, harvestDate),
+  ]);
+} else {
+  const startDate = new Date(plantingDate);
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  if (startDate < today) {
+    // 🔹 МИНУЛЕ: беремо історію до сьогодні + прогноз від сьогодні +14 днів
+    const [historyWx, historyRain] = await Promise.all([
+      fetchWeatherFromNASA(region.lat, region.lon, plantingDate, today),
+      fetchDailyRainFromNASA(region.lat, region.lon, plantingDate, today),
+    ]);
+
+    const [forecastWx, forecastRain] = await Promise.all([
+      fetchForecastHourly(region.lat, region.lon, today, 14),
+      fetchForecastDailyRain(region.lat, region.lon, today, 14),
+    ]);
+
+    // об’єднуємо історичні і прогнозні дані
+    wx = {
+      daily: [...(historyWx.daily || []), ...(forecastWx.daily || [])],
+      raw: forecastWx.raw,
+      error: historyWx.error || forecastWx.error,
+      url: forecastWx.url,
+    };
+
+    rain = {
+      daily: [...(historyRain.daily || []), ...(forecastRain.daily || [])],
+      error: historyRain.error || forecastRain.error,
+      url: forecastRain.url,
+    };
+  } else {
+    // 🔹 СЬОГОДНІ/МАЙБУТНЄ: стандартний прогноз
+    wx = await fetchForecastHourly(region.lat, region.lon, plantingDate, 14);
+    rain = await fetchForecastDailyRain(region.lat, region.lon, plantingDate, 14);
+  }
+}
 
       if (wx.error) {
         setError(`Помилка погоди: ${wx.error}`);
