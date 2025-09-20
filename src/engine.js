@@ -383,11 +383,14 @@ export async function fetchForecastHourly(lat, lon, startISO, days = 14) {
   const { ok, lat: la, lon: lo } = coerceLatLon(lat, lon);
   if (!ok || !s) return { daily: [], error: "Invalid lat/lon or start date", url: "" };
 
-  const end = toISOyyyy_mm_dd(new Date(new Date(s).getTime() + (days - 1) * 86400000));
+  const end = toISOyyyy_mm_dd(
+    new Date(new Date(s).getTime() + (days - 1) * 86400000)
+  );
   const params = new URLSearchParams({
     latitude: String(la),
     longitude: String(lo),
     timezone: "auto",
+    // ✅ додаємо вітер і опади
     hourly: "temperature_2m,relative_humidity_2m,windspeed_10m,precipitation",
     start_date: s,
     end_date: end,
@@ -399,8 +402,8 @@ export async function fetchForecastHourly(lat, lon, startISO, days = 14) {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
     return {
-      daily: transformOpenMeteoHourly(json),
-      raw: json, // ✅ Додаємо сирі погодинні дані
+      daily: transformOpenMeteoHourly(json), // денні дані для розрахунків
+      raw: json, // ✅ повертаємо сирі погодинні дані (тут є і вітер, і опади)
       error: "",
       url,
     };
@@ -522,6 +525,7 @@ export async function fetchDailyRainFromNASA(lat, lon, start, end) {
     return { daily: [], error: String(e), url };
   }
 }
+
 export function extractSuitableHoursFromHourly(json) {
   const h = json?.hourly;
   if (!h) return {};
@@ -535,17 +539,22 @@ export function extractSuitableHoursFromHourly(json) {
 
   for (let i = 0; i < times.length; i++) {
     const ts = times[i]; // e.g. "2025-09-20T06:00"
+    if (!ts.includes("T")) continue;
+
     const [date, hour] = ts.split("T");
+    const d = parseISO(date);
+    const dateStr = format(d, "dd.MM.yyyy"); // ✅ тепер у такому ж форматі, як sprayDates
+
     const hNum = parseInt(hour.split(":")[0]);
     const t = temps[i];
     const w = winds[i];
     const p = precs[i];
 
     if (t >= 10 && t <= 25 && w <= 4 && p === 0) {
-      if (!result[date]) result[date] = [];
-      result[date].push(`${hNum}:00`);
+      if (!result[dateStr]) result[dateStr] = [];
+      result[dateStr].push(`${hNum}:00`);
     }
   }
 
-  return result; // { '2025-09-20': ['6:00', '7:00', ...] }
+  return result; // { '20.09.2025': ['6:00', '7:00', ...] }
 }
