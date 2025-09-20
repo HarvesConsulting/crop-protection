@@ -166,19 +166,50 @@ export default function Step4Results({ result, onRestart }) {
     return { name, entries };
   });
 
-  const integratedSystem = [
-    ...sprayData.map(({ Дата, Препарат, Рекомендація }) => ({ Дата, Препарат, Рекомендація }))
-  ];
+  const rawEntries = [
+  ...sprayData,
+  ...diseaseCardsGrouped.flatMap(({ entries }) => entries),
+];
 
-  diseaseCardsGrouped?.forEach(({ entries }) => {
-    entries.forEach(({ Дата, Препарат, Рекомендація }) => {
-      integratedSystem.push({ Дата, Препарат, Рекомендація });
-    });
-  });
+// 🔄 Групуємо за датами
+const groupedByDate = rawEntries.reduce((acc, entry) => {
+  const key = entry.Дата;
+  if (!acc[key]) acc[key] = [];
+  acc[key].push(entry);
+  return acc;
+}, {});
 
-  integratedSystem.sort(
-    (a, b) => parseISO(a.Дата.split(".").reverse().join("-")) - parseISO(b.Дата.split(".").reverse().join("-"))
-  );
+// 🧪 Об’єднуємо в одну обробку на кожну дату
+const integratedSystem = Object.entries(groupedByDate).map(([date, entries]) => {
+  const allProducts = entries.map(e => e.Препарат).join(", ");
+  
+  const allLinks = entries
+    .map(e => {
+      if (typeof e.Рекомендація === "string") return null;
+      const href = e.Рекомендація?.props?.href;
+      return href ? (
+        <div key={href}>
+          <a href={href} target="_blank" rel="noreferrer">
+            {href}
+          </a>
+        </div>
+      ) : null;
+    })
+    .filter(Boolean);
+
+  return {
+    Дата: date,
+    Препарат: allProducts,
+    Рекомендація: allLinks.length ? <>{allLinks}</> : "—",
+  };
+});
+
+// ⏳ Сортуємо за датою
+integratedSystem.sort(
+  (a, b) =>
+    parseISO(a.Дата.split(".").reverse().join("-")) -
+    parseISO(b.Дата.split(".").reverse().join("-"))
+);
 
   const exportToExcel = () => {
     const simplified = integratedSystem.map(({ Дата, Препарат, Рекомендація }) => ({
