@@ -104,7 +104,7 @@ export default function Step3Run({
 
       /* ---------------- 📊 Розрахунок захисту ---------------- */
       const comp = computeDSVSchedule(rowsAfter, DEFAULT_DSV_THRESHOLD);
-      const sprays = computeMultiSpraySchedule(rowsAfter, rainAfter);
+      const sprays = computeMultiSpraySchedule(rowsAfter, rainAfter, plantingDate);
 
       const weekly = makeWeeklyPlan(
         comp.rows,

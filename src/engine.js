@@ -112,8 +112,11 @@ export function computeDSVSchedule(daily, dsvThreshold = DEFAULT_DSV_THRESHOLD) 
 }
 
 export function computeMultiSpraySchedule(rows, rainDaily = [], plantingDate) {
-  const safeRows = Array.isArray(rows) ? rows.filter(r => r?.date instanceof Date || asDate(r?.date)) : [];
-  const normRows = safeRows
+  const safeRows = Array.isArray(rows)
+    ? rows.filter(r => r?.date instanceof Date || asDate(r?.date))
+    : [];
+
+  let normRows = safeRows
     .map(r => ({ ...r, date: r.date instanceof Date ? r.date : asDate(r.date) }))
     .filter(r => r.date && isValidDate(r.date));
 
@@ -121,20 +124,22 @@ export function computeMultiSpraySchedule(rows, rainDaily = [], plantingDate) {
   const sprays = [];
   const dayMs = 86400000;
 
-  // 🔽 Мінімальна дата для першої обробки
+  // 👉 мінімальна дата першої обробки = plantingDate + 10 днів
   const planting = asDate(plantingDate);
   const minFirstDate = planting ? new Date(planting.getTime() + 10 * dayMs) : null;
 
-  // Знаходимо перший день з умовами
+  // Якщо є мінімум — відразу фільтруємо рядки, що раніше
+  if (minFirstDate) {
+    normRows = normRows.filter(r => r.date >= minFirstDate);
+  }
+
+  // перший день з умовами
   const firstObj = normRows.find(hasCond);
   const first = firstObj?.date || null;
   if (!first) return sprays;
 
-  // Якщо перша дата раніше ніж plantingDate+10 → переносимо
-  const firstAllowed = minFirstDate && first < minFirstDate ? minFirstDate : first;
-
-  sprays.push(firstAllowed);
-  let cursor = firstAllowed;
+  sprays.push(first);
+  let cursor = first;
 
   // нормалізуємо опади
   const rain = Array.isArray(rainDaily)
@@ -168,7 +173,6 @@ export function computeMultiSpraySchedule(rows, rainDaily = [], plantingDate) {
 
   return sprays;
 }
-
 
 export function makeWeeklyPlan(rows, rainDaily, startISO, rainThreshold, horizonDays) {
   // старт беремо з параметра, або з першого дня даних, або з сьогодні
