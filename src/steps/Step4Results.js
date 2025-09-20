@@ -284,10 +284,6 @@ integratedSystem.sort(
           ))}
         </>
       )}
-
-      <button className="restart-button" onClick={onRestart}>
-        🔄 Почати спочатку
-      </button>
       <div style={{ marginTop: 40, textAlign: "center" }}>
   <p style={{ fontSize: "18px", fontWeight: "bold", color: "#2d6cdf" }}>
     🇺🇦 Україна
@@ -301,7 +297,10 @@ integratedSystem.sort(
     Harvest Consulting в Instagram
   </a>
 </div>
-
+      <button className="restart-button" onClick={onRestart}>
+        🔄 Почати спочатку
+      </button>
+      
     </div>
   );
 }
