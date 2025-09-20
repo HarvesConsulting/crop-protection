@@ -1,4 +1,3 @@
-import { extractSuitableHoursFromHourly } from "../engine";
 import React, { useState } from "react";
 import {
   fetchForecastHourly,
