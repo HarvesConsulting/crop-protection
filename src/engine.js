@@ -463,7 +463,7 @@ export async function fetchWeatherFromNASA(lat, lon, start, end) {
     const params = new URLSearchParams({
       latitude: String(la),
       longitude: String(lo),
-      hourly: "temperature_2m,relative_humidity_2m,windspeed_10m,precipitation",
+      hourly: "temperature_2m,relative_humidity_2m,windspeed_2m,precipitation",
       start_date: toISOyyyy_mm_dd(s),
       end_date: toISOyyyy_mm_dd(e),
       timezone: "auto",
