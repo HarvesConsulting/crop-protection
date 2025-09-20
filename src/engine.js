@@ -111,21 +111,18 @@ export function computeDSVSchedule(daily, dsvThreshold = DEFAULT_DSV_THRESHOLD) 
   return { rows, schedule };
 }
 
-export function computeMultiSpraySchedule(rows, rainDaily = []) {
-  const safeRows = Array.isArray(rows) ? rows.filter(r => r?.date instanceof Date || asDate(r?.date)) : [];
-  const normRows = safeRows.map(r => ({ ...r, date: r.date instanceof Date ? r.date : asDate(r.date) }))
-                           .filter(r => r.date && isValidDate(r.date));
+export function computeMultiSpraySchedule(rows, rainDaily = [], lastSprayDate = null) {
+  const safeRows = Array.isArray(rows)
+    ? rows.filter(r => r?.date instanceof Date || asDate(r?.date))
+    : [];
+
+  const normRows = safeRows
+    .map(r => ({ ...r, date: r.date instanceof Date ? r.date : asDate(r.date) }))
+    .filter(r => r.date && isValidDate(r.date));
 
   const hasCond = (r) => Number(r?.condHours || 0) >= COND_HOURS_TRIGGER;
   const sprays = [];
   const dayMs = 86400000;
-
-  const firstObj = normRows.find(hasCond);
-  const first = firstObj?.date || null;
-  if (!first) return sprays;
-
-  sprays.push(first);
-  let cursor = first;
 
   // нормалізуємо опади
   const rain = Array.isArray(rainDaily)
@@ -134,12 +131,30 @@ export function computeMultiSpraySchedule(rows, rainDaily = []) {
         .filter(x => x.date && isValidDate(x.date))
     : [];
 
+  // якщо задана остання обробка → починаємо з наступного дня
+  let cursor = null;
+  if (lastSprayDate) {
+    cursor = new Date(lastSprayDate);
+    cursor.setDate(cursor.getDate() + 1);
+    cursor.setHours(0, 0, 0, 0);
+  }
+
+  // перший день з умовами після останньої обробки
+  const firstObj = normRows.find(r => hasCond(r) && (!cursor || r.date >= cursor));
+  const first = firstObj?.date || null;
+  if (!first) return sprays;
+
+  sprays.push(first);
+  cursor = first;
+
   while (true) {
     const d1 = new Date(cursor.getTime() + 1 * dayMs);
     const d5 = new Date(cursor.getTime() + 5 * dayMs);
     const d7 = new Date(cursor.getTime() + 7 * dayMs);
 
-    const hadHeavyRain = rain.some((r) => r.date > cursor && r.date <= d7 && Number(r.rain) >= RAIN_HIGH_THRESHOLD_MM);
+    const hadHeavyRain = rain.some(
+      (r) => r.date > cursor && r.date <= d7 && Number(r.rain) >= RAIN_HIGH_THRESHOLD_MM
+    );
 
     let next = null;
     if (hadHeavyRain) {

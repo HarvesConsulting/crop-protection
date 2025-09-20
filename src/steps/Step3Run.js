@@ -27,7 +27,7 @@ export default function Step3Run({
   harvestDate,
   useForecast,
   diseases,
-  lastSprayDate, // ✅ нове
+  lastSprayDate, // ✅ тепер враховуємо останню обробку
   onResult,
   onBack,
 }) {
@@ -42,7 +42,6 @@ export default function Step3Run({
       let wx, rain;
 
       if (useForecast) {
-        // 🔹 історичні дані
         [wx, rain] = await Promise.all([
           fetchWeatherFromNASA(region.lat, region.lon, plantingDate, harvestDate),
           fetchDailyRainFromNASA(region.lat, region.lon, plantingDate, harvestDate),
@@ -53,7 +52,6 @@ export default function Step3Run({
         today.setHours(0, 0, 0, 0);
 
         if (startDate < today) {
-          // 🔹 якщо старт минулий → історія до сьогодні + прогноз на 14 днів
           const [historyWx, historyRain] = await Promise.all([
             fetchWeatherFromNASA(region.lat, region.lon, plantingDate, today),
             fetchDailyRainFromNASA(region.lat, region.lon, plantingDate, today),
@@ -77,7 +75,6 @@ export default function Step3Run({
             url: forecastRain.url,
           };
         } else {
-          // 🔹 тільки прогноз
           wx = await fetchForecastHourly(region.lat, region.lon, plantingDate, 14);
           rain = await fetchForecastDailyRain(region.lat, region.lon, plantingDate, 14);
         }
@@ -104,16 +101,16 @@ export default function Step3Run({
 
       if (last) {
         const nextDay = new Date(last);
-        nextDay.setDate(nextDay.getDate() + 1); // наступний день після обробки
+        nextDay.setDate(nextDay.getDate() + 1);
         nextDay.setHours(0, 0, 0, 0);
 
-        rowsAfter = wx.daily.filter(r => r?.date && r.date >= nextDay);
-        rainAfter = (rain?.daily || []).filter(r => r?.date && r.date >= nextDay);
+        rowsAfter = wx.daily.filter((r) => r?.date && r.date >= nextDay);
+        rainAfter = (rain?.daily || []).filter((r) => r?.date && r.date >= nextDay);
       }
 
-      // ✅ розрахунки тільки з відсіченими даними
+      // ✅ розрахунки
       const comp = computeDSVSchedule(rowsAfter, DEFAULT_DSV_THRESHOLD);
-      const sprays = computeMultiSpraySchedule(rowsAfter, rainAfter);
+      const sprays = computeMultiSpraySchedule(rowsAfter, rainAfter, last);
 
       const startForWeeksISO = last
         ? last.toISOString().split("T")[0]
@@ -138,37 +135,38 @@ export default function Step3Run({
         );
       }
 
-      // 🔍 ризики хвороб тільки після останньої обробки
+      // ✅ ризики хвороб
       const diseaseSummary = [];
 
       if (diseases?.includes("grayMold")) {
-        const riskDates = rowsAfter.filter(isGrayMoldRisk).map(d => d.date);
+        const riskDates = rowsAfter.filter(isGrayMoldRisk).map((d) => d.date);
         diseaseSummary.push({ name: "Сіра гниль", riskDates });
       }
 
       if (diseases?.includes("alternaria")) {
-        const riskDates = rowsAfter.filter(isAlternariaRisk).map(d => d.date);
+        const riskDates = rowsAfter.filter(isAlternariaRisk).map((d) => d.date);
         diseaseSummary.push({ name: "Альтернаріоз", riskDates });
       }
 
       if (diseases?.includes("bacteriosis")) {
         const riskDates = rowsAfter
-          .filter(d => {
-            const rv = rainAfter.find(r => r.date.getTime() === d.date.getTime())?.rain || 0;
+          .filter((d) => {
+            const rv = rainAfter.find((r) => r.date.getTime() === d.date.getTime())?.rain || 0;
             return isBacterialRisk(d, rv);
           })
-          .map(d => d.date);
+          .map((d) => d.date);
         diseaseSummary.push({ name: "Бактеріоз", riskDates });
       }
 
-      // ✅ результат
       const result = {
-        sprayDates: sprays.map(d => format(d, "dd.MM.yyyy")), // ❌ вже не фільтруємо тут!
+        sprayDates: sprays.map((d) => format(d, "dd.MM.yyyy")),
         diagnostics: comp.rows,
         weeklyPlan: weekly,
         diseaseSummary,
         suitableHours: suitable,
-        lastSprayDate: lastSprayDate ? format(new Date(lastSprayDate), "dd.MM.yyyy") : null,
+        lastSprayDate: lastSprayDate
+          ? format(new Date(lastSprayDate), "dd.MM.yyyy")
+          : null,
       };
 
       console.log("Step3Run → result:", result);
@@ -186,13 +184,13 @@ export default function Step3Run({
 
       <p>
         Натисніть кнопку, щоб отримати{" "}
-        {useForecast ? "модель захисту за історичними даними" : "14-денний прогноз"}.
+        {useForecast
+          ? "модель захисту за історичними даними"
+          : "14-денний прогноз"}.
       </p>
 
       {error && (
-        <div style={{ color: "red", marginBottom: 10 }}>
-          ⚠️ {error}
-        </div>
+        <div style={{ color: "red", marginBottom: 10 }}>⚠️ {error}</div>
       )}
 
       <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
@@ -227,3 +225,4 @@ export default function Step3Run({
     </div>
   );
 }
+
