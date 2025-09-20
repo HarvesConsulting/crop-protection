@@ -84,6 +84,33 @@ export function dsvFromWet(wetHours, wetTempAvg) {
   return 0;
 }
 
+export function computeDSVSchedule(daily, dsvThreshold = DEFAULT_DSV_THRESHOLD) {
+  const rows = (daily || []).map(d => ({
+    ...d,
+    DSV: Math.min(dsvFromWet(Number(d?.wetHours ?? 0), Number(d?.wetTempAvg ?? NaN)), 4),
+  }));
+  const schedule = [];
+  let acc = 0;
+  let lastSpray = null;
+
+  for (const r of rows) {
+    const curDate = r.date instanceof Date ? r.date : asDate(r.date);
+    if (!curDate) continue;
+    acc += r.DSV || 0;
+
+    const lastDate = lastSpray ? (lastSpray instanceof Date ? lastSpray : asDate(lastSpray)) : null;
+    const canSpray = !lastDate || (isValidDate(lastDate) && differenceInDays(curDate, lastDate) >= 5);
+
+    if (acc >= dsvThreshold && canSpray) {
+      schedule.push({ date: curDate, accBefore: acc });
+      acc -= dsvThreshold;
+      lastSpray = curDate;
+    }
+  }
+
+  return { rows, schedule };
+}
+
 export function computeMultiSpraySchedule(rows, rainDaily = [], lastSprayDate = null) {
   const safeRows = Array.isArray(rows)
     ? rows.filter(r => r?.date instanceof Date || asDate(r?.date))
@@ -97,55 +124,52 @@ export function computeMultiSpraySchedule(rows, rainDaily = [], lastSprayDate = 
   const sprays = [];
   const dayMs = 86400000;
 
+  // нормалізуємо опади
   const rain = Array.isArray(rainDaily)
     ? rainDaily
-        .map(x => ({ date: x?.date instanceof Date ? x.date : asDate(x?.date), rain: Number(x?.rain || 0) }))
+        .map(x => ({
+          date: x?.date instanceof Date ? x.date : asDate(x?.date),
+          rain: Number(x?.rain || 0),
+        }))
         .filter(x => x.date && isValidDate(x.date))
     : [];
 
-  // Початкова позиція курсору
-  let cursor = null;
-  if (lastSprayDate) {
-    cursor = new Date(lastSprayDate);
-    cursor.setHours(0, 0, 0, 0);
-  }
+  // ❗ Починаємо з останньої обробки
+  if (!lastSprayDate) return []; // Якщо її немає — не будуємо нічого
 
-  // Пошук першого сприятливого дня ПІСЛЯ останньої обробки
-  const firstObj = normRows.find(r =>
-    hasCond(r) && (!cursor || r.date.getTime() > cursor.getTime())
-  );
-  const first = firstObj?.date || null;
-  if (!first) return sprays;
-
-  sprays.push(first);
-  cursor = first;
+  let cursor = new Date(lastSprayDate);
+  cursor.setHours(0, 0, 0, 0);
+  sprays.push(new Date(cursor)); // Додаємо першу обробку
 
   while (true) {
-    const d1 = new Date(cursor.getTime() + 1 * dayMs);
     const d5 = new Date(cursor.getTime() + 5 * dayMs);
     const d7 = new Date(cursor.getTime() + 7 * dayMs);
 
+    // Чи були сильні дощі у вікні [cursor +1, cursor+7]
     const hadHeavyRain = rain.some(
-      (r) => r.date > cursor && r.date <= d7 && Number(r.rain) >= RAIN_HIGH_THRESHOLD_MM
+      (r) => r.date > cursor && r.date <= d7 && r.rain >= RAIN_HIGH_THRESHOLD_MM
     );
 
     let next = null;
+
     if (hadHeavyRain) {
       next = d5;
     } else {
-      const hadCondWithin7 = normRows.some((r) => r.date >= d1 && r.date <= d7 && hasCond(r));
-      if (hadCondWithin7) {
+      const hadCond = normRows.some(
+        (r) => r.date > cursor && r.date <= d7 && hasCond(r)
+      );
+      if (hadCond) {
         next = d7;
-      } else {
-        next = normRows.find((r) => r.date > d7 && hasCond(r))?.date || null;
       }
     }
 
     if (!next) break;
+
+    // захист від зациклення
     if (sprays.length && next.getTime() <= sprays[sprays.length - 1].getTime()) break;
 
-    sprays.push(next);
-    cursor = next;
+    sprays.push(new Date(next));
+    cursor = new Date(next);
   }
 
   return sprays;
