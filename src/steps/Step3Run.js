@@ -7,6 +7,7 @@ import {
   computeMultiSpraySchedule,
   computeDSVSchedule,
   makeWeeklyPlan,
+  extractSuitableHoursFromHourly, // ✅ імпортуємо готову функцію
 } from "../engine";
 
 import {
@@ -74,35 +75,8 @@ export default function Step3Run({
         useForecast ? undefined : 14
       );
 
-      // ✅ Обчислення рекомендованих годин для кожної дати
-      const suitable = {};
-      for (const row of wx.daily) {
-        const hours = [];
-        if (!row?.date || !Array.isArray(row?.hourly)) continue;
-
-        for (let i = 0; i < row.hourly.length; i++) {
-          const h = row.hourly[i];
-          const t = h?.temp;
-          const rh = h?.rh;
-          const wind = h?.wind;
-          const rain = h?.rain;
-
-          if (
-            typeof t === "number" &&
-            typeof rh === "number" &&
-            typeof wind === "number" &&
-            typeof rain === "number" &&
-            t >= 10 && t <= 25 &&
-            wind <= 4 &&
-            rain === 0
-          ) {
-            hours.push(`${i}:00`);
-          }
-        }
-
-        const dateStr = format(row.date, "dd.MM.yyyy");
-        suitable[dateStr] = hours;
-      }
+      // ✅ Використовуємо функцію з engine.js
+      const suitable = extractSuitableHoursFromHourly(wx.raw || {});
 
       // 🔍 Ризики хвороб
       const diseaseSummary = [];
@@ -134,10 +108,10 @@ export default function Step3Run({
         diagnostics: comp.rows,
         weeklyPlan: weekly,
         diseaseSummary,
-        suitableHours: suitable, // ✅ додаємо години
+        suitableHours: suitable, // ✅ тепер правильні години
       };
-      // 👇 лог тут
-console.log("Step3Run → result:", result);
+
+      console.log("Step3Run → result:", result);
       onResult(result);
     } catch (e) {
       setError(`Помилка обчислення: ${e?.message || e}`);
