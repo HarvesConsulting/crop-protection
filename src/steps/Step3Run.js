@@ -9,6 +9,7 @@ import {
   makeWeeklyPlan,
   transformForecastToHourlyData,
   extractSuitableSprayHours,
+  fetchArchiveHourlyExtras, // ✅ новий імпорт
 } from "../engine";
 
 import {
@@ -47,53 +48,60 @@ export default function Step3Run({
 
       let weatherDaily = [];
       let rainDaily = [];
-      let hourlyForecastData = []; // погодинний масив для годин обприскування
+      let hourlyData = []; // ✅ загальний масив: архівні години + прогнозні
 
-      // ⏳ Архівна погода (до сьогодні)
+      /* ---------------- ⏳ Архівна погода ---------------- */
       if (startDate < today) {
         const historyEnd = endDate < today ? endDate : today;
-        const [historyWx, historyRain] = await Promise.all([
+        const [historyWx, historyRain, historyHourly] = await Promise.all([
           fetchWeatherFromNASA(region.lat, region.lon, startDate, historyEnd),
           fetchDailyRainFromNASA(region.lat, region.lon, startDate, historyEnd),
+          fetchArchiveHourlyExtras(region.lat, region.lon, startDate, historyEnd), // ✅ нова функція
         ]);
+
         weatherDaily.push(...(historyWx.daily || []));
         rainDaily.push(...(historyRain.daily || []));
+        hourlyData.push(...(historyHourly || [])); // ✅ додаємо архівні години
       }
 
-      // 📈 Прогноз (сьогодні і далі)
+      /* ---------------- 📈 Прогноз ---------------- */
       if (endDate >= today) {
         const forecastStart = startDate > today ? startDate : today;
         const [forecastWx, forecastRain] = await Promise.all([
           fetchForecastHourly(region.lat, region.lon, forecastStart),
           fetchForecastDailyRain(region.lat, region.lon, forecastStart),
         ]);
+
         weatherDaily.push(...(forecastWx.daily || []));
         rainDaily.push(...(forecastRain.daily || []));
 
-        // ⚙️ Перетворення forecast raw → погодинний масив
+        // ⚙️ Перетворюємо forecast raw → погодинні дані
         if (forecastWx.raw) {
-          hourlyForecastData = transformForecastToHourlyData(forecastWx.raw);
+          const hourlyForecastData = transformForecastToHourlyData(forecastWx.raw);
+          hourlyData.push(...hourlyForecastData); // ✅ додаємо прогнозні години
         }
       }
 
+      /* ---------------- ❌ Якщо немає даних ---------------- */
       if (weatherDaily.length === 0) {
         setError("Не вдалося отримати погодні дані.");
         setLoading(false);
         return;
       }
 
-      // ✂️ Обрізаємо після останньої обробки (якщо вказано)
+      /* ---------------- ✂️ Відрізаємо після останньої обробки ---------------- */
       let rowsAfter = weatherDaily;
       let rainAfter = rainDaily;
       if (lastSprayDate) {
         const last = new Date(lastSprayDate);
         last.setHours(0, 0, 0, 0);
         const nextDay = new Date(last.getTime() + 86400000);
+
         rowsAfter = rowsAfter.filter((r) => r?.date && r.date >= nextDay);
         rainAfter = rainAfter.filter((r) => r?.date && r.date >= nextDay);
       }
 
-      // 📊 Розрахунок захисту
+      /* ---------------- 📊 Розрахунок захисту ---------------- */
       const comp = computeDSVSchedule(rowsAfter, DEFAULT_DSV_THRESHOLD);
       const sprays = computeMultiSpraySchedule(rowsAfter, rainAfter);
 
@@ -105,10 +113,20 @@ export default function Step3Run({
         undefined
       );
 
-      // 🕒 Рекомендовані години обприскування
-      const suitable = extractSuitableSprayHours(hourlyForecastData);
+      /* ---------------- 🕒 Рекомендовані години ---------------- */
+      const suitable = extractSuitableSprayHours(hourlyData);
 
-      // 🦠 Аналіз ризику хвороб
+      // 🔁 Перетворення ключів ISO → формат "dd.MM.yyyy"
+      const formattedSuitable = {};
+      Object.entries(suitable).forEach(([iso, hours]) => {
+        const d = new Date(iso);
+        if (!isNaN(d)) {
+          const formatted = format(d, "dd.MM.yyyy");
+          formattedSuitable[formatted] = hours;
+        }
+      });
+
+      /* ---------------- 🦠 Аналіз ризику хвороб ---------------- */
       const diseaseSummary = [];
 
       if (diseases.includes("grayMold")) {
@@ -124,20 +142,22 @@ export default function Step3Run({
       if (diseases.includes("bacteriosis")) {
         const riskDates = rowsAfter
           .filter((d) => {
-            const rv = rainAfter.find((r) => r.date.getTime() === d.date.getTime())?.rain || 0;
+            const rv =
+              rainAfter.find((r) => r.date.getTime() === d.date.getTime())
+                ?.rain || 0;
             return isBacterialRisk(d, rv);
           })
           .map((d) => d.date);
         diseaseSummary.push({ name: "Бактеріоз", riskDates });
       }
 
-      // ✅ Готовий результат
+      /* ---------------- ✅ Готовий результат ---------------- */
       const result = {
         sprayDates: sprays.map((d) => format(d, "dd.MM.yyyy")),
         diagnostics: comp.rows,
         weeklyPlan: weekly,
         diseaseSummary,
-        suitableHours: suitable,
+        suitableHours: formattedSuitable, // 🕒 тепер є і архів, і прогноз
         lastSprayDate: lastSprayDate
           ? format(new Date(lastSprayDate), "dd.MM.yyyy")
           : null,

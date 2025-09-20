@@ -398,7 +398,13 @@ export async function fetchForecastHourly(lat, lon, startISO, days = 14) {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
-    return { daily: transformOpenMeteoHourly(json), error: "", url };
+    return {
+  daily: transformOpenMeteoHourly(json),
+  raw: json,                // ← ОБОВ’ЯЗКОВО
+  error: "",
+  url
+};
+
   } catch (e) {
     return { daily: [], error: String(e), url };
   }
@@ -468,6 +474,31 @@ export async function fetchWeatherFromNASA(lat, lon, start, end) {
 
   } catch (e) {
     return { daily: [], error: String(e), url };
+  }
+}
+export async function fetchArchiveHourlyExtras(lat, lon, startISO, endISO) {
+  const { ok, lat: la, lon: lo } = coerceLatLon(lat, lon);
+  const s = toISOyyyy_mm_dd(startISO);
+  const e = toISOyyyy_mm_dd(endISO);
+  if (!ok || !s || !e) return { hourly: [], error: "Invalid lat/lon or dates", url: "" };
+
+  const params = new URLSearchParams({
+    latitude: String(la),
+    longitude: String(lo),
+    timezone: "auto",
+    hourly: "temperature_2m,windspeed_10m,precipitation", // у ERA5 зазвичай 10м
+    start_date: s,
+    end_date: e,
+  });
+  const url = `https://archive-api.open-meteo.com/v1/era5?${params.toString()}`;
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    return { hourly: transformArchiveToHourlyData(json), error: "", url };
+  } catch (e) {
+    return { hourly: [], error: String(e), url };
   }
 }
 
@@ -559,39 +590,70 @@ export function extractSuitableSprayHours(hourlyData) {
 
   return suitableByDate;
 }
+export function transformArchiveToHourlyData(json) {
+  const h = json?.hourly;
+  if (!h) return [];
+
+  const times = h.time || [];
+  const temps = h.temperature_2m || [];
+  const winds = h.windspeed_10m || [];   // ERA5 дає вітер на 10 м
+  const rain  = h.precipitation || [];
+
+  const n = Math.min(times.length, temps.length, winds.length, rain.length);
+  const out = [];
+
+  for (let i = 0; i < n; i++) {
+    const ts = times[i]; // "2025-09-19T14:00"
+    if (!ts || typeof ts !== "string") continue;
+
+    const [dateStr, hourStr] = ts.split("T");
+    const date = new Date(dateStr);
+    const hour = parseInt((hourStr || "0").split(":")[0], 10);
+
+    // ✅ конвертуємо вітер до 2 м (грубо множимо на 0.75)
+    const windAt2m = Number(winds[i]) * 0.75;
+
+    out.push({
+      date,
+      hour,
+      temperature: Number(temps[i]),
+      windspeed: windAt2m,
+      precipitation: Number(rain[i]),
+    });
+  }
+
+  return out;
+}
+
 export function transformForecastToHourlyData(json) {
   const h = json?.hourly;
   if (!h) return [];
 
   const times = h.time || [];
   const temps = h.temperature_2m || [];
-  const winds = h.windspeed_2m || h.windspeed_2m || [];
-  const rain = h.precipitation || h.precipitation_sum || [];
+  const winds = h.windspeed_2m || [];              // ← тільки 2м
+  const rain  = h.precipitation || [];             // forecast повертає precipitation
 
   const n = Math.min(times.length, temps.length, winds.length, rain.length);
-
   const out = [];
 
   for (let i = 0; i < n; i++) {
-    const ts = times[i]; // ISO string, e.g. "2025-09-20T14:00"
+    const ts = times[i];                 // "2025-09-20T14:00"
     if (!ts || typeof ts !== "string") continue;
 
     const [dateStr, hourStr] = ts.split("T");
     const date = new Date(dateStr);
-    const hour = parseInt(hourStr?.split(":")[0] || "0");
+    const hour = parseInt((hourStr || "0").split(":")[0], 10);
 
-    const temperature = Number(temps[i]);
-    let windspeed = Number(winds[i]);
-    const precipitation = Number(rain[i]);
-
-      out.push({
+    out.push({
       date,
       hour,
-      temperature,
-      windspeed,
-      precipitation,
+      temperature: Number(temps[i]),
+      windspeed:   Number(winds[i]),     // ← вже 2м
+      precipitation: Number(rain[i]),
     });
   }
 
   return out;
 }
+
