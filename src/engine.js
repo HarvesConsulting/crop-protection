@@ -532,7 +532,7 @@ export function extractSuitableHoursFromHourly(json) {
 
   const times = h.time || [];
   const temps = h.temperature_2m || [];
-  const winds = h.windspeed_10m || [];
+  const winds = h.windspeed_2m || [];
   const precs = h.precipitation || [];
 
   const result = {};
