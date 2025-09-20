@@ -136,7 +136,8 @@ export default function Step3Run({
         diseaseSummary,
         suitableHours: suitable, // ✅ додаємо години
       };
-
+      // 👇 лог тут
+console.log("Step3Run → result:", result);
       onResult(result);
     } catch (e) {
       setError(`Помилка обчислення: ${e?.message || e}`);

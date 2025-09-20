@@ -555,6 +555,6 @@ export function extractSuitableHoursFromHourly(json) {
       result[dateStr].push(`${hNum}:00`);
     }
   }
-
+console.log("extractSuitableHoursFromHourly → result:", result);
   return result; // { '20.09.2025': ['6:00', '7:00', ...] }
 }
