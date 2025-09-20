@@ -69,6 +69,33 @@ const rotationGrayMold = [
 
 const rotationAlternaria = rotationGrayMold;
 const rotationBacteriosis = ["Медян Екстра", "Казумін", "Серенада"];
+function InfoToggle({ content }) {
+  const [show, setShow] = useState(false);
+
+  return (
+    <span style={{ display: "inline-block" }}>
+      <button
+        onClick={() => setShow(!show)}
+        style={{
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          color: "#007bff",
+          fontSize: "16px",
+          marginLeft: 6,
+        }}
+        title="Показати рекомендації"
+      >
+        ℹ️
+      </button>
+      {show && (
+        <div style={{ marginTop: 6 }}>
+          {Array.isArray(content) ? content : <div>{content}</div>}
+        </div>
+      )}
+    </span>
+  );
+}
 
 function getAdvancedTreatments(riskDates, minGap = 7, shortGap = 5) {
   const sorted = [...riskDates].map((d) => new Date(d)).sort((a, b) => a - b);
@@ -103,10 +130,11 @@ function CardView({ title, entries }) {
         <div key={i} className="card">
           <div className="card-index">#{i + 1}</div>
           {Object.entries(item).map(([key, value]) => (
-            <div key={key} className="card-row">
-              <strong>{key}:</strong> {value}
-            </div>
-          ))}
+  <div key={key} className="card-row">
+    <strong>{key}:</strong>{" "}
+    {key === "Рекомендація" ? <InfoToggle content={value} /> : value}
+  </div>
+))}
         </div>
       ))}
     </div>
