@@ -117,12 +117,12 @@ export default function Step3Run({
         : plantingDate;
 
       const weekly = makeWeeklyPlan(
-        comp.rows,
-        rainAfter,
-        startForWeeksISO,
-        RAIN_HIGH_THRESHOLD_MM,
-        useForecast ? undefined : 14
-      );
+  comp.rows,
+  rainAfter,
+  startForWeeksISO,
+  RAIN_HIGH_THRESHOLD_MM,
+  useForecast ? 14 : undefined
+);
 
       // ✅ рекомендовані години
       let suitable = extractSuitableHoursFromHourly(wx.raw);

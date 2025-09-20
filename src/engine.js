@@ -188,13 +188,14 @@ export function makeWeeklyPlan(rows, rainDaily, startISO, rainThreshold, horizon
 
   // ✅ Виправлена логіка кінцевої дати
   let stopDate;
-  if (horizonDays) {
-    // Прогноз → обмежуємо горизонт (наприклад, 14 днів)
-    stopDate = new Date(start.getTime() + horizonDays * 86400000);
-  } else {
-    // Історія → до останнього дня з даних
-    stopDate = normRows.length ? normRows[normRows.length - 1].date : start;
-  }
+  const lastDateInData = normRows.length ? normRows[normRows.length - 1].date : start;
+
+if (horizonDays) {
+  const projected = new Date(start.getTime() + (horizonDays - 1) * 86400000);
+  stopDate = projected > lastDateInData ? lastDateInData : projected;
+} else {
+  stopDate = lastDateInData;
+}
 
   // нормалізуємо опади
   const rain = Array.isArray(rainDaily)
