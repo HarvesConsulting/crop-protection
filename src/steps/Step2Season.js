@@ -26,7 +26,7 @@ export default function Step2Season({
       </p>
 
       <div style={{ marginBottom: 12 }}>
-        <label>Дата висадки (початок сезону):</label>
+        <label>Дата висадки (початок сезону) або дата останнього внесення фунгіциду:</label>
         <input
           type="date"
           value={plantingDate}
