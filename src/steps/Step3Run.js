@@ -16,7 +16,7 @@ import {
   isBacterialRisk,
 } from "../diseases";
 
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 const DEFAULT_DSV_THRESHOLD = 15;
 const RAIN_HIGH_THRESHOLD_MM = 12.7;
@@ -108,7 +108,10 @@ export default function Step3Run({
       const comp = computeDSVSchedule(rowsAfter, DEFAULT_DSV_THRESHOLD);
       const sprays = computeMultiSpraySchedule(rowsAfter, rainAfter);
 
-      const startForWeeksISO = lastSprayDate || plantingDate;
+      const startForWeeksISO = last
+        ? last.toISOString().split("T")[0]
+        : plantingDate;
+
       const weekly = makeWeeklyPlan(
         comp.rows,
         rainAfter,
@@ -118,23 +121,38 @@ export default function Step3Run({
       );
 
       // ✅ рекомендовані години
-      const suitable = extractSuitableHoursFromHourly(wx.raw);
+      let suitable = extractSuitableHoursFromHourly(wx.raw);
+      if (last) {
+        suitable = Object.fromEntries(
+          Object.entries(suitable).filter(([date]) => {
+            const d = parseISO(date.split(".").reverse().join("-"));
+            return d > last;
+          })
+        );
+      }
 
       // 🔍 ризики хвороб тільки після останньої обробки
       const diseaseSummary = [];
 
       if (diseases?.includes("grayMold")) {
-        const riskDates = rowsAfter.filter(isGrayMoldRisk).map(d => d.date);
+        const riskDates = rowsAfter
+          .filter(d => !last || d.date > last)
+          .filter(isGrayMoldRisk)
+          .map(d => d.date);
         diseaseSummary.push({ name: "Сіра гниль", riskDates });
       }
 
       if (diseases?.includes("alternaria")) {
-        const riskDates = rowsAfter.filter(isAlternariaRisk).map(d => d.date);
+        const riskDates = rowsAfter
+          .filter(d => !last || d.date > last)
+          .filter(isAlternariaRisk)
+          .map(d => d.date);
         diseaseSummary.push({ name: "Альтернаріоз", riskDates });
       }
 
       if (diseases?.includes("bacteriosis")) {
         const riskDates = rowsAfter
+          .filter(d => !last || d.date > last)
           .filter(d => {
             const rv = rainAfter.find(r => r.date.getTime() === d.date.getTime())?.rain || 0;
             return isBacterialRisk(d, rv);
@@ -145,7 +163,9 @@ export default function Step3Run({
 
       // ✅ результат
       const result = {
-        sprayDates: sprays.map(d => format(d, "dd.MM.yyyy")),
+        sprayDates: sprays
+          .filter(d => !last || d > last)
+          .map(d => format(d, "dd.MM.yyyy")),
         diagnostics: comp.rows,
         weeklyPlan: weekly,
         diseaseSummary,
