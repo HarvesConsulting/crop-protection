@@ -7,7 +7,7 @@ import {
   computeMultiSpraySchedule,
   computeDSVSchedule,
   makeWeeklyPlan,
-  extractSuitableHoursFromHourly, // ✅ додано тут
+  extractSuitableHoursFromHourly,
 } from "../engine";
 
 import {
@@ -27,6 +27,7 @@ export default function Step3Run({
   harvestDate,
   useForecast,
   diseases,
+  lastSprayDate, // ✅ нове
   onResult,
   onBack,
 }) {
@@ -41,47 +42,46 @@ export default function Step3Run({
       let wx, rain;
 
       if (useForecast) {
-  // 🔹 ІСТОРІЯ: все як є
-  [wx, rain] = await Promise.all([
-    fetchWeatherFromNASA(region.lat, region.lon, plantingDate, harvestDate),
-    fetchDailyRainFromNASA(region.lat, region.lon, plantingDate, harvestDate),
-  ]);
-} else {
-  const startDate = new Date(plantingDate);
-  const today = new Date();
-  today.setHours(0,0,0,0);
+        // 🔹 історичні дані
+        [wx, rain] = await Promise.all([
+          fetchWeatherFromNASA(region.lat, region.lon, plantingDate, harvestDate),
+          fetchDailyRainFromNASA(region.lat, region.lon, plantingDate, harvestDate),
+        ]);
+      } else {
+        const startDate = new Date(plantingDate);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
 
-  if (startDate < today) {
-    // 🔹 МИНУЛЕ: беремо історію до сьогодні + прогноз від сьогодні +14 днів
-    const [historyWx, historyRain] = await Promise.all([
-      fetchWeatherFromNASA(region.lat, region.lon, plantingDate, today),
-      fetchDailyRainFromNASA(region.lat, region.lon, plantingDate, today),
-    ]);
+        if (startDate < today) {
+          // 🔹 якщо старт минулий → історія до сьогодні + прогноз на 14 днів
+          const [historyWx, historyRain] = await Promise.all([
+            fetchWeatherFromNASA(region.lat, region.lon, plantingDate, today),
+            fetchDailyRainFromNASA(region.lat, region.lon, plantingDate, today),
+          ]);
 
-    const [forecastWx, forecastRain] = await Promise.all([
-      fetchForecastHourly(region.lat, region.lon, today, 14),
-      fetchForecastDailyRain(region.lat, region.lon, today, 14),
-    ]);
+          const [forecastWx, forecastRain] = await Promise.all([
+            fetchForecastHourly(region.lat, region.lon, today, 14),
+            fetchForecastDailyRain(region.lat, region.lon, today, 14),
+          ]);
 
-    // об’єднуємо історичні і прогнозні дані
-    wx = {
-      daily: [...(historyWx.daily || []), ...(forecastWx.daily || [])],
-      raw: forecastWx.raw,
-      error: historyWx.error || forecastWx.error,
-      url: forecastWx.url,
-    };
+          wx = {
+            daily: [...(historyWx.daily || []), ...(forecastWx.daily || [])],
+            raw: forecastWx.raw,
+            error: historyWx.error || forecastWx.error,
+            url: forecastWx.url,
+          };
 
-    rain = {
-      daily: [...(historyRain.daily || []), ...(forecastRain.daily || [])],
-      error: historyRain.error || forecastRain.error,
-      url: forecastRain.url,
-    };
-  } else {
-    // 🔹 СЬОГОДНІ/МАЙБУТНЄ: стандартний прогноз
-    wx = await fetchForecastHourly(region.lat, region.lon, plantingDate, 14);
-    rain = await fetchForecastDailyRain(region.lat, region.lon, plantingDate, 14);
-  }
-}
+          rain = {
+            daily: [...(historyRain.daily || []), ...(forecastRain.daily || [])],
+            error: historyRain.error || forecastRain.error,
+            url: forecastRain.url,
+          };
+        } else {
+          // 🔹 тільки прогноз
+          wx = await fetchForecastHourly(region.lat, region.lon, plantingDate, 14);
+          rain = await fetchForecastDailyRain(region.lat, region.lon, plantingDate, 14);
+        }
+      }
 
       if (wx.error) {
         setError(`Помилка погоди: ${wx.error}`);
@@ -95,60 +95,65 @@ export default function Step3Run({
         return;
       }
 
-      const rows = wx.daily;
-      const comp = computeDSVSchedule(rows, DEFAULT_DSV_THRESHOLD);
-      const sprays = computeMultiSpraySchedule(rows, rain?.daily || []);
+      // ✅ відсікання даних після останньої обробки
+      const last = lastSprayDate ? new Date(lastSprayDate) : null;
+      if (last) last.setHours(0, 0, 0, 0);
 
-      const startForWeeksISO = plantingDate;
+      const rowsAfter = last ? wx.daily.filter(r => r?.date && r.date > last) : wx.daily;
+      const rainAfter = last
+        ? (rain?.daily || []).filter(r => r?.date && r.date > last)
+        : (rain?.daily || []);
+
+      // ✅ розрахунки тільки з відсіченими даними
+      const comp = computeDSVSchedule(rowsAfter, DEFAULT_DSV_THRESHOLD);
+      const sprays = computeMultiSpraySchedule(rowsAfter, rainAfter);
+
+      const startForWeeksISO = lastSprayDate || plantingDate;
       const weekly = makeWeeklyPlan(
         comp.rows,
-        rain?.daily || [],
+        rainAfter,
         startForWeeksISO,
         RAIN_HIGH_THRESHOLD_MM,
         useForecast ? undefined : 14
       );
-      console.log("🌐 wx.raw = ", wx.raw);
-      // ✅ Обчислення рекомендованих годин для кожної дати
-      const suitable = extractSuitableHoursFromHourly(wx.raw);
-      console.log("Step3Run → suitableHours keys:", Object.keys(suitable));
-for (const [date, hours] of Object.entries(suitable)) {
-  console.log(`→ ${date}: ${hours.join(", ")}`);
-}
 
-      // 🔍 Ризики хвороб
+      // ✅ рекомендовані години
+      const suitable = extractSuitableHoursFromHourly(wx.raw);
+
+      // 🔍 ризики хвороб тільки після останньої обробки
       const diseaseSummary = [];
 
       if (diseases?.includes("grayMold")) {
-        const riskDates = rows.filter(isGrayMoldRisk).map((d) => d.date);
+        const riskDates = rowsAfter.filter(isGrayMoldRisk).map(d => d.date);
         diseaseSummary.push({ name: "Сіра гниль", riskDates });
       }
 
       if (diseases?.includes("alternaria")) {
-        const riskDates = rows.filter(isAlternariaRisk).map((d) => d.date);
+        const riskDates = rowsAfter.filter(isAlternariaRisk).map(d => d.date);
         diseaseSummary.push({ name: "Альтернаріоз", riskDates });
       }
 
       if (diseases?.includes("bacteriosis")) {
-        const riskDates = rows
-          .filter((d) => {
-            const rainVal = (rain?.daily || []).find(
-              (r) => r.date.getTime() === d.date.getTime()
-            )?.rain || 0;
-            return isBacterialRisk(d, rainVal);
+        const riskDates = rowsAfter
+          .filter(d => {
+            const rv = rainAfter.find(r => r.date.getTime() === d.date.getTime())?.rain || 0;
+            return isBacterialRisk(d, rv);
           })
-          .map((d) => d.date);
+          .map(d => d.date);
         diseaseSummary.push({ name: "Бактеріоз", riskDates });
       }
 
+      // ✅ результат
       const result = {
-        sprayDates: sprays.map((d) => format(d, "dd.MM.yyyy")),
+        sprayDates: sprays.map(d => format(d, "dd.MM.yyyy")),
         diagnostics: comp.rows,
         weeklyPlan: weekly,
         diseaseSummary,
-        suitableHours: suitable, // ✅ додаємо години
+        suitableHours: suitable,
+        lastSprayDate: lastSprayDate ? format(new Date(lastSprayDate), "dd.MM.yyyy") : null,
       };
-      // 👇 лог тут
-console.log("Step3Run → result:", result);
+
+      console.log("Step3Run → result:", result);
       onResult(result);
     } catch (e) {
       setError(`Помилка обчислення: ${e?.message || e}`);
