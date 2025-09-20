@@ -65,7 +65,6 @@ export default function App() {
   const [region, setRegion] = useState(null);
   const [plantingDate, setPlantingDate] = useState("");
   const [harvestDate, setHarvestDate] = useState("");
-  const [useForecast, setUseForecast] = useState(false);
   const [diseases, setDiseases] = useState(["lateBlight"]);
   const [result, setResult] = useState(null);
 
@@ -99,8 +98,6 @@ export default function App() {
           setPlantingDate={setPlantingDate}
           harvestDate={harvestDate}
           setHarvestDate={setHarvestDate}
-          useForecast={useForecast}
-          setUseForecast={setUseForecast}
           onNext={({ diseases }) => {
             setDiseases(diseases);
             next();
@@ -114,7 +111,6 @@ export default function App() {
           region={region}
           plantingDate={plantingDate}
           harvestDate={harvestDate}
-          useForecast={useForecast}
           diseases={diseases}
           onResult={(res) => {
             setResult(res);
@@ -126,8 +122,13 @@ export default function App() {
 
       {step === 4 && (
         <>
-          <Step4Results result={result} onRestart={() => setStep(1)} />
-          
+          <Step4Results
+            result={result}
+            onRestart={() => {
+              setStep(1);
+              setResult(null);
+            }}
+          />
           <CalendarView events={extractCalendarEvents(result)} />
         </>
       )}
