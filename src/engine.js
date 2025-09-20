@@ -388,7 +388,7 @@ export async function fetchForecastHourly(lat, lon, startISO, days = 14) {
     latitude: String(la),
     longitude: String(lo),
     timezone: "auto",
-    hourly: "temperature_2m,relative_humidity_2m",
+    hourly: "temperature_2m,relative_humidity_2m,windspeed_2m,precipitation",
     start_date: s,
     end_date: end,
   });
@@ -565,7 +565,7 @@ export function transformForecastToHourlyData(json) {
 
   const times = h.time || [];
   const temps = h.temperature_2m || [];
-  const winds = h.windspeed_10m || h.windspeed_2m || [];
+  const winds = h.windspeed_2m || h.windspeed_2m || [];
   const rain = h.precipitation || h.precipitation_sum || [];
 
   const n = Math.min(times.length, temps.length, winds.length, rain.length);
@@ -584,12 +584,7 @@ export function transformForecastToHourlyData(json) {
     let windspeed = Number(winds[i]);
     const precipitation = Number(rain[i]);
 
-    // 🌀 Якщо це windspeed_10m → коригуємо до 2м (приблизно)
-    if (h.windspeed_10m && !h.windspeed_2m) {
-      windspeed = windspeed * 0.75;
-    }
-
-    out.push({
+      out.push({
       date,
       hour,
       temperature,
