@@ -82,6 +82,9 @@ export default function Step3Run({
           hourlyData.push(...hourlyForecastData); // ✅ додаємо прогнозні години
         }
       }
+console.log("weatherDaily:", weatherDaily);
+console.log("rainDaily:", rainDaily);
+console.log("hourlyData:", hourlyData);
 
       /* ---------------- ❌ Якщо немає даних ---------------- */
       if (weatherDaily.length === 0) {
@@ -166,7 +169,7 @@ export default function Step3Run({
         harvestDate,
       };
 
-      console.log("Step3Run → result:", result);
+      console.log("Diagnostics (DSV rows):", comp.rows);
       onResult(result);
     } catch (e) {
       setError(`Помилка обчислення: ${e.message || e}`);
