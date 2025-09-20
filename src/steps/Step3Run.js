@@ -74,7 +74,7 @@ export default function Step3Run({
         RAIN_HIGH_THRESHOLD_MM,
         useForecast ? undefined : 14
       );
-
+      console.log("🌐 wx.raw = ", wx.raw);
       // ✅ Обчислення рекомендованих годин для кожної дати
       const suitable = extractSuitableHoursFromHourly(wx.raw);
       console.log("Step3Run → suitableHours keys:", Object.keys(suitable));
