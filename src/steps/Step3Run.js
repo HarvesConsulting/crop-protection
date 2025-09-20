@@ -100,16 +100,16 @@ export default function Step3Run({
       if (last) last.setHours(0, 0, 0, 0);
 
       let rowsAfter = wx.daily;
-let rainAfter = rain?.daily || [];
+      let rainAfter = rain?.daily || [];
 
-if (last) {
-  const nextDay = new Date(last);
-  nextDay.setDate(nextDay.getDate() + 1); // наступний день після обробки
-  nextDay.setHours(0, 0, 0, 0);
+      if (last) {
+        const nextDay = new Date(last);
+        nextDay.setDate(nextDay.getDate() + 1); // наступний день після обробки
+        nextDay.setHours(0, 0, 0, 0);
 
-  rowsAfter = wx.daily.filter(r => r?.date && r.date >= nextDay);
-  rainAfter = (rain?.daily || []).filter(r => r?.date && r.date >= nextDay);
-}
+        rowsAfter = wx.daily.filter(r => r?.date && r.date >= nextDay);
+        rainAfter = (rain?.daily || []).filter(r => r?.date && r.date >= nextDay);
+      }
 
       // ✅ розрахунки тільки з відсіченими даними
       const comp = computeDSVSchedule(rowsAfter, DEFAULT_DSV_THRESHOLD);
@@ -142,24 +142,17 @@ if (last) {
       const diseaseSummary = [];
 
       if (diseases?.includes("grayMold")) {
-        const riskDates = rowsAfter
-          .filter(d => !last || d.date > last)
-          .filter(isGrayMoldRisk)
-          .map(d => d.date);
+        const riskDates = rowsAfter.filter(isGrayMoldRisk).map(d => d.date);
         diseaseSummary.push({ name: "Сіра гниль", riskDates });
       }
 
       if (diseases?.includes("alternaria")) {
-        const riskDates = rowsAfter
-          .filter(d => !last || d.date > last)
-          .filter(isAlternariaRisk)
-          .map(d => d.date);
+        const riskDates = rowsAfter.filter(isAlternariaRisk).map(d => d.date);
         diseaseSummary.push({ name: "Альтернаріоз", riskDates });
       }
 
       if (diseases?.includes("bacteriosis")) {
         const riskDates = rowsAfter
-          .filter(d => !last || d.date > last)
           .filter(d => {
             const rv = rainAfter.find(r => r.date.getTime() === d.date.getTime())?.rain || 0;
             return isBacterialRisk(d, rv);
@@ -170,9 +163,7 @@ if (last) {
 
       // ✅ результат
       const result = {
-        sprayDates: sprays
-          .filter(d => !last || d > last)
-          .map(d => format(d, "dd.MM.yyyy")),
+        sprayDates: sprays.map(d => format(d, "dd.MM.yyyy")), // ❌ вже не фільтруємо тут!
         diagnostics: comp.rows,
         weeklyPlan: weekly,
         diseaseSummary,
