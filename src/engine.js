@@ -391,7 +391,7 @@ export async function fetchForecastHourly(lat, lon, startISO, days = 14) {
     longitude: String(lo),
     timezone: "auto",
     // ✅ додаємо вітер і опади
-    hourly: "temperature_2m,relative_humidity_2m,windspeed_10m,precipitation",
+    hourly: "temperature_2m,relative_humidity_2m,windspeed_2m,precipitation",
     start_date: s,
     end_date: end,
   });
