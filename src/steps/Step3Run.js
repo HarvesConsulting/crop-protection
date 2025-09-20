@@ -77,6 +77,10 @@ export default function Step3Run({
 
       // ✅ Обчислення рекомендованих годин для кожної дати
       const suitable = extractSuitableHoursFromHourly(wx.raw);
+      console.log("Step3Run → suitableHours keys:", Object.keys(suitable));
+for (const [date, hours] of Object.entries(suitable)) {
+  console.log(`→ ${date}: ${hours.join(", ")}`);
+}
 
       // 🔍 Ризики хвороб
       const diseaseSummary = [];
