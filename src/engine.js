@@ -111,65 +111,50 @@ export function computeDSVSchedule(daily, dsvThreshold = DEFAULT_DSV_THRESHOLD) 
   return { rows, schedule };
 }
 
-export function computeMultiSpraySchedule(rows, rainDaily = [], lastSprayDate = null) {
-  const safeRows = Array.isArray(rows)
-    ? rows.filter(r => r?.date instanceof Date || asDate(r?.date))
-    : [];
-
-  const normRows = safeRows
-    .map(r => ({ ...r, date: r.date instanceof Date ? r.date : asDate(r.date) }))
-    .filter(r => r.date && isValidDate(r.date));
+export function computeMultiSpraySchedule(rows, rainDaily = []) {
+  const safeRows = Array.isArray(rows) ? rows.filter(r => r?.date instanceof Date || asDate(r?.date)) : [];
+  const normRows = safeRows.map(r => ({ ...r, date: r.date instanceof Date ? r.date : asDate(r.date) }))
+                           .filter(r => r.date && isValidDate(r.date));
 
   const hasCond = (r) => Number(r?.condHours || 0) >= COND_HOURS_TRIGGER;
   const sprays = [];
   const dayMs = 86400000;
 
+  const firstObj = normRows.find(hasCond);
+  const first = firstObj?.date || null;
+  if (!first) return sprays;
+
+  sprays.push(first);
+  let cursor = first;
+
   // нормалізуємо опади
   const rain = Array.isArray(rainDaily)
     ? rainDaily
-        .map(x => ({
-          date: x?.date instanceof Date ? x.date : asDate(x?.date),
-          rain: Number(x?.rain || 0),
-        }))
+        .map(x => ({ date: x?.date instanceof Date ? x.date : asDate(x?.date), rain: Number(x?.rain || 0) }))
         .filter(x => x.date && isValidDate(x.date))
     : [];
 
-  // ❗ Починаємо з останньої обробки
-  if (!lastSprayDate) return []; // Якщо її немає — не будуємо нічого
-
-  let cursor = new Date(lastSprayDate);
-  cursor.setHours(0, 0, 0, 0);
-  sprays.push(new Date(cursor)); // Додаємо першу обробку
-
   while (true) {
+    const d1 = new Date(cursor.getTime() + 1 * dayMs);
     const d5 = new Date(cursor.getTime() + 5 * dayMs);
     const d7 = new Date(cursor.getTime() + 7 * dayMs);
 
-    // Чи були сильні дощі у вікні [cursor +1, cursor+7]
-    const hadHeavyRain = rain.some(
-      (r) => r.date > cursor && r.date <= d7 && r.rain >= RAIN_HIGH_THRESHOLD_MM
-    );
+    const hadHeavyRain = rain.some((r) => r.date > cursor && r.date <= d7 && Number(r.rain) >= RAIN_HIGH_THRESHOLD_MM);
 
     let next = null;
-
     if (hadHeavyRain) {
       next = d5;
     } else {
-      const hadCond = normRows.some(
-        (r) => r.date > cursor && r.date <= d7 && hasCond(r)
-      );
-      if (hadCond) {
-        next = d7;
-      }
+      const hadCondWithin7 = normRows.some((r) => r.date >= d1 && r.date <= d7 && hasCond(r));
+      if (hadCondWithin7) next = d7;
+      else next = normRows.find((r) => r.date > d7 && hasCond(r))?.date || null;
     }
 
     if (!next) break;
-
-    // захист від зациклення
     if (sprays.length && next.getTime() <= sprays[sprays.length - 1].getTime()) break;
 
-    sprays.push(new Date(next));
-    cursor = new Date(next);
+    sprays.push(next);
+    cursor = next;
   }
 
   return sprays;
@@ -188,14 +173,13 @@ export function makeWeeklyPlan(rows, rainDaily, startISO, rainThreshold, horizon
 
   // ✅ Виправлена логіка кінцевої дати
   let stopDate;
-  const lastDateInData = normRows.length ? normRows[normRows.length - 1].date : start;
-
-if (horizonDays) {
-  const projected = new Date(start.getTime() + (horizonDays - 1) * 86400000);
-  stopDate = projected > lastDateInData ? lastDateInData : projected;
-} else {
-  stopDate = lastDateInData;
-}
+  if (horizonDays) {
+    // Прогноз → обмежуємо горизонт (наприклад, 14 днів)
+    stopDate = new Date(start.getTime() + horizonDays * 86400000);
+  } else {
+    // Історія → до останнього дня з даних
+    stopDate = normRows.length ? normRows[normRows.length - 1].date : start;
+  }
 
   // нормалізуємо опади
   const rain = Array.isArray(rainDaily)
@@ -399,15 +383,12 @@ export async function fetchForecastHourly(lat, lon, startISO, days = 14) {
   const { ok, lat: la, lon: lo } = coerceLatLon(lat, lon);
   if (!ok || !s) return { daily: [], error: "Invalid lat/lon or start date", url: "" };
 
-  const end = toISOyyyy_mm_dd(
-    new Date(new Date(s).getTime() + (days - 1) * 86400000)
-  );
+  const end = toISOyyyy_mm_dd(new Date(new Date(s).getTime() + (days - 1) * 86400000));
   const params = new URLSearchParams({
     latitude: String(la),
     longitude: String(lo),
     timezone: "auto",
-    // ✅ додаємо вітер і опади
-    hourly: "temperature_2m,relative_humidity_2m,windspeed_2m,precipitation",
+    hourly: "temperature_2m,relative_humidity_2m",
     start_date: s,
     end_date: end,
   });
@@ -417,12 +398,7 @@ export async function fetchForecastHourly(lat, lon, startISO, days = 14) {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
-    return {
-      daily: transformOpenMeteoHourly(json), // денні дані для розрахунків
-      raw: json, // ✅ повертаємо сирі погодинні дані (тут є і вітер, і опади)
-      error: "",
-      url,
-    };
+    return { daily: transformOpenMeteoHourly(json), error: "", url };
   } catch (e) {
     return { daily: [], error: String(e), url };
   }
@@ -479,7 +455,7 @@ export async function fetchWeatherFromNASA(lat, lon, start, end) {
     const params = new URLSearchParams({
       latitude: String(la),
       longitude: String(lo),
-      hourly: "temperature_2m,relative_humidity_2m,windspeed_2m,precipitation",
+      hourly: "temperature_2m,relative_humidity_2m",
       start_date: toISOyyyy_mm_dd(s),
       end_date: toISOyyyy_mm_dd(e),
       timezone: "auto",
@@ -542,35 +518,3 @@ export async function fetchDailyRainFromNASA(lat, lon, start, end) {
   }
 }
 
-export function extractSuitableHoursFromHourly(json) {
-  const h = json?.hourly;
-  if (!h) return {};
-
-  const times = h.time || [];
-  const temps = h.temperature_2m || [];
-  const winds = h.windspeed_2m || [];
-  const precs = h.precipitation || [];
-
-  const result = {};
-
-  for (let i = 0; i < times.length; i++) {
-    const ts = times[i]; // e.g. "2025-09-20T06:00"
-    if (!ts.includes("T")) continue;
-
-    const [date, hour] = ts.split("T");
-    const d = parseISO(date);
-    const dateStr = format(d, "dd.MM.yyyy"); // ✅ тепер у такому ж форматі, як sprayDates
-
-    const hNum = parseInt(hour.split(":")[0]);
-    const t = temps[i];
-    const w = winds[i];
-    const p = precs[i];
-
-    if (t >= 10 && t <= 25 && w <= 4 && p === 0) {
-      if (!result[dateStr]) result[dateStr] = [];
-      result[dateStr].push(`${hNum}:00`);
-    }
-  }
-console.log("extractSuitableHoursFromHourly → result:", result);
-  return result; // { '20.09.2025': ['6:00', '7:00', ...] }
-}
