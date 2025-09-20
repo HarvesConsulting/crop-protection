@@ -154,6 +154,32 @@ console.log("hourlyData:", hourlyData);
           .map((d) => d.date);
         diseaseSummary.push({ name: "Бактеріоз", riskDates });
       }
+// Таблиця з денними даними
+console.log("📊 WeatherDaily:");
+console.table(weatherDaily.map(d => ({
+  date: d.date instanceof Date ? d.date.toISOString().split("T")[0] : d.date,
+  wetHours: d.wetHours,
+  wetTempAvg: d.wetTempAvg?.toFixed(1),
+  allTempAvg: d.allTempAvg?.toFixed(1),
+  condHours: d.condHours,
+})));
+
+// Таблиця з опадами
+console.log("🌧️ RainDaily:");
+console.table(rainDaily.map(r => ({
+  date: r.date instanceof Date ? r.date.toISOString().split("T")[0] : r.date,
+  rain: r.rain,
+})));
+
+// Таблиця з погодинними даними
+console.log("⏱️ HourlyData:");
+console.table(hourlyData.map(h => ({
+  date: h.date instanceof Date ? h.date.toISOString().split("T")[0] : h.date,
+  hour: h.hour,
+  temp: h.temperature?.toFixed(1),
+  wind: h.windspeed?.toFixed(1),
+  rain: h.precipitation,
+})));
 
       /* ---------------- ✅ Готовий результат ---------------- */
       const result = {
