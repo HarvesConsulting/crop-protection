@@ -1,3 +1,4 @@
+import { format } from "date-fns";  // 🔝 на початку файлу
 import React, { useState } from "react";
 import { parseISO, differenceInDays } from "date-fns";
 import "./Step4Results.css";
@@ -147,7 +148,7 @@ export default function Step4Results({ result, onRestart }) {
     const treatments = getAdvancedTreatments(riskDates);
     const entries = treatments.map((item, i) => {
       const product = rotation[i % rotation.length];
-      const dateStr = item.date.toLocaleDateString("uk-UA");
+      const dateStr = format(item.date, "dd.MM.yyyy");
       const recommendedHours = suitableHours[dateStr] || [];
 
       return {
