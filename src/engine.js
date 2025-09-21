@@ -9,6 +9,9 @@ const COND_T_MAX = 28;
 const COND_HOURS_TRIGGER = 3;
 const DEFAULT_DSV_THRESHOLD = 15;
 const RAIN_HIGH_THRESHOLD_MM = 12.7;
+// прийнятний вітер (м/с) — значення на висоті 10 м
+const MAX_WIND_SPEED = 5.5;
+
 
 /* ------------------------- DSV правила ------------------------- */
 const DSV_RULES = [
@@ -402,7 +405,7 @@ export async function fetchForecastHourly(lat, lon, startISO, days = 14) {
     latitude: String(la),
     longitude: String(lo),
     timezone: "auto",
-    hourly: "temperature_2m,relative_humidity_2m,windspeed_2m,precipitation",
+    hourly: "temperature_2m,relative_humidity_2m,windspeed_10m,precipitation",
     start_date: s,
     end_date: end,
   });
@@ -500,7 +503,7 @@ export async function fetchArchiveHourlyExtras(lat, lon, startISO, endISO) {
     latitude: String(la),
     longitude: String(lo),
     timezone: "auto",
-    hourly: "temperature_2m,windspeed_10m,precipitation", // ERA5 дає тільки 10м
+    hourly: "temperature_2m,windspeed_10m,precipitation", // ⚡ беремо як є з ERA5 (10м)
     start_date: s,
     end_date: e,
   });
@@ -528,15 +531,11 @@ export async function fetchArchiveHourlyExtras(lat, lon, startISO, endISO) {
       const date = new Date(dateStr);
       const hour = parseInt((hourStr || "0").split(":")[0], 10);
 
-      // 🔽 Конвертація: 10м → 2м (емпірично через логарифмічний профіль)
-      const windspeed10m = Number(winds10m[i]);
-      const windspeed2m = windspeed10m * 0.75; // коефіцієнт ≈0.75 для z0=0.1
-
       out.push({
         date,
         hour,
         temperature: Number(temps[i]),
-        windspeed: windspeed2m,
+        windspeed: Number(winds10m[i]),    // ⚡ залишаємо 10м без перерахунку
         precipitation: Number(rain[i]),
       });
     }
@@ -620,8 +619,9 @@ export function extractSuitableSprayHours(hourlyData) {
   hourlyData.forEach((entry) => {
     const { date, hour, temperature, windspeed, precipitation } = entry;
 
+    // ✅ умови для сприятливої години
     const tempOK = temperature >= 10 && temperature <= 25;
-    const windOK = windspeed <= 4;
+    const windOK = Number.isFinite(windspeed) && windspeed <= MAX_WIND_SPEED;
     const rainOK = precipitation <= 0;
 
     if (tempOK && windOK && rainOK) {
@@ -635,6 +635,7 @@ export function extractSuitableSprayHours(hourlyData) {
 
   return suitableByDate;
 }
+
 export function transformArchiveToHourlyData(json) {
   const h = json?.hourly;
   if (!h) return [];
@@ -655,16 +656,17 @@ export function transformArchiveToHourlyData(json) {
     const date = new Date(dateStr);
     const hour = parseInt((hourStr || "0").split(":")[0], 10);
 
-    // ✅ конвертуємо вітер до 2 м (грубо множимо на 0.75)
-    const windAt2m = Number(winds[i]) * 0.75;
+    // ⚡ вітер беремо як є з ERA5 (10 м), без перерахунку
+const wind10m = Number(winds[i]);
 
-    out.push({
-      date,
-      hour,
-      temperature: Number(temps[i]),
-      windspeed: windAt2m,
-      precipitation: Number(rain[i]),
-    });
+out.push({
+  date,
+  hour,
+  temperature: Number(temps[i]),
+  windspeed: wind10m,   // 10 м
+  precipitation: Number(rain[i]),
+});
+
   }
 
   return out;
@@ -676,14 +678,14 @@ export function transformForecastToHourlyData(json) {
 
   const times = h.time || [];
   const temps = h.temperature_2m || [];
-  const winds = h.windspeed_2m || [];              // ← тільки 2м
-  const rain  = h.precipitation || [];             // forecast повертає precipitation
+  const winds = h.windspeed_10m || [];   // ⚡ беремо напряму з 10м
+  const rain  = h.precipitation || [];
 
   const n = Math.min(times.length, temps.length, winds.length, rain.length);
   const out = [];
 
   for (let i = 0; i < n; i++) {
-    const ts = times[i];                 // "2025-09-20T14:00"
+    const ts = times[i]; // "2025-09-20T14:00"
     if (!ts || typeof ts !== "string") continue;
 
     const [dateStr, hourStr] = ts.split("T");
@@ -694,11 +696,10 @@ export function transformForecastToHourlyData(json) {
       date,
       hour,
       temperature: Number(temps[i]),
-      windspeed:   Number(winds[i]),     // ← вже 2м
+      windspeed: Number(winds[i]),        // ⚡ вже 10м
       precipitation: Number(rain[i]),
     });
   }
 
   return out;
 }
-
