@@ -10,7 +10,7 @@ const COND_HOURS_TRIGGER = 3;
 const DEFAULT_DSV_THRESHOLD = 15;
 const RAIN_HIGH_THRESHOLD_MM = 12.7;
 // прийнятний вітер (м/с) — значення на висоті 10 м
-const MAX_WIND_SPEED = 5.5;
+const MAX_WIND_SPEED = 14.5;
 
 
 /* ------------------------- DSV правила ------------------------- */
