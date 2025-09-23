@@ -1,15 +1,34 @@
 .container {
-  padding: 16px;
-  max-width: 800px;
-  margin: 0 auto;
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  color: #2c3e50;
 }
 
 .description {
-  font-size: 14px;
+  font-size: 15px;
   color: #555;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
+.period-box {
+  background: #eef5ff;
+  border-left: 4px solid #2d6cdf;
+  padding: 10px 16px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 15px;
+  color: #333;
+}
+
+/* 🔘 Кнопки */
 .toggle-button,
 .restart-button {
   padding: 10px 18px;
@@ -17,47 +36,58 @@
   font-weight: 600;
   border-radius: 6px;
   cursor: pointer;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   border: 1px solid #2d6cdf;
-  background-color: white;
+  background-color: #fff;
   color: #2d6cdf;
+  transition: all 0.25s ease;
 }
 
 .toggle-button:hover,
 .restart-button:hover {
   background-color: #2d6cdf;
-  color: white;
+  color: #fff;
+  transform: scale(1.02);
 }
 
+/* 📦 Блок карток */
 .card-section {
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
 .card-section h3 {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: bold;
   margin-bottom: 12px;
+  color: #2c3e50;
 }
 
+/* 🧾 Картка */
 .card {
   border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 12px 16px;
-  margin-bottom: 12px;
-  background-color: #f9f9f9;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 14px;
+  background-color: #fdfdfd;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
 }
 
 .card-index {
   font-size: 13px;
   font-weight: bold;
-  color: #888;
-  margin-bottom: 4px;
+  color: #2d6cdf;
+  margin-bottom: 6px;
 }
 
 .card-row {
   font-size: 14px;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .card-row strong {
