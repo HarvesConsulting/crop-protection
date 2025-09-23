@@ -129,7 +129,7 @@ export function computeMultiSpraySchedule(rows, rainDaily = [], plantingDate) {
 
   // 👉 мінімальна дата першої обробки = plantingDate + 10 днів
   const planting = asDate(plantingDate);
-  const minFirstDate = planting ? new Date(planting.getTime() + 10 * dayMs) : null;
+  const minFirstDate = planting ? new Date(planting.getTime() + 5 * dayMs) : null;
 
   // Якщо є мінімум — відразу фільтруємо рядки, що раніше
   if (minFirstDate) {
