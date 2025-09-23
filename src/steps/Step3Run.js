@@ -8,6 +8,7 @@ import {
   computeDSVSchedule,
   makeWeeklyPlan,
   transformForecastToHourlyData,
+  transformOpenMeteoHourly, // ← 🟢 ОЦЕ додай
   extractSuitableSprayHours,
   fetchArchiveHourlyExtras, // ✅ новий імпорт
 } from "../engine";
@@ -73,7 +74,9 @@ export default function Step3Run({
           fetchForecastDailyRain(region.lat, region.lon, forecastStart),
         ]);
 
-        weatherDaily.push(...(forecastWx.daily || []));
+        const forecastTransformed = transformOpenMeteoHourly(forecastWx.raw);
+weatherDaily.push(...forecastTransformed);
+
         rainDaily.push(...(forecastRain.daily || []));
 
         // ⚙️ Перетворюємо forecast raw → погодинні дані
