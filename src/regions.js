@@ -215850,3 +215850,12 @@ export const regions = [
     "lon": 39.8070203
   }
 ];
+// Видаляємо дублікати по name
+const uniqueRegions = Object.values(
+  regions.reduce((acc, item) => {
+    if (!acc[item.name]) acc[item.name] = item; // залишаємо тільки перший з таким name
+    return acc;
+  }, {})
+);
+
+export default uniqueRegions;
