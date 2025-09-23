@@ -258,6 +258,11 @@ integratedSystem.sort(
   return (
     <div className="container">
       <h2>Крок 4: Результати</h2>
+      <p>
+  Період розрахунку:{" "}
+  <strong>{format(new Date(result.plantingDate), "dd.MM.yyyy")}</strong> —{" "}
+  <strong>{format(new Date(result.harvestDate), "dd.MM.yyyy")}</strong>
+</p>
       <p className="description">
         Нижче показано рекомендовані дати обробки. Ви можете сформувати інтегровану систему захисту.
       </p>
