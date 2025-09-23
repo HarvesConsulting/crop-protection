@@ -343,20 +343,26 @@ function transformOpenMeteoHourly(json) {
     const ts = times[i];
     if (!ts || typeof ts !== "string" || ts.indexOf("T") < 0) continue;
     const iso = ts.split("T")[0];
+
     const tv = Number(temps[i]);
     const rv = Number(rhs[i]);
 
+    // ❌ Пропускаємо псевдозначення (-999) або нечислові
+    if (!Number.isFinite(tv) || tv === -999) continue;
+    if (!Number.isFinite(rv) || rv === -999) continue;
+
     const rec = perDay.get(iso) || { allTemp: [], wetTemp: [], wetHours: 0, condHours: 0 };
-    if (Number.isFinite(tv)) rec.allTemp.push(tv);
-    if (Number.isFinite(tv) && Number.isFinite(rv)) {
-      if (rv >= RH_WET_THRESHOLD) {
-        rec.wetTemp.push(tv);
-        rec.wetHours += 1;
-      }
-      if (rv >= COND_RH && tv >= COND_T_MIN && tv < COND_T_MAX) {
-        rec.condHours += 1;
-      }
+
+    rec.allTemp.push(tv);
+
+    if (rv >= RH_WET_THRESHOLD) {
+      rec.wetTemp.push(tv);
+      rec.wetHours += 1;
     }
+    if (rv >= COND_RH && tv >= COND_T_MIN && tv < COND_T_MAX) {
+      rec.condHours += 1;
+    }
+
     perDay.set(iso, rec);
   }
 
@@ -364,8 +370,10 @@ function transformOpenMeteoHourly(json) {
   for (const [iso, r] of perDay.entries()) {
     const d = asDate(iso);
     if (!d) continue;
+
     const allAvg = r.allTemp.length ? r.allTemp.reduce((a, b) => a + b, 0) / r.allTemp.length : NaN;
     const wetAvg = r.wetTemp.length ? r.wetTemp.reduce((a, b) => a + b, 0) / r.wetTemp.length : NaN;
+
     out.push({
       date: d,
       wetHours: r.wetHours,
@@ -374,9 +382,11 @@ function transformOpenMeteoHourly(json) {
       condHours: r.condHours,
     });
   }
+
   out.sort((a, b) => a.date.getTime() - b.date.getTime());
   return out;
 }
+
 export { transformOpenMeteoHourly };
 
 function transformOpenMeteoDaily(json) {
