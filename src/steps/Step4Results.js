@@ -257,6 +257,10 @@ integratedSystem.sort(
 
   return (
     <div className="container">
+    {/* 🔝 Додали кнопку зверху */}
+      <button className="restart-button" onClick={onRestart}>
+        🔄 Почати спочатку
+      </button>
       <h2>Крок 4: Результати</h2>
       <p>
   Період розрахунку:{" "}
