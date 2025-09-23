@@ -63,10 +63,7 @@ export default function CalendarView({ events = [] }) {
 
       {/* ✨ Патріотичне повідомлення + Instagram */}
       <div style={{ marginTop: 40, textAlign: "center" }}>
-        <p style={{ fontSize: "18px", fontWeight: "bold", color: "#2d6cdf" }}>
-          🇺🇦 Україна
-        </p>
-        <a
+                <a
           href="https://www.instagram.com/harvest.consulting/"
           target="_blank"
           rel="noreferrer"
