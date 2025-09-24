@@ -265,7 +265,7 @@ function aggregateDailyRain(hourlyData = []) {
 
   hourlyData.forEach((entry) => {
     const date = entry.date;
-    const rainValue = Number(entry.rain ?? entry.precip);
+    const rainValue = Number(entry.rain ?? entry.precip ?? entry.opad); // додай всі можливі
 
     if (!date || isNaN(rainValue)) return;
 
@@ -282,20 +282,23 @@ function aggregateDailyRain(hourlyData = []) {
   }));
 }
 
+
 export default function Step4Results({ result, onRestart }) {
   const [showIntegrated, setShowIntegrated] = useState(false);
-  const aggregatedRain = aggregateDailyRain(result.rainDaily || []);
-
   if (!result) return <p>Дані відсутні</p>;
 
-  const {
-    sprayDates,
-    diseaseSummary,
-    suitableHours = {},
-    diagnostics = [],
-    rainDaily = [],
-    plantingDate,
-  } = result;
+const {
+  sprayDates,
+  diseaseSummary,
+  suitableHours = {},
+  diagnostics = [],
+  rainDaily = [],
+  plantingDate,
+  harvestDate,
+} = result;
+
+const aggregatedRain = aggregateDailyRain(rainDaily);
+
 
   const sprayData = sprayDates.map((d, i) => {
     const cur = parseISO(d.split(".").reverse().join("-"));
