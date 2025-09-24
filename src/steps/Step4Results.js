@@ -151,9 +151,14 @@ function getAccumulatedStats(diagnostics = [], startDate, endDate) {
 
   // 🟢 універсальна перевірка полів для опадів
   const rain = periodData.reduce((sum, d) => {
-    const r = d.rain ?? d.precipitation ?? d.rain_sum ?? d.precip ?? 0;
-    return sum + r;
-  }, 0);
+  const r =
+    Number(d.rain) ??
+    Number(d.precipitation) ??
+    Number(d.rain_sum) ??
+    Number(d.precip) ??
+    0;
+  return sum + (Number.isFinite(r) ? r : 0);
+}, 0);
 
   const condHours = periodData.reduce(
     (sum, d) => sum + (d.condHours || 0),
