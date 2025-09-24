@@ -375,7 +375,10 @@ export default function Step4Results({ result, onRestart }) {
       );
 
     const prevDate = prevDates.length
-      ? parseISO(prevDates[0].split(".").reverse().join("-"))
+      ? typeof prevDates[0] === "string"
+  ? parseISO(prevDates[0].split(".").reverse().join("-"))
+  : prevDates[0]
+
       : plantingDate;
 
     const diag = getAccumulatedStats(diagnostics, prevDate, currentDate, rainDaily);
