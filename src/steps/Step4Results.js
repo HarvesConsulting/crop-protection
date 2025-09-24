@@ -245,6 +245,7 @@ function CardView({ title, entries, diagnostics = [], plantingDate, rainDaily = 
     />
   );
 })}
+
     </div>
   );
 }
