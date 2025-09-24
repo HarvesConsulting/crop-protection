@@ -160,6 +160,7 @@ function Card({ frontData, backData }) {
           <p>
             <strong>Сприятливі години:</strong> {backData.condHours ?? 0}
           </p>
+          <p><strong>Опади:</strong> {backData.rain ?? 0} мм</p>
         </div>
       </div>
     </div>
