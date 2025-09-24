@@ -132,6 +132,7 @@ function getAdvancedTreatments(riskDates, minGap = 7, shortGap = 5) {
 }
 
 // ✅ Акумуляція тільки по опадам та сприятливим годинам
+// ✅ Акумуляція тільки по опадам та сприятливим годинам
 function getAccumulatedStats(diagnostics = [], startDate, endDate) {
   if (!Array.isArray(diagnostics)) return { rain: 0, condHours: 0 };
 
@@ -148,7 +149,12 @@ function getAccumulatedStats(diagnostics = [], startDate, endDate) {
     return { rain: 0, condHours: 0 };
   }
 
-  const rain = periodData.reduce((sum, d) => sum + (d.rain || 0), 0);
+  // 🟢 універсальна перевірка полів для опадів
+  const rain = periodData.reduce((sum, d) => {
+    const r = d.rain ?? d.precipitation ?? d.rain_sum ?? d.precip ?? 0;
+    return sum + r;
+  }, 0);
+
   const condHours = periodData.reduce(
     (sum, d) => sum + (d.condHours || 0),
     0
