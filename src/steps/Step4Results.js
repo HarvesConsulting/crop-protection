@@ -133,30 +133,41 @@ function getAdvancedTreatments(riskDates, minGap = 7, shortGap = 5) {
 
 // ✅ Акумуляція тільки по опадам та сприятливим годинам
 // ✅ Акумуляція тільки по опадам та сприятливим годинам
-function getAccumulatedStats(diagnostics, prevDate, currentDate, rainDaily) {
-  const start = new Date(prevDate);
-  const end = new Date(currentDate);
+function getAccumulatedStats(diagnostics = [], prevDate, currentDate, rainDaily = []) {
+  const start = parseISO(typeof prevDate === "string" ? prevDate.split(".").reverse().join("-") : prevDate);
+  const end = parseISO(typeof currentDate === "string" ? currentDate.split(".").reverse().join("-") : currentDate);
 
-  // 🔵 Опади лише з rainDaily
-  const rain = rainDaily
-    .filter((r) => {
-      const date = new Date(r.date);
+  // 🟡 Перевірка валідності дат
+  if (!start || !end || isNaN(start) || isNaN(end)) {
+    return { rain: 0, condHours: 0 };
+  }
+
+  // 🔵 Опади — акумуляція за період
+  const rainSum = rainDaily
+    .filter((entry) => {
+      const date = new Date(entry.date);
       return date >= start && date <= end;
     })
-    .reduce(
-      (sum, r) => sum + (Number(r.rain) || Number(r.precip) || 0),
-      0
-    );
+    .reduce((sum, entry) => {
+      const value = Number(entry.rain ?? entry.precip);
+      return sum + (isNaN(value) ? 0 : value);
+    }, 0);
 
-  // 🟢 Сприятливі години з diagnostics
-  const condHours = diagnostics
-    .filter((d) => {
-      const date = new Date(d.date);
+  // 🟢 Сприятливі години
+  const hoursSum = diagnostics
+    .filter((entry) => {
+      const date = new Date(entry.date);
       return date >= start && date <= end;
     })
-    .reduce((sum, d) => sum + (d.condHours || 0), 0);
+    .reduce((sum, entry) => {
+      const h = Number(entry.condHours);
+      return sum + (isNaN(h) ? 0 : h);
+    }, 0);
 
-  return { rain, condHours };
+  return {
+    rain: rainSum,
+    condHours: hoursSum,
+  };
 }
 
 
