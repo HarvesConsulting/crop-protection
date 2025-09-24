@@ -57,44 +57,9 @@ const rotationProducts = [
   "Інфініто",
 ];
 
-const rotationGrayMold = [
-  "Луна Експірієнс",
-  "Сігнум",
-  "Скала",
-  "Тельдор",
-  "Скор",
-  "Натіво",
-];
-
+const rotationGrayMold = ["Луна Експірієнс", "Сігнум", "Скала", "Тельдор", "Скор", "Натіво"];
 const rotationAlternaria = rotationGrayMold;
 const rotationBacteriosis = ["Медян Екстра", "Казумін", "Серенада"];
-
-// 📌 Рахуємо накопичені дані між датами
-function getAccumulatedStats(diagnostics, startDate, endDate) {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-
-  const periodData = diagnostics.filter((d) => {
-    const dDate = new Date(d.date);
-    return dDate >= start && dDate <= end;
-  });
-
-  const wetHours = periodData.reduce((sum, d) => sum + (d.wetHours || 0), 0);
-  const rain = periodData.reduce((sum, d) => sum + (d.rain || 0), 0);
-  const condHours = periodData.reduce((sum, d) => sum + (d.condHours || 0), 0);
-
-  const wetTemps = periodData
-    .map((d) => d.wetTempAvg)
-    .filter((v) => v !== undefined && !isNaN(v));
-  const allTemps = periodData
-    .map((d) => d.allTempAvg)
-    .filter((v) => v !== undefined && !isNaN(v));
-
-  const wetTempAvg = wetTemps.length ? wetTemps.reduce((a, b) => a + b, 0) / wetTemps.length : undefined;
-  const allTempAvg = allTemps.length ? allTemps.reduce((a, b) => a + b, 0) / allTemps.length : undefined;
-
-  return { wetHours, rain, condHours, wetTempAvg, allTempAvg };
-}
 
 function InfoToggle({ content }) {
   const [show, setShow] = useState(false);
@@ -103,7 +68,7 @@ function InfoToggle({ content }) {
     <span style={{ display: "inline-block" }}>
       <button
         onClick={(e) => {
-          e.stopPropagation(); // 🛑 Не перевертати картку при кліку на ℹ️
+          e.stopPropagation(); // 🛑 не перевертати картку
           setShow(!show);
         }}
         style={{
@@ -153,14 +118,41 @@ function getAdvancedTreatments(riskDates, minGap = 7, shortGap = 5) {
   return selected;
 }
 
+// 🧮 Сумування погодних умов за період
+function getAccumulatedStats(diagnostics = [], startDate, endDate) {
+  if (!Array.isArray(diagnostics)) return {};
+
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  const periodData = diagnostics.filter((d) => {
+    if (!d.date) return false;
+    const dDate = new Date(d.date);
+    return dDate >= start && dDate <= end;
+  });
+
+  if (!periodData.length) {
+    return { wetHours: 0, rain: 0, condHours: 0 };
+  }
+
+  const wetHours = periodData.reduce((sum, d) => sum + (d.wetHours || 0), 0);
+  const rain = periodData.reduce((sum, d) => sum + (d.rain || 0), 0);
+  const condHours = periodData.reduce((sum, d) => sum + (d.condHours || 0), 0);
+
+  const wetTemps = periodData.map((d) => d.wetTempAvg).filter((v) => v !== undefined && !isNaN(v));
+  const allTemps = periodData.map((d) => d.allTempAvg).filter((v) => v !== undefined && !isNaN(v));
+
+  const wetTempAvg = wetTemps.length ? wetTemps.reduce((a, b) => a + b, 0) / wetTemps.length : undefined;
+  const allTempAvg = allTemps.length ? allTemps.reduce((a, b) => a + b, 0) / allTemps.length : undefined;
+
+  return { wetHours, rain, condHours, wetTempAvg, allTempAvg };
+}
+
 function Card({ frontData, backData }) {
   const [flipped, setFlipped] = useState(false);
 
   return (
-    <div
-      className={`flip-card ${flipped ? "flipped" : ""}`}
-      onClick={() => setFlipped(!flipped)}
-    >
+    <div className={`flip-card ${flipped ? "flipped" : ""}`} onClick={() => setFlipped(!flipped)}>
       <div className="flip-card-inner">
         {/* Передня сторона */}
         <div className="flip-card-front">
@@ -176,15 +168,22 @@ function Card({ frontData, backData }) {
         {/* Задня сторона */}
         <div className="flip-card-back">
           <h4>Погодні умови</h4>
-          <p><strong>Середня температура:</strong> 
+          <p>
+            <strong>Середня температура:</strong>{" "}
             {backData.allTempAvg !== undefined ? backData.allTempAvg.toFixed(1) : "—"} °C
           </p>
-          <p><strong>Середня t° при волозі:</strong> 
+          <p>
+            <strong>Середня t° при волозі:</strong>{" "}
             {backData.wetTempAvg !== undefined ? backData.wetTempAvg.toFixed(1) : "—"} °C
           </p>
-          <p><strong>Вологі години:</strong> {backData.wetHours ?? 0}</p>
-          <p><strong>Сприятливі години:</strong> {backData.condHours ?? 0}</p>
-          <p><strong>Опади:</strong> 
+          <p>
+            <strong>Вологі години:</strong> {backData.wetHours ?? 0}
+          </p>
+          <p>
+            <strong>Сприятливі години:</strong> {backData.condHours ?? 0}
+          </p>
+          <p>
+            <strong>Опади:</strong>{" "}
             {backData.rain !== undefined ? backData.rain.toFixed(1) : 0} мм
           </p>
         </div>
@@ -193,17 +192,27 @@ function Card({ frontData, backData }) {
   );
 }
 
-function CardView({ title, entries }) {
+function CardView({ title, entries, diagnostics = [], plantingDate }) {
   return (
     <div className="card-section">
       <h3>{title}</h3>
-      {entries.map((item, i) => (
-        <Card
-          key={i}
-          frontData={{ index: `#${i + 1}`, fields: item }}
-          backData={item.backData || {}}
-        />
-      ))}
+      {entries.map((item, i) => {
+        const curDate = parseISO(item.Дата.split(".").reverse().join("-"));
+        const prevDate =
+          i > 0
+            ? parseISO(entries[i - 1].Дата.split(".").reverse().join("-"))
+            : new Date(plantingDate);
+
+        const diag = getAccumulatedStats(diagnostics, prevDate, curDate);
+
+        return (
+          <Card
+            key={i}
+            frontData={{ index: `#${i + 1}`, fields: item }}
+            backData={diag}
+          />
+        );
+      })}
     </div>
   );
 }
@@ -213,25 +222,15 @@ export default function Step4Results({ result, onRestart }) {
 
   if (!result) return <p>Дані відсутні</p>;
 
-  const { sprayDates, diseaseSummary, suitableHours = {}, diagnostics = [] } = result;
+  const { sprayDates, diseaseSummary, suitableHours = {}, diagnostics = [], plantingDate, harvestDate } = result;
 
-  // 📌 Формування sprayData з накопиченими даними
   const sprayData = sprayDates.map((d, i) => {
     const cur = parseISO(d.split(".").reverse().join("-"));
-    const prev =
-      i > 0
-        ? parseISO(sprayDates[i - 1].split(".").reverse().join("-"))
-        : parseISO(result.plantingDate);
-
-    const gap = i > 0
-      ? `${differenceInDays(cur, prev)} діб після попередньої`
-      : "—";
-
+    const prev = i > 0 ? parseISO(sprayDates[i - 1].split(".").reverse().join("-")) : null;
+    const gap = prev ? `${differenceInDays(cur, prev)} діб після попередньої` : "—";
     const product = rotationProducts[i % rotationProducts.length];
     const dateStr = format(cur, "dd.MM.yyyy");
     const recommendedHours = suitableHours[dateStr] || [];
-
-    const backData = getAccumulatedStats(diagnostics, prev, cur);
 
     return {
       Дата: d,
@@ -244,14 +243,10 @@ export default function Step4Results({ result, onRestart }) {
         "—"
       ),
       Інтервал: gap,
-      "Рекомендовані години": recommendedHours.length
-        ? recommendedHours.join(", ")
-        : "—",
-      backData,
+      "Рекомендовані години": recommendedHours.length ? recommendedHours.join(", ") : "—",
     };
   });
 
-  // 📌 Disease data
   const diseaseCardsGrouped = diseaseSummary?.map(({ name, riskDates }) => {
     const rotation = {
       "Сіра гниль": rotationGrayMold,
@@ -265,9 +260,6 @@ export default function Step4Results({ result, onRestart }) {
       const dateStr = format(item.date, "dd.MM.yyyy");
       const recommendedHours = suitableHours[dateStr] || [];
 
-      const prev = i > 0 ? treatments[i - 1].date : parseISO(result.plantingDate);
-      const backData = getAccumulatedStats(diagnostics, prev, item.date);
-
       return {
         Дата: dateStr,
         Препарат: `${product} (${productInfo[product] || "—"})`,
@@ -279,13 +271,8 @@ export default function Step4Results({ result, onRestart }) {
           "—"
         ),
         Інтервал:
-          i === 0
-            ? "—"
-            : `${differenceInDays(item.date, treatments[i - 1].date)} діб після попередньої`,
-        "Рекомендовані години": recommendedHours.length
-          ? recommendedHours.join(", ")
-          : "—",
-        backData,
+          i === 0 ? "—" : `${differenceInDays(item.date, treatments[i - 1].date)} діб після попередньої`,
+        "Рекомендовані години": recommendedHours.length ? recommendedHours.join(", ") : "—",
       };
     });
 
@@ -294,7 +281,6 @@ export default function Step4Results({ result, onRestart }) {
 
   const rawEntries = [...sprayData, ...diseaseCardsGrouped.flatMap(({ entries }) => entries)];
 
-  // Групування по датах
   const groupedByDate = rawEntries.reduce((acc, entry) => {
     const key = entry.Дата;
     if (!acc[key]) acc[key] = [];
@@ -322,6 +308,7 @@ export default function Step4Results({ result, onRestart }) {
       Дата: date,
       Препарат: allProducts,
       Рекомендація: allLinks.length ? <>{allLinks}</> : "—",
+      backData: {}, // ✅ щоб не ламалось
     };
   });
 
@@ -332,16 +319,11 @@ export default function Step4Results({ result, onRestart }) {
   );
 
   const exportToExcel = () => {
-    const simplified = integratedSystem.map(
-      ({ Дата, Препарат, Рекомендація }) => ({
-        Дата,
-        Препарат,
-        Рекомендація:
-          typeof Рекомендація === "string"
-            ? Рекомендація
-            : Рекомендація?.props?.href || "",
-      })
-    );
+    const simplified = integratedSystem.map(({ Дата, Препарат, Рекомендація }) => ({
+      Дата,
+      Препарат,
+      Рекомендація: typeof Рекомендація === "string" ? Рекомендація : Рекомендація?.props?.href || "",
+    }));
     const ws = XLSX.utils.json_to_sheet(simplified);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Захист");
@@ -355,33 +337,29 @@ export default function Step4Results({ result, onRestart }) {
       </button>
       <h2>Крок 4: Результати</h2>
       <p>
-        Період розрахунку:{" "}
-        <strong>{format(new Date(result.plantingDate), "dd.MM.yyyy")}</strong> —{" "}
-        <strong>{format(new Date(result.harvestDate), "dd.MM.yyyy")}</strong>
+        Період розрахунку: <strong>{format(new Date(plantingDate), "dd.MM.yyyy")}</strong> —{" "}
+        <strong>{format(new Date(harvestDate), "dd.MM.yyyy")}</strong>
       </p>
       <p className="description">
         Нижче показано рекомендовані дати обробки. Ви можете сформувати інтегровану систему захисту.
       </p>
 
-      <button
-        className="toggle-button"
-        onClick={() => setShowIntegrated(!showIntegrated)}
-      >
+      <button className="toggle-button" onClick={() => setShowIntegrated(!showIntegrated)}>
         {showIntegrated ? "🔽 Сховати інтегровану систему" : "🍅 Сформувати інтегровану систему захисту"}
       </button>
 
       {showIntegrated ? (
         <>
-          <CardView title="Інтегрована система захисту" entries={integratedSystem} />
+          <CardView title="Інтегрована система захисту" entries={integratedSystem} diagnostics={diagnostics} plantingDate={plantingDate} />
           <button onClick={exportToExcel} className="toggle-button">
             ⬇️ Експорт в Excel
           </button>
         </>
       ) : (
         <>
-          <CardView title="Рекомендовані внесення (проти фітофторозу)" entries={sprayData} />
+          <CardView title="Рекомендовані внесення (проти фітофторозу)" entries={sprayData} diagnostics={diagnostics} plantingDate={plantingDate} />
           {diseaseCardsGrouped?.map(({ name, entries }) => (
-            <CardView key={name} title={`Рекомендовані внесення (проти: ${name})`} entries={entries} />
+            <CardView key={name} title={`Рекомендовані внесення (проти: ${name})`} entries={entries} diagnostics={diagnostics} plantingDate={plantingDate} />
           ))}
         </>
       )}
