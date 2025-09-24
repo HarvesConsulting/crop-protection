@@ -132,41 +132,30 @@ function getAdvancedTreatments(riskDates, minGap = 7, shortGap = 5) {
 }
 
 // ✅ Акумуляція тільки по опадам та сприятливим годинам
-// ✅ Акумуляція тільки по опадам та сприятливим годинам
-function getAccumulatedStats(diagnostics = [], startDate, endDate) {
-  if (!Array.isArray(diagnostics)) return { rain: 0, condHours: 0 };
-
+function getAccumulatedStats(diagnostics, prevDate, currentDate, rainDaily)
+ {
   const start = new Date(startDate);
   const end = new Date(endDate);
 
-  const periodData = diagnostics.filter((d) => {
-    if (!d.date) return false;
-    const dDate = new Date(d.date);
-    return dDate >= start && dDate <= end;
-  });
+  // 🔵 Опади лише з rainDaily
+  const rain = rainDaily
+    .filter((r) => {
+      const date = new Date(r.date);
+      return date >= start && date <= end;
+    })
+    .reduce((sum, r) => sum + (Number(r.rain || r.precip || 0) || 0), 0);
 
-  if (!periodData.length) {
-    return { rain: 0, condHours: 0 };
-  }
-
-  // 🟢 універсальна перевірка полів для опадів
-  const rain = periodData.reduce((sum, d) => {
-  const r =
-    Number(d.rain) ??
-    Number(d.precipitation) ??
-    Number(d.rain_sum) ??
-    Number(d.precip) ??
-    0;
-  return sum + (Number.isFinite(r) ? r : 0);
-}, 0);
-
-  const condHours = periodData.reduce(
-    (sum, d) => sum + (d.condHours || 0),
-    0
-  );
+  // 🟢 Сприятливі години з diagnostics
+  const condHours = diagnostics
+    .filter((d) => {
+      const date = new Date(d.date);
+      return date >= start && date <= end;
+    })
+    .reduce((sum, d) => sum + (d.condHours || 0), 0);
 
   return { rain, condHours };
 }
+
 
 function Card({ frontData, backData }) {
   const [flipped, setFlipped] = useState(false);
@@ -220,10 +209,12 @@ function CardView({ title, entries, diagnostics = [], plantingDate }) {
             : parseISO(entries[i - 1].Дата.split(".").reverse().join("-"));
 
         const diag = getAccumulatedStats(
-          diagnostics,
-          prevDate,
-          currentDate
-        );
+  diagnostics,
+  prevDate,
+  currentDate,
+  rainDaily
+);
+
 
         return (
           <Card
@@ -247,6 +238,7 @@ export default function Step4Results({ result, onRestart }) {
     diseaseSummary,
     suitableHours = {},
     diagnostics = [],
+    rainDaily = [],
     plantingDate,
   } = result;
 
@@ -407,11 +399,13 @@ export default function Step4Results({ result, onRestart }) {
       {showIntegrated ? (
         <>
           <CardView
-            title="Інтегрована система захисту"
-            entries={integratedSystem}
-            diagnostics={diagnostics}
-            plantingDate={plantingDate}
-          />
+  title="Інтегрована система захисту"
+  entries={integratedSystem}
+  diagnostics={diagnostics}
+  plantingDate={plantingDate}
+  rainDaily={rainDaily}
+/>
+
           <button onClick={exportToExcel} className="toggle-button">
             ⬇️ Експорт в Excel
           </button>
@@ -419,19 +413,23 @@ export default function Step4Results({ result, onRestart }) {
       ) : (
         <>
           <CardView
-            title="Рекомендовані внесення (проти фітофторозу)"
-            entries={sprayData}
-            diagnostics={diagnostics}
-            plantingDate={plantingDate}
-          />
+  title="Рекомендовані внесення (проти фітофторозу)"
+  entries={sprayData}
+  diagnostics={diagnostics}
+  plantingDate={plantingDate}
+  rainDaily={rainDaily}
+/>
+
           {diseaseCardsGrouped?.map(({ name, entries }) => (
             <CardView
-              key={name}
-              title={`Рекомендовані внесення (проти: ${name})`}
-              entries={entries}
-              diagnostics={diagnostics}
-              plantingDate={plantingDate}
-            />
+  key={name}
+  title={`Рекомендовані внесення (проти: ${name})`}
+  entries={entries}
+  diagnostics={diagnostics}
+  plantingDate={plantingDate}
+  rainDaily={rainDaily}
+/>
+
           ))}
         </>
       )}
