@@ -75,7 +75,9 @@ function InfoToggle({ content }) {
   return (
     <span style={{ display: "inline-block" }}>
       <button
-        onClick={() => setShow(!show)}
+        onClick={(e) => {
+    e.stopPropagation();   // 🛑 Зупиняємо клік, щоб картка не переверталась
+    setShow(!show);}}
         style={{
           background: "none",
           border: "none",
