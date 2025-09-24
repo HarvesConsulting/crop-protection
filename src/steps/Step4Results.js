@@ -132,10 +132,10 @@ function getAdvancedTreatments(riskDates, minGap = 7, shortGap = 5) {
 }
 
 // ✅ Акумуляція тільки по опадам та сприятливим годинам
-function getAccumulatedStats(diagnostics, prevDate, currentDate, rainDaily)
- {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
+// ✅ Акумуляція тільки по опадам та сприятливим годинам
+function getAccumulatedStats(diagnostics, prevDate, currentDate, rainDaily) {
+  const start = new Date(prevDate);
+  const end = new Date(currentDate);
 
   // 🔵 Опади лише з rainDaily
   const rain = rainDaily
@@ -143,7 +143,10 @@ function getAccumulatedStats(diagnostics, prevDate, currentDate, rainDaily)
       const date = new Date(r.date);
       return date >= start && date <= end;
     })
-    .reduce((sum, r) => sum + (Number(r.rain || r.precip || 0) || 0), 0);
+    .reduce(
+      (sum, r) => sum + (Number(r.rain) || Number(r.precip) || 0),
+      0
+    );
 
   // 🟢 Сприятливі години з diagnostics
   const condHours = diagnostics
