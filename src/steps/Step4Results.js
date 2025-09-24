@@ -222,20 +222,18 @@ function CardView({ title, entries, diagnostics = [], plantingDate, rainDaily = 
             ? plantingDate
             : parseISO(entries[i - 1].Дата.split(".").reverse().join("-"));
 
-        const diag = getAccumulatedStats(
-          diagnostics,
-          prevDate,
-          currentDate,
-          rainDaily
-        );
+        const backData = item.backData
+  ? item.backData
+  : getAccumulatedStats(diagnostics, prevDate, currentDate, rainDaily);
 
-        return (
-          <Card
-            key={i}
-            frontData={{ index: `#${i + 1}`, fields: item }}
-            backData={diag}
-          />
-        );
+return (
+  <Card
+    key={i}
+    frontData={{ index: `#${i + 1}`, fields: item }}
+    backData={backData}
+  />
+);
+
       })}
     </div>
   );
@@ -352,10 +350,8 @@ export default function Step4Results({ result, onRestart }) {
       })
       .filter(Boolean);
 
-    // 🎯 Поточна дата
     const currentDate = parseISO(date.split(".").reverse().join("-"));
 
-    // 🔙 Пошук попередньої дати
     const prevDates = Object.keys(groupedByDate)
       .filter((d) => parseISO(d.split(".").reverse().join("-")) < currentDate)
       .sort((a, b) =>
@@ -366,14 +362,13 @@ export default function Step4Results({ result, onRestart }) {
       ? parseISO(prevDates[0].split(".").reverse().join("-"))
       : plantingDate;
 
-    // 🧠 Розрахунок погодних умов
     const diag = getAccumulatedStats(diagnostics, prevDate, currentDate, rainDaily);
 
     return {
-      Дата: date,
+      Дата: format(currentDate, "dd.MM.yyyy"), // ✅ ОБОВʼЯЗКОВО
       Препарат: allProducts,
       Рекомендація: allLinks.length ? <>{allLinks}</> : "—",
-      backData: diag, // ✅ тепер є дані для зворотної сторони
+      backData: diag,
     };
   }
 );
@@ -385,12 +380,7 @@ integratedSystem.sort(
     parseISO(b.Дата.split(".").reverse().join("-"))
 );
 
-  integratedSystem.sort(
-    (a, b) =>
-      parseISO(a.Дата.split(".").reverse().join("-")) -
-      parseISO(b.Дата.split(".").reverse().join("-"))
-  );
-
+  
   const exportToExcel = () => {
     const simplified = integratedSystem.map(
       ({ Дата, Препарат, Рекомендація }) => ({
