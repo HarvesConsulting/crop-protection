@@ -336,30 +336,54 @@ export default function Step4Results({ result, onRestart }) {
   }, {});
 
   const integratedSystem = Object.entries(groupedByDate).map(
-    ([date, entries]) => {
-      const allProducts = entries.map((e) => e.Препарат).join(", ");
-      const allLinks = entries
-        .map((e) => {
-          if (typeof e.Рекомендація === "string") return null;
-          const href = e.Рекомендація?.props?.href;
-          return href ? (
-            <div key={href}>
-              <a href={href} target="_blank" rel="noreferrer">
-                {href}
-              </a>
-            </div>
-          ) : null;
-        })
-        .filter(Boolean);
+  ([date, entries]) => {
+    const allProducts = entries.map((e) => e.Препарат).join(", ");
+    const allLinks = entries
+      .map((e) => {
+        if (typeof e.Рекомендація === "string") return null;
+        const href = e.Рекомендація?.props?.href;
+        return href ? (
+          <div key={href}>
+            <a href={href} target="_blank" rel="noreferrer">
+              {href}
+            </a>
+          </div>
+        ) : null;
+      })
+      .filter(Boolean);
 
-      return {
-        Дата: date,
-        Препарат: allProducts,
-        Рекомендація: allLinks.length ? <>{allLinks}</> : "—",
-        backData: {}, // щоб не ламалось
-      };
-    }
-  );
+    // 🎯 Поточна дата
+    const currentDate = parseISO(date.split(".").reverse().join("-"));
+
+    // 🔙 Пошук попередньої дати
+    const prevDates = Object.keys(groupedByDate)
+      .filter((d) => parseISO(d.split(".").reverse().join("-")) < currentDate)
+      .sort((a, b) =>
+        parseISO(b.split(".").reverse().join("-")) - parseISO(a.split(".").reverse().join("-"))
+      );
+
+    const prevDate = prevDates.length
+      ? parseISO(prevDates[0].split(".").reverse().join("-"))
+      : plantingDate;
+
+    // 🧠 Розрахунок погодних умов
+    const diag = getAccumulatedStats(diagnostics, prevDate, currentDate, rainDaily);
+
+    return {
+      Дата: date,
+      Препарат: allProducts,
+      Рекомендація: allLinks.length ? <>{allLinks}</> : "—",
+      backData: diag, // ✅ тепер є дані для зворотної сторони
+    };
+  }
+);
+
+// 🔁 Сортування за датою
+integratedSystem.sort(
+  (a, b) =>
+    parseISO(a.Дата.split(".").reverse().join("-")) -
+    parseISO(b.Дата.split(".").reverse().join("-"))
+);
 
   integratedSystem.sort(
     (a, b) =>
