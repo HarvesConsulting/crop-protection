@@ -132,10 +132,16 @@ function getAdvancedTreatments(riskDates, minGap = 7, shortGap = 5) {
 }
 
 // ✅ Акумуляція тільки по опадам та сприятливим годинам
-// ✅ Акумуляція тільки по опадам та сприятливим годинам
 function getAccumulatedStats(diagnostics = [], prevDate, currentDate, rainDaily = []) {
-  const start = parseISO(typeof prevDate === "string" ? prevDate.split(".").reverse().join("-") : prevDate);
-  const end = parseISO(typeof currentDate === "string" ? currentDate.split(".").reverse().join("-") : currentDate);
+  const start =
+    typeof prevDate === "string"
+      ? parseISO(prevDate.split(".").reverse().join("-"))
+      : prevDate;
+
+  const end =
+    typeof currentDate === "string"
+      ? parseISO(currentDate.split(".").reverse().join("-"))
+      : currentDate;
 
   // 🟡 Перевірка валідності дат
   if (!start || !end || isNaN(start) || isNaN(end)) {
