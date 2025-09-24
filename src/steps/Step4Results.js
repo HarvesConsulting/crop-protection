@@ -200,7 +200,7 @@ function Card({ frontData, backData }) {
   );
 }
 
-function CardView({ title, entries, diagnostics = [], plantingDate }) {
+function CardView({ title, entries, diagnostics = [], plantingDate, rainDaily = [] }) {
   return (
     <div className="card-section">
       <h3>{title}</h3>
@@ -212,12 +212,11 @@ function CardView({ title, entries, diagnostics = [], plantingDate }) {
             : parseISO(entries[i - 1].Дата.split(".").reverse().join("-"));
 
         const diag = getAccumulatedStats(
-  diagnostics,
-  prevDate,
-  currentDate,
-  rainDaily
-);
-
+          diagnostics,
+          prevDate,
+          currentDate,
+          rainDaily
+        );
 
         return (
           <Card
@@ -229,7 +228,7 @@ function CardView({ title, entries, diagnostics = [], plantingDate }) {
       })}
     </div>
   );
-}
+} 
 
 export default function Step4Results({ result, onRestart }) {
   const [showIntegrated, setShowIntegrated] = useState(false);
