@@ -145,23 +145,20 @@ function Card({ frontData, backData }) {
 
         {/* Задня сторона */}
         <div className="flip-card-back">
-          <h4>Погодні умови</h4>
-          <p>
-            <strong>Середня температура:</strong>{" "}
-            {backData.allTempAvg ?? "—"} °C
-          </p>
-          <p>
-            <strong>Середня t° при волозі:</strong>{" "}
-            {backData.wetTempAvg ?? "—"} °C
-          </p>
-          <p>
-            <strong>Вологі години:</strong> {backData.wetHours ?? 0}
-          </p>
-          <p>
-            <strong>Сприятливі години:</strong> {backData.condHours ?? 0}
-          </p>
-          <p><strong>Опади:</strong> {backData.rain ?? 0} мм</p>
-        </div>
+  <h4>Погодні умови</h4>
+  <p><strong>Середня температура:</strong> 
+    {backData.allTempAvg !== undefined ? backData.allTempAvg.toFixed(1) : "—"} °C
+  </p>
+  <p><strong>Середня t° при волозі:</strong> 
+    {backData.wetTempAvg !== undefined ? backData.wetTempAvg.toFixed(1) : "—"} °C
+  </p>
+  <p><strong>Вологі години:</strong> {backData.wetHours ?? 0}</p>
+  <p><strong>Сприятливі години:</strong> {backData.condHours ?? 0}</p>
+  <p><strong>Опади:</strong> 
+    {backData.rain !== undefined ? backData.rain.toFixed(1) : 0} мм
+  </p>
+</div>
+
       </div>
     </div>
   );
