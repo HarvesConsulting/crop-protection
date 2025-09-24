@@ -297,7 +297,7 @@ const {
   harvestDate,
 } = result;
 
-const aggregatedRain = aggregateDailyRain(rainDaily);
+const aggregatedRain = rainDaily;
 
 
   const sprayData = sprayDates.map((d, i) => {
