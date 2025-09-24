@@ -222,30 +222,41 @@ function CardView({ title, entries, diagnostics = [], plantingDate, rainDaily = 
     <div className="card-section">
       <h3>{title}</h3>
       {entries.map((item, i) => {
-  if (!item?.Дата) return null;
+        if (!item?.Дата) {
+          console.warn("Пропущено item через відсутність Дата:", item);
+          return null;
+        }
 
-  // Парсимо дату
-  const currentDate = parseISO(item.Дата.split(".").reverse().join("-"));
+        let currentDate;
+        try {
+          currentDate = parseISO(item.Дата.split(".").reverse().join("-"));
+        } catch (e) {
+          console.error("Помилка парсингу дати:", item.Дата);
+          return null;
+        }
 
-  // Шукаємо відповідний запис у rainDaily
-  const rainEntry = rainDaily.find(
-    (r) =>
-      r.date &&
-      new Date(r.date).toDateString() === currentDate.toDateString()
-  );
+        if (isNaN(currentDate)) {
+          console.warn("Некоректна дата:", item.Дата);
+          return null;
+        }
 
-  return (
-    <Card
-      key={i}
-      frontData={{ index: `#${i + 1}`, fields: item }}
-      backData={{
-        condHours: item.condHours,
-        rain: rainEntry?.rain,
-      }}
-    />
-  );
-})}
+        const prevDate =
+          i === 0
+            ? plantingDate
+            : parseISO(entries[i - 1].Дата.split(".").reverse().join("-"));
 
+        const backData = item.backData
+          ? item.backData
+          : getAccumulatedStats(diagnostics, prevDate, currentDate, rainDaily);
+
+        return (
+          <Card
+            key={i}
+            frontData={{ index: `#${i + 1}`, fields: item }}
+            backData={backData}
+          />
+        );
+      })}
     </div>
   );
 }
