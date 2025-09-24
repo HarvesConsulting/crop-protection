@@ -260,9 +260,31 @@ function CardView({ title, entries, diagnostics = [], plantingDate, rainDaily = 
     </div>
   );
 }
+function aggregateDailyRain(hourlyData = []) {
+  const dailyMap = {};
+
+  hourlyData.forEach((entry) => {
+    const date = entry.date;
+    const rainValue = Number(entry.rain ?? entry.precip);
+
+    if (!date || isNaN(rainValue)) return;
+
+    if (!dailyMap[date]) {
+      dailyMap[date] = 0;
+    }
+
+    dailyMap[date] += rainValue;
+  });
+
+  return Object.entries(dailyMap).map(([date, totalRain]) => ({
+    date,
+    rain: totalRain,
+  }));
+}
 
 export default function Step4Results({ result, onRestart }) {
   const [showIntegrated, setShowIntegrated] = useState(false);
+  const aggregatedRain = aggregateDailyRain(result.rainDaily || []);
 
   if (!result) return <p>Дані відсутні</p>;
 
@@ -387,7 +409,7 @@ export default function Step4Results({ result, onRestart }) {
 
       : plantingDate;
 
-    const diag = getAccumulatedStats(diagnostics, prevDate, currentDate, rainDaily);
+    const diag = getAccumulatedStats(diagnostics, prevDate, currentDate, aggregatedRain);
 
     return {
       Дата: format(currentDate, "dd.MM.yyyy"), // ✅ ОБОВʼЯЗКОВО
@@ -455,7 +477,7 @@ integratedSystem.sort(
   entries={integratedSystem}
   diagnostics={diagnostics}
   plantingDate={plantingDate}
-  rainDaily={rainDaily}
+  rainDaily={aggregatedRain}
 />
 
           <button onClick={exportToExcel} className="toggle-button">
@@ -469,7 +491,7 @@ integratedSystem.sort(
   entries={sprayData}
   diagnostics={diagnostics}
   plantingDate={plantingDate}
-  rainDaily={rainDaily}
+  rainDaily={aggregatedRain}
 />
 
           {diseaseCardsGrouped?.map(({ name, entries }) => (
@@ -479,7 +501,7 @@ integratedSystem.sort(
   entries={entries}
   diagnostics={diagnostics}
   plantingDate={plantingDate}
-  rainDaily={rainDaily}
+  rainDaily={aggregatedRain}
 />
 
           ))}
