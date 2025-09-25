@@ -455,7 +455,7 @@ const aggregatedRain = rainDaily;
     const diag = getAccumulatedStats(diagnostics, prevDate, currentDate, aggregatedRain);
 
     return {
-      Дата: currentDate, // тип Dat
+      Дата: format(currentDate, "dd.MM.yyyy"),
       Препарат: allProducts,
       Рекомендація: allLinks.length ? <>{allLinks}</> : "—",
       backData: diag,
