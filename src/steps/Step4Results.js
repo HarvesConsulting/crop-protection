@@ -220,7 +220,10 @@ function Card({ frontData, backData }) {
               {key === "Рекомендація" ? (
                 <InfoToggle content={value} />
               ) : (
-                value
+                typeof value === "object" && value !== null
+  ? JSON.stringify(value)
+  : value
+
               )}
             </div>
           ))}
