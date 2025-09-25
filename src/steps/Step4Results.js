@@ -258,9 +258,8 @@ function CardView({ title, entries, diagnostics = [], plantingDate, rainDaily = 
         let currentDate;
         try {
           currentDate = item.Дата instanceof Date
-  ? item.Дата
-  : parseISO(item.Дата.split(".").reverse().join("-"));
-
+            ? item.Дата
+            : parseISO(item.Дата.split(".").reverse().join("-"));
         } catch (e) {
           console.error("Помилка парсингу дати:", item.Дата);
           return null;
@@ -272,27 +271,34 @@ function CardView({ title, entries, diagnostics = [], plantingDate, rainDaily = 
         }
 
         const prevDate =
-  i === 0
-    ? plantingDate
-    : entries[i - 1].Дата instanceof Date
-    ? entries[i - 1].Дата
-    : parseISO(entries[i - 1].Дата.split(".").reverse().join("-"));
+          i === 0
+            ? plantingDate
+            : entries[i - 1].Дата instanceof Date
+            ? entries[i - 1].Дата
+            : parseISO(entries[i - 1].Дата.split(".").reverse().join("-"));
 
+        const backDataResult = getAccumulatedStats(
+          diagnostics,
+          prevDate,
+          currentDate,
+          rainDaily
+        );
 
-        const backData = getAccumulatedStats(diagnostics, prevDate, currentDate, rainDaily);
-
+        // ✂️ Вирізаємо backData з item перед передачею у frontData
+        const { backData, ...frontFields } = item;
 
         return (
           <Card
             key={i}
-            frontData={{ index: `#${i + 1}`, fields: item }}
-            backData={backData}
+            frontData={{ index: `#${i + 1}`, fields: frontFields }}
+            backData={backDataResult}
           />
         );
       })}
     </div>
   );
 }
+
 function aggregateDailyRain(hourlyData = []) {
   const dailyMap = {};
 
