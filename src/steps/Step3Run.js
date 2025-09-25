@@ -75,6 +75,18 @@ export default function Step3Run({
         ]);
 
         const forecastTransformed = transformOpenMeteoHourly(forecastWx.raw);
+        // 🛠️ Обчислюємо condHours для прогнозних днів
+forecastTransformed.forEach((day) => {
+  const wet = Number(day.wetHours);
+  const temp = Number(day.wetTempAvg);
+  if (!isNaN(wet) && !isNaN(temp)) {
+    // ✍️ Тут впиши свою логіку або формулу condHours:
+    day.condHours = wet >= 6 && temp >= 15 ? wet : 0;
+  } else {
+    day.condHours = 0; // 🔒 fallback
+  }
+});
+
 weatherDaily.push(...forecastTransformed);
 
         rainDaily.push(...(forecastRain.daily || []));
