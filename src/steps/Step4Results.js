@@ -260,9 +260,8 @@ function CardView({ title, entries, diagnostics = [], plantingDate, rainDaily = 
             ? plantingDate
             : parseISO(entries[i - 1].Дата.split(".").reverse().join("-"));
 
-        const backData = item.backData
-          ? item.backData
-          : getAccumulatedStats(diagnostics, prevDate, currentDate, rainDaily);
+        const backData = getAccumulatedStats(diagnostics, prevDate, currentDate, rainDaily);
+
 
         return (
           <Card
