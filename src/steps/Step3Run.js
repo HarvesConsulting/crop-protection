@@ -162,7 +162,10 @@ console.log("hourlyData:", hourlyData);
         const riskDates = rowsAfter
           .filter((d) => {
             const rv =
-              rainAfter.find((r) => r.date.getTime() === d.date.getTime())
+              rainAfter.find((r) =>
+  format(r.date, "yyyy-MM-dd") === format(d.date, "yyyy-MM-dd")
+)
+
                 ?.rain || 0;
             return isBacterialRisk(d, rv);
           })
@@ -208,6 +211,7 @@ console.table(hourlyData.map(h => ({
           : null,
         plantingDate,
         harvestDate,
+        rainDaily,
       };
 
       console.log("Diagnostics (DSV rows):", comp.rows);
