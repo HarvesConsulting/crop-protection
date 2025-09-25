@@ -159,14 +159,18 @@ export function getAccumulatedStats(
     return { rain: 0, condHours: 0 };
   }
 
+  // 🟢 Порівнюємо дати як строки "yyyy-MM-dd"
+  const startStr = format(start, "yyyy-MM-dd");
+  const endStr = format(end, "yyyy-MM-dd");
+
   const rainEntries = rainDaily.filter((entry) => {
-    const date = new Date(entry.date);
-    return !isNaN(date) && date >= start && date <= end;
+    const entryStr = format(new Date(entry.date), "yyyy-MM-dd");
+    return entryStr >= startStr && entryStr <= endStr;
   });
 
   const condEntries = diagnostics.filter((entry) => {
-    const date = new Date(entry.date);
-    return !isNaN(date) && date >= start && date <= end;
+    const entryStr = format(new Date(entry.date), "yyyy-MM-dd");
+    return entryStr >= startStr && entryStr <= endStr;
   });
 
   console.log("🌧️ Враховано опадів:", rainEntries.length);
@@ -191,6 +195,7 @@ export function getAccumulatedStats(
     condHours: hoursSum,
   };
 }
+
 
 function Card({ frontData, backData }) {
   const [flipped, setFlipped] = useState(false);
