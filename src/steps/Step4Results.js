@@ -304,7 +304,7 @@ const {
   harvestDate,
 } = result;
 
-const aggregatedRain = aggregateDailyRain(result.weatherDaily || []);
+const aggregatedRain = result.rainDaily || [];
 
   const sprayData = sprayDates.map((d, i) => {
     const cur = parseISO(d.split(".").reverse().join("-"));
