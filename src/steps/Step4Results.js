@@ -254,7 +254,10 @@ function CardView({ title, entries, diagnostics = [], plantingDate, rainDaily = 
 
         let currentDate;
         try {
-          currentDate = parseISO(item.Дата.split(".").reverse().join("-"));
+          currentDate = item.Дата instanceof Date
+  ? item.Дата
+  : parseISO(item.Дата.split(".").reverse().join("-"));
+
         } catch (e) {
           console.error("Помилка парсингу дати:", item.Дата);
           return null;
@@ -266,9 +269,12 @@ function CardView({ title, entries, diagnostics = [], plantingDate, rainDaily = 
         }
 
         const prevDate =
-          i === 0
-            ? plantingDate
-            : parseISO(entries[i - 1].Дата.split(".").reverse().join("-"));
+  i === 0
+    ? plantingDate
+    : entries[i - 1].Дата instanceof Date
+    ? entries[i - 1].Дата
+    : parseISO(entries[i - 1].Дата.split(".").reverse().join("-"));
+
 
         const backData = getAccumulatedStats(diagnostics, prevDate, currentDate, rainDaily);
 
@@ -446,7 +452,7 @@ const aggregatedRain = rainDaily;
     const diag = getAccumulatedStats(diagnostics, prevDate, currentDate, aggregatedRain);
 
     return {
-      Дата: format(currentDate, "dd.MM.yyyy"), // ✅ ОБОВʼЯЗКОВО
+      Дата: currentDate, // тип Dat
       Препарат: allProducts,
       Рекомендація: allLinks.length ? <>{allLinks}</> : "—",
       backData: diag,
