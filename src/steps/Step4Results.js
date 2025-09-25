@@ -57,122 +57,487 @@ const rotationProducts = [
   "Інфініто",
 ];
 
-const rotationGrayMold = ["Луна Експірієнс", "Сігнум", "Скала", "Тельдор", "Скор", "Натіво"];
+const rotationGrayMold = [
+  "Луна Експірієнс",
+  "Сігнум",
+  "Скала",
+  "Тельдор",
+  "Скор",
+  "Натіво",
+];
+
 const rotationAlternaria = rotationGrayMold;
 const rotationBacteriosis = ["Медян Екстра", "Казумін", "Серенада"];
 
-// ✅ Підсумовує опади та сприятливі години за період
-function getAccumulatedStats(weatherDaily = [], rainDaily = [], prevDate, currentDate) {
-  const start = typeof prevDate === "string" ? parseISO(prevDate.split(".").reverse().join("-")) : prevDate;
-  const end = typeof currentDate === "string" ? parseISO(currentDate.split(".").reverse().join("-")) : currentDate;
+function InfoToggle({ content }) {
+  const [show, setShow] = useState(false);
+
+  return (
+    <span style={{ display: "inline-block" }}>
+      <button
+        onClick={(e) => {
+          e.stopPropagation(); // 🛑 не перевертати картку
+          setShow(!show);
+        }}
+        style={{
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          color: "#007bff",
+          fontSize: "16px",
+          marginLeft: 6,
+        }}
+        title="Показати рекомендації"
+      >
+        ℹ️
+      </button>
+      {show && (
+        <div style={{ marginTop: 6 }}>
+          {Array.isArray(content) ? content : <div>{content}</div>}
+        </div>
+      )}
+    </span>
+  );
+}
+
+function getAdvancedTreatments(riskDates, minGap = 7, shortGap = 5) {
+  const sorted = [...riskDates].map((d) => new Date(d)).sort((a, b) => a - b);
+  const selected = [];
+  let i = 0;
+
+  while (i < sorted.length) {
+    const current = sorted[i];
+    if (
+      !selected.length ||
+      differenceInDays(
+        current,
+        selected[selected.length - 1].date
+      ) >= selected[selected.length - 1].gap
+    ) {
+      let streak = 1;
+      let j = i + 1;
+      while (
+        j < sorted.length &&
+        differenceInDays(sorted[j], sorted[j - 1]) === 1
+      ) {
+        streak++;
+        j++;
+      }
+      const gap = streak >= 4 ? shortGap : minGap;
+      selected.push({ date: current, gap });
+    }
+    i++;
+  }
+  return selected;
+}
+
+// Допоміжна функція: перетворення 'dd.MM.yyyy' у Date
+const parseDotDate = (str) => {
+  if (!str || typeof str !== "string") return null;
+  const [day, month, year] = str.split(".");
+  if (!day || !month || !year) return null;
+  const isoStr = `${year}-${month}-${day}`;
+  const date = parseISO(isoStr);
+  return isValid(date) ? date : null;
+};
+
+export function getAccumulatedStats(
+  diagnostics = [],
+  prevDate,
+  currentDate,
+  rainDaily = []
+) {
+  // 📅 Обробка вхідних дат
+  const start =
+    typeof prevDate === "string" ? parseDotDate(prevDate) : prevDate;
+  const end =
+    typeof currentDate === "string" ? parseDotDate(currentDate) : currentDate;
+
+  console.log("🔍 getAccumulatedStats()");
+  console.log("⏱️ prevDate:", prevDate, "→", start);
+  console.log("⏱️ currentDate:", currentDate, "→", end);
 
   if (!start || !end || isNaN(start) || isNaN(end)) {
+    console.warn("❗ Невалідна дата:", { start, end });
     return { rain: 0, condHours: 0 };
   }
 
-  const condHours = weatherDaily
-    .filter((entry) => parseISO(entry.date) >= start && parseISO(entry.date) <= end)
-    .reduce((sum, entry) => sum + (Number(entry.condHours) || 0), 0);
+  // 🌧️ Фільтрація опадів по діапазону
+  const rainEntries = rainDaily.filter((entry) => {
+    const date = parseDotDate(entry.date);
+    return date && date >= start && date <= end;
+  });
 
-  const rain = rainDaily
-    .filter((entry) => parseISO(entry.date) >= start && parseISO(entry.date) <= end)
-    .reduce((sum, entry) => sum + (Number(entry.rain) || 0), 0);
+  // ⏳ Фільтрація сприятливих годин по діапазону
+  const condEntries = diagnostics.filter((entry) => {
+    const date = parseDotDate(entry.date);
+    return date && date >= start && date <= end;
+  });
 
-  return { rain, condHours };
+  console.log("🌧️ Враховано опадів:", rainEntries.length);
+  console.log("⏳ Враховано годин:", condEntries.length);
+
+  // 📊 Сума опадів
+  const rainSum = rainEntries.reduce((sum, entry) => {
+    const value = Number(entry.rain ?? entry.precip ?? entry.opad);
+    return sum + (isNaN(value) ? 0 : value);
+  }, 0);
+
+  // ⏱️ Сума сприятливих годин
+  const hoursSum = condEntries.reduce((sum, entry) => {
+    const h = Number(entry.condHours ?? entry.cond_hours ?? entry.hours);
+    return sum + (isNaN(h) ? 0 : h);
+  }, 0);
+
+  console.log("✅ Підсумок за період:");
+  console.log("☔ Опади:", rainSum.toFixed(1), "мм");
+  console.log("🕒 Години:", hoursSum);
+
+  return {
+    rain: rainSum,
+    condHours: hoursSum,
+  };
 }
 
-// Карточка
 function Card({ frontData, backData }) {
   const [flipped, setFlipped] = useState(false);
 
   return (
-    <div className={`flip-card ${flipped ? "flipped" : ""}`} onClick={() => setFlipped(!flipped)}>
+    <div
+      className={`flip-card ${flipped ? "flipped" : ""}`}
+      onClick={() => setFlipped(!flipped)}
+    >
       <div className="flip-card-inner">
         {/* Передня сторона */}
         <div className="flip-card-front">
           <div className="card-index">{frontData.index}</div>
           {Object.entries(frontData.fields).map(([key, value]) => (
             <div key={key} className="card-row">
-              <strong>{key}:</strong> {value}
+              <strong>{key}:</strong>{" "}
+              {key === "Рекомендація" ? (
+                <InfoToggle content={value} />
+              ) : (
+                value
+              )}
             </div>
           ))}
         </div>
 
         {/* Задня сторона */}
         <div className="flip-card-back">
-          <h4>Погодні умови за період</h4>
-          <p><strong>Сприятливі години:</strong> {backData.condHours}</p>
-          <p><strong>Опади:</strong> {backData.rain.toFixed(1)} мм</p>
+          <h4>Погодні умови</h4>
+          <p>
+            <strong>Сприятливі години:</strong> {backData.condHours ?? 0}
+          </p>
+          <p>
+            <strong>Опади:</strong>{" "}
+            {backData.rain !== undefined ? backData.rain.toFixed(1) : 0} мм
+          </p>
         </div>
       </div>
     </div>
   );
 }
 
-// Секція з картками
-function CardView({ title, entries, weatherDaily, rainDaily, plantingDate }) {
+function CardView({ title, entries, diagnostics = [], plantingDate, rainDaily = [] }) {
   return (
     <div className="card-section">
       <h3>{title}</h3>
       {entries.map((item, i) => {
-        if (!item?.Дата) return null;
+        if (!item?.Дата) {
+          console.warn("Пропущено item через відсутність Дата:", item);
+          return null;
+        }
 
-        const currentDate = parseISO(item.Дата.split(".").reverse().join("-"));
-        if (isNaN(currentDate)) return null;
+        let currentDate;
+        try {
+          currentDate = parseISO(item.Дата.split(".").reverse().join("-"));
+        } catch (e) {
+          console.error("Помилка парсингу дати:", item.Дата);
+          return null;
+        }
 
-        const prevDate = i === 0 ? plantingDate : parseISO(entries[i - 1].Дата.split(".").reverse().join("-"));
-        const backData = getAccumulatedStats(weatherDaily, rainDaily, prevDate, currentDate);
+        if (isNaN(currentDate)) {
+          console.warn("Некоректна дата:", item.Дата);
+          return null;
+        }
 
-        return <Card key={i} frontData={{ index: `#${i + 1}`, fields: item }} backData={backData} />;
+        const prevDate =
+          i === 0
+            ? plantingDate
+            : parseISO(entries[i - 1].Дата.split(".").reverse().join("-"));
+
+        const backData = item.backData
+          ? item.backData
+          : getAccumulatedStats(diagnostics, prevDate, currentDate, rainDaily);
+
+        return (
+          <Card
+            key={i}
+            frontData={{ index: `#${i + 1}`, fields: item }}
+            backData={backData}
+          />
+        );
       })}
     </div>
   );
 }
+function aggregateDailyRain(hourlyData = []) {
+  const dailyMap = {};
+
+  hourlyData.forEach((entry) => {
+    const date = entry.date;
+    const rainValue = Number(entry.rain ?? entry.precip ?? entry.opad); // додай всі можливі
+
+    if (!date || isNaN(rainValue)) return;
+
+    if (!dailyMap[date]) {
+      dailyMap[date] = 0;
+    }
+
+    dailyMap[date] += rainValue;
+  });
+
+  return Object.entries(dailyMap).map(([date, totalRain]) => ({
+    date,
+    rain: totalRain,
+  }));
+}
+
 
 export default function Step4Results({ result, onRestart }) {
   const [showIntegrated, setShowIntegrated] = useState(false);
   if (!result) return <p>Дані відсутні</p>;
 
-  const { sprayDates, diseaseSummary, suitableHours = {}, weatherDaily = [], rainDaily = [], plantingDate, harvestDate } = result;
+const {
+  sprayDates,
+  diseaseSummary,
+  suitableHours = {},
+  diagnostics = [],
+  rainDaily = [],
+  plantingDate,
+  harvestDate,
+} = result;
+
+const aggregatedRain = rainDaily;
+
+
 
   const sprayData = sprayDates.map((d, i) => {
     const cur = parseISO(d.split(".").reverse().join("-"));
-    const prev = i > 0 ? parseISO(sprayDates[i - 1].split(".").reverse().join("-")) : null;
-    const gap = prev ? `${differenceInDays(cur, prev)} діб після попередньої` : "—";
+    const prev =
+      i > 0
+        ? parseISO(sprayDates[i - 1].split(".").reverse().join("-"))
+        : null;
+    const gap = prev
+      ? `${differenceInDays(cur, prev)} діб після попередньої`
+      : "—";
     const product = rotationProducts[i % rotationProducts.length];
+    const recommendedHours = suitableHours[d] || [];
 
     return {
       Дата: d,
       Препарат: `${product} (${productInfo[product] || "—"})`,
       Рекомендація: productLinks[product] ? (
-        <a href={productLinks[product]} target="_blank" rel="noreferrer">Перейти</a>
-      ) : "—",
+        <a href={productLinks[product]} target="_blank" rel="noreferrer">
+          Перейти
+        </a>
+      ) : (
+        "—"
+      ),
       Інтервал: gap,
+      "Рекомендовані години": recommendedHours.length
+        ? recommendedHours.join(", ")
+        : "—",
     };
   });
 
+  const diseaseCardsGrouped = diseaseSummary?.map(({ name, riskDates }) => {
+    const rotation = {
+      "Сіра гниль": rotationGrayMold,
+      "Альтернаріоз": rotationAlternaria,
+      "Бактеріоз": rotationBacteriosis,
+    }[name] || [];
+
+    const treatments = getAdvancedTreatments(riskDates);
+    const entries = treatments.map((item, i) => {
+      const product = rotation[i % rotation.length];
+      const dateStr = format(item.date, "dd.MM.yyyy");
+      const recommendedHours = suitableHours[dateStr] || [];
+
+      return {
+        Дата: dateStr,
+        Препарат: `${product} (${productInfo[product] || "—"})`,
+        Рекомендація: productLinks[product] ? (
+          <a href={productLinks[product]} target="_blank" rel="noreferrer">
+            Перейти
+          </a>
+        ) : (
+          "—"
+        ),
+        Інтервал:
+          i === 0
+            ? "—"
+            : `${differenceInDays(
+                item.date,
+                treatments[i - 1].date
+              )} діб після попередньої`,
+        "Рекомендовані години": recommendedHours.length
+          ? recommendedHours.join(", ")
+          : "—",
+      };
+    });
+
+    return { name, entries };
+  });
+
+  const rawEntries = [
+    ...sprayData,
+    ...diseaseCardsGrouped.flatMap(({ entries }) => entries),
+  ];
+
+  const groupedByDate = rawEntries.reduce((acc, entry) => {
+    const key = entry.Дата;
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(entry);
+    return acc;
+  }, {});
+
+  const integratedSystem = Object.entries(groupedByDate).map(
+  ([date, entries]) => {
+    const allProducts = entries.map((e) => e.Препарат).join(", ");
+    const allLinks = entries
+      .map((e) => {
+        if (typeof e.Рекомендація === "string") return null;
+        const href = e.Рекомендація?.props?.href;
+        return href ? (
+          <div key={href}>
+            <a href={href} target="_blank" rel="noreferrer">
+              {href}
+            </a>
+          </div>
+        ) : null;
+      })
+      .filter(Boolean);
+
+    const currentDate = parseISO(date.split(".").reverse().join("-"));
+
+    const prevDates = Object.keys(groupedByDate)
+      .filter((d) => parseISO(d.split(".").reverse().join("-")) < currentDate)
+      .sort((a, b) =>
+        parseISO(b.split(".").reverse().join("-")) - parseISO(a.split(".").reverse().join("-"))
+      );
+
+    const prevDate = prevDates.length
+      ? typeof prevDates[0] === "string"
+  ? parseISO(prevDates[0].split(".").reverse().join("-"))
+  : prevDates[0]
+
+      : plantingDate;
+
+    const diag = getAccumulatedStats(diagnostics, prevDate, currentDate, aggregatedRain);
+
+    return {
+      Дата: format(currentDate, "dd.MM.yyyy"), // ✅ ОБОВʼЯЗКОВО
+      Препарат: allProducts,
+      Рекомендація: allLinks.length ? <>{allLinks}</> : "—",
+      backData: diag,
+    };
+  }
+);
+
+// 🔁 Сортування за датою
+integratedSystem.sort(
+  (a, b) =>
+    parseISO(a.Дата.split(".").reverse().join("-")) -
+    parseISO(b.Дата.split(".").reverse().join("-"))
+);
+
+  
+  const exportToExcel = () => {
+    const simplified = integratedSystem.map(
+      ({ Дата, Препарат, Рекомендація }) => ({
+        Дата,
+        Препарат,
+        Рекомендація:
+          typeof Рекомендація === "string"
+            ? Рекомендація
+            : Рекомендація?.props?.href || "",
+      })
+    );
+    const ws = XLSX.utils.json_to_sheet(simplified);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Захист");
+    XLSX.writeFile(wb, "Інтегрована_система_захисту.xlsx");
+  };
+
   return (
     <div className="container">
-      <button className="restart-button" onClick={onRestart}>🔄 Почати спочатку</button>
+      <button className="restart-button" onClick={onRestart}>
+        🔄 Почати спочатку
+      </button>
       <h2>Крок 4: Результати</h2>
       <p>
-        Період розрахунку: <strong>{format(new Date(plantingDate), "dd.MM.yyyy")}</strong> — <strong>{format(new Date(harvestDate), "dd.MM.yyyy")}</strong>
+        Період розрахунку:{" "}
+        <strong>{format(new Date(result.plantingDate), "dd.MM.yyyy")}</strong> —{" "}
+        <strong>{format(new Date(result.harvestDate), "dd.MM.yyyy")}</strong>
       </p>
-      <p className="description">Нижче показано рекомендовані дати обробки. Ви можете сформувати інтегровану систему захисту.</p>
+      <p className="description">
+        Нижче показано рекомендовані дати обробки. Ви можете сформувати
+        інтегровану систему захисту.
+      </p>
 
-      <button className="toggle-button" onClick={() => setShowIntegrated(!showIntegrated)}>
-        {showIntegrated ? "🔽 Сховати інтегровану систему" : "🍅 Сформувати інтегровану систему захисту"}
+      <button
+        className="toggle-button"
+        onClick={() => setShowIntegrated(!showIntegrated)}
+      >
+        {showIntegrated
+          ? "🔽 Сховати інтегровану систему"
+          : "🍅 Сформувати інтегровану систему захисту"}
       </button>
 
-      <CardView
-        title="Рекомендовані внесення (проти фітофторозу)"
-        entries={sprayData}
-        weatherDaily={weatherDaily}
-        rainDaily={rainDaily}
-        plantingDate={plantingDate}
-      />
+      {showIntegrated ? (
+        <>
+          <CardView
+  title="Інтегрована система захисту"
+  entries={integratedSystem}
+  diagnostics={diagnostics}
+  plantingDate={plantingDate}
+  rainDaily={aggregatedRain}
+/>
 
-      <button className="restart-button" onClick={onRestart}>🔄 Почати спочатку</button>
+          <button onClick={exportToExcel} className="toggle-button">
+            ⬇️ Експорт в Excel
+          </button>
+        </>
+      ) : (
+        <>
+          <CardView
+  title="Рекомендовані внесення (проти фітофторозу)"
+  entries={sprayData}
+  diagnostics={diagnostics}
+  plantingDate={plantingDate}
+  rainDaily={aggregatedRain}
+/>
+
+          {diseaseCardsGrouped?.map(({ name, entries }) => (
+            <CardView
+  key={name}
+  title={`Рекомендовані внесення (проти: ${name})`}
+  entries={entries}
+  diagnostics={diagnostics}
+  plantingDate={plantingDate}
+  rainDaily={aggregatedRain}
+/>
+
+          ))}
+        </>
+      )}
+
+      <button className="restart-button" onClick={onRestart}>
+        🔄 Почати спочатку
+      </button>
     </div>
   );
 }
+
