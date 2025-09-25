@@ -318,6 +318,12 @@ const {
   plantingDate,
   harvestDate,
 } = result;
+// ✅ ВСТАВКА ЛОГІВ ДЛЯ ПЕРЕВІРКИ ДАНИХ
+  console.log("🔬 Перевірка diagnostics:");
+  console.table(diagnostics.slice(0, 10));
+
+  console.log("🔬 Перевірка rainDaily:");
+  console.table(rainDaily.slice(0, 10));
 
 const aggregatedRain = rainDaily;
 
