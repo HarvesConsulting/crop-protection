@@ -177,8 +177,13 @@ export function getAccumulatedStats(
   console.log("⏳ Враховано годин:", condEntries.length);
 
   const rainSum = rainEntries.reduce((sum, entry) => {
-    const value = Number(entry.rain ?? entry.precip ?? entry.opad);
-    return sum + (isNaN(value) ? 0 : value);
+    let value = Number(entry.rain ?? entry.precip ?? entry.opad);
+
+// 🛡️ Захист від NaN, null, "", і негативних значень
+if (!isFinite(value) || value < 0) value = 0;
+
+return sum + value;
+
   }, 0);
 
   const hoursSum = condEntries.reduce((sum, entry) => {
