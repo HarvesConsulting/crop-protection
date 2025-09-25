@@ -137,6 +137,17 @@ function getAccumulatedStats(diagnostics = [], prevDate, currentDate, rainDaily 
     typeof prevDate === "string"
       ? parseISO(prevDate.split(".").reverse().join("-"))
       : prevDate;
+console.log("🔎 getAccumulatedStats - START to END:", start, "➡️", end);
+
+console.log("🧪 Diagnostics приклад:");
+diagnostics.slice(0, 3).forEach((entry, i) => {
+  console.log(`  #${i + 1}:`, entry.date, "condHours:", entry.condHours);
+});
+
+console.log("🌧 RainDaily приклад:");
+rainDaily.slice(0, 3).forEach((entry, i) => {
+  console.log(`  #${i + 1}:`, entry.date, "rain:", entry.rain ?? entry.precip ?? entry.opad);
+});
 
   const end =
     typeof currentDate === "string"
