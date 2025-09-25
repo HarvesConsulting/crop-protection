@@ -147,11 +147,8 @@ export function getAccumulatedStats(
   currentDate,
   rainDaily = []
 ) {
-  // 📅 Обробка вхідних дат
-  const start =
-    typeof prevDate === "string" ? parseDotDate(prevDate) : prevDate;
-  const end =
-    typeof currentDate === "string" ? parseDotDate(currentDate) : currentDate;
+  const start = typeof prevDate === "string" ? new Date(prevDate) : prevDate;
+  const end = typeof currentDate === "string" ? new Date(currentDate) : currentDate;
 
   console.log("🔍 getAccumulatedStats()");
   console.log("⏱️ prevDate:", prevDate, "→", start);
@@ -162,28 +159,24 @@ export function getAccumulatedStats(
     return { rain: 0, condHours: 0 };
   }
 
-  // 🌧️ Фільтрація опадів по діапазону
   const rainEntries = rainDaily.filter((entry) => {
-    const date = parseDotDate(entry.date);
-    return date && date >= start && date <= end;
+    const date = new Date(entry.date);
+    return !isNaN(date) && date >= start && date <= end;
   });
 
-  // ⏳ Фільтрація сприятливих годин по діапазону
   const condEntries = diagnostics.filter((entry) => {
-    const date = parseDotDate(entry.date);
-    return date && date >= start && date <= end;
+    const date = new Date(entry.date);
+    return !isNaN(date) && date >= start && date <= end;
   });
 
   console.log("🌧️ Враховано опадів:", rainEntries.length);
   console.log("⏳ Враховано годин:", condEntries.length);
 
-  // 📊 Сума опадів
   const rainSum = rainEntries.reduce((sum, entry) => {
     const value = Number(entry.rain ?? entry.precip ?? entry.opad);
     return sum + (isNaN(value) ? 0 : value);
   }, 0);
 
-  // ⏱️ Сума сприятливих годин
   const hoursSum = condEntries.reduce((sum, entry) => {
     const h = Number(entry.condHours ?? entry.cond_hours ?? entry.hours);
     return sum + (isNaN(h) ? 0 : h);
