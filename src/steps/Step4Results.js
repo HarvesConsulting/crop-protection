@@ -264,24 +264,24 @@ function aggregateDailyRain(hourlyData = []) {
   const dailyMap = {};
 
   hourlyData.forEach((entry) => {
-    const date = entry.date;
-    const rainValue = Number(entry.rain ?? entry.precip ?? entry.opad); // додай всі можливі
+    const rawDate = new Date(entry.date);
+    const dayStr = format(rawDate, "yyyy-MM-dd"); // ✅ нормалізуємо дату до ISO-рядка
+    const rainValue = Number(entry.rain ?? entry.precip ?? entry.opad);
 
-    if (!date || isNaN(rainValue)) return;
+    if (!dayStr || isNaN(rainValue)) return;
 
-    if (!dailyMap[date]) {
-      dailyMap[date] = 0;
+    if (!dailyMap[dayStr]) {
+      dailyMap[dayStr] = 0;
     }
 
-    dailyMap[date] += rainValue;
+    dailyMap[dayStr] += rainValue;
   });
 
   return Object.entries(dailyMap).map(([date, totalRain]) => ({
-    date,
+    date,           // ← уже у форматі "2025-09-03"
     rain: totalRain,
   }));
 }
-
 
 export default function Step4Results({ result, onRestart }) {
   const [showIntegrated, setShowIntegrated] = useState(false);
@@ -297,9 +297,7 @@ const {
   harvestDate,
 } = result;
 
-const aggregatedRain = rainDaily;
-
-
+const aggregatedRain = aggregateDailyRain(result.weatherDaily || []);
 
   const sprayData = sprayDates.map((d, i) => {
     const cur = parseISO(d.split(".").reverse().join("-"));
