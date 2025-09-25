@@ -463,9 +463,10 @@ const aggregatedRain = rainDaily;
 // 🔁 Сортування за датою
 integratedSystem.sort(
   (a, b) =>
-    parseISO(a.Дата.split(".").reverse().join("-")) -
-    parseISO(b.Дата.split(".").reverse().join("-"))
+    (a.Дата instanceof Date ? a.Дата : parseISO(a.Дата.split(".").reverse().join("-"))) -
+    (b.Дата instanceof Date ? b.Дата : parseISO(b.Дата.split(".").reverse().join("-")))
 );
+
 
   
   const exportToExcel = () => {
