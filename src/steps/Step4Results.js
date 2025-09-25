@@ -141,7 +141,9 @@ console.log("🔎 getAccumulatedStats - START to END:", start, "➡️", end);
 
 console.log("🧪 Diagnostics приклад:");
 diagnostics.slice(0, 3).forEach((entry, i) => {
-  console.log(`  #${i + 1}:`, entry.date, "condHours:", entry.condHours);
+  const rainVal = entry?.rain ?? entry?.precip ?? entry?.opad ?? 0;
+console.log(`#${i + 1}:`, entry?.date, "rain:", rainVal);
+
 });
 
 console.log("🌧 RainDaily приклад:");
@@ -161,30 +163,27 @@ rainDaily.slice(0, 3).forEach((entry, i) => {
 
   // 🔵 Опади — акумуляція за період
   const rainSum = rainDaily
-    .filter((entry) => {
-      const date = new Date(entry.date);
-      return date >= start && date <= end;
-    })
-    .reduce((sum, entry) => {
-      const value = Number(entry.rain ?? entry.precip);
-      return sum + (isNaN(value) ? 0 : value);
-    }, 0);
+  .filter((entry) => {
+    const date = new Date(entry.date);
+    return date >= start && date <= end;
+  })
+  .reduce((sum, entry) => {
+    const val = Number(entry?.rain ?? entry?.precip ?? entry?.opad ?? 0);
+    return sum + (isNaN(val) ? 0 : val);
+  }, 0);
+
 
   // 🟢 Сприятливі години
   const hoursSum = diagnostics
-    .filter((entry) => {
-      const date = new Date(entry.date);
-      return date >= start && date <= end;
-    })
-    .reduce((sum, entry) => {
-      const h = Number(entry.condHours);
-      return sum + (isNaN(h) ? 0 : h);
-    }, 0);
+  .filter((entry) => {
+    const date = new Date(entry.date);
+    return date >= start && date <= end;
+  })
+  .reduce((sum, entry) => {
+    const h = Number(entry?.condHours ?? 0);
+    return sum + (isNaN(h) ? 0 : h);
+  }, 0);
 
-  return {
-    rain: rainSum,
-    condHours: hoursSum,
-  };
 }
 
 
