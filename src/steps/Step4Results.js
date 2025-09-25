@@ -145,21 +145,29 @@ function getAccumulatedStats(diagnostics = [], prevDate, currentDate, rainDaily 
 
   // 🟡 Перевірка валідності дат
   if (!start || !end || isNaN(start) || isNaN(end)) {
+    console.warn("⛔ Некоректні дати у getAccumulatedStats", { start, end });
     return { rain: 0, condHours: 0 };
   }
+
+  // 🧪 ДІАГНОСТИЧНИЙ ЛОГ
+  console.log("📊 ПЕРЕВІРКА getAccumulatedStats", {
+    start: start.toISOString(),
+    end: end.toISOString(),
+    rainDailySample: rainDaily.slice(0, 5),
+  });
 
   // 🔵 Опади — акумуляція за період
   const rainSum = rainDaily
     .filter((entry) => {
-      const date = new Date(entry.date);
-      return date >= start && date <= end;
+      const date = parseISO(entry.date); // ISO рядок
+      return isValid(date) && date >= start && date <= end;
     })
     .reduce((sum, entry) => {
       const value = Number(entry.rain ?? entry.precip);
       return sum + (isNaN(value) ? 0 : value);
     }, 0);
 
-  // 🟢 Сприятливі години
+  // 🟢 Сприятливі години — акумуляція за період
   const hoursSum = diagnostics
     .filter((entry) => {
       const date = new Date(entry.date);
@@ -175,7 +183,6 @@ function getAccumulatedStats(diagnostics = [], prevDate, currentDate, rainDaily 
     condHours: hoursSum,
   };
 }
-
 
 function Card({ frontData, backData }) {
   const [flipped, setFlipped] = useState(false);
