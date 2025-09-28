@@ -13,11 +13,12 @@ export default function LoginPage({ onLogin }) {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  // Слайд-шоу фону
   const images = [
     "/images/bg1.png",
     "/images/bg2.png",
     "/images/bg3.png",
-    "/images/bg4.png",
+    "/images/bg4.png"
   ];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -50,15 +51,8 @@ export default function LoginPage({ onLogin }) {
   };
 
   return (
-    <div style={wrapperStyle}>
-      <div
-        style={{
-          ...backgroundStyle,
-          backgroundImage: `url(${images[currentImageIndex]})`,
-        }}
-      />
-      <div style={overlayStyle} />
-
+    <div style={{ ...backgroundStyle, backgroundImage: `url(${images[currentImageIndex]})` }}>
+      <div style={overlayStyle}></div>
       <div style={containerStyle}>
         <div style={cardStyle}>
           <h2 style={{ textAlign: "center", marginBottom: 20 }}>
@@ -67,9 +61,6 @@ export default function LoginPage({ onLogin }) {
 
           <input
             type="email"
-            inputMode="email"
-            autoComplete="email"
-            autoCapitalize="none"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -79,9 +70,6 @@ export default function LoginPage({ onLogin }) {
           <div style={{ position: "relative", marginBottom: "14px" }}>
             <input
               type={showPassword ? "text" : "password"}
-              inputMode="text"
-              autoComplete="current-password"
-              autoCapitalize="none"
               placeholder="Пароль"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -121,13 +109,7 @@ export default function LoginPage({ onLogin }) {
   );
 }
 
-// 🔽 Стилі
-
-const wrapperStyle = {
-  position: "relative",
-  height: "100vh",
-  overflow: "hidden",
-};
+// --- Стилі
 
 const backgroundStyle = {
   position: "fixed",
@@ -155,7 +137,7 @@ const containerStyle = {
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  height: "100%",
+  height: "100vh",
   padding: "20px",
 };
 
