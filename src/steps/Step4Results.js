@@ -442,6 +442,13 @@ const aggregatedRain = rainDaily;
     acc[key].push(entry);
     return acc;
   }, {});
+// 🔁 зберігатимемо останню дату обробки для кожної хвороби
+let lastDatesByDisease = {
+  "Фітофтороз": plantingDate,
+  "Альтернаріоз": plantingDate,
+  "Сіра гниль": plantingDate,
+  "Бактеріоз": plantingDate,
+};
 
   const integratedSystem = Object.entries(groupedByDate)
   .sort(([dateA], [dateB]) => {
@@ -452,27 +459,42 @@ const aggregatedRain = rainDaily;
   .map(([date, entries]) => {
     const currentDate = parseISO(date.split(".").reverse().join("-"));
 
-    // 🔁 Обчислюємо погодні умови по кожній окремій обробці (entry)
-    const entryStats = entries.map((entry, i) => {
-      const prev =
-        i === 0
-          ? plantingDate
-          : parseISO(entries[i - 1].Дата.split(".").reverse().join("-"));
+    // 🔁 сюди зберемо backData по кожній хворобі
+    const perDiseaseBackData = [];
 
-      const stat = getAccumulatedStats(
-        diagnostics,
-        prev,
-        currentDate,
-        aggregatedRain
-      );
+    for (const entry of entries) {
+      let disease = null;
 
-      return stat;
-    });
+      // визначаємо хворобу по препарату
+      if (rotationProducts.some((p) => entry.Препарат.includes(p))) {
+        disease = "Фітофтороз";
+      } else if (rotationAlternaria.some((p) => entry.Препарат.includes(p))) {
+        disease = "Альтернаріоз";
+      } else if (rotationBacteriosis.some((p) => entry.Препарат.includes(p))) {
+        disease = "Бактеріоз";
+      }
 
-    // 📈 Вибираємо максимум по condHours
-    const maxBackData =
-      entryStats.length > 0
-        ? entryStats.reduce((max, cur) =>
+      if (disease) {
+        const prev = lastDatesByDisease[disease] || plantingDate;
+
+        const bd = getAccumulatedStats(
+          diagnostics,
+          prev,
+          currentDate,
+          aggregatedRain
+        );
+
+        perDiseaseBackData.push({ disease, ...bd });
+
+        // 🔁 оновлюємо останню дату для цієї хвороби
+        lastDatesByDisease[disease] = currentDate;
+      }
+    }
+
+    // 📈 беремо backData з найбільшим condHours
+    const worst =
+      perDiseaseBackData.length > 0
+        ? perDiseaseBackData.reduce((max, cur) =>
             cur.condHours > max.condHours ? cur : max
           )
         : { condHours: 0, rain: 0 };
@@ -498,7 +520,7 @@ const aggregatedRain = rainDaily;
         .filter(Boolean)
         .join(", "),
       Інтервал: "—",
-      backData: maxBackData, // 💥 ось ключова зміна
+      backData: worst, // 💥 саме це значення впливає на колір
     };
   });
 
