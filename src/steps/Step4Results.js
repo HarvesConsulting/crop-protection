@@ -443,48 +443,64 @@ const aggregatedRain = rainDaily;
     return acc;
   }, {});
 
-  const integratedSystem = Object.entries(groupedByDate).map(
-  ([date, entries]) => {
-    const allProducts = entries.map((e) => e.Препарат).join(", ");
-    const allLinks = entries
-      .map((e) => {
-        if (typeof e.Рекомендація === "string") return null;
-        const href = e.Рекомендація?.props?.href;
-        return href ? (
-          <div key={href}>
-            <a href={href} target="_blank" rel="noreferrer">
-              {href}
-            </a>
-          </div>
-        ) : null;
-      })
-      .filter(Boolean);
-
+  const integratedSystem = Object.entries(groupedByDate)
+  .sort(([dateA], [dateB]) => {
+    const dA = parseISO(dateA.split(".").reverse().join("-"));
+    const dB = parseISO(dateB.split(".").reverse().join("-"));
+    return dA - dB;
+  })
+  .map(([date, entries]) => {
     const currentDate = parseISO(date.split(".").reverse().join("-"));
 
-    const prevDates = Object.keys(groupedByDate)
-      .filter((d) => parseISO(d.split(".").reverse().join("-")) < currentDate)
-      .sort((a, b) =>
-        parseISO(b.split(".").reverse().join("-")) - parseISO(a.split(".").reverse().join("-"))
+    // 🔁 Обчислюємо погодні умови по кожній окремій обробці (entry)
+    const entryStats = entries.map((entry, i) => {
+      const prev =
+        i === 0
+          ? plantingDate
+          : parseISO(entries[i - 1].Дата.split(".").reverse().join("-"));
+
+      const stat = getAccumulatedStats(
+        diagnostics,
+        prev,
+        currentDate,
+        aggregatedRain
       );
 
-    const prevDate = prevDates.length
-      ? typeof prevDates[0] === "string"
-  ? parseISO(prevDates[0].split(".").reverse().join("-"))
-  : prevDates[0]
+      return stat;
+    });
 
-      : plantingDate;
-
-    const diag = getAccumulatedStats(diagnostics, prevDate, currentDate, aggregatedRain);
+    // 📈 Вибираємо максимум по condHours
+    const maxBackData =
+      entryStats.length > 0
+        ? entryStats.reduce((max, cur) =>
+            cur.condHours > max.condHours ? cur : max
+          )
+        : { condHours: 0, rain: 0 };
 
     return {
       Дата: format(currentDate, "dd.MM.yyyy"),
-      Препарат: allProducts,
-      Рекомендація: allLinks.length ? <>{allLinks}</> : "—",
-      backData: diag,
+      Препарат: entries.map((e) => e.Препарат).join(", "),
+      Рекомендація: entries
+        .map((e) => {
+          if (typeof e.Рекомендація === "string") return null;
+          const href = e.Рекомендація?.props?.href;
+          return href ? (
+            <div key={href}>
+              <a href={href} target="_blank" rel="noreferrer">
+                {href}
+              </a>
+            </div>
+          ) : null;
+        })
+        .filter(Boolean),
+      "Рекомендовані години": entries
+        .map((e) => e["Рекомендовані години"])
+        .filter(Boolean)
+        .join(", "),
+      Інтервал: "—",
+      backData: maxBackData, // 💥 ось ключова зміна
     };
-  }
-);
+  });
 
 // 🔁 Сортування за датою
 integratedSystem.sort(
