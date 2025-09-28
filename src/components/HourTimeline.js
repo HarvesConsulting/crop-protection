@@ -19,17 +19,16 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
 
           return (
             <div
-  key={hour}
-  className={`hour-segment ${isSuitable ? "suitable" : "not-suitable"}`}
-  onClick={(e) => {
-    e.stopPropagation(); // 🛑 зупиняємо "перевертання" картки
-    setSelectedHour(hourData);
-  }}
-  title={`Натисніть для деталей (${hour}:00)`}
->
-  {hour}
-</div>
-
+              key={hour}
+              className={`hour-segment ${isSuitable ? "suitable" : "not-suitable"}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedHour(hourData || { hour, notFound: true });
+              }}
+              title={`Натисніть для деталей (${hour}:00)`}
+            >
+              {hour}
+            </div>
           );
         })}
       </div>
@@ -37,9 +36,16 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
       {selectedHour && (
         <div className="hour-details">
           <strong>{selectedHour.hour}:00</strong><br />
-          🌡 Температура: {selectedHour.temperature}°C <br />
-          💨 Вітер: {selectedHour.windspeed} м/с <br />
-          🌧 Опади: {selectedHour.precipitation ?? 0} мм
+          {selectedHour.notFound ? (
+            <span>📭 Немає даних для цієї години</span>
+          ) : (
+            <>
+              🌡 Температура: {selectedHour.temperature}°C <br />
+              💨 Вітер: {selectedHour.windspeed} м/с <br />
+              🌧 Опади: {selectedHour.precipitation ?? 0} мм <br />
+              <pre>{JSON.stringify(selectedHour, null, 2)}</pre> {/* тимчасово для перевірки */}
+            </>
+          )}
         </div>
       )}
     </div>
