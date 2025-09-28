@@ -500,28 +500,24 @@ let lastDatesByDisease = {
         : { condHours: 0, rain: 0 };
 
     return {
-      Дата: format(currentDate, "dd.MM.yyyy"),
-      Препарат: entries.map((e) => e.Препарат).join(", "),
-      Рекомендація: entries
-        .map((e) => {
-          if (typeof e.Рекомендація === "string") return null;
-          const href = e.Рекомендація?.props?.href;
-          return href ? (
-            <div key={href}>
-              <a href={href} target="_blank" rel="noreferrer">
-                {href}
-              </a>
-            </div>
-          ) : null;
-        })
-        .filter(Boolean),
-      "Рекомендовані години": entries
-        .map((e) => e["Рекомендовані години"])
-        .filter(Boolean)
-        .join(", "),
-      Інтервал: "—",
-      backData: worst, // 💥 саме це значення впливає на колір
-    };
+  Дата: format(currentDate, "dd.MM.yyyy"),
+  Препарат: entries.map((e) => e.Препарат).join(", "),
+  Рекомендація: entries
+    .map((e) => {
+      if (typeof e.Рекомендація === "string") return null;
+      const href = e.Рекомендація?.props?.href;
+      return href ? (
+        <div key={href}>
+          <a href={href} target="_blank" rel="noreferrer">
+            {href}
+          </a>
+        </div>
+      ) : null;
+    })
+    .filter(Boolean),
+  backData: worst, // 🎯 тут тільки backData, без інтервалу чи рекоменд. годин
+};
+
   });
 
 // 🔁 Сортування за датою
