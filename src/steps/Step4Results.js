@@ -480,13 +480,10 @@ integratedSystem.sort(
   
   const exportToExcel = () => {
     const simplified = integratedSystem.map(
-      ({ Дата, Препарат, Рекомендація }) => ({
+      ({ Дата, Препарат }) => ({
         Дата,
         Препарат,
-        Рекомендація:
-          typeof Рекомендація === "string"
-            ? Рекомендація
-            : Рекомендація?.props?.href || "",
+       
       })
     );
     const ws = XLSX.utils.json_to_sheet(simplified);
