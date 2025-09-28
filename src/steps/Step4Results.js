@@ -205,13 +205,19 @@ return sum + value;
 function Card({ frontData, backData }) {
   const [flipped, setFlipped] = useState(false);
 
+  const getCardClass = () => {
+    const hours = backData?.condHours ?? 0;
+    if (hours <= 10) return "card-green";
+    if (hours <= 20) return "card-yellow";
+    return "card-red";
+  };
+
   return (
     <div
-      className={`flip-card ${flipped ? "flipped" : ""}`}
+      className={`flip-card ${getCardClass()} ${flipped ? "flipped" : ""}`}
       onClick={() => setFlipped(!flipped)}
     >
       <div className="flip-card-inner">
-        {/* Передня сторона */}
         <div className="flip-card-front">
           <div className="card-index">{frontData.index}</div>
           {Object.entries(frontData.fields).map(([key, value]) => (
@@ -219,17 +225,15 @@ function Card({ frontData, backData }) {
               <strong>{key}:</strong>{" "}
               {key === "Рекомендація" ? (
                 <InfoToggle content={value} />
+              ) : typeof value === "object" && value !== null ? (
+                JSON.stringify(value)
               ) : (
-                typeof value === "object" && value !== null
-  ? JSON.stringify(value)
-  : value
-
+                value
               )}
             </div>
           ))}
         </div>
 
-        {/* Задня сторона */}
         <div className="flip-card-back">
           <h4>Погодні умови</h4>
           <p>
@@ -498,6 +502,22 @@ integratedSystem.sort(
         🔄 Почати спочатку
       </button>
       <h2>Крок 4: Результати</h2>
+      <div className="info-box">
+  <button
+    className="info-button"
+    title="Що означають кольори?"
+    onClick={() =>
+      alert(
+        "🟢 Зелений — помірний ризик захворювання (до 10 годин)\n" +
+        "🟡 Жовтий — середній ризик (11–20 годин)\n" +
+        "🔴 Червоний — високий ризик (понад 20 годин)"
+      )
+    }
+  >
+    ℹ️ Інформація про кольори карток
+  </button>
+</div>
+
       <p>
         Період розрахунку:{" "}
         <strong>{format(new Date(result.plantingDate), "dd.MM.yyyy")}</strong> —{" "}
