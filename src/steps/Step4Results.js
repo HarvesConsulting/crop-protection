@@ -281,12 +281,12 @@ function CardView({ title, entries, diagnostics = [], plantingDate, rainDaily = 
             ? entries[i - 1].Дата
             : parseISO(entries[i - 1].Дата.split(".").reverse().join("-"));
 
-        const backDataResult = getAccumulatedStats(
-          diagnostics,
-          prevDate,
-          currentDate,
-          rainDaily
-        );
+        const backDataResult = item.backData ?? getAccumulatedStats(
+  diagnostics,
+  prevDate,
+  currentDate,
+  rainDaily
+);
 
         // ✂️ Вирізаємо backData з item перед передачею у frontData
         const { backData, ...frontFields } = item;
