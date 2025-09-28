@@ -12,21 +12,18 @@ export default function LoginPage({ onLogin }) {
   const [isRegistering, setIsRegistering] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
-  // 👉 Слайдшоу
   const images = [
     "/images/bg1.png",
     "/images/bg2.png",
     "/images/bg3.png",
-    "/images/bg4.png"
+    "/images/bg4.png",
   ];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % images.length);
-    }, 5000); // Зміна кожні 5 секунд
-
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -34,7 +31,6 @@ export default function LoginPage({ onLogin }) {
     try {
       setError("");
       let userCredential;
-
       if (isRegistering) {
         userCredential = await createUserWithEmailAndPassword(auth, email, password);
         await setDoc(doc(db, "users", userCredential.user.uid), {
@@ -44,7 +40,6 @@ export default function LoginPage({ onLogin }) {
       } else {
         userCredential = await signInWithEmailAndPassword(auth, email, password);
       }
-
       onLogin(userCredential.user);
     } catch (err) {
       setError(err.message);
@@ -52,20 +47,19 @@ export default function LoginPage({ onLogin }) {
   };
 
   return (
-    <div
-      style={{
-        ...backgroundStyle,
-        backgroundImage: `url(${images[currentImageIndex]})`
-      }}
-    >
-      <div style={overlayStyle}></div>
-
+    <div style={wrapperStyle}>
+      <div
+        style={{
+          ...backgroundStyle,
+          backgroundImage: `url(${images[currentImageIndex]})`,
+        }}
+      />
+      <div style={overlayStyle} />
       <div style={containerStyle}>
         <div style={cardStyle}>
           <h2 style={{ textAlign: "center", marginBottom: 20 }}>
             {isRegistering ? "Реєстрація" : "Вхід"}
           </h2>
-
           <input
             type="email"
             placeholder="Email"
@@ -73,7 +67,6 @@ export default function LoginPage({ onLogin }) {
             onChange={(e) => setEmail(e.target.value)}
             style={inputStyle}
           />
-
           <div style={{ position: "relative", marginBottom: "14px" }}>
             <input
               type={showPassword ? "text" : "password"}
@@ -90,15 +83,14 @@ export default function LoginPage({ onLogin }) {
               {showPassword ? "🙈" : "👁️"}
             </span>
           </div>
-
           <button onClick={handleAuth} style={buttonStyle}>
             {isRegistering ? "Зареєструватись" : "Увійти"}
           </button>
-
           <p onClick={() => setIsRegistering(!isRegistering)} style={toggleStyle}>
-            {isRegistering ? "У вас вже є акаунт? Увійти" : "Немає акаунта? Зареєструйтесь"}
+            {isRegistering
+              ? "У вас вже є акаунт? Увійти"
+              : "Немає акаунта? Зареєструйтесь"}
           </p>
-
           {error && (
             <p style={{ color: "red", marginTop: 10, textAlign: "center" }}>
               ⚠ {error}
@@ -110,35 +102,43 @@ export default function LoginPage({ onLogin }) {
   );
 }
 
-// 🔽 Стилі
+// 🧱 СТИЛІ
+const wrapperStyle = {
+  position: "relative",
+  width: "100%",
+  height: "100vh",
+  overflow: "hidden",
+};
 
 const backgroundStyle = {
-  position: "fixed",
+  position: "absolute",
   top: 0,
   left: 0,
-  width: "100vw",
-  height: "100vh",
+  width: "100%",
+  height: "100%",
   backgroundSize: "cover",
   backgroundPosition: "center",
   transition: "background-image 1s ease-in-out",
-  zIndex: -2,
+  zIndex: 0,
 };
 
 const overlayStyle = {
-  position: "fixed",
+  position: "absolute",
   top: 0,
   left: 0,
-  width: "100vw",
-  height: "100vh",
+  width: "100%",
+  height: "100%",
   backgroundColor: "rgba(0, 0, 0, 0.4)",
-  zIndex: -1,
+  zIndex: 1,
 };
 
 const containerStyle = {
+  position: "relative",
+  zIndex: 2,
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  height: "100vh",
+  height: "100%",
   padding: "20px",
 };
 
@@ -146,7 +146,7 @@ const cardStyle = {
   background: "#fff",
   padding: "30px",
   borderRadius: "10px",
-  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
   width: "100%",
   maxWidth: "400px",
 };
@@ -188,5 +188,6 @@ const eyeIconStyle = {
   cursor: "pointer",
   fontSize: 20,
   userSelect: "none",
+  lineHeight: 1,
   color: "#444",
 };
