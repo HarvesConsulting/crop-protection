@@ -2,7 +2,7 @@ import { format, parseISO, differenceInDays, isValid } from "date-fns";
 import React, { useState } from "react";
 import "./Step4Results.css";
 import * as XLSX from "xlsx";
-import HourTimeline from "./components/HourTimeline"; // шлях коригуй під себе
+import HourTimeline from "../components/HourTimeline";
 
 const productInfo = {
   "Зорвек Інкантія": "0,5л/га",
