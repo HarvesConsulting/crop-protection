@@ -351,33 +351,38 @@ const aggregatedRain = rainDaily;
 
 
   const sprayData = sprayDates.map((d, i) => {
-    const cur = parseISO(d.split(".").reverse().join("-"));
-    const prev =
-      i > 0
-        ? parseISO(sprayDates[i - 1].split(".").reverse().join("-"))
-        : null;
-    const gap = prev
-      ? `${differenceInDays(cur, prev)} діб після попередньої`
-      : "—";
-    const product = rotationProducts[i % rotationProducts.length];
-    const recommendedHours = suitableHours[d] || [];
+  const cur = parseISO(d.split(".").reverse().join("-"));
+  const prev =
+    i > 0
+      ? parseISO(sprayDates[i - 1].split(".").reverse().join("-"))
+      : plantingDate;
 
-    return {
-      Дата: d,
-      Препарат: `${product} (${productInfo[product] || "—"})`,
-      Рекомендація: productLinks[product] ? (
-        <a href={productLinks[product]} target="_blank" rel="noreferrer">
-          Перейти
-        </a>
-      ) : (
-        "—"
-      ),
-      Інтервал: gap,
-      "Рекомендовані години": recommendedHours.length
-        ? recommendedHours.join(", ")
-        : "—",
-    };
-  });
+  const gap = prev
+    ? `${differenceInDays(cur, prev)} діб після попередньої`
+    : "—";
+
+  const product = rotationProducts[i % rotationProducts.length];
+  const recommendedHours = suitableHours[d] || [];
+
+  const backData = getAccumulatedStats(diagnostics, prev, cur, aggregatedRain);
+
+  return {
+    Дата: d,
+    Препарат: `${product} (${productInfo[product] || "—"})`,
+    Рекомендація: productLinks[product] ? (
+      <a href={productLinks[product]} target="_blank" rel="noreferrer">
+        Перейти
+      </a>
+    ) : (
+      "—"
+    ),
+    Інтервал: gap,
+    "Рекомендовані години": recommendedHours.length
+      ? recommendedHours.join(", ")
+      : "—",
+    backData, // 🔥 Ось що ми додаємо
+  };
+});
 
   const diseaseCardsGrouped = diseaseSummary?.map(({ name, riskDates }) => {
     const rotation = {
@@ -388,32 +393,40 @@ const aggregatedRain = rainDaily;
 
     const treatments = getAdvancedTreatments(riskDates);
     const entries = treatments.map((item, i) => {
-      const product = rotation[i % rotation.length];
-      const dateStr = format(item.date, "dd.MM.yyyy");
-      const recommendedHours = suitableHours[dateStr] || [];
+  const product = rotation[i % rotation.length];
+  const dateStr = format(item.date, "dd.MM.yyyy");
+  const recommendedHours = suitableHours[dateStr] || [];
 
-      return {
-        Дата: dateStr,
-        Препарат: `${product} (${productInfo[product] || "—"})`,
-        Рекомендація: productLinks[product] ? (
-          <a href={productLinks[product]} target="_blank" rel="noreferrer">
-            Перейти
-          </a>
-        ) : (
-          "—"
-        ),
-        Інтервал:
-          i === 0
-            ? "—"
-            : `${differenceInDays(
-                item.date,
-                treatments[i - 1].date
-              )} діб після попередньої`,
-        "Рекомендовані години": recommendedHours.length
-          ? recommendedHours.join(", ")
-          : "—",
-      };
-    });
+  const prevDate =
+    i === 0 ? plantingDate : treatments[i - 1].date;
+
+  const backData = getAccumulatedStats(
+    diagnostics,
+    prevDate,
+    item.date,
+    aggregatedRain
+  );
+
+  return {
+    Дата: dateStr,
+    Препарат: `${product} (${productInfo[product] || "—"})`,
+    Рекомендація: productLinks[product] ? (
+      <a href={productLinks[product]} target="_blank" rel="noreferrer">
+        Перейти
+      </a>
+    ) : (
+      "—"
+    ),
+    Інтервал:
+      i === 0
+        ? "—"
+        : `${differenceInDays(item.date, treatments[i - 1].date)} діб після попередньої`,
+    "Рекомендовані години": recommendedHours.length
+      ? recommendedHours.join(", ")
+      : "—",
+    backData, // ✅ додаємо підсумкові дані
+  };
+});
 
     return { name, entries };
   });
