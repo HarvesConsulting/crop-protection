@@ -153,33 +153,33 @@ h2 {
   font-size: 14px;
   margin: 4px 0;
 }
-/* 🟢 Зелена, 🟡 Жовта, 🔴 Червона картка — кольори ризику */
-.card-green .flip-card-inner {
-  border: 2px solid #28a745;
+/* 🟢 Зелена картка */
+.card-green .flip-card-front {
   background-color: #eafaf1;
+  border: 2px solid #28a745;
 }
 
-.card-yellow .flip-card-inner {
-  border: 2px solid #ffc107;
+.card-green .flip-card-back {
+  background-color: #28a745;
+}
+
+/* 🟡 Жовта картка */
+.card-yellow .flip-card-front {
   background-color: #fff9e6;
+  border: 2px solid #ffc107;
 }
 
-.card-red .flip-card-inner {
-  border: 2px solid #dc3545;
+.card-yellow .flip-card-back {
+  background-color: #ffc107;
+}
+
+/* 🔴 Червона картка */
+.card-red .flip-card-front {
   background-color: #fdecea;
+  border: 2px solid #dc3545;
 }
 
-/* ℹ️ Інформаційна кнопка */
-.info-box {
-  margin-bottom: 16px;
+.card-red .flip-card-back {
+  background-color: #dc3545;
 }
 
-.info-button {
-  background: none;
-  border: none;
-  color: #007bff;
-  font-size: 16px;
-  cursor: pointer;
-  padding: 4px 8px;
-  text-decoration: underline;
-}
