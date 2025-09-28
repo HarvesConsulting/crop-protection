@@ -2,6 +2,7 @@ import { format, parseISO, differenceInDays, isValid } from "date-fns";
 import React, { useState } from "react";
 import "./Step4Results.css";
 import * as XLSX from "xlsx";
+import HourTimeline from "./components/HourTimeline"; // шлях коригуй під себе
 
 const productInfo = {
   "Зорвек Інкантія": "0,5л/га",
@@ -221,17 +222,24 @@ function Card({ frontData, backData }) {
         <div className="flip-card-front">
           <div className="card-index">{frontData.index}</div>
           {Object.entries(frontData.fields).map(([key, value]) => (
-            <div key={key} className="card-row">
-              <strong>{key}:</strong>{" "}
-              {key === "Рекомендація" ? (
-                <InfoToggle content={value} />
-              ) : typeof value === "object" && value !== null ? (
-                JSON.stringify(value)
-              ) : (
-                value
-              )}
-            </div>
-          ))}
+  <div key={key} className="card-row">
+    <strong>{key}:</strong>{" "}
+    {key === "Рекомендація" ? (
+      <InfoToggle content={value} />
+    ) : key === "Рекомендовані години" ? (
+      <HourTimeline
+        date={frontData.fields["Дата"]}
+        suitableHours={(value || "").split(", ").map((h) => h.trim())}
+        hourlyData={frontData.hourlyData || []}
+      />
+    ) : typeof value === "object" && value !== null ? (
+      JSON.stringify(value)
+    ) : (
+      value
+    )}
+  </div>
+))}
+
         </div>
 
         <div className="flip-card-back">
@@ -249,7 +257,7 @@ function Card({ frontData, backData }) {
   );
 }
 
-function CardView({ title, entries, diagnostics = [], plantingDate, rainDaily = [] }) {
+function CardView({ title, entries, diagnostics = [], plantingDate, rainDaily = [], hourlyData = [] }) {
   return (
     <div className="card-section">
       <h3>{title}</h3>
@@ -293,10 +301,15 @@ function CardView({ title, entries, diagnostics = [], plantingDate, rainDaily = 
 
         return (
           <Card
-            key={i}
-            frontData={{ index: `#${i + 1}`, fields: frontFields }}
-            backData={backDataResult}
-          />
+  key={i}
+  frontData={{
+    index: `#${i + 1}`,
+    fields: frontFields,
+    hourlyData, // ✅ сюди передаємо повні метео-дані
+  }}
+  backData={backDataResult}
+/>
+
         );
       })}
     </div>
@@ -336,6 +349,7 @@ const {
   suitableHours = {},
   diagnostics = [],
   rainDaily = [],
+  hourlyData = [],
   plantingDate,
   harvestDate,
 } = result;
@@ -592,6 +606,7 @@ integratedSystem.sort(
   diagnostics={diagnostics}
   plantingDate={plantingDate}
   rainDaily={aggregatedRain}
+  hourlyData={hourlyData}
 />
 
           <button onClick={exportToExcel} className="toggle-button">
@@ -606,6 +621,7 @@ integratedSystem.sort(
   diagnostics={diagnostics}
   plantingDate={plantingDate}
   rainDaily={aggregatedRain}
+  hourlyData={hourlyData}
 />
 
           {diseaseCardsGrouped?.map(({ name, entries }) => (
@@ -616,6 +632,7 @@ integratedSystem.sort(
   diagnostics={diagnostics}
   plantingDate={plantingDate}
   rainDaily={aggregatedRain}
+  hourlyData={hourlyData}
 />
 
           ))}

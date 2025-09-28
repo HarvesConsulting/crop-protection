@@ -1,0 +1,36 @@
+.timeline-wrapper {
+  margin-top: 10px;
+}
+
+.timeline-bar {
+  display: flex;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.hour-segment {
+  flex: 1;
+  text-align: center;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 3px 0;
+  color: white;
+  user-select: none;
+}
+
+.suitable {
+  background-color: #4caf50;
+}
+
+.not-suitable {
+  background-color: #f44336;
+}
+
+.hour-details {
+  margin-top: 6px;
+  font-size: 14px;
+  background: #f3f3f3;
+  padding: 6px 8px;
+  border-radius: 4px;
+}
