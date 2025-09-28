@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { auth, db } from "../firebase";
 import {
   signInWithEmailAndPassword,
@@ -12,6 +12,21 @@ export default function LoginPage({ onLogin }) {
   const [isRegistering, setIsRegistering] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  const images = [
+    "/images/bg1.png",
+    "/images/bg2.png",
+    "/images/bg3.png",
+    "/images/bg4.png",
+  ];
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleAuth = async () => {
     try {
@@ -35,74 +50,112 @@ export default function LoginPage({ onLogin }) {
   };
 
   return (
-    <div style={containerStyle}>
-      <div style={cardStyle}>
-        <h2 style={{ textAlign: "center", marginBottom: 20 }}>
-          {isRegistering ? "Реєстрація" : "Вхід"}
-        </h2>
+    <div style={wrapperStyle}>
+      <div
+        style={{
+          ...backgroundStyle,
+          backgroundImage: `url(${images[currentImageIndex]})`,
+        }}
+      />
+      <div style={overlayStyle} />
 
-        <input
-          type="email"
-          inputMode="email"
-          autoComplete="email"
-          autoCapitalize="none"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={inputStyle}
-        />
+      <div style={containerStyle}>
+        <div style={cardStyle}>
+          <h2 style={{ textAlign: "center", marginBottom: 20 }}>
+            {isRegistering ? "Реєстрація" : "Вхід"}
+          </h2>
 
-        <div style={{ position: "relative", marginBottom: "14px" }}>
           <input
-            type={showPassword ? "text" : "password"}
-            inputMode="text"
-            autoComplete="current-password"
+            type="email"
+            inputMode="email"
+            autoComplete="email"
             autoCapitalize="none"
-            placeholder="Пароль"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={{
-              ...inputStyle,
-              paddingRight: 40,
-              marginBottom: 0,
-            }}
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={inputStyle}
           />
-          <span
-            onClick={() => setShowPassword(!showPassword)}
-            style={eyeIconStyle}
-            title={showPassword ? "Сховати пароль" : "Показати пароль"}
-          >
-            {showPassword ? "🙈" : "👁️"}
-          </span>
-        </div>
 
-        <button onClick={handleAuth} style={buttonStyle}>
-          {isRegistering ? "Зареєструватись" : "Увійти"}
-        </button>
+          <div style={{ position: "relative", marginBottom: "14px" }}>
+            <input
+              type={showPassword ? "text" : "password"}
+              inputMode="text"
+              autoComplete="current-password"
+              autoCapitalize="none"
+              placeholder="Пароль"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              style={{
+                ...inputStyle,
+                paddingRight: 40,
+                marginBottom: 0,
+              }}
+            />
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              style={eyeIconStyle}
+              title={showPassword ? "Сховати пароль" : "Показати пароль"}
+            >
+              {showPassword ? "🙈" : "👁️"}
+            </span>
+          </div>
 
-        <p onClick={() => setIsRegistering(!isRegistering)} style={toggleStyle}>
-          {isRegistering
-            ? "У вас вже є акаунт? Увійти"
-            : "Немає акаунта? Зареєструйтесь"}
-        </p>
+          <button onClick={handleAuth} style={buttonStyle}>
+            {isRegistering ? "Зареєструватись" : "Увійти"}
+          </button>
 
-        {error && (
-          <p style={{ color: "red", marginTop: 10, textAlign: "center" }}>
-            ⚠ {error}
+          <p onClick={() => setIsRegistering(!isRegistering)} style={toggleStyle}>
+            {isRegistering
+              ? "У вас вже є акаунт? Увійти"
+              : "Немає акаунта? Зареєструйтесь"}
           </p>
-        )}
+
+          {error && (
+            <p style={{ color: "red", marginTop: 10, textAlign: "center" }}>
+              ⚠ {error}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
 // 🔽 Стилі
+
+const wrapperStyle = {
+  position: "relative",
+  height: "100vh",
+  overflow: "hidden",
+};
+
+const backgroundStyle = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+  transition: "background-image 1s ease-in-out",
+  zIndex: -2,
+};
+
+const overlayStyle = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  backgroundColor: "rgba(0, 0, 0, 0.4)",
+  zIndex: -1,
+};
+
 const containerStyle = {
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  height: "100vh",
-  background: "#f0f4f8",
+  height: "100%",
   padding: "20px",
 };
 
@@ -152,6 +205,5 @@ const eyeIconStyle = {
   cursor: "pointer",
   fontSize: 20,
   userSelect: "none",
-  lineHeight: 1,
   color: "#444",
 };
