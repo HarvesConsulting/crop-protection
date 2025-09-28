@@ -4,13 +4,13 @@ import "./HourTimeline.css";
 export default function HourTimeline({ date, suitableHours = [], hourlyData = [] }) {
   const [selectedHour, setSelectedHour] = useState(null);
 
-  // ✅ Конвертуємо дату у формат yyyy-mm-dd
-  const formattedDate = new Date(date.split(".").reverse().join("-"))
-    .toISOString()
-    .slice(0, 10);
+  // ✅ Надійне перетворення дати у формат yyyy-MM-dd
+  const parsedDate = new Date(date.split(".").reverse().join("-"));
+  const formattedDate = parsedDate.toISOString().slice(0, 10);
 
-  // ✅ Фільтруємо по днях (годинні дані конвертуємо так само)
+  // ✅ Фільтруємо погодинні дані лише для цієї дати
   const hoursToday = hourlyData.filter((h) => {
+    if (!h?.date) return false;
     const hDate = new Date(h.date).toISOString().slice(0, 10);
     return hDate === formattedDate;
   });
@@ -19,12 +19,8 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
     <div className="timeline-wrapper">
       <div className="timeline-bar">
         {[...Array(24).keys()].map((hour) => {
-          // ✅ Перевірка годин
-          const isSuitable = suitableHours.includes(
-            hour.toString().padStart(2, "0") + ":00"
-          );
-
-          // ✅ Пошук даних для цієї години
+          const hourStr = hour.toString().padStart(2, "0") + ":00";
+          const isSuitable = suitableHours.includes(hourStr);
           const hourData = hoursToday.find((h) => Number(h.hour) === hour);
 
           return (
@@ -32,10 +28,8 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
               key={hour}
               className={`hour-segment ${isSuitable ? "suitable" : "not-suitable"}`}
               onClick={(e) => {
-                e.stopPropagation(); // 🛑 блокуємо перевертання картки
-                setSelectedHour(
-                  hourData || { hour, notFound: true } // якщо даних нема — маркер
-                );
+                e.stopPropagation();
+                setSelectedHour(hourData || { hour, notFound: true });
               }}
               title={`Натисніть для деталей (${hour}:00)`}
             >
@@ -56,7 +50,7 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
               🌡 Температура: {selectedHour.temperature}°C <br />
               💨 Вітер: {selectedHour.windspeed} м/с <br />
               🌧 Опади: {selectedHour.precipitation ?? 0} мм <br />
-              {/* Тимчасово показуємо весь об’єкт */}
+              {/* 🔧 Тимчасовий JSON для діагностики */}
               <pre>{JSON.stringify(selectedHour, null, 2)}</pre>
             </>
           )}
