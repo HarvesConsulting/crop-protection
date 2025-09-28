@@ -23,7 +23,7 @@ export default function LoginPage({ onLogin }) {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % images.length);
-    }, 5000);
+    }, 15000);
     return () => clearInterval(interval);
   }, []);
 
