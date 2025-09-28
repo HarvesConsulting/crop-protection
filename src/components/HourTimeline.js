@@ -19,17 +19,13 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
 
           return (
             <div
-  key={hour}
-  className={`hour-segment ${isSuitable ? "suitable" : "not-suitable"}`}
-  onClick={(e) => {
-    e.stopPropagation(); // 🛑 зупиняємо "перевертання" картки
-    setSelectedHour(hourData);
-  }}
-  title={`Натисніть для деталей (${hour}:00)`}
->
-  {hour}
-</div>
-
+              key={hour}
+              className={`hour-segment ${isSuitable ? "suitable" : "not-suitable"}`}
+              onClick={() => setSelectedHour(hourData)}
+              title={`Натисніть для деталей (${hour}:00)`}
+            >
+              {hour}
+            </div>
           );
         })}
       </div>
