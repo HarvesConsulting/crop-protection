@@ -146,18 +146,18 @@ const containerStyle = {
   justifyContent: "center",
   alignItems: "center",
   height: "100vh",
+  background: "transparent", // 👈 Прозорий фон
   padding: "20px",
-  position: "relative",
-  zIndex: 1,
 };
 
 const cardStyle = {
-  background: "#fff",
+  background: "rgba(255, 255, 255, 0.85)", // напівпрозорий
   padding: "30px",
   borderRadius: "10px",
   boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
   width: "100%",
   maxWidth: "400px",
+  zIndex: 1, // 👈 додано
 };
 
 const inputStyle = {
