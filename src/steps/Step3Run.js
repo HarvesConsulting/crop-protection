@@ -212,6 +212,7 @@ console.table(hourlyData.map(h => ({
         plantingDate,
         harvestDate,
         rainDaily,
+        hourlyData,
       };
 
       console.log("Diagnostics (DSV rows):", comp.rows);
