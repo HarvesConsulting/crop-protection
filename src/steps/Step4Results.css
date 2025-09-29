@@ -100,22 +100,18 @@ h2 {
 
 /* === FLIP-КАРТКИ === */
 .flip-card {
-  background-color: transparent;
+  perspective: 1000px;
   width: 100%;
   max-width: 360px;
-  height: auto;
-  perspective: 1000px;
   margin: 12px 0;
-  cursor: pointer;
 }
 
 .flip-card-inner {
   position: relative;
   width: 100%;
-  height: auto;
-  text-align: left;
-  transition: transform 0.6s;
+  min-height: 220px; /* 🧷 потрібна мінімальна висота */
   transform-style: preserve-3d;
+  transition: transform 0.6s;
 }
 
 .flip-card.flipped .flip-card-inner {
@@ -124,41 +120,32 @@ h2 {
 
 .flip-card-front,
 .flip-card-back {
-  position: relative;
+  position: absolute;
   width: 100%;
-  height: auto;
-  min-height: 200px;
-  border-radius: 8px;
+  height: 100%;
   padding: 14px 18px;
-  background-color: #f9f9f9;
+  border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  box-sizing: border-box;
   top: 0;
   left: 0;
 }
 
 .flip-card-front {
-  border: 1px solid #ddd;
+  background-color: #eafaf1;
+  border: 2px solid #28a745;
+  z-index: 2;
   transform: rotateY(0deg);
 }
 
 .flip-card-back {
-  transform: rotateY(180deg);
+  background-color: #28a745;
   color: white;
+  transform: rotateY(180deg);
+  z-index: 1;
 }
 
-.flip-card-back h4 {
-  margin-bottom: 8px;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.flip-card-back p {
-  font-size: 14px;
-  margin: 4px 0;
-}
 
 /* КОЛЬОРИ КАРТОК */
 .card-green .flip-card-front {
