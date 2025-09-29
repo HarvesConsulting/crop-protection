@@ -323,10 +323,7 @@ h2 {
   }
 }
 .card-section {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start; /* 🔧 вирівнювання по лівому краю */
-  gap: 16px;
+  display: block !important;
+  text-align: left !important;
 }
-
 
