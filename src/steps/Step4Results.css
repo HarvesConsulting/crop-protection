@@ -182,9 +182,18 @@ h2 {
 .card-red .flip-card-back {
   background-color: #dc3545;
 }
-.flip-card-back .timeline-wrapper,
-.flip-card-back .hour-segment,
-.flip-card-back .hour-details-tooltip {
-  display: none !important;
+/* Передня і задня частина */
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  padding: 14px 18px;
+  backface-visibility: hidden;  /* <-- залишаємо */
+  -webkit-backface-visibility: hidden; /* <-- для мобільних Safari/Chrome */
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
+
 
