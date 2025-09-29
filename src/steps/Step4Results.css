@@ -126,20 +126,24 @@ h2 {
   height: 100%;
   border-radius: 8px;
   padding: 14px 18px;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden; /* для iOS Safari */
   background-color: #f9f9f9;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+  /* ✅ FIX для мобільних */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  top: 0;
+  left: 0;
 }
 
 /* Передня */
 .flip-card-front {
   border: 1px solid #ddd;
+  transform: rotateY(0deg);
 }
 
 /* Задня */
 .flip-card-back {
-  background-color: #2d6cdf;
   color: white;
   transform: rotateY(180deg);
 }
@@ -185,12 +189,10 @@ h2 {
   background-color: #dc3545;
 }
 
-/* 📱 FIX для мобільних Safari/Chrome */
-@supports (-webkit-touch-callout: none) {
-  .flip-card-inner {
-    -webkit-transform-style: flat !important;
-    transform-style: flat !important;
-  }
+/* 🛑 Ховаємо timeline і tooltip на зворотній стороні */
+.flip-card-back .timeline-wrapper,
+.flip-card-back .hour-segment,
+.flip-card-back .hour-details-tooltip {
+  display: none !important;
 }
-
 
