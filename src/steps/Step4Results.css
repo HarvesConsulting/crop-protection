@@ -109,9 +109,10 @@ h2 {
 .flip-card-inner {
   position: relative;
   width: 100%;
-  min-height: 220px; /* 🧷 потрібна мінімальна висота */
+  height: 100%;
   transform-style: preserve-3d;
   transition: transform 0.6s;
+  min-height: 240px; /* встанови мінімальну однакову висоту */
 }
 
 .flip-card.flipped .flip-card-inner {
@@ -123,13 +124,13 @@ h2 {
   position: absolute;
   width: 100%;
   height: 100%;
-  padding: 14px 18px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
   top: 0;
   left: 0;
+  padding: 14px 18px;
+  border-radius: 8px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  box-sizing: border-box;
 }
 
 .flip-card-front {
@@ -145,7 +146,6 @@ h2 {
   transform: rotateY(180deg);
   z-index: 1;
 }
-
 
 /* КОЛЬОРИ КАРТОК */
 .card-green .flip-card-front {
