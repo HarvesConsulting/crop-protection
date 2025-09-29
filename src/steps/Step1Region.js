@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { regions } from "../regions"; // або ./regions, залежно від місця
 import { norm, searchTextFor, placeKey } from "../helpers"; // або додай ці функції сюди, якщо helpers немає
+import Layout from "../components/Layout";
 
 export default function Step1Region({ region, setRegion, onNext }) {
   const [inputValue, setInputValue] = useState(region?.name || "");
@@ -39,6 +40,7 @@ export default function Step1Region({ region, setRegion, onNext }) {
   }, [inputValue]);
 
   return (
+    <Layout>
     <div>
       <h2>Крок 1: Оберіть ваше місто</h2>
       <p className="text-sm text-gray-600 mb-4">
@@ -115,5 +117,6 @@ export default function Step1Region({ region, setRegion, onNext }) {
         Продовжити
       </button>
     </div>
+    </Layout>
   );
 }

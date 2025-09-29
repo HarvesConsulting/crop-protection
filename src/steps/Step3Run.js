@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Layout from "../components/Layout";
 import {
   fetchForecastHourly,
   fetchForecastDailyRain,
@@ -225,6 +226,7 @@ console.table(hourlyData.map(h => ({
   };
 
   return (
+    <Layout>
     <div>
       <h2>Крок 3: Розрахунок 🧪</h2>
 
@@ -267,5 +269,6 @@ console.table(hourlyData.map(h => ({
         </button>
       </div>
     </div>
+    </Layout>
   );
 }

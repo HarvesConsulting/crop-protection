@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import "./Step4Results.css";
 import * as XLSX from "xlsx";
 import HourTimeline from "../components/HourTimeline";
+import Layout from "../components/Layout";
 
 const productInfo = {
   "Зорвек Інкантія": "0,5л/га",
@@ -558,6 +559,7 @@ integratedSystem.sort(
   };
 
   return (
+    <Layout>
     <div className="container">
       <button className="restart-button" onClick={onRestart}>
         🔄 Почати спочатку
@@ -643,6 +645,7 @@ integratedSystem.sort(
         🔄 Почати спочатку
       </button>
     </div>
+    </Layout>
   );
 }
 

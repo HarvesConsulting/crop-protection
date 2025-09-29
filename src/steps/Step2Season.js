@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Layout from "../components/Layout";
 
 export default function Step2Season({
   plantingDate,
@@ -19,6 +20,7 @@ export default function Step2Season({
   };
 
   return (
+    <Layout>
     <div>
       <h2>Крок 2: Дані про сезон 🌿</h2>
       <p className="text-sm text-gray-600 mb-4">
@@ -108,5 +110,6 @@ export default function Step2Season({
         </button>
       </div>
     </div>
+    </Layout>
   );
 }
