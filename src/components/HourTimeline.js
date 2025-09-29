@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./HourTimeline.css";
+import { format } from "date-fns";
 
 export default function HourTimeline({ date, suitableHours = [], hourlyData = [] }) {
   const [selectedHour, setSelectedHour] = useState(null);
@@ -11,7 +12,7 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
 
   // ✅ Фільтруємо по днях (годинні дані конвертуємо так само)
   const hoursToday = hourlyData.filter((h) => {
-    const hDate = new Date(h.date).toISOString().slice(0, 10);
+    const hDate = format(new Date(h.date), "yyyy-MM-dd");
     return hDate === formattedDate;
   });
 
