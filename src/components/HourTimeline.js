@@ -78,7 +78,7 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
               💨 Вітер: {selectedHour.windspeed} м/с <br />
               🌧 Опади: {selectedHour.precipitation ?? 0} мм <br />
               {/* Тимчасово показуємо весь об’єкт */}
-              <pre>{JSON.stringify(selectedHour, null, 2)}</pre>
+              {/* <pre>{JSON.stringify(selectedHour, null, 2)}</pre> */}
             </>
           )}
         </div>
