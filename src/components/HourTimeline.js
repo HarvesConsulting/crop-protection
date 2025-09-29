@@ -3,11 +3,13 @@ import "./HourTimeline.css";
 import { format, parseISO } from "date-fns";
 
 export default function HourTimeline({ date, suitableHours = [], hourlyData = [] }) {
+  // Конвертація дати у формат "yyyy-MM-dd"
   const formattedDate = format(
     parseISO(date.split(".").reverse().join("-")),
     "yyyy-MM-dd"
   );
 
+  // Фільтрація погодинних даних по поточному дню
   const hoursToday = hourlyData.filter((h) => {
     const hDate =
       h.date instanceof Date
@@ -29,11 +31,7 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
 
           return (
             <div key={hour} className="hour-segment-wrapper">
-              <div
-                className={`hour-segment ${
-                  isSuitable ? "suitable" : "not-suitable"
-                }`}
-              >
+              <div className={`hour-segment ${isSuitable ? "suitable" : "not-suitable"}`}>
                 {hour}
               </div>
 
