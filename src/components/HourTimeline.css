@@ -1,47 +1,41 @@
-/* Основний контейнер */
 .timeline-wrapper {
   margin-top: 10px;
   position: relative;
   z-index: 1;
 }
 
-/* Лінія часу */
 .timeline-bar {
   display: flex;
   border: 1px solid #ccc;
   border-radius: 4px;
-  overflow: visible; /* ВАЖЛИВО — дозволяє tooltip виходити за межі */
+  overflow: visible;
   position: relative;
 }
 
-/* Обгортка для кожної години */
 .hour-segment-wrapper {
   position: relative;
   flex: 1;
   text-align: center;
 }
 
-/* Годинні блоки */
 .hour-segment {
   font-size: 12px;
   cursor: pointer;
   padding: 4px 0;
   color: white;
   user-select: none;
-  transition: transform 0.15s ease;
   border-right: 1px solid #e0e0e0;
+  transition: transform 0.1s ease-in-out;
 }
 
 .hour-segment:last-child {
   border-right: none;
 }
 
-/* Анімація при наведенні */
-.hour-segment:hover {
-  transform: scale(1.08);
+.hour-segment:active {
+  transform: scale(1.1); /* 📱 На мобільному видно "відгук" */
 }
 
-/* Стан годин — підходить / ні */
 .suitable {
   background-color: #4caf50;
 }
@@ -50,11 +44,9 @@
   background-color: #f44336;
 }
 
-/* Tooltip — інфо про погоду */
 .hour-details-tooltip {
-  display: none;
   position: absolute;
-  bottom: 100%; /* 👉 Поява над годиною */
+  bottom: 100%;
   left: 50%;
   transform: translateX(-50%) translateY(-6px);
   background: #fff;
@@ -65,19 +57,13 @@
   font-size: 13px;
   white-space: nowrap;
   z-index: 10;
-  pointer-events: none;
   width: max-content;
   max-width: 220px;
   line-height: 1.4;
   text-align: left;
+  animation: fadeIn 0.2s ease-in-out;
 }
 
-/* Показувати tooltip при наведенні */
-.hour-segment-wrapper:hover .hour-details-tooltip {
-  display: block;
-}
-
-/* Маленький трикутник зверху */
 .hour-details-tooltip::after {
   content: "";
   position: absolute;
@@ -87,13 +73,15 @@
   border: 6px solid transparent;
   border-top-color: #fff;
 }
-@media (max-width: 768px) {
-  .flip-card-back .timeline-wrapper,
-  .flip-card-back .hour-details-tooltip {
-    display: none !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-    transform: scale(0) !important;
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-6px);
   }
 }
 
