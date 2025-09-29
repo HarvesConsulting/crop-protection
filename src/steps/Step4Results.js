@@ -342,6 +342,7 @@ function aggregateDailyRain(hourlyData = []) {
 
 export default function Step4Results({ result, onRestart }) {
   const [showIntegrated, setShowIntegrated] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   if (!result) return <p>Дані відсутні</p>;
 
 const {
@@ -559,96 +560,98 @@ integratedSystem.sort(
   };
 
   return (
-    <Layout>
-    <div className="container">
-      <div className="top-actions">
-  <button className="btn-action restart" onClick={onRestart}>
-    🔄 Почати спочатку
-  </button>
-
-  <button
-    className="btn-action info"
-    title="Що означають кольори карток"
-    onClick={() =>
-      alert(
-        "🟢 Зелений — помірний ризик захворювання (до 10 годин)\n" +
-        "🟡 Жовтий — середній ризик (11–20 годин)\n" +
-        "🔴 Червоний — високий ризик (понад 20 годин)"
-      )
-    }
-  >
-    ℹ️ Інформація про кольори карток
-  </button>
-
-  <button
-    className="btn-action system"
-    onClick={() => setShowIntegrated(!showIntegrated)}
-  >
-    {showIntegrated
-      ? "🔽 Сховати інтегровану систему"
-      : "🍅 Сформувати інтегровану систему захисту"}
-  </button>
-</div>
-
-<h2>Крок 4: Результати</h2>
-
-      <p>
-        Період розрахунку:{" "}
-        <strong>{format(new Date(result.plantingDate), "dd.MM.yyyy")}</strong> —{" "}
-        <strong>{format(new Date(result.harvestDate), "dd.MM.yyyy")}</strong>
-      </p>
-      <p className="description">
-        Нижче показано рекомендовані дати обробки. Ви можете сформувати
-        інтегровану систему захисту.
-      </p>
-
-      
-      {showIntegrated ? (
-        <>
-          <CardView
-  title="Інтегрована система захисту"
-  entries={integratedSystem}
-  diagnostics={diagnostics}
-  plantingDate={plantingDate}
-  rainDaily={aggregatedRain}
-  hourlyData={hourlyData}
-/>
-
-          <button onClick={exportToExcel} className="toggle-button">
-            ⬇️ Експорт в Excel
-          </button>
-        </>
-      ) : (
-        <>
-          <CardView
-  title="Рекомендовані внесення (проти фітофторозу)"
-  entries={sprayData}
-  diagnostics={diagnostics}
-  plantingDate={plantingDate}
-  rainDaily={aggregatedRain}
-  hourlyData={hourlyData}
-/>
-
-          {diseaseCardsGrouped?.map(({ name, entries }) => (
-            <CardView
-  key={name}
-  title={`Рекомендовані внесення (проти: ${name})`}
-  entries={entries}
-  diagnostics={diagnostics}
-  plantingDate={plantingDate}
-  rainDaily={aggregatedRain}
-  hourlyData={hourlyData}
-/>
-
-          ))}
-        </>
-      )}
-
-      <button className="restart-button" onClick={onRestart}>
-        🔄 Почати спочатку
+  <Layout>
+    <div className="menu-wrapper">
+      <button className="menu-toggle" onClick={() => setShowMenu(!showMenu)}>
+        ☰ Меню дій
       </button>
-    </div>
-    </Layout>
-  );
-}
 
+      {showMenu && (
+        <div className="menu-dropdown">
+          <button className="menu-item" onClick={onRestart}>
+            🔄 Почати спочатку
+          </button>
+
+          <button
+            className="menu-item"
+            onClick={() =>
+              alert(
+                "🟢 Зелений — помірний ризик захворювання (до 10 годин)\n" +
+                  "🟡 Жовтий — середній ризик (11–20 годин)\n" +
+                  "🔴 Червоний — високий ризик (понад 20 годин)"
+              )
+            }
+          >
+            ℹ️ Інформація про кольори карток
+          </button>
+
+          <button
+            className="menu-item"
+            onClick={() => setShowIntegrated(!showIntegrated)}
+          >
+            🍅 {showIntegrated
+              ? "Сховати інтегровану систему"
+              : "Сформувати інтегровану систему"}
+          </button>
+        </div>
+      )}
+    </div>
+
+    <h2>Крок 4: Результати</h2>
+
+    <p>
+      Період розрахунку:{" "}
+      <strong>{format(new Date(result.plantingDate), "dd.MM.yyyy")}</strong> —{" "}
+      <strong>{format(new Date(result.harvestDate), "dd.MM.yyyy")}</strong>
+    </p>
+    <p className="description">
+      Нижче показано рекомендовані дати обробки. Ви можете сформувати інтегровану систему
+      захисту.
+    </p>
+
+    {showIntegrated ? (
+      <>
+        <CardView
+          title="Інтегрована система захисту"
+          entries={integratedSystem}
+          diagnostics={diagnostics}
+          plantingDate={plantingDate}
+          rainDaily={aggregatedRain}
+          hourlyData={hourlyData}
+        />
+
+        <button onClick={exportToExcel} className="toggle-button">
+          ⬇️ Експорт в Excel
+        </button>
+      </>
+    ) : (
+      <>
+        <CardView
+          title="Рекомендовані внесення (проти фітофторозу)"
+          entries={sprayData}
+          diagnostics={diagnostics}
+          plantingDate={plantingDate}
+          rainDaily={aggregatedRain}
+          hourlyData={hourlyData}
+        />
+
+        {diseaseCardsGrouped?.map(({ name, entries }) => (
+          <CardView
+            key={name}
+            title={`Рекомендовані внесення (проти: ${name})`}
+            entries={entries}
+            diagnostics={diagnostics}
+            plantingDate={plantingDate}
+            rainDaily={aggregatedRain}
+            hourlyData={hourlyData}
+          />
+        ))}
+
+        <button className="restart-button" onClick={onRestart}>
+          🔄 Почати спочатку
+        </button>
+      </>
+    )}
+  </Layout>
+);
+}
