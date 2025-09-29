@@ -88,12 +88,13 @@
   border-top-color: #fff;
 }
 @media (max-width: 768px) {
-  .card-back .timeline-wrapper {
+  .flip-card-back .timeline-wrapper,
+  .flip-card-back .hour-details-tooltip {
     display: none !important;
-  }
-
-  .card-back .hour-details-tooltip {
-    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: scale(0) !important;
   }
 }
+
 
