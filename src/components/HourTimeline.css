@@ -1,6 +1,5 @@
 .timeline-wrapper {
   margin-top: 10px;
-  position: relative;
 }
 
 .timeline-bar {
@@ -10,18 +9,19 @@
   overflow: hidden;
 }
 
-.hour-segment-wrapper {
-  position: relative;
-  flex: 1;
-}
-
 .hour-segment {
+  flex: 1;
   text-align: center;
   font-size: 12px;
-  cursor: default;
-  padding: 3px 0;
+  cursor: pointer;
+  padding: 4px 0;
   color: white;
   user-select: none;
+  transition: transform 0.15s ease;
+}
+
+.hour-segment:hover {
+  transform: scale(1.1);
 }
 
 .suitable {
@@ -32,25 +32,35 @@
   background-color: #f44336;
 }
 
-.hour-details-tooltip {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #fff;
-  border: 1px solid #ccc;
-  border-left: 4px solid #2d6cdf;
-  padding: 8px 12px;
-  border-radius: 8px;
-  white-space: nowrap;
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
-  font-size: 13px;
-  color: #333;
-  z-index: 999;
+.hour-details {
+  margin-top: 10px;
+  background-color: #fefefe;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  line-height: 1.6;
+  animation: fadeIn 0.3s ease-in-out;
 }
 
-/* 🌟 Ключ: tooltip показується при наведенні */
-.hour-segment-wrapper:hover .hour-details-tooltip {
-  display: block;
+.hour-details strong {
+  font-size: 16px;
+  color: #2d6cdf;
+}
+
+.hour-details pre {
+  font-size: 12px;
+  background: #f8f8f8;
+  padding: 8px;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin-top: 10px;
+  border: 1px solid #e0e0e0;
+  color: #444;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
