@@ -1,40 +1,39 @@
-/* Контейнер таймлайну */
+/* ───────────────────────────────
+   📦 Обгортка всього таймлайну
+──────────────────────────────── */
 .timeline-wrapper {
   margin-top: 10px;
   position: relative;
   z-index: 1;
 }
 
-/* Обгортка для скролу */
-.timeline-scroll {
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 6px;
-}
-
-/* Горизонтальна лінія часу */
+/* ───────────────────────────────
+   🟩 Горизонтальна смуга часу
+──────────────────────────────── */
 .timeline-bar {
   display: flex;
   border: 1px solid #ccc;
   border-radius: 6px;
+  overflow: visible; /* дозволяє тултіпу виходити за межі */
   position: relative;
-  min-width: max-content; /* 🧠 щоб не стискалося */
-  gap: 2px;
 }
 
-/* Кожна година */
+/* ───────────────────────────────
+   ⏱ Контейнер для кожної години
+──────────────────────────────── */
 .hour-segment-wrapper {
   position: relative;
-  flex: 0 0 auto;
+  flex: 1;
   text-align: center;
 }
 
-/* Сама година */
+/* ───────────────────────────────
+   ⌛️ Сама година (один блок)
+──────────────────────────────── */
 .hour-segment {
   font-size: 12px;
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 4px 0;
   color: #fff;
   user-select: none;
   transition: transform 0.15s ease;
@@ -45,22 +44,24 @@
   border-right: none;
 }
 
-/* Анімація */
+/* 🔍 Hover ефект */
 .hour-segment:hover {
   transform: scale(1.05);
 }
 
-/* Підходящі години */
+/* 🟢 Підходящі години */
 .suitable {
   background-color: #4caf50;
 }
 
-/* Непідходящі */
+/* 🔴 Непідходящі години */
 .not-suitable {
   background-color: #f44336;
 }
 
-/* Tooltip – віконце з погодними даними */
+/* ───────────────────────────────
+   💬 Tooltip з деталями погоди
+──────────────────────────────── */
 .hour-details-tooltip {
   display: none;
   position: absolute;
@@ -82,18 +83,18 @@
   text-align: left;
 }
 
-/* ПК – показувати при hover */
+/* 🎯 Покажемо тултіп при hover (ПК) */
 .hour-segment-wrapper:hover .hour-details-tooltip {
   display: block;
 }
 
-/* 📱 мобільний – tooltip керується через JS */
+/* ☝️ Показ тултіпу на мобільному (через JS) */
 .hour-details-tooltip.mobile {
   display: block;
   pointer-events: auto;
 }
 
-/* Маленький трикутничок */
+/* 🔻 Маленький трикутник під тултіпом */
 .hour-details-tooltip::after {
   content: "";
   position: absolute;
@@ -104,7 +105,9 @@
   border-top-color: #fff;
 }
 
-/* 📱 Адаптив – мобільний вигляд */
+/* ───────────────────────────────
+   📱 Адаптив для мобільних
+──────────────────────────────── */
 @media (max-width: 768px) {
   .timeline-bar {
     border-radius: 4px;
@@ -112,7 +115,7 @@
 
   .hour-segment {
     font-size: 11px;
-    padding: 3px 6px;
+    padding: 3px 0;
   }
 
   .hour-details-tooltip {
