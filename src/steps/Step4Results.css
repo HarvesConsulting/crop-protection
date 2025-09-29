@@ -195,5 +195,11 @@ h2 {
   background-color: #f9f9f9;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
+@supports (-webkit-touch-callout: none) {
+  .flip-card-inner {
+    -webkit-transform-style: flat !important;
+    transform-style: flat !important;
+  }
+}
 
 
