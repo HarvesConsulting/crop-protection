@@ -395,6 +395,7 @@ const aggregatedRain = rainDaily;
       ? recommendedHours.join(", ")
       : "—",
     backData, // 🔥 Ось що ми додаємо
+    hourlyData,
   };
 });
 
@@ -439,6 +440,7 @@ const aggregatedRain = rainDaily;
       ? recommendedHours.join(", ")
       : "—",
     backData, // ✅ додаємо підсумкові дані
+    hourlyData,
   };
 });
 
@@ -530,6 +532,7 @@ let lastDatesByDisease = {
     })
     .filter(Boolean),
   backData: worst, // 🎯 тут тільки backData, без інтервалу чи рекоменд. годин
+  hourlyData,
 };
 
   });
