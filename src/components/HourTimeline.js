@@ -12,14 +12,15 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
   );
 
   // ✅ Фільтруємо по днях (годинні дані теж конвертуємо так само)
-  const hoursToday = hourlyData.filter((h) => {
-    // h.date може бути рядком або Date — уніфікуємо
-    const hDate = format(
-      typeof h.date === "string" ? parseISO(h.date) : h.date,
-      "yyyy-MM-dd"
-    );
-    return hDate === formattedDate;
-  });
+ const hoursToday = hourlyData.filter((h) => {
+  const hDate =
+    h.date instanceof Date
+      ? format(h.date, "yyyy-MM-dd")
+      : format(parseISO(h.date), "yyyy-MM-dd");
+
+  return hDate === formattedDate;
+});
+
 
   // 🔍 Дебаг-логи
   console.log("🕐 formattedDate (з карти):", formattedDate);
