@@ -5,13 +5,13 @@ import { format, parseISO } from "date-fns";
 export default function HourTimeline({ date, suitableHours = [], hourlyData = [] }) {
   const [selectedHour, setSelectedHour] = useState(null);
 
-  // ✅ Конвертація дати у формат "yyyy-MM-dd"
+  // ✅ Перетворюємо дату у формат "yyyy-MM-dd"
   const formattedDate = format(
     parseISO(date.split(".").reverse().join("-")),
     "yyyy-MM-dd"
   );
 
-  // ✅ Фільтрація даних за конкретний день
+  // ✅ Відбираємо погодинні дані тільки для цього дня
   const hoursToday = hourlyData.filter((h) => {
     const hDate =
       h.date instanceof Date
@@ -20,9 +20,9 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
     return hDate === formattedDate;
   });
 
-  const handleSelect = (hourData, hour) => {
+  const handleClick = (hourData, hour) => {
     if (selectedHour?.hour === hour) {
-      setSelectedHour(null); // повторний тап закриває
+      setSelectedHour(null); // другий тап закриває
     } else {
       setSelectedHour(hourData || { hour, notFound: true });
     }
@@ -41,8 +41,7 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
             <div
               key={hour}
               className="hour-segment-wrapper"
-              onClick={() => handleSelect(hourData, hour)}
-              onTouchMove={() => handleSelect(hourData, hour)} // 📱 плавний апдейт при русі
+              onClick={() => handleClick(hourData, hour)} // 📱 мобільний тап
             >
               <div
                 className={`hour-segment ${isSuitable ? "suitable" : "not-suitable"}`}
@@ -50,8 +49,19 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
                 {hour}
               </div>
 
-              {selectedHour && selectedHour.hour === hour && (
+              {/* 🖱️ ПК: показуємо tooltip при hover */}
+              {hourData && (
                 <div className="hour-details-tooltip">
+                  <strong>{hour}:00</strong> <br />
+                  🌡 Температура: {hourData.temperature}°C <br />
+                  💨 Вітер: {hourData.windspeed} км/год <br />
+                  🌧 Опади: {hourData.precipitation ?? 0} мм
+                </div>
+              )}
+
+              {/* 📱 мобільний: тільки при кліку */}
+              {selectedHour && selectedHour.hour === hour && (
+                <div className="hour-details-tooltip mobile">
                   <strong>{hour}:00</strong> <br />
                   {selectedHour.notFound ? (
                     <>📭 Немає даних для цієї години</>

@@ -1,50 +1,6 @@
-.timeline-wrapper {
-  margin-top: 10px;
-  position: relative;
-  z-index: 1;
-}
-
-.timeline-bar {
-  display: flex;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  overflow: visible;
-  position: relative;
-}
-
-.hour-segment-wrapper {
-  position: relative;
-  flex: 1;
-  text-align: center;
-}
-
-.hour-segment {
-  font-size: 12px;
-  cursor: pointer;
-  padding: 4px 0;
-  color: white;
-  user-select: none;
-  border-right: 1px solid #e0e0e0;
-  transition: transform 0.1s ease-in-out;
-}
-
-.hour-segment:last-child {
-  border-right: none;
-}
-
-.hour-segment:active {
-  transform: scale(1.1); /* 📱 На мобільному видно "відгук" */
-}
-
-.suitable {
-  background-color: #4caf50;
-}
-
-.not-suitable {
-  background-color: #f44336;
-}
-
+/* Базове віконце */
 .hour-details-tooltip {
+  display: none;
   position: absolute;
   bottom: 100%;
   left: 50%;
@@ -61,28 +17,16 @@
   max-width: 220px;
   line-height: 1.4;
   text-align: left;
-  animation: fadeIn 0.2s ease-in-out;
 }
 
-.hour-details-tooltip::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 6px solid transparent;
-  border-top-color: #fff;
+/* ПК: показувати при наведенні */
+.hour-segment-wrapper:hover .hour-details-tooltip {
+  display: block;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(0);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(-6px);
-  }
+/* 📱 мобільний — показується лише через JS */
+.hour-details-tooltip.mobile {
+  display: block;
 }
 
 
