@@ -87,3 +87,8 @@
   border: 6px solid transparent;
   border-top-color: #fff;
 }
+@media (max-width: 768px) {
+  .card-back .timeline-wrapper {
+    display: none !important;
+  }
+}
