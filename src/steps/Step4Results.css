@@ -127,6 +127,7 @@ h2 {
   border-radius: 8px;
   padding: 14px 18px;
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden; /* для iOS Safari */
   background-color: #f9f9f9;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
@@ -153,6 +154,7 @@ h2 {
   font-size: 14px;
   margin: 4px 0;
 }
+
 /* 🟢 Зелена картка */
 .card-green .flip-card-front {
   background-color: #eafaf1;
@@ -182,19 +184,8 @@ h2 {
 .card-red .flip-card-back {
   background-color: #dc3545;
 }
-/* Передня і задня частина */
-.flip-card-front,
-.flip-card-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 8px;
-  padding: 14px 18px;
-  backface-visibility: hidden;  /* <-- залишаємо */
-  -webkit-backface-visibility: hidden; /* <-- для мобільних Safari/Chrome */
-  background-color: #f9f9f9;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
+
+/* 📱 FIX для мобільних Safari/Chrome */
 @supports (-webkit-touch-callout: none) {
   .flip-card-inner {
     -webkit-transform-style: flat !important;
