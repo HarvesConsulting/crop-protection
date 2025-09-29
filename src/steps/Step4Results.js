@@ -561,14 +561,14 @@ integratedSystem.sort(
   return (
     <Layout>
     <div className="container">
-      <button className="restart-button" onClick={onRestart}>
-        🔄 Почати спочатку
-      </button>
-      <h2>Крок 4: Результати</h2>
-      <div className="info-box">
+      <div className="top-actions">
+  <button className="btn-action restart" onClick={onRestart}>
+    🔄 Почати спочатку
+  </button>
+
   <button
-    className="info-button"
-    title="Що означають кольори?"
+    className="btn-action info"
+    title="Що означають кольори карток"
     onClick={() =>
       alert(
         "🟢 Зелений — помірний ризик захворювання (до 10 годин)\n" +
@@ -579,7 +579,19 @@ integratedSystem.sort(
   >
     ℹ️ Інформація про кольори карток
   </button>
+
+  <button
+    className="btn-action system"
+    onClick={() => setShowIntegrated(!showIntegrated)}
+  >
+    {showIntegrated
+      ? "🔽 Сховати інтегровану систему"
+      : "🍅 Сформувати інтегровану систему захисту"}
+  </button>
 </div>
+
+<h2>Крок 4: Результати</h2>
+
 
       <p>
         Період розрахунку:{" "}

@@ -195,4 +195,48 @@ h2 {
 .flip-card-back .hour-details-tooltip {
   display: none !important;
 }
+.top-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.btn-action {
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-action.restart {
+  background-color: #e0f4ff;
+  color: #005ea3;
+  border: 1px solid #007acc;
+}
+
+.btn-action.info {
+  background-color: #f1f1f1;
+  color: #333;
+  border: 1px solid #aaa;
+}
+
+.btn-action.system {
+  background-color: #ffe8e1;
+  color: #b13a00;
+  border: 1px solid #f07800;
+}
+
+.btn-action:hover {
+  transform: scale(1.03);
+  opacity: 0.9;
+}
 
