@@ -7,6 +7,7 @@ import Step3Run from "./steps/Step3Run";
 import Step4Results from "./steps/Step4Results";
 import LoginPage from "./components/LoginPage";
 import CalendarView from "./components/CalendarView";
+import Layout from "./components/Layout";
 
 import {
   rotationProducts,
@@ -79,6 +80,7 @@ export default function App() {
   const back = () => setStep((s) => Math.max(s - 1, 1));
 
   return (
+    <Layout>
     <div className="main-container" style={{ maxWidth: 800, margin: "0 auto", padding: 20 }}>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 10 }}>
         <LogoutButton onLogout={() => setUser(null)} />
@@ -133,6 +135,7 @@ export default function App() {
         </>
       )}
     </div>
+    </Layout>
   );
 }
 
