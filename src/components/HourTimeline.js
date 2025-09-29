@@ -35,54 +35,52 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
   );
 
   return (
-    <div className="timeline-wrapper">
-      <div className="timeline-bar">
-        {[...Array(24).keys()].map((hour) => {
-          // ✅ Перевірка, чи година підходить
-          const isSuitable = suitableHours.includes(
-            hour.toString().padStart(2, "0") + ":00"
-          );
+  <div
+    className="timeline-wrapper"
+    onClick={() => setSelectedHour(null)}
+  >
+    <div className="timeline-bar">
+      {[...Array(24).keys()].map((hour) => {
+        const isSuitable = suitableHours.includes(
+          hour.toString().padStart(2, "0") + ":00"
+        );
 
-          // ✅ Знаходимо дані для цієї години
-          const hourData = hoursToday.find((h) => Number(h.hour) === hour);
+        const hourData = hoursToday.find((h) => Number(h.hour) === hour);
 
-          return (
-            <div
-              key={hour}
-              className={`hour-segment ${
-                isSuitable ? "suitable" : "not-suitable"
-              }`}
-              onClick={(e) => {
-                e.stopPropagation(); // 🛑 блокуємо перевертання картки
-                setSelectedHour(
-                  hourData || { hour, notFound: true } // якщо даних нема — маркер
-                );
-              }}
-              title={`Натисніть для деталей (${hour}:00)`}
-            >
-              {hour}
-            </div>
-          );
-        })}
-      </div>
-
-      {selectedHour && (
-        <div className="hour-details">
-          <strong>{selectedHour.hour}:00</strong>
-          <br />
-          {selectedHour.notFound ? (
-            <span>📭 Немає даних для цієї години</span>
-          ) : (
-            <>
-              🌡 Температура: {selectedHour.temperature}°C <br />
-              💨 Вітер: {selectedHour.windspeed} м/с <br />
-              🌧 Опади: {selectedHour.precipitation ?? 0} мм <br />
-              {/* Тимчасово показуємо весь об’єкт */}
-              {/* <pre>{JSON.stringify(selectedHour, null, 2)}</pre> */}
-            </>
-          )}
-        </div>
-      )}
+        return (
+          <div
+            key={hour}
+            className={`hour-segment ${isSuitable ? "suitable" : "not-suitable"}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (selectedHour?.hour === hour) {
+                setSelectedHour(null);
+              } else {
+                setSelectedHour(hourData || { hour, notFound: true });
+              }
+            }}
+          >
+            {hour}
+          </div>
+        );
+      })}
     </div>
-  );
+
+    {selectedHour && (
+      <div className="hour-details-tooltip">
+        <strong>{selectedHour.hour}:00</strong>
+        <br />
+        {selectedHour.notFound ? (
+          <span>📭 Немає даних для цієї години</span>
+        ) : (
+          <>
+            🌡 Температура: {selectedHour.temperature}°C <br />
+            💨 Вітер: {selectedHour.windspeed} км/год <br />
+            🌧 Опади: {selectedHour.precipitation ?? 0} мм
+          </>
+        )}
+      </div>
+    )}
+  </div>
+);
 }
