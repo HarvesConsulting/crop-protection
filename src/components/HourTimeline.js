@@ -1,15 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import "./HourTimeline.css";
 import { format, parseISO } from "date-fns";
 
 export default function HourTimeline({ date, suitableHours = [], hourlyData = [] }) {
-  // ✅ Конвертуємо дату "dd.MM.yyyy" у формат "yyyy-MM-dd"
+  const [selectedHour, setSelectedHour] = useState(null);
+
   const formattedDate = format(
     parseISO(date.split(".").reverse().join("-")),
     "yyyy-MM-dd"
   );
 
-  // ✅ Фільтруємо по днях (годинні дані теж конвертуємо так само)
   const hoursToday = hourlyData.filter((h) => {
     const hDate =
       h.date instanceof Date
@@ -19,42 +19,43 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
     return hDate === formattedDate;
   });
 
-  // 🔍 Дебаг-логи
-  console.log("🕐 formattedDate (з карти):", formattedDate);
-  console.log("📊 hourlyData sample:", hourlyData.slice(0, 5));
-  console.log(
-    "📅 hoursToday:",
-    hoursToday.map((h) => ({
-      date: h.date,
-      hour: h.hour,
-      temp: h.temperature,
-    }))
-  );
-
   return (
     <div className="timeline-wrapper">
       <div className="timeline-bar">
         {[...Array(24).keys()].map((hour) => {
-          // ✅ Перевірка, чи година підходить
           const isSuitable = suitableHours.includes(
             hour.toString().padStart(2, "0") + ":00"
           );
 
-          // ✅ Знаходимо погодинні дані для цієї години
           const hourData = hoursToday.find((h) => Number(h.hour) === hour);
 
           return (
-            <div key={hour} className="hour-segment-wrapper">
+            <div
+              key={hour}
+              className="hour-segment-wrapper"
+              onClick={(e) => {
+                e.stopPropagation(); // блокуємо перевертання
+                setSelectedHour(hourData || { hour, notFound: true });
+              }}
+              onMouseLeave={() => setSelectedHour(null)} // 🧼 прибираємо підказку
+            >
               <div className={`hour-segment ${isSuitable ? "suitable" : "not-suitable"}`}>
                 {hour}
               </div>
 
-              {hourData && (
+              {/* Підказка (при кліку, зникає при виході миші) */}
+              {selectedHour?.hour === hour && (
                 <div className="hour-details-tooltip">
                   <strong>{hour}:00</strong><br />
-                  🌡 Температура: {hourData.temperature}°C <br />
-                  💨 Швидкість вітру: {hourData.windspeed} м/с <br />
-                  🌧 Кількість опадів: {hourData.precipitation ?? 0} мм
+                  {selectedHour.notFound ? (
+                    <span>📭 Немає даних для цієї години</span>
+                  ) : (
+                    <>
+                      🌡 Температура: {selectedHour.temperature}°C <br />
+                      💨 Швидкість вітру: {selectedHour.windspeed} м/с <br />
+                      🌧 Опади: {selectedHour.precipitation ?? 0} мм
+                    </>
+                  )}
                 </div>
               )}
             </div>
