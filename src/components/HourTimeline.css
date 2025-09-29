@@ -91,4 +91,9 @@
   .card-back .timeline-wrapper {
     display: none !important;
   }
+
+  .card-back .hour-details-tooltip {
+    display: none !important;
+  }
 }
+
