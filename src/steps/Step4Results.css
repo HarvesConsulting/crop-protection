@@ -288,4 +288,13 @@ h2 {
 .menu-item:hover {
   background-color: #f0f0f0;
 }
+@media (max-width: 768px) {
+  .card,
+  .flip-card {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+}
 
