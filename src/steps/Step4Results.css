@@ -322,4 +322,8 @@ h2 {
     padding: 12px !important;
   }
 }
+.card-section {
+  display: block !important;
+  text-align: left !important;
+}
 
