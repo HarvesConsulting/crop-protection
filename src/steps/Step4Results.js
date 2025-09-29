@@ -592,7 +592,6 @@ integratedSystem.sort(
 
 <h2>Крок 4: Результати</h2>
 
-
       <p>
         Період розрахунку:{" "}
         <strong>{format(new Date(result.plantingDate), "dd.MM.yyyy")}</strong> —{" "}
@@ -603,15 +602,7 @@ integratedSystem.sort(
         інтегровану систему захисту.
       </p>
 
-      <button
-        className="toggle-button"
-        onClick={() => setShowIntegrated(!showIntegrated)}
-      >
-        {showIntegrated
-          ? "🔽 Сховати інтегровану систему"
-          : "🍅 Сформувати інтегровану систему захисту"}
-      </button>
-
+      
       {showIntegrated ? (
         <>
           <CardView
