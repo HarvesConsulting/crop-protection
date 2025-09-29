@@ -1,37 +1,56 @@
 import React, { useState } from "react";
 import "./HourTimeline.css";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 export default function HourTimeline({ date, suitableHours = [], hourlyData = [] }) {
   const [selectedHour, setSelectedHour] = useState(null);
 
-  // ✅ Конвертуємо дату у формат yyyy-mm-dd
-  const formattedDate = new Date(date.split(".").reverse().join("-"))
-    .toISOString()
-    .slice(0, 10);
+  // ✅ Конвертуємо дату "dd.MM.yyyy" у формат "yyyy-MM-dd"
+  const formattedDate = format(
+    parseISO(date.split(".").reverse().join("-")),
+    "yyyy-MM-dd"
+  );
 
-  // ✅ Фільтруємо по днях (годинні дані конвертуємо так само)
+  // ✅ Фільтруємо по днях (годинні дані теж конвертуємо так само)
   const hoursToday = hourlyData.filter((h) => {
-    const hDate = format(new Date(h.date), "yyyy-MM-dd");
+    // h.date може бути рядком або Date — уніфікуємо
+    const hDate = format(
+      typeof h.date === "string" ? parseISO(h.date) : h.date,
+      "yyyy-MM-dd"
+    );
     return hDate === formattedDate;
   });
+
+  // 🔍 Дебаг-логи
+  console.log("🕐 formattedDate (з карти):", formattedDate);
+  console.log("📊 hourlyData sample:", hourlyData.slice(0, 5));
+  console.log(
+    "📅 hoursToday:",
+    hoursToday.map((h) => ({
+      date: h.date,
+      hour: h.hour,
+      temp: h.temperature,
+    }))
+  );
 
   return (
     <div className="timeline-wrapper">
       <div className="timeline-bar">
         {[...Array(24).keys()].map((hour) => {
-          // ✅ Перевірка годин
+          // ✅ Перевірка, чи година підходить
           const isSuitable = suitableHours.includes(
             hour.toString().padStart(2, "0") + ":00"
           );
 
-          // ✅ Пошук даних для цієї години
+          // ✅ Знаходимо дані для цієї години
           const hourData = hoursToday.find((h) => Number(h.hour) === hour);
 
           return (
             <div
               key={hour}
-              className={`hour-segment ${isSuitable ? "suitable" : "not-suitable"}`}
+              className={`hour-segment ${
+                isSuitable ? "suitable" : "not-suitable"
+              }`}
               onClick={(e) => {
                 e.stopPropagation(); // 🛑 блокуємо перевертання картки
                 setSelectedHour(
