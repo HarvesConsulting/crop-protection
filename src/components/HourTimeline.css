@@ -5,19 +5,28 @@
   z-index: 1;
 }
 
+/* Обгортка для скролу */
+.timeline-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 6px;
+}
+
 /* Горизонтальна лінія часу */
 .timeline-bar {
   display: flex;
   border: 1px solid #ccc;
   border-radius: 6px;
-  overflow: visible; /* дозволяє тултіпу виходити за межі */
   position: relative;
+  min-width: max-content; /* 🧠 щоб не стискалося */
+  gap: 2px;
 }
 
 /* Кожна година */
 .hour-segment-wrapper {
   position: relative;
-  flex: 1;
+  flex: 0 0 auto;
   text-align: center;
 }
 
@@ -25,7 +34,7 @@
 .hour-segment {
   font-size: 12px;
   cursor: pointer;
-  padding: 4px 0;
+  padding: 4px 8px;
   color: #fff;
   user-select: none;
   transition: transform 0.15s ease;
@@ -70,7 +79,7 @@
   width: max-content;
   max-width: 240px;
   line-height: 1.4;
-  text-align: left; /* ✅ вирівнювання тексту по лівому краю */
+  text-align: left;
 }
 
 /* ПК – показувати при hover */
@@ -103,7 +112,7 @@
 
   .hour-segment {
     font-size: 11px;
-    padding: 3px 0;
+    padding: 3px 6px;
   }
 
   .hour-details-tooltip {
@@ -111,12 +120,4 @@
     max-width: 180px;
   }
 }
-.timeline-scroll {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch; /* для плавного скролу на iPhone */
-}
 
-.timeline-bar {
-  display: flex;
-  min-width: 720px; /* або більше, щоб не ламалось на малих екранах */
-}
