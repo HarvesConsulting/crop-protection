@@ -1,8 +1,61 @@
-/* Базове віконце */
+/* Контейнер таймлайну */
+.timeline-wrapper {
+  margin-top: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Горизонтальна лінія часу */
+.timeline-bar {
+  display: flex;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  overflow: visible; /* дозволяє тултіпу виходити за межі */
+  position: relative;
+}
+
+/* Кожна година */
+.hour-segment-wrapper {
+  position: relative;
+  flex: 1;
+  text-align: center;
+}
+
+/* Сама година */
+.hour-segment {
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 0;
+  color: #fff;
+  user-select: none;
+  transition: transform 0.15s ease;
+  border-right: 1px solid #e0e0e0;
+}
+
+.hour-segment:last-child {
+  border-right: none;
+}
+
+/* Анімація */
+.hour-segment:hover {
+  transform: scale(1.05);
+}
+
+/* Підходящі години */
+.suitable {
+  background-color: #4caf50;
+}
+
+/* Непідходящі */
+.not-suitable {
+  background-color: #f44336;
+}
+
+/* Tooltip – віконце з погодними даними */
 .hour-details-tooltip {
   display: none;
   position: absolute;
-  bottom: 100%;
+  bottom: 100%; /* показуємо над годиною */
   left: 50%;
   transform: translateX(-50%) translateY(-6px);
   background: #fff;
@@ -13,20 +66,50 @@
   font-size: 13px;
   white-space: nowrap;
   z-index: 10;
+  pointer-events: none;
   width: max-content;
-  max-width: 220px;
+  max-width: 240px;
   line-height: 1.4;
-  text-align: left;
+  text-align: left; /* ✅ вирівнювання тексту по лівому краю */
 }
 
-/* ПК: показувати при наведенні */
+/* ПК – показувати при hover */
 .hour-segment-wrapper:hover .hour-details-tooltip {
   display: block;
 }
 
-/* 📱 мобільний — показується лише через JS */
+/* 📱 мобільний – tooltip керується через JS */
 .hour-details-tooltip.mobile {
   display: block;
+  pointer-events: auto;
+}
+
+/* Маленький трикутничок */
+.hour-details-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #fff;
+}
+
+/* 📱 Адаптив – мобільний вигляд */
+@media (max-width: 768px) {
+  .timeline-bar {
+    border-radius: 4px;
+  }
+
+  .hour-segment {
+    font-size: 11px;
+    padding: 3px 0;
+  }
+
+  .hour-details-tooltip {
+    font-size: 12px;
+    max-width: 180px;
+  }
 }
 
 
