@@ -1,28 +1,47 @@
+/* Основний контейнер */
 .timeline-wrapper {
   margin-top: 10px;
+  position: relative;
+  z-index: 1;
 }
 
+/* Лінія часу */
 .timeline-bar {
   display: flex;
   border: 1px solid #ccc;
   border-radius: 4px;
-  overflow: hidden;
+  overflow: visible; /* ВАЖЛИВО — дозволяє tooltip виходити за межі */
+  position: relative;
 }
 
+/* Обгортка для кожної години */
 .hour-segment-wrapper {
   position: relative;
   flex: 1;
   text-align: center;
 }
 
+/* Годинні блоки */
 .hour-segment {
   font-size: 12px;
   cursor: pointer;
   padding: 4px 0;
   color: white;
   user-select: none;
+  transition: transform 0.15s ease;
+  border-right: 1px solid #e0e0e0;
 }
 
+.hour-segment:last-child {
+  border-right: none;
+}
+
+/* Анімація при наведенні */
+.hour-segment:hover {
+  transform: scale(1.08);
+}
+
+/* Стан годин — підходить / ні */
 .suitable {
   background-color: #4caf50;
 }
@@ -31,30 +50,39 @@
   background-color: #f44336;
 }
 
-/* Tooltip */
+/* Tooltip — інфо про погоду */
 .hour-details-tooltip {
   display: none;
   position: absolute;
-  bottom: 100%; /* ⬆️ Показуємо над блоком */
+  bottom: 100%; /* 👉 Поява над годиною */
   left: 50%;
-  transform: translateX(-50%);
-  background: white;
+  transform: translateX(-50%) translateY(-6px);
+  background: #fff;
   color: #000;
-  padding: 8px 10px;
+  padding: 8px 12px;
   border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   font-size: 13px;
   white-space: nowrap;
   z-index: 10;
-  min-width: 160px;
+  pointer-events: none;
+  width: max-content;
+  max-width: 220px;
+  line-height: 1.4;
 }
 
+/* Показувати tooltip при наведенні */
 .hour-segment-wrapper:hover .hour-details-tooltip {
   display: block;
-  animation: fadeIn 0.2s ease-in-out;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translate(-50%, 6px); }
-  to { opacity: 1; transform: translate(-50%, 0); }
+/* Маленький трикутник зверху */
+.hour-details-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #fff;
 }
