@@ -18,7 +18,7 @@
 .hour-segment {
   text-align: center;
   font-size: 12px;
-  cursor: pointer;
+  cursor: default;
   padding: 3px 0;
   color: white;
   user-select: none;
@@ -33,12 +33,14 @@
 }
 
 .hour-details-tooltip {
+  display: none;
   position: absolute;
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
   background: #fff;
   border: 1px solid #ccc;
+  border-left: 4px solid #2d6cdf;
   padding: 8px 12px;
   border-radius: 8px;
   white-space: nowrap;
@@ -46,4 +48,9 @@
   font-size: 13px;
   color: #333;
   z-index: 999;
+}
+
+/* 🌟 Ключ: tooltip показується при наведенні */
+.hour-segment-wrapper:hover .hour-details-tooltip {
+  display: block;
 }
