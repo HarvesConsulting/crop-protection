@@ -1,8 +1,10 @@
+/* Загальний контейнер */
 .timeline-wrapper {
   margin-top: 10px;
-  position: relative;
+  position: relative; /* для абсолютного позиціонування .hour-details */
 }
 
+/* Панель з годинами */
 .timeline-bar {
   display: flex;
   border: 1px solid #ccc;
@@ -10,6 +12,7 @@
   overflow: hidden;
 }
 
+/* Сегменти (години) */
 .hour-segment {
   flex: 1;
   text-align: center;
@@ -25,6 +28,7 @@
   transform: scale(1.1);
 }
 
+/* Кольори для годин */
 .suitable {
   background-color: #4caf50;
 }
@@ -33,24 +37,43 @@
   background-color: #f44336;
 }
 
+/* Вікно з деталями (над годинами) */
 .hour-details {
-  margin-top: 10px;
-  background-color: #fefefe;
+  position: absolute;
+  top: -140px; /* розташовуємо над timeline */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ffffff;
   border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 10px 14px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 10px 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   font-size: 14px;
   line-height: 1.6;
+  z-index: 100;
+  min-width: 250px;
   animation: fadeIn 0.3s ease-in-out;
-  max-width: 300px;
 }
 
+/* Заголовок години */
 .hour-details strong {
   font-size: 16px;
   color: #2d6cdf;
 }
 
+/* Тимчасове виведення JSON (закоментовано) */
+.hour-details pre {
+  font-size: 12px;
+  background: #f8f8f8;
+  padding: 8px;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin-top: 10px;
+  border: 1px solid #e0e0e0;
+  color: #444;
+}
+
+/* Анімація появи */
 @keyframes fadeIn {
   from {
     opacity: 0;
