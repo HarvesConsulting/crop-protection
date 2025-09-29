@@ -13,7 +13,6 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
       h.date instanceof Date
         ? format(h.date, "yyyy-MM-dd")
         : format(parseISO(h.date), "yyyy-MM-dd");
-
     return hDate === formattedDate;
   });
 
@@ -24,6 +23,7 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
           const isSuitable = suitableHours.includes(
             hour.toString().padStart(2, "0") + ":00"
           );
+
           const hourData = hoursToday.find((h) => Number(h.hour) === hour);
 
           return (
@@ -33,7 +33,7 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
               </div>
 
               {hourData && (
-                <div className="hour-tooltip">
+                <div className="hour-details-tooltip">
                   <strong>{hour}:00</strong> <br />
                   🌡 Температура: {hourData.temperature}°C <br />
                   💨 Вітер: {hourData.windspeed} км/год <br />
