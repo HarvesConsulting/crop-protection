@@ -1,5 +1,6 @@
 .timeline-wrapper {
   margin-top: 10px;
+  position: relative;
 }
 
 .timeline-bar {
@@ -9,18 +10,19 @@
   overflow: hidden;
 }
 
-.hour-segment-wrapper {
-  position: relative;
+.hour-segment {
   flex: 1;
   text-align: center;
-}
-
-.hour-segment {
   font-size: 12px;
   cursor: pointer;
   padding: 4px 0;
   color: white;
   user-select: none;
+  transition: transform 0.15s ease;
+}
+
+.hour-segment:hover {
+  transform: scale(1.1);
 }
 
 .suitable {
@@ -31,23 +33,31 @@
   background-color: #f44336;
 }
 
-/* Tooltip */
-.hour-details-tooltip {
-  display: none;
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: white;
-  color: #000;
-  padding: 8px 10px;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  font-size: 13px;
-  white-space: nowrap;
-  z-index: 10;
+.hour-details {
+  margin-top: 10px;
+  background-color: #fefefe;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  line-height: 1.6;
+  animation: fadeIn 0.3s ease-in-out;
+  max-width: 300px;
 }
 
-.hour-segment-wrapper:hover .hour-details-tooltip {
-  display: block;
+.hour-details strong {
+  font-size: 16px;
+  color: #2d6cdf;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
