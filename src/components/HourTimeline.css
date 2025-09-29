@@ -1,6 +1,6 @@
 .timeline-wrapper {
   margin-top: 10px;
-  position: relative; /* додано — щоб .hour-details позиціювалось всередині */
+  position: relative;
 }
 
 .timeline-bar {
@@ -10,15 +10,18 @@
   overflow: hidden;
 }
 
-.hour-segment {
+.hour-segment-wrapper {
+  position: relative;
   flex: 1;
+}
+
+.hour-segment {
   text-align: center;
   font-size: 12px;
-  cursor: pointer;
+  cursor: default;
   padding: 3px 0;
   color: white;
   user-select: none;
-  transition: background-color 0.2s ease;
 }
 
 .suitable {
@@ -29,19 +32,25 @@
   background-color: #f44336;
 }
 
-.hour-details {
+.hour-details-tooltip {
+  display: none;
   position: absolute;
-  top: 110%; /* трохи нижче лінії годин */
-  left: 0;
-  z-index: 1000;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
   background: #fff;
   border: 1px solid #ccc;
   border-left: 4px solid #2d6cdf;
-  padding: 10px 14px;
+  padding: 8px 12px;
   border-radius: 8px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  max-width: 280px;
-  font-size: 14px;
-  color: #333;
   white-space: nowrap;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+  font-size: 13px;
+  color: #333;
+  z-index: 999;
+}
+
+/* 🌟 Ключ: tooltip показується при наведенні */
+.hour-segment-wrapper:hover .hour-details-tooltip {
+  display: block;
 }
