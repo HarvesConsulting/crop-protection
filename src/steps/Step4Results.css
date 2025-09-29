@@ -99,9 +99,9 @@ h2 {
   background-color: transparent;
   width: 100%;
   max-width: 360px;
-  height: 200px;
+  height: auto; /* 🔧 фікс! */
   perspective: 1000px;
-  margin: 12px auto;
+  margin: 12px 0; /* 🔧 замість auto */
   cursor: pointer;
 }
 
@@ -323,7 +323,10 @@ h2 {
   }
 }
 .card-section {
-  display: block !important;
-  text-align: left !important;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* 🔧 вирівнювання по лівому краю */
+  gap: 16px;
 }
+
 
