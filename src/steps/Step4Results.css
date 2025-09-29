@@ -182,8 +182,8 @@ h2 {
 .card-red .flip-card-back {
   background-color: #dc3545;
 }
-/* Сховати лінію часу і tooltip на звороті картки */
 .flip-card-back .timeline-wrapper,
+.flip-card-back .hour-segment,
 .flip-card-back .hour-details-tooltip {
   display: none !important;
 }
