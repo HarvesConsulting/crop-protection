@@ -123,4 +123,13 @@
     max-width: 180px;
   }
 }
+/* ✅ Показуй тултіп тільки на передній стороні */
+.flip-card-front .hour-details-tooltip {
+  display: block !important;
+}
+
+/* ❌ Але приховай повністю на задній стороні */
+.flip-card-back .hour-details-tooltip {
+  display: none !important;
+}
 
