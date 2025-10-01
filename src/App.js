@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import AppIntro from "./components/AppIntro";
 import Step1Region from "./steps/Step1Region";
 import Step2Season from "./steps/Step2Season";
 import Step3Run from "./steps/Step3Run";
@@ -22,7 +21,6 @@ import { auth } from "./firebase";
 // 🧠 Перетворення результатів у події для календаря
 function extractCalendarEvents(result) {
   if (!result) return [];
-
   const events = [];
   const { sprayDates, diseaseSummary } = result;
 
@@ -80,54 +78,48 @@ export default function App() {
 
   return (
     <Layout step={step} onLogout={() => setUser(null)}>
-      <div className="main-container" style={{ maxWidth: 800, margin: "0 auto", padding: 20 }}>
-        {step === 1 && <AppIntro />}
+      {step === 1 && <Step1Region region={region} setRegion={setRegion} onNext={next} />}
 
-        {step === 1 && (
-          <Step1Region region={region} setRegion={setRegion} onNext={next} />
-        )}
+      {step === 2 && (
+        <Step2Season
+          plantingDate={plantingDate}
+          setPlantingDate={setPlantingDate}
+          harvestDate={harvestDate}
+          setHarvestDate={setHarvestDate}
+          onNext={({ diseases }) => {
+            setDiseases(diseases);
+            next();
+          }}
+          onBack={back}
+        />
+      )}
 
-        {step === 2 && (
-          <Step2Season
-            plantingDate={plantingDate}
-            setPlantingDate={setPlantingDate}
-            harvestDate={harvestDate}
-            setHarvestDate={setHarvestDate}
-            onNext={({ diseases }) => {
-              setDiseases(diseases);
-              next();
+      {step === 3 && (
+        <Step3Run
+          region={region}
+          plantingDate={plantingDate}
+          harvestDate={harvestDate}
+          diseases={diseases}
+          onResult={(res) => {
+            setResult(res);
+            next();
+          }}
+          onBack={back}
+        />
+      )}
+
+      {step === 4 && (
+        <>
+          <Step4Results
+            result={result}
+            onRestart={() => {
+              setStep(1);
+              setResult(null);
             }}
-            onBack={back}
           />
-        )}
-
-        {step === 3 && (
-          <Step3Run
-            region={region}
-            plantingDate={plantingDate}
-            harvestDate={harvestDate}
-            diseases={diseases}
-            onResult={(res) => {
-              setResult(res);
-              next();
-            }}
-            onBack={back}
-          />
-        )}
-
-        {step === 4 && (
-          <>
-            <Step4Results
-              result={result}
-              onRestart={() => {
-                setStep(1);
-                setResult(null);
-              }}
-            />
-            <CalendarView events={extractCalendarEvents(result)} />
-          </>
-        )}
-      </div>
+          <CalendarView events={extractCalendarEvents(result)} />
+        </>
+      )}
     </Layout>
   );
 }
