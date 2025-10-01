@@ -1,26 +1,26 @@
+// Оновлений компонент Step3Run.js без Layout всередині, з уніфікованими кнопками і чистим інтерфейсом
+
 import React, { useState } from "react";
+import { format } from "date-fns";
 import Layout from "../components/Layout";
 import {
   fetchForecastHourly,
   fetchForecastDailyRain,
   fetchWeatherFromNASA,
   fetchDailyRainFromNASA,
-  fetchArchiveHourlyExtras,
-  transformOpenMeteoHourly,
-  transformForecastToHourlyData,
-  extractSuitableSprayHours,
-  computeDSVSchedule,
   computeMultiSpraySchedule,
+  computeDSVSchedule,
   makeWeeklyPlan,
+  transformForecastToHourlyData,
+  transformOpenMeteoHourly,
+  extractSuitableSprayHours,
+  fetchArchiveHourlyExtras,
 } from "../engine";
-
 import {
   isGrayMoldRisk,
   isAlternariaRisk,
   isBacterialRisk,
 } from "../diseases";
-
-import { format } from "date-fns";
 
 const DEFAULT_DSV_THRESHOLD = 15;
 const RAIN_HIGH_THRESHOLD_MM = 12.7;
@@ -78,7 +78,7 @@ export default function Step3Run({
         forecastTransformed.forEach((day) => {
           const wet = Number(day.wetHours);
           const temp = Number(day.wetTempAvg);
-          day.condHours = !isNaN(wet) && !isNaN(temp) && wet >= 6 && temp >= 15 ? wet : 0;
+          day.condHours = wet >= 6 && temp >= 15 ? wet : 0;
         });
 
         weatherDaily.push(...forecastTransformed);
@@ -108,14 +108,20 @@ export default function Step3Run({
 
       const comp = computeDSVSchedule(rowsAfter, DEFAULT_DSV_THRESHOLD);
       const sprays = computeMultiSpraySchedule(rowsAfter, rainAfter, plantingDate);
-      const weekly = makeWeeklyPlan(comp.rows, rainAfter, plantingDate, RAIN_HIGH_THRESHOLD_MM);
-      const suitable = extractSuitableSprayHours(hourlyData);
+      const weekly = makeWeeklyPlan(
+        comp.rows,
+        rainAfter,
+        plantingDate,
+        RAIN_HIGH_THRESHOLD_MM
+      );
 
+      const suitable = extractSuitableSprayHours(hourlyData);
       const formattedSuitable = {};
       Object.entries(suitable).forEach(([iso, hours]) => {
         const d = new Date(iso);
         if (!isNaN(d)) {
-          formattedSuitable[format(d, "dd.MM.yyyy")] = hours;
+          const formatted = format(d, "dd.MM.yyyy");
+          formattedSuitable[formatted] = hours;
         }
       });
 
@@ -134,8 +140,9 @@ export default function Step3Run({
       if (diseases.includes("bacteriosis")) {
         const riskDates = rowsAfter
           .filter((d) => {
-            const rv =
-              rainAfter.find((r) => format(r.date, "yyyy-MM-dd") === format(d.date, "yyyy-MM-dd"))?.rain || 0;
+            const rv = rainAfter.find(
+              (r) => format(r.date, "yyyy-MM-dd") === format(d.date, "yyyy-MM-dd")
+            )?.rain || 0;
             return isBacterialRisk(d, rv);
           })
           .map((d) => d.date);
@@ -164,36 +171,35 @@ export default function Step3Run({
   };
 
   return (
-    <Layout>
-      <div>
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">Крок 3: Розрахунок 🧪</h2>
+    <div className="space-y-4">
+      <h2 className="text-2xl font-semibold">Крок 3: Розрахунок 🧪</h2>
+      <p className="text-gray-700">
+        Натисніть кнопку, щоб розрахувати систему захисту на весь сезон: від{' '}
+        <strong>{plantingDate}</strong> до <strong>{harvestDate}</strong>.
+      </p>
 
-        <p className="text-sm text-gray-600">
-          Натисніть кнопку, щоб розрахувати систему захисту на весь сезон:
-          <br />
-          від <strong>{plantingDate}</strong> до <strong>{harvestDate}</strong>.
-        </p>
+      {error && <div className="text-red-600 font-medium">⚠️ {error}</div>}
 
-        {error && <div className="text-red-600 mt-4 font-medium">⚠️ {error}</div>}
+      <div className="flex gap-4 pt-2">
+        <button
+          onClick={onBack}
+          className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded transition"
+        >
+          Назад
+        </button>
 
-        <div className="flex gap-4 mt-6">
-          <button
-            onClick={onBack}
-            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition"
-          >
-            Назад
-          </button>
-          <button
-            onClick={runModel}
-            disabled={loading}
-            className={`px-4 py-2 text-white rounded transition ${
-              loading ? "bg-gray-500 cursor-wait" : "bg-blue-600 hover:bg-blue-700"
-            }`}
-          >
-            {loading ? "Обчислення..." : "Запустити розрахунок"}
-          </button>
-        </div>
+        <button
+          onClick={runModel}
+          disabled={loading}
+          className={`px-4 py-2 rounded text-white transition ${
+            loading
+              ? 'bg-blue-400 cursor-wait'
+              : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'
+          }`}
+        >
+          {loading ? "Обчислення..." : "Запустити розрахунок"}
+        </button>
       </div>
-    </Layout>
+    </div>
   );
 }
