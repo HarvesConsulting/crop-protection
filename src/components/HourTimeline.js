@@ -19,14 +19,6 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
     return hDate === formattedDate;
   });
 
-  const handleTouchMove = (e) => {
-    const touch = e.touches[0];
-    const el = document.elementFromPoint(touch.clientX, touch.clientY);
-    if (el && el.dataset.hour) {
-      setActiveHour(Number(el.dataset.hour));
-    }
-  };
-
   const closeTooltip = () => setActiveHour(null);
 
   return (
@@ -37,8 +29,10 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
           onTouchEnd={closeTooltip}
         >
           {[...Array(24).keys()].map((hour) => {
-            const hourStr = hour.toString().padStart(2, "0") + ":00";
-            const isSuitable = suitableHours.includes(hourStr);
+            const isSuitable = suitableHours.includes(
+              hour.toString().padStart(2, "0") + ":00"
+            );
+
             const hourData = hoursToday.find((h) => Number(h.hour) === hour);
             const isActive = activeHour === hour;
 
@@ -46,11 +40,16 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
               <div
                 key={hour}
                 className="hour-segment-wrapper"
-                data-hour={hour}
                 onMouseEnter={() => setActiveHour(hour)}
                 onMouseLeave={closeTooltip}
                 onTouchStart={() => setActiveHour(hour)}
-                onTouchMove={handleTouchMove}
+                onTouchMove={(e) => {
+                  const touch = e.touches[0];
+                  const element = document.elementFromPoint(touch.clientX, touch.clientY);
+                  if (element && element.dataset.hour) {
+                    setActiveHour(Number(element.dataset.hour));
+                  }
+                }}
               >
                 <div
                   className={`hour-segment ${isSuitable ? "suitable" : "not-suitable"}`}
@@ -60,10 +59,10 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
                 </div>
 
                 {hourData && isActive && (
-                  <div className="hour-details-tooltip">
-                    <strong>{hour}:00</strong><br />
-                    🌡 Температура: {hourData.temperature}°C<br />
-                    💨 Вітер: {hourData.windspeed} км/год<br />
+                  <div className="hour-details-tooltip mobile">
+                    <strong>{hour}:00</strong> <br />
+                    🌡 Температура: {hourData.temperature}°C <br />
+                    💨 Вітер: {hourData.windspeed} км/год <br />
                     🌧 Опади: {hourData.precipitation ?? 0} мм
                   </div>
                 )}
