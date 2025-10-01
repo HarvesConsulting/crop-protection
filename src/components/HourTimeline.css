@@ -14,7 +14,7 @@
   display: flex;
   border: 1px solid #ccc;
   border-radius: 6px;
-  overflow: visible; /* дозволяє тултіпу виходити за межі */
+  overflow: visible;
   position: relative;
 }
 
@@ -65,7 +65,7 @@
 .hour-details-tooltip {
   display: none;
   position: absolute;
-  bottom: 100%; /* показуємо над годиною */
+  bottom: 100%;
   left: 50%;
   transform: translateX(-50%) translateY(-6px);
   background: #fff;
@@ -83,9 +83,14 @@
   text-align: left;
 }
 
-/* 🎯 Покажемо тултіп при hover (ПК) */
-.hour-segment-wrapper:hover .hour-details-tooltip {
+/* ✅ Показати тултіп на передній стороні тільки при hover */
+.flip-card-front .hour-segment-wrapper:hover .hour-details-tooltip {
   display: block;
+}
+
+/* ❌ Приховати тултіп повністю на звороті */
+.flip-card-back .hour-details-tooltip {
+  display: none !important;
 }
 
 /* ☝️ Показ тултіпу на мобільному (через JS) */
@@ -122,14 +127,5 @@
     font-size: 12px;
     max-width: 180px;
   }
-}
-/* ✅ Показуй тултіп тільки на передній стороні */
-.flip-card-front .hour-details-tooltip {
-  display: block !important;
-}
-
-/* ❌ Але приховай повністю на задній стороні */
-.flip-card-back .hour-details-tooltip {
-  display: none !important;
 }
 
