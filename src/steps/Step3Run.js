@@ -1,8 +1,4 @@
-// Оновлений компонент Step3Run.js без Layout всередині, з уніфікованими кнопками і чистим інтерфейсом
-
 import React, { useState } from "react";
-import { format } from "date-fns";
-import Layout from "../components/Layout";
 import {
   fetchForecastHourly,
   fetchForecastDailyRain,
@@ -16,11 +12,14 @@ import {
   extractSuitableSprayHours,
   fetchArchiveHourlyExtras,
 } from "../engine";
+
 import {
   isGrayMoldRisk,
   isAlternariaRisk,
   isBacterialRisk,
 } from "../diseases";
+
+import { format } from "date-fns";
 
 const DEFAULT_DSV_THRESHOLD = 15;
 const RAIN_HIGH_THRESHOLD_MM = 12.7;
@@ -78,7 +77,11 @@ export default function Step3Run({
         forecastTransformed.forEach((day) => {
           const wet = Number(day.wetHours);
           const temp = Number(day.wetTempAvg);
-          day.condHours = wet >= 6 && temp >= 15 ? wet : 0;
+          if (!isNaN(wet) && !isNaN(temp)) {
+            day.condHours = wet >= 6 && temp >= 15 ? wet : 0;
+          } else {
+            day.condHours = 0;
+          }
         });
 
         weatherDaily.push(...forecastTransformed);
@@ -102,20 +105,24 @@ export default function Step3Run({
         const last = new Date(lastSprayDate);
         last.setHours(0, 0, 0, 0);
         const nextDay = new Date(last.getTime() + 86400000);
+
         rowsAfter = rowsAfter.filter((r) => r?.date && r.date >= nextDay);
         rainAfter = rainAfter.filter((r) => r?.date && r.date >= nextDay);
       }
 
       const comp = computeDSVSchedule(rowsAfter, DEFAULT_DSV_THRESHOLD);
       const sprays = computeMultiSpraySchedule(rowsAfter, rainAfter, plantingDate);
+
       const weekly = makeWeeklyPlan(
         comp.rows,
         rainAfter,
         plantingDate,
-        RAIN_HIGH_THRESHOLD_MM
+        RAIN_HIGH_THRESHOLD_MM,
+        undefined
       );
 
       const suitable = extractSuitableSprayHours(hourlyData);
+
       const formattedSuitable = {};
       Object.entries(suitable).forEach(([iso, hours]) => {
         const d = new Date(iso);
@@ -140,9 +147,10 @@ export default function Step3Run({
       if (diseases.includes("bacteriosis")) {
         const riskDates = rowsAfter
           .filter((d) => {
-            const rv = rainAfter.find(
-              (r) => format(r.date, "yyyy-MM-dd") === format(d.date, "yyyy-MM-dd")
-            )?.rain || 0;
+            const rv =
+              rainAfter.find((r) =>
+                format(r.date, "yyyy-MM-dd") === format(d.date, "yyyy-MM-dd")
+              )?.rain || 0;
             return isBacterialRisk(d, rv);
           })
           .map((d) => d.date);
@@ -155,7 +163,9 @@ export default function Step3Run({
         weeklyPlan: weekly,
         diseaseSummary,
         suitableHours: formattedSuitable,
-        lastSprayDate: lastSprayDate ? format(new Date(lastSprayDate), "dd.MM.yyyy") : null,
+        lastSprayDate: lastSprayDate
+          ? format(new Date(lastSprayDate), "dd.MM.yyyy")
+          : null,
         plantingDate,
         harvestDate,
         rainDaily,
@@ -171,19 +181,22 @@ export default function Step3Run({
   };
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-semibold">Крок 3: Розрахунок 🧪</h2>
-      <p className="text-gray-700">
-        Натисніть кнопку, щоб розрахувати систему захисту на весь сезон: від{' '}
-        <strong>{plantingDate}</strong> до <strong>{harvestDate}</strong>.
+    <div className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-md">
+      <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+        Крок 3: Розрахунок <span role="img" aria-label="lab">🧪</span>
+      </h2>
+      <p className="text-sm text-gray-600 mb-4">
+        Натисніть кнопку, щоб розрахувати систему захисту на весь сезон: від <strong>{plantingDate}</strong> до <strong>{harvestDate}</strong>.
       </p>
 
-      {error && <div className="text-red-600 font-medium">⚠️ {error}</div>}
+      {error && (
+        <div className="text-red-600 font-medium mb-4">⚠️ {error}</div>
+      )}
 
-      <div className="flex gap-4 pt-2">
+      <div className="flex gap-4 mt-4">
         <button
           onClick={onBack}
-          className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded transition"
+          className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800 transition"
         >
           Назад
         </button>
@@ -191,11 +204,7 @@ export default function Step3Run({
         <button
           onClick={runModel}
           disabled={loading}
-          className={`px-4 py-2 rounded text-white transition ${
-            loading
-              ? 'bg-blue-400 cursor-wait'
-              : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'
-          }`}
+          className={`px-4 py-2 rounded text-white transition ${loading ? "bg-gray-500 cursor-wait" : "bg-blue-600 hover:bg-blue-700"}`}
         >
           {loading ? "Обчислення..." : "Запустити розрахунок"}
         </button>
