@@ -1,17 +1,15 @@
-/* 📦 Обгортка всього таймлайну */
+/* ───────────────────────────────
+   📦 Обгортка всього таймлайну
+──────────────────────────────── */
 .timeline-wrapper {
   margin-top: 10px;
   position: relative;
   z-index: 1;
 }
 
-/* 📜 Смуга, яка тримає всі години */
-.timeline-scroll {
-  overflow-x: auto;
-  padding-bottom: 10px;
-}
-
-/* 🟩 Горизонтальна смуга часу */
+/* ───────────────────────────────
+   🟩 Горизонтальна смуга часу
+──────────────────────────────── */
 .timeline-bar {
   display: flex;
   border: 1px solid #ccc;
@@ -20,14 +18,18 @@
   position: relative;
 }
 
-/* ⏱ Контейнер для кожної години */
+/* ───────────────────────────────
+   ⏱ Контейнер для кожної години
+──────────────────────────────── */
 .hour-segment-wrapper {
   position: relative;
   flex: 1;
   text-align: center;
 }
 
-/* ⌛️ Сама година (один блок) */
+/* ───────────────────────────────
+   ⌛️ Сама година (один блок)
+──────────────────────────────── */
 .hour-segment {
   font-size: 12px;
   cursor: pointer;
@@ -57,8 +59,11 @@
   background-color: #f44336;
 }
 
-/* 💬 Tooltip з деталями погоди */
+/* ───────────────────────────────
+   💬 Tooltip з деталями погоди
+──────────────────────────────── */
 .hour-details-tooltip {
+  display: none;
   position: absolute;
   bottom: 100%;
   left: 50%;
@@ -76,21 +81,16 @@
   max-width: 240px;
   line-height: 1.4;
   text-align: left;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.2s ease-in-out;
 }
 
 /* 🎯 ПК: Показувати тултіп при hover */
 .hour-segment-wrapper:hover .hour-details-tooltip {
-  opacity: 1;
-  visibility: visible;
+  display: block;
 }
 
 /* ☝️ Мобільний режим – показ через JS */
 .hour-details-tooltip.mobile {
-  opacity: 1 !important;
-  visibility: visible !important;
+  display: block !important;
   pointer-events: auto;
 }
 
@@ -107,17 +107,17 @@
 
 /* ✅ Показуй тултіп тільки на передній стороні */
 .flip-card-front .hour-details-tooltip {
-  opacity: 1 !important;
-  visibility: visible !important;
+  display: block !important;
 }
 
 /* ❌ Приховуй повністю на задній стороні */
 .flip-card-back .hour-details-tooltip {
-  opacity: 0 !important;
-  visibility: hidden !important;
+  display: none !important;
 }
 
-/* 📱 Адаптив для мобільних */
+/* ───────────────────────────────
+   📱 Адаптив для мобільних
+──────────────────────────────── */
 @media (max-width: 768px) {
   .timeline-bar {
     border-radius: 4px;
