@@ -42,7 +42,7 @@ export default function Step1Region({ region, setRegion, onNext }) {
     <main className="flex justify-center items-start min-h-[70vh] px-4">
       <div className="w-full max-w-xl bg-white rounded-xl shadow-lg p-6 space-y-6">
 
-        {/* Header with info button */}
+        {/* Заголовок з кнопкою info */}
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-800">
             Крок 1: Оберіть ваше місто
@@ -56,7 +56,7 @@ export default function Step1Region({ region, setRegion, onNext }) {
           </button>
         </div>
 
-        {/* Info Box */}
+        {/* Інфо-бокс */}
         {showInfo && (
           <div className="bg-blue-50 border border-blue-200 text-sm text-gray-700 p-4 rounded-md shadow-sm">
             Введіть назву населеного пункту (мінімум 2 букви). Застосунок запропонує відповідні
@@ -64,13 +64,10 @@ export default function Step1Region({ region, setRegion, onNext }) {
           </div>
         )}
 
-        {/* Input */}
-        <div>
-          <label className="block mb-2 text-sm font-medium text-gray-700">
-            Назва населеного пункту
-          </label>
+        {/* Поле вводу */}
+        <div className="flex justify-center">
           <input
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition"
+            className="w-full max-w-sm px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition"
             type="text"
             value={inputValue}
             onChange={(e) => {
@@ -82,40 +79,40 @@ export default function Step1Region({ region, setRegion, onNext }) {
             }}
             placeholder="Почніть вводити (мін. 2 букви)"
           />
-
-          {/* Suggestions */}
-          {inputValue.trim().length >= 2 && !region && (
-            <div className="mt-2 border border-gray-200 rounded-md bg-white max-h-60 overflow-y-auto shadow-md">
-              {suggestions.length === 0 ? (
-                <div className="p-2 text-gray-500">Немає збігів</div>
-              ) : (
-                suggestions.map((c, i) => (
-                  <div
-                    key={`${c.name}-${c.lat}-${c.lon}`}
-                    className={`p-2 cursor-pointer hover:bg-blue-100 ${
-                      active === i ? "bg-blue-50" : ""
-                    }`}
-                    onClick={() => {
-                      setInputValue(c.name);
-                      setRegion(c);
-                      setSuggestions([]);
-                      setActive(-1);
-                    }}
-                  >
-                    {c.name}
-                  </div>
-                ))
-              )}
-            </div>
-          )}
         </div>
 
-        {/* Button */}
-        <div className="flex justify-end">
+        {/* Список підказок */}
+        {inputValue.trim().length >= 2 && !region && (
+          <div className="max-w-sm mx-auto mt-2 border border-gray-200 rounded-md bg-white max-h-60 overflow-y-auto shadow-md">
+            {suggestions.length === 0 ? (
+              <div className="p-2 text-gray-500">Немає збігів</div>
+            ) : (
+              suggestions.map((c, i) => (
+                <div
+                  key={`${c.name}-${c.lat}-${c.lon}`}
+                  className={`p-2 cursor-pointer hover:bg-blue-100 ${
+                    active === i ? "bg-blue-50" : ""
+                  }`}
+                  onClick={() => {
+                    setInputValue(c.name);
+                    setRegion(c);
+                    setSuggestions([]);
+                    setActive(-1);
+                  }}
+                >
+                  {c.name}
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        {/* Кнопка "Продовжити" */}
+        <div className="flex justify-center">
           <button
             onClick={onNext}
             disabled={!region}
-            className={`px-5 py-2 rounded-md text-white font-medium transition ${
+            className={`px-6 py-2 rounded-md text-white font-medium transition ${
               region
                 ? "bg-green-600 hover:bg-green-700"
                 : "bg-gray-300 cursor-not-allowed"
