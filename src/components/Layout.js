@@ -22,9 +22,9 @@ export default function Layout({ children, step, onLogout }) {
         <LogoutButton onLogout={onLogout} />
       </header>
 
-      {/* Info Box */}
+      {/* Info Box (без бітого скла) */}
       {showInfo && (
-        <div className="bg-yellow-100 text-sm text-gray-700 p-4 shadow-inner">
+        <div className="bg-yellow-50 border border-yellow-200 text-sm text-gray-800 px-6 py-4">
           <p>
             Застосунок для аграріїв: прогнозує дати обробки томатів від фітофторозу, сірої гнилі,
             альтернаріозу та бактеріозу на основі погодних даних.
@@ -33,13 +33,13 @@ export default function Layout({ children, step, onLogout }) {
       )}
 
       {/* Stepper */}
-      <div className="flex justify-around bg-white py-3 shadow-md text-sm">
+      <div className="flex justify-around bg-white py-3 shadow text-sm">
         {steps.map((label, i) => (
           <div
             key={i}
-            className={`px-2 py-1 rounded ${
+            className={`px-3 py-1 rounded-full transition ${
               i + 1 === step
-                ? "bg-green-200 text-green-900 font-semibold"
+                ? "bg-green-100 text-green-800 font-semibold border border-green-400"
                 : "text-gray-500"
             }`}
           >
@@ -48,9 +48,9 @@ export default function Layout({ children, step, onLogout }) {
         ))}
       </div>
 
-      {/* Main */}
-      <main className="max-w-2xl mx-auto p-6">
-        <div className="bg-white rounded-xl shadow-md p-6">{children}</div>
+      {/* Main content without extra "glass" wrapper */}
+      <main className="max-w-3xl mx-auto px-4 py-8">
+        {children}
       </main>
     </div>
   );
