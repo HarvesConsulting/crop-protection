@@ -21,6 +21,14 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
 
   const closeTooltip = () => setActiveHour(null);
 
+  const handleTouchMove = (e) => {
+    const touch = e.touches[0];
+    const el = document.elementFromPoint(touch.clientX, touch.clientY);
+    if (el && el.dataset.hour) {
+      setActiveHour(Number(el.dataset.hour));
+    }
+  };
+
   return (
     <div className="timeline-wrapper">
       <div className="timeline-scroll">
@@ -32,7 +40,6 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
             const isSuitable = suitableHours.includes(
               hour.toString().padStart(2, "0") + ":00"
             );
-
             const hourData = hoursToday.find((h) => Number(h.hour) === hour);
             const isActive = activeHour === hour;
 
@@ -43,13 +50,7 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
                 onMouseEnter={() => setActiveHour(hour)}
                 onMouseLeave={closeTooltip}
                 onTouchStart={() => setActiveHour(hour)}
-                onTouchMove={(e) => {
-                  const touch = e.touches[0];
-                  const element = document.elementFromPoint(touch.clientX, touch.clientY);
-                  if (element && element.dataset.hour) {
-                    setActiveHour(Number(element.dataset.hour));
-                  }
-                }}
+                onTouchMove={handleTouchMove}
               >
                 <div
                   className={`hour-segment ${isSuitable ? "suitable" : "not-suitable"}`}
@@ -59,7 +60,7 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
                 </div>
 
                 {hourData && isActive && (
-                  <div className="hour-details-tooltip mobile">
+                  <div className="hour-details-tooltip">
                     <strong>{hour}:00</strong> <br />
                     🌡 Температура: {hourData.temperature}°C <br />
                     💨 Вітер: {hourData.windspeed} км/год <br />
