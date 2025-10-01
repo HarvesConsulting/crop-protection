@@ -1,4 +1,3 @@
-// src/components/LogoutButton.js
 import React from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
@@ -14,18 +13,12 @@ export default function LogoutButton({ onLogout }) {
   };
 
   return (
-    <button onClick={handleLogout} style={buttonStyle}>
-      🚪 Вийти з акаунту
+    <button
+      onClick={handleLogout}
+      className="bg-white text-green-700 px-4 py-2 rounded hover:bg-green-100 transition text-sm font-medium shadow-sm border border-green-700"
+      title="Вийти з акаунту"
+    >
+      🔓 Вийти
     </button>
   );
 }
-
-const buttonStyle = {
-  padding: "10px 16px",
-  fontSize: "14px",
-  backgroundColor: "#ccc",
-  border: "none",
-  borderRadius: "8px",
-  cursor: "pointer",
-  marginBottom: "20px",
-};

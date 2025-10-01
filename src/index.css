@@ -116,4 +116,10 @@ html, body, #root {
   font-weight: bold;
   color: #2d6cdf;
 }
+body {
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  background-color: #f9fafb;
+  margin: 0;
+  padding: 0;
+}
 

@@ -3,19 +3,18 @@ import LogoutButton from "./LogoutButton";
 
 export default function Layout({ children, step, onLogout }) {
   const [showInfo, setShowInfo] = useState(false);
-
   const steps = ["Місто", "Сезон", "Розрахунок", "Результати"];
 
   return (
-    <div className="page-wrapper">
-      {/* Хедер */}
-      <header className="header">
-        <div className="logo">
+    <div className="min-h-screen bg-gray-50 text-gray-800 font-sans">
+      {/* Header */}
+      <header className="flex justify-between items-center p-4 bg-green-700 text-white shadow">
+        <div className="flex items-center gap-3 text-lg font-semibold">
           🍅 Crop Protection
           <button
-            className="info-icon"
+            className="hover:text-yellow-200 transition"
             onClick={() => setShowInfo(!showInfo)}
-            title="Інформація"
+            title="Інформація про застосунок"
           >
             ℹ️
           </button>
@@ -23,36 +22,35 @@ export default function Layout({ children, step, onLogout }) {
         <LogoutButton onLogout={onLogout} />
       </header>
 
-      {/* Інфо-бокс */}
+      {/* Info Box */}
       {showInfo && (
-        <div className="info-box" style={{ margin: "16px" }}>
+        <div className="bg-yellow-100 text-sm text-gray-700 p-4 shadow-inner">
           <p>
-            Цей застосунок допомагає агрономам, фермерам та консультантам
-            ухвалювати рішення щодо захисту томатів від фітофтори, сірої гнилі,
-            альтернаріозу та бактеріозу.
-          </p>
-          <p>
-            Ми аналізуємо погодні дані, обчислюємо індекси ризику (DSV) та
-            прогнозуємо оптимальні дати обробок.
+            Застосунок для аграріїв: прогнозує дати обробки томатів від фітофторозу, сірої гнилі,
+            альтернаріозу та бактеріозу на основі погодних даних.
           </p>
         </div>
       )}
 
-      {/* Прогрес-бар */}
-      <div className="progress-bar">
+      {/* Stepper */}
+      <div className="flex justify-around bg-white py-3 shadow-md text-sm">
         {steps.map((label, i) => (
           <div
             key={i}
-            className={`progress-step ${i + 1 === step ? "active" : ""}`}
+            className={`px-2 py-1 rounded ${
+              i + 1 === step
+                ? "bg-green-200 text-green-900 font-semibold"
+                : "text-gray-500"
+            }`}
           >
             {i + 1}. {label}
           </div>
         ))}
       </div>
 
-      {/* Контент */}
-      <main className="main-content">
-        <div className="glass-container">{children}</div>
+      {/* Main */}
+      <main className="max-w-2xl mx-auto p-6">
+        <div className="bg-white rounded-xl shadow-md p-6">{children}</div>
       </main>
     </div>
   );
