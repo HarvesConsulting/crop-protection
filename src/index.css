@@ -2,11 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f5f5f5;
-}
 /* Глобальні базові стилі */
 html, body, #root {
   height: 100%;
@@ -14,6 +9,7 @@ html, body, #root {
   padding: 0;
   font-family: system-ui, Arial, sans-serif;
   background: #f8f8f8;
+  overflow-x: hidden;
 }
 
 /* Контейнер головного контенту */
@@ -56,8 +52,10 @@ html, body, #root {
     padding: 10px;
   }
 }
+
+/* Фон для всієї аплікації */
 .page-wrapper {
-  background-image: url("images/bg.jpg");
+  background-image: url("images/bg.jpg"); /* або /images/bg.jpg */
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
@@ -66,19 +64,17 @@ html, body, #root {
   position: relative;
 }
 
-/* (Не обов’язково) — напівпрозора пелена для читабельності */
+/* Напівпрозора пелена поверх фону */
 .page-wrapper::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.9); /* світла маска */
+  background: rgba(0, 0, 0, 0.4); /* 🔹 темна пелена замість білої */
   z-index: 0;
 }
 
+/* Щоб усі діти були поверх overlay */
 .page-wrapper > * {
   position: relative;
   z-index: 1;
-}
-html, body {
-  overflow-x: hidden;
 }

@@ -1,6 +1,7 @@
+// src/steps/Step1Region.js
 import React, { useState, useEffect } from "react";
-import { regions } from "../regions"; // або ./regions, залежно від місця
-import { norm, searchTextFor, placeKey } from "../helpers"; // або додай ці функції сюди, якщо helpers немає
+import { regions } from "../regions";
+import { norm, searchTextFor, placeKey } from "../helpers";
 import Layout from "../components/Layout";
 
 export default function Step1Region({ region, setRegion, onNext }) {
@@ -40,83 +41,65 @@ export default function Step1Region({ region, setRegion, onNext }) {
   }, [inputValue]);
 
   return (
-    <Layout>
-    <div>
-      <h2>Крок 1: Оберіть ваше місто</h2>
-      <p className="text-sm text-gray-600 mb-4">
-  Оберіть населений пункт, для якого потрібно розрахувати захист. 
-</p>
+    <Layout currentStep={1}>
+      <h2 className="title">Крок 1: Оберіть ваше місто</h2>
+      <p className="subtitle">
+        Оберіть населений пункт, для якого потрібно розрахувати захист.
+      </p>
 
-      <label>Населений пункт:</label>
-      <input
-        type="text"
-        value={inputValue}
-        onChange={(e) => {
-          const v = e.target.value;
-          setInputValue(v);
-          const q = norm(v.trim());
-          const exact = regions.find((r) => searchTextFor(r) === q);
-          setRegion(exact || null);
-        }}
-        placeholder="Почніть вводити (мін. 2 букви)"
-        style={{ width: "100%", padding: "12px", fontSize: "16px", marginBottom: "8px" }}
-      />
-
-      {inputValue.trim().length >= 2 && !region && (
-        <div
-          tabIndex={-1}
-          onBlur={() => setTimeout(() => setSuggestions([]), 100)}
-          style={{
-            border: "1px solid #ddd",
-            borderRadius: "6px",
-            background: "#fff",
-            maxHeight: "200px",
-            overflowY: "auto",
-            position: "relative",
+      <div className="input-group">
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(e) => {
+            const v = e.target.value;
+            setInputValue(v);
+            const q = norm(v.trim());
+            const exact = regions.find((r) => searchTextFor(r) === q);
+            setRegion(exact || null);
           }}
-        >
-          {suggestions.length === 0 ? (
-            <div style={{ padding: 8, color: "#666" }}>Немає збігів</div>
-          ) : (
-            suggestions.map((c, i) => (
-              <div
-                key={`${c.name}-${c.lat}-${c.lon}`}
-                onClick={() => {
-                  setInputValue(c.name);
-                  setRegion(c);
-                  setSuggestions([]);
-                  setActive(-1);
-                }}
-                style={{
-                  padding: 8,
-                  background: active === i ? "#eef" : "#fff",
-                  cursor: "pointer",
-                }}
-              >
-                {c.name}
-              </div>
-            ))
-          )}
-        </div>
-      )}
+          placeholder="Почніть вводити (мін. 2 букви)"
+          className="input"
+        />
+
+        {inputValue.trim().length >= 2 && !region && (
+          <div
+            tabIndex={-1}
+            onBlur={() => setTimeout(() => setSuggestions([]), 100)}
+            className="suggestions"
+          >
+            {suggestions.length === 0 ? (
+              <div className="no-match">Немає збігів</div>
+            ) : (
+              suggestions.map((c, i) => (
+                <div
+                  key={`${c.name}-${c.lat}-${c.lon}`}
+                  onClick={() => {
+                    setInputValue(c.name);
+                    setRegion(c);
+                    setSuggestions([]);
+                    setActive(-1);
+                  }}
+                  className={`suggestion-item ${
+                    active === i ? "active" : ""
+                  }`}
+                >
+                  {c.name}
+                </div>
+              ))
+            )}
+          </div>
+        )}
+      </div>
 
       <button
         onClick={onNext}
         disabled={!region}
-        style={{
-          marginTop: "16px",
-          padding: "10px 20px",
-          fontSize: "16px",
-          fontWeight: "bold",
-          borderRadius: "8px",
-          background: region ? "#2d6cdf" : "#ccc",
-          color: "#fff",
-          cursor: region ? "pointer" : "not-allowed",
-        }}
+        className={`btn ${region ? "btn-active" : "btn-disabled"}`}
       >
         Продовжити
       </button>
-    </div>
     </Layout>
   );
 }
+
