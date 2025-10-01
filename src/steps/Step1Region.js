@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { regions } from "../regions";
 import { norm, searchTextFor, placeKey } from "../helpers";
+import { Info } from "lucide-react"; // npm i lucide-react
+
+<button
+  onClick={() => setShowInfo(!showInfo)}
+  className="text-blue-600 hover:text-blue-800 transition"
+  title="Інформація"
+>
+  <Info size={20} />
+</button>
+
 
 export default function Step1Region({ region, setRegion, onNext }) {
   const [inputValue, setInputValue] = useState(region?.name || "");
@@ -39,16 +49,19 @@ export default function Step1Region({ region, setRegion, onNext }) {
 
   return (
     <>
-      <div className="flex items-center gap-2">
-        <h2 className="text-xl font-semibold">Крок 1: Оберіть ваше місто</h2>
-        <button
-          className="info-icon"
-          onClick={() => setShowInfo(!showInfo)}
-          title="Додаткова інформація"
-        >
-          ℹ️
-        </button>
-      </div>
+      <div className="flex items-center justify-between mb-4">
+  <h2 className="text-xl font-semibold text-gray-800">
+    Крок 1: Оберіть ваше місто
+  </h2>
+  <button
+    onClick={() => setShowInfo(!showInfo)}
+    className="text-blue-600 hover:text-blue-800 transition text-lg"
+    title="Інформація про вибір міста"
+  >
+    ℹ️
+  </button>
+</div>
+
 
       {showInfo && (
         <div className="info-box">
