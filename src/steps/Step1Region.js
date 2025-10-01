@@ -45,7 +45,7 @@ export default function Step1Region({ region, setRegion, onNext }) {
         {/* Заголовок з кнопкою info */}
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-800">
-            Крок 1: Оберіть ваше місто
+            Оберіть місто
           </h2>
           <button
             onClick={() => setShowInfo(!showInfo)}

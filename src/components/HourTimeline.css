@@ -75,7 +75,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   font-size: 13px;
   white-space: nowrap;
-  z-index: 10;
+  z-index: 9999;
   pointer-events: none;
   width: max-content;
   max-width: 240px;
@@ -83,23 +83,18 @@
   text-align: left;
 }
 
-/* ✅ Показати тултіп на передній стороні тільки при hover */
-.flip-card-front .hour-segment-wrapper:hover .hour-details-tooltip {
+/* 🎯 ПК: Показувати тултіп при hover */
+.hour-segment-wrapper:hover .hour-details-tooltip {
   display: block;
 }
 
-/* ❌ Приховати тултіп повністю на звороті */
-.flip-card-back .hour-details-tooltip {
-  display: none !important;
-}
-
-/* ☝️ Показ тултіпу на мобільному (через JS) */
+/* ☝️ Мобільний режим – показ через JS */
 .hour-details-tooltip.mobile {
-  display: block;
+  display: block !important;
   pointer-events: auto;
 }
 
-/* 🔻 Маленький трикутник під тултіпом */
+/* 🔻 Трикутник тултіпа */
 .hour-details-tooltip::after {
   content: "";
   position: absolute;
@@ -108,6 +103,16 @@
   transform: translateX(-50%);
   border: 6px solid transparent;
   border-top-color: #fff;
+}
+
+/* ✅ Показуй тултіп тільки на передній стороні */
+.flip-card-front .hour-details-tooltip {
+  display: block !important;
+}
+
+/* ❌ Приховуй повністю на задній стороні */
+.flip-card-back .hour-details-tooltip {
+  display: none !important;
 }
 
 /* ───────────────────────────────
@@ -128,4 +133,3 @@
     max-width: 180px;
   }
 }
-
