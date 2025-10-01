@@ -1,4 +1,3 @@
-// src/steps/Step1Region.js
 import React, { useState, useEffect } from "react";
 import { regions } from "../regions";
 import { norm, searchTextFor, placeKey } from "../helpers";
@@ -12,28 +11,17 @@ export default function Step1Region({ region, setRegion, onNext }) {
   useEffect(() => {
     const q = norm(inputValue.trim());
     if (q.length < 2) {
-      setSuggestions([]);
-      setActive(-1);
-      return;
+      setSuggestions([]); setActive(-1); return;
     }
-
     const exact = regions.find((r) => searchTextFor(r) === q);
-    if (exact) {
-      setSuggestions([]);
-      setActive(-1);
-      return;
-    }
+    if (exact) { setSuggestions([]); setActive(-1); return; }
 
-    const seen = new Set();
-    const res = [];
+    const seen = new Set(); const res = [];
     for (const r of regions) {
       const s = searchTextFor(r);
       if (s.startsWith(q)) {
         const key = placeKey(r);
-        if (!seen.has(key)) {
-          seen.add(key);
-          res.push(r);
-        }
+        if (!seen.has(key)) { seen.add(key); res.push(r); }
       }
     }
     setSuggestions(res.slice(0, 30));
@@ -41,14 +29,13 @@ export default function Step1Region({ region, setRegion, onNext }) {
   }, [inputValue]);
 
   return (
-    <Layout currentStep={1}>
+    <Layout>
       <h2 className="title">Крок 1: Оберіть ваше місто</h2>
-      <p className="subtitle">
-        Оберіть населений пункт, для якого потрібно розрахувати захист.
-      </p>
+      <p className="subtitle">Оберіть населений пункт, для якого потрібно розрахувати захист.</p>
 
       <div className="input-group">
         <input
+          className="input"
           type="text"
           value={inputValue}
           onChange={(e) => {
@@ -59,14 +46,22 @@ export default function Step1Region({ region, setRegion, onNext }) {
             setRegion(exact || null);
           }}
           placeholder="Почніть вводити (мін. 2 букви)"
-          className="input"
+          onKeyDown={(e) => {
+            if (!suggestions.length) return;
+            if (e.key === "ArrowDown") setActive((p) => Math.min(p + 1, suggestions.length - 1));
+            if (e.key === "ArrowUp") setActive((p) => Math.max(p - 1, 0));
+            if (e.key === "Enter" && active >= 0) {
+              const c = suggestions[active];
+              setInputValue(c.name); setRegion(c); setSuggestions([]); setActive(-1);
+            }
+          }}
         />
 
         {inputValue.trim().length >= 2 && !region && (
           <div
-            tabIndex={-1}
-            onBlur={() => setTimeout(() => setSuggestions([]), 100)}
             className="suggestions"
+            tabIndex={-1}
+            onBlur={() => setTimeout(() => setSuggestions([]), 120)}
           >
             {suggestions.length === 0 ? (
               <div className="no-match">Немає збігів</div>
@@ -74,15 +69,15 @@ export default function Step1Region({ region, setRegion, onNext }) {
               suggestions.map((c, i) => (
                 <div
                   key={`${c.name}-${c.lat}-${c.lon}`}
+                  className={`suggestion-item ${active === i ? "active" : ""}`}
+                  onMouseEnter={() => setActive(i)}
+                  onMouseLeave={() => setActive(-1)}
                   onClick={() => {
                     setInputValue(c.name);
                     setRegion(c);
                     setSuggestions([]);
                     setActive(-1);
                   }}
-                  className={`suggestion-item ${
-                    active === i ? "active" : ""
-                  }`}
                 >
                   {c.name}
                 </div>
