@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import LogoutButton from "./components/LogoutButton";
 import AppIntro from "./components/AppIntro";
 import Step1Region from "./steps/Step1Region";
 import Step2Season from "./steps/Step2Season";
@@ -80,76 +79,56 @@ export default function App() {
   const back = () => setStep((s) => Math.max(s - 1, 1));
 
   return (
-  <Layout step={step}>
-    <div className="main-container" style={{ maxWidth: 800, margin: "0 auto", padding: 20 }}>
-      {step === 1 && <AppIntro />}
+    <Layout step={step} onLogout={() => setUser(null)}>
+      <div className="main-container" style={{ maxWidth: 800, margin: "0 auto", padding: 20 }}>
+        {step === 1 && <AppIntro />}
 
-      {step === 1 && (
-        <Step1Region region={region} setRegion={setRegion} onNext={next} />
-      )}
+        {step === 1 && (
+          <Step1Region region={region} setRegion={setRegion} onNext={next} />
+        )}
 
-      {step === 2 && (
-        <Step2Season
-          plantingDate={plantingDate}
-          setPlantingDate={setPlantingDate}
-          harvestDate={harvestDate}
-          setHarvestDate={setHarvestDate}
-          onNext={({ diseases }) => {
-            setDiseases(diseases);
-            next();
-          }}
-          onBack={back}
-        />
-      )}
-
-      {step === 3 && (
-        <Step3Run
-          region={region}
-          plantingDate={plantingDate}
-          harvestDate={harvestDate}
-          diseases={diseases}
-          onResult={(res) => {
-            setResult(res);
-            next();
-          }}
-          onBack={back}
-        />
-      )}
-
-      {step === 4 && (
-        <>
-          <Step4Results
-            result={result}
-            onRestart={() => {
-              setStep(1);
-              setResult(null);
+        {step === 2 && (
+          <Step2Season
+            plantingDate={plantingDate}
+            setPlantingDate={setPlantingDate}
+            harvestDate={harvestDate}
+            setHarvestDate={setHarvestDate}
+            onNext={({ diseases }) => {
+              setDiseases(diseases);
+              next();
             }}
+            onBack={back}
           />
-          <CalendarView events={extractCalendarEvents(result)} />
-        </>
-      )}
-    </div>
-  </Layout>
-);
+        )}
 
-}
+        {step === 3 && (
+          <Step3Run
+            region={region}
+            plantingDate={plantingDate}
+            harvestDate={harvestDate}
+            diseases={diseases}
+            onResult={(res) => {
+              setResult(res);
+              next();
+            }}
+            onBack={back}
+          />
+        )}
 
-function ProgressBar({ step }) {
-  const steps = ["Місто", "Сезон", "Розрахунок", "Результати"];
-  return (
-    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20 }}>
-      {steps.map((label, i) => (
-        <div
-          key={i}
-          style={{
-            fontWeight: i + 1 === step ? "bold" : "normal",
-            color: i + 1 === step ? "#2d6cdf" : "#999",
-          }}
-        >
-          {i + 1}. {label}
-        </div>
-      ))}
-    </div>
+        {step === 4 && (
+          <>
+            <Step4Results
+              result={result}
+              onRestart={() => {
+                setStep(1);
+                setResult(null);
+              }}
+            />
+            <CalendarView events={extractCalendarEvents(result)} />
+          </>
+        )}
+      </div>
+    </Layout>
   );
 }
 
