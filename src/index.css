@@ -96,4 +96,24 @@ html, body, #root {
   color: #333;
   line-height: 1.4;
 }
+.progress-bar {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 0;
+  padding: 10px 20px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(6px);
+}
+
+.progress-step {
+  font-size: 14px;
+  color: #777;
+  transition: all 0.3s ease;
+}
+
+.progress-step.active {
+  font-weight: bold;
+  color: #2d6cdf;
+}
 
