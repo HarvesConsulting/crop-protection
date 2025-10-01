@@ -1,4 +1,3 @@
-// src/components/Layout.js
 import React, { useState } from "react";
 import LogoutButton from "./LogoutButton";
 
@@ -9,14 +8,14 @@ export default function Layout({ children, step, onLogout }) {
 
   return (
     <div className="page-wrapper">
-      {/* 🔹 Шапка */}
+      {/* Хедер */}
       <header className="header">
         <div className="logo">
           🍅 Crop Protection
           <button
             className="info-icon"
             onClick={() => setShowInfo(!showInfo)}
-            title={showInfo ? "Сховати інформацію" : "Показати інформацію"}
+            title="Інформація"
           >
             ℹ️
           </button>
@@ -24,22 +23,22 @@ export default function Layout({ children, step, onLogout }) {
         <LogoutButton onLogout={onLogout} />
       </header>
 
-      {/* 🔹 Інформаційний блок */}
+      {/* Інфо-бокс */}
       {showInfo && (
-        <div className="info-box" style={{ maxWidth: 700, margin: "20px auto" }}>
-          <strong>ℹ️ Інформація</strong>
+        <div className="info-box" style={{ margin: "16px" }}>
           <p>
-            Цей застосунок допомагає агрономам, фермерам та консультантам ухвалювати рішення
-            щодо захисту томатів від фітофтори, сірої гнилі, альтернаріозу та бактеріозу.
+            Цей застосунок допомагає агрономам, фермерам та консультантам
+            ухвалювати рішення щодо захисту томатів від фітофтори, сірої гнилі,
+            альтернаріозу та бактеріозу.
           </p>
-          <p style={{ fontSize: "0.9em", color: "#555" }}>
-            Ми аналізуємо погодні дані, обчислюємо індекси ризику захворювань (DSV)
-            та прогнозуємо доцільні дати обробки.
+          <p>
+            Ми аналізуємо погодні дані, обчислюємо індекси ризику (DSV) та
+            прогнозуємо оптимальні дати обробок.
           </p>
         </div>
       )}
 
-      {/* 🔹 Прогрес-бар */}
+      {/* Прогрес-бар */}
       <div className="progress-bar">
         {steps.map((label, i) => (
           <div
@@ -51,7 +50,7 @@ export default function Layout({ children, step, onLogout }) {
         ))}
       </div>
 
-      {/* 🔹 Контент */}
+      {/* Контент */}
       <main className="main-content">
         <div className="glass-container">{children}</div>
       </main>

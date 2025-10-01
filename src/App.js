@@ -7,6 +7,8 @@ import LoginPage from "./components/LoginPage";
 import CalendarView from "./components/CalendarView";
 import Layout from "./components/Layout";
 
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "./firebase";
 import {
   rotationProducts,
   rotationGrayMold,
@@ -15,10 +17,6 @@ import {
   getAdvancedTreatments,
 } from "./data/productData";
 
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "./firebase";
-
-// 🧠 Перетворення результатів у події для календаря
 function extractCalendarEvents(result) {
   if (!result) return [];
   const events = [];
@@ -79,7 +77,6 @@ export default function App() {
   return (
     <Layout step={step} onLogout={() => setUser(null)}>
       {step === 1 && <Step1Region region={region} setRegion={setRegion} onNext={next} />}
-
       {step === 2 && (
         <Step2Season
           plantingDate={plantingDate}
@@ -93,7 +90,6 @@ export default function App() {
           onBack={back}
         />
       )}
-
       {step === 3 && (
         <Step3Run
           region={region}
@@ -107,7 +103,6 @@ export default function App() {
           onBack={back}
         />
       )}
-
       {step === 4 && (
         <>
           <Step4Results
