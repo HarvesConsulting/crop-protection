@@ -80,11 +80,9 @@ export default function App() {
   const back = () => setStep((s) => Math.max(s - 1, 1));
 
   return (
-    <Layout>
+  <Layout>
     <div className="main-container" style={{ maxWidth: 800, margin: "0 auto", padding: 20 }}>
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 10 }}>
-        <LogoutButton onLogout={() => setUser(null)} />
-      </div>
+      {/* 🟢 Прибрали дубльований LogoutButton */}
 
       <ProgressBar step={step} />
 
@@ -135,8 +133,8 @@ export default function App() {
         </>
       )}
     </div>
-    </Layout>
-  );
+  </Layout>
+);
 }
 
 function ProgressBar({ step }) {
