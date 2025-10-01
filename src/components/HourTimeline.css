@@ -1,32 +1,35 @@
+/* ───────────────────────────────
+   📦 Обгортка всього таймлайну
+──────────────────────────────── */
 .timeline-wrapper {
   margin-top: 10px;
   position: relative;
   z-index: 1;
 }
 
-.timeline-scroll {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
+/* ───────────────────────────────
+   🟩 Горизонтальна смуга часу
+──────────────────────────────── */
 .timeline-bar {
   display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
   border: 1px solid #ccc;
   border-radius: 6px;
   overflow: visible;
   position: relative;
-  min-width: max-content;
 }
 
+/* ───────────────────────────────
+   ⏱ Контейнер для кожної години
+──────────────────────────────── */
 .hour-segment-wrapper {
   position: relative;
-  flex: 0 0 auto;
-  width: 40px;
+  flex: 1;
   text-align: center;
 }
 
+/* ───────────────────────────────
+   ⌛️ Сама година (один блок)
+──────────────────────────────── */
 .hour-segment {
   font-size: 12px;
   cursor: pointer;
@@ -41,19 +44,26 @@
   border-right: none;
 }
 
+/* 🔍 Hover ефект */
 .hour-segment:hover {
   transform: scale(1.05);
 }
 
+/* 🟢 Підходящі години */
 .suitable {
   background-color: #4caf50;
 }
 
+/* 🔴 Непідходящі години */
 .not-suitable {
   background-color: #f44336;
 }
 
+/* ───────────────────────────────
+   💬 Tooltip з деталями погоди
+──────────────────────────────── */
 .hour-details-tooltip {
+  display: none;
   position: absolute;
   bottom: 100%;
   left: 50%;
@@ -67,10 +77,24 @@
   white-space: nowrap;
   z-index: 9999;
   pointer-events: none;
+  width: max-content;
+  max-width: 240px;
   line-height: 1.4;
   text-align: left;
 }
 
+/* 🎯 ПК: Показувати тултіп при hover */
+.hour-segment-wrapper:hover .hour-details-tooltip {
+  display: block;
+}
+
+/* ☝️ Мобільний режим – показ через JS */
+.hour-details-tooltip.mobile {
+  display: block !important;
+  pointer-events: auto;
+}
+
+/* 🔻 Трикутник тултіпа */
 .hour-details-tooltip::after {
   content: "";
   position: absolute;
@@ -79,4 +103,33 @@
   transform: translateX(-50%);
   border: 6px solid transparent;
   border-top-color: #fff;
+}
+
+/* ✅ Показуй тултіп тільки на передній стороні */
+.flip-card-front .hour-details-tooltip {
+  display: block !important;
+}
+
+/* ❌ Приховуй повністю на задній стороні */
+.flip-card-back .hour-details-tooltip {
+  display: none !important;
+}
+
+/* ───────────────────────────────
+   📱 Адаптив для мобільних
+──────────────────────────────── */
+@media (max-width: 768px) {
+  .timeline-bar {
+    border-radius: 4px;
+  }
+
+  .hour-segment {
+    font-size: 11px;
+    padding: 3px 0;
+  }
+
+  .hour-details-tooltip {
+    font-size: 12px;
+    max-width: 180px;
+  }
 }
