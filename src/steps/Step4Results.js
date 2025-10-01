@@ -560,10 +560,8 @@ integratedSystem.sort(
   };
 
   return (
-  <main className="max-w-2xl mx-auto p-6">
-    <div className="bg-white rounded-xl shadow-md p-6">
-      <div className="menu-wrapper">
-
+  <Layout>
+    <div className="menu-wrapper">
       <button className="menu-toggle" onClick={() => setShowMenu(!showMenu)}>
         ☰ Меню дій
       </button>
@@ -654,9 +652,7 @@ integratedSystem.sort(
         </button>
       </>
     )}
-        </div>
-    
-  </main>
-  );
+  </Layout>
+);
 }
 
