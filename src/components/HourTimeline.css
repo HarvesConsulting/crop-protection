@@ -123,8 +123,5 @@
     max-width: 180px;
   }
 }
-.flip-card-front {
-  padding-bottom: 16px; /* або більше, якщо тултіп */
-  box-sizing: border-box;
-}
+
 

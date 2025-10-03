@@ -45,3 +45,11 @@
   padding: 16px;
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
+.flip-card-front {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-bottom: 24px; /* 🟢 Додає простору для timeline */
+  position: relative; /* 🧩 Потрібно для тултіпів */
+  box-sizing: border-box;
+}
