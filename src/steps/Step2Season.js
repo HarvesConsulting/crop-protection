@@ -44,8 +44,8 @@ export default function Step2Season({
       )}
 
       {/* Поля для введення дат */}
-      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-end">
-  <div className="flex-1">
+      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+  <div className="flex flex-col items-start flex-1">
     <label className="text-sm font-medium text-gray-700 mb-1 block">
       Дата висадки (або останнє внесення фунгіциду):
     </label>
@@ -57,7 +57,7 @@ export default function Step2Season({
     />
   </div>
 
-  <div className="flex-1">
+  <div className="flex flex-col items-start flex-1">
     <label className="text-sm font-medium text-gray-700 mb-1 block">
       Дата збирання:
     </label>
