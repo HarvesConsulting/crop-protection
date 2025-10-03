@@ -5,6 +5,8 @@
   margin-top: 10px;
   position: relative;
   z-index: 1;
+  width: 100%;          /* ⬅️ завжди по ширині картки */
+  box-sizing: border-box;
 }
 
 /* ───────────────────────────────

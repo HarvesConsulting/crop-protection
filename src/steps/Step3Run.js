@@ -216,7 +216,7 @@ export default function Step3Run({
           className={`px-6 py-2 rounded-md text-white font-medium transition ${
             loading
               ? "bg-gray-500 cursor-wait"
-              : "bg-blue-600 hover:bg-blue-700"
+              : "bg-green-600 hover:bg-green-700"
           }`}
         >
           {loading ? "Обчислення..." : "Запустити розрахунок"}
@@ -225,5 +225,4 @@ export default function Step3Run({
     </div>
   </main>
 );
-
 }
