@@ -3,7 +3,6 @@
 ──────────────────────────────── */
 .timeline-wrapper {
   margin-top: 10px;
-  padding-bottom: 8px; /* ⬅️ додає запасу для тултіпів */
   position: relative;
   z-index: 1;
 }
@@ -15,7 +14,7 @@
   display: flex;
   border: 1px solid #ccc;
   border-radius: 6px;
-  overflow: visible; /* тултіп не обрізається */
+  overflow: visible; /* дозволяє тултіпу виходити за межі */
   position: relative;
 }
 
@@ -64,9 +63,11 @@
    💬 Tooltip з деталями погоди
 ──────────────────────────────── */
 .hour-details-tooltip {
-  display: none;             /* приховано за замовчуванням */
-  position: static;          /* ⬅️ тултіп у потоці, картка розтягується */
-  margin-top: 6px;           /* відступ вниз від блоку години */
+  display: none;
+  position: absolute;
+  bottom: 100%; /* показуємо над годиною */
+  left: 50%;
+  transform: translateX(-50%) translateY(-6px);
   background: #fff;
   color: #000;
   padding: 8px 12px;
@@ -93,9 +94,15 @@
   pointer-events: auto;
 }
 
-/* 🔻 При static псевдо-елемент стрілочки не потрібен */
+/* 🔻 Маленький трикутник під тултіпом */
 .hour-details-tooltip::after {
-  display: none;
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #fff;
 }
 
 /* ───────────────────────────────
