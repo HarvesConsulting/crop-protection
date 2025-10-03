@@ -12,14 +12,10 @@
 ──────────────────────────────── */
 .timeline-bar {
   display: flex;
-  flex-wrap: nowrap; /* Забороняємо перенос рядків */
-  overflow-x: auto; /* Додаємо горизонтальний скрол */
-  overflow-y: hidden;
   border: 1px solid #ccc;
   border-radius: 6px;
+  overflow: visible; /* дозволяє тултіпу виходити за межі */
   position: relative;
-  scrollbar-width: thin; /* Firefox */
-  scrollbar-color: #ccc transparent;
 }
 
 /* ───────────────────────────────
