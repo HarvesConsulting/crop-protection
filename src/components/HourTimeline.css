@@ -5,6 +5,8 @@
   margin-top: 10px;
   position: relative;
   z-index: 1;
+  width: 100%;          /* ✅ завжди вписується в картку */
+  box-sizing: border-box;
 }
 
 /* ───────────────────────────────
@@ -12,10 +14,12 @@
 ──────────────────────────────── */
 .timeline-bar {
   display: flex;
+  width: 100%;          /* ✅ розтягується по ширині */
   border: 1px solid #ccc;
   border-radius: 6px;
-  overflow: visible; /* дозволяє тултіпу виходити за межі */
+  overflow: hidden;     /* ✅ смужка не вилізе */
   position: relative;
+  box-sizing: border-box;
 }
 
 /* ───────────────────────────────
