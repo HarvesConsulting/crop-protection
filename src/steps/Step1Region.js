@@ -67,7 +67,7 @@ export default function Step1Region({ region, setRegion, onNext }) {
         {/* Поле вводу */}
         <div className="flex justify-center">
           <input
-            className="w-full max-w-sm px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition"
+            className="w-full max-w-sm px-4 py-2 text-[16px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition"
             type="text"
             value={inputValue}
             onChange={(e) => {
