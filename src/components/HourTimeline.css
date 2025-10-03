@@ -125,7 +125,7 @@
 }
 .flip-card-front {
   position: relative;
-  padding-bottom: 40px; /* ✅ додаємо запас під timeline і тултіп */
+  padding-bottom: 12px; /* ✅ додаємо запас під timeline і тултіп */
   box-sizing: border-box;
 }
 
