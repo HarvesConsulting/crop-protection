@@ -609,10 +609,12 @@ integratedSystem.sort(
     }}
     style={{
       background: "none",
-      border: "none",
+      border: "1px solid #ccc",
+      borderRadius: "6px",
+      padding: "2px 6px",
       cursor: "pointer",
+      fontSize: "16px",
       color: "#007bff",
-      fontSize: "18px",
     }}
     title="Показати інформацію"
   >
@@ -624,10 +626,10 @@ integratedSystem.sort(
   <div
     style={{
       marginTop: "10px",
-      background: "#f0f8ff",
+      background: "#e9f5ff",
       padding: "12px 16px",
-      borderRadius: "8px",
-      border: "1px solid #cce5ff",
+      borderLeft: "4px solid #007bff",
+      borderRadius: "6px",
     }}
   >
     <p>
@@ -641,6 +643,7 @@ integratedSystem.sort(
     </p>
   </div>
 )}
+
 
     {showIntegrated ? (
       <>
