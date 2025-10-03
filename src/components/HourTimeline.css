@@ -123,5 +123,10 @@
     max-width: 180px;
   }
 }
+.flip-card-front {
+  position: relative;
+  padding-bottom: 40px; /* ✅ додаємо запас під timeline і тултіп */
+  box-sizing: border-box;
+}
 
 
