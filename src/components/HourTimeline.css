@@ -12,6 +12,7 @@
 ──────────────────────────────── */
 .timeline-bar {
   display: flex;
+  flex-wrap: wrap; /* ДОДАЙ ЦЕ */
   border: 1px solid #ccc;
   border-radius: 6px;
   overflow: visible; /* дозволяє тултіпу виходити за межі */
