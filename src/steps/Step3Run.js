@@ -181,7 +181,7 @@ export default function Step3Run({
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-md">
+    <div className="w-full max-w-xl mx-auto bg-white rounded-xl shadow-md px-6 sm:px-10 py-6 space-y-6 text-base sm:text-lg">
       <h2 className="text-2xl font-semibold text-gray-800 mb-2">
         Крок 3: Розрахунок <span role="img" aria-label="lab">🧪</span>
       </h2>
