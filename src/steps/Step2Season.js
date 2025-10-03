@@ -45,32 +45,30 @@ export default function Step2Season({
 
       {/* Поля для введення дат */}
       <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-end">
-  <div className="flex flex-col flex-1">
-    <label className="text-sm font-medium text-gray-700 mb-1">
+  <div className="flex-1">
+    <label className="text-sm font-medium text-gray-700 mb-1 block">
       Дата висадки (або останнє внесення фунгіциду):
     </label>
     <input
       type="date"
       value={plantingDate}
       onChange={(e) => setPlantingDate(e.target.value)}
-      className="border border-gray-300 rounded-md px-3 py-2 text-[16px] focus:outline-none focus:ring-2 focus:ring-green-500 transition w-full"
+      className="w-full border border-gray-300 rounded-md px-3 py-2 text-[16px] focus:outline-none focus:ring-2 focus:ring-green-500 transition"
     />
   </div>
 
-  <div className="flex flex-col flex-1">
-    <label className="text-sm font-medium text-gray-700 mb-1">
+  <div className="flex-1">
+    <label className="text-sm font-medium text-gray-700 mb-1 block">
       Дата збирання:
     </label>
     <input
       type="date"
       value={harvestDate}
       onChange={(e) => setHarvestDate(e.target.value)}
-      className="border border-gray-300 rounded-md px-3 py-2 text-[16px] focus:outline-none focus:ring-2 focus:ring-green-500 transition w-full"
+      className="w-full border border-gray-300 rounded-md px-3 py-2 text-[16px] focus:outline-none focus:ring-2 focus:ring-green-500 transition"
     />
   </div>
 </div>
-
-
 
       {/* Чекбокси */}
       <div>
