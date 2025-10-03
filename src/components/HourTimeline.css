@@ -3,6 +3,7 @@
 ──────────────────────────────── */
 .timeline-wrapper {
   margin-top: 10px;
+  padding-bottom: 8px; /* ⬅️ додає простору для тултіпів */
   position: relative;
   z-index: 1;
 }
