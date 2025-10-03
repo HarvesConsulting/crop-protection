@@ -46,7 +46,7 @@ export default function Step2Season({
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
           <div className="flex flex-col flex-1">
             <label className="text-sm font-medium text-gray-700 mb-1 block">
-              Дата висадки (або останнє внесення фунгіциду):
+              Дата висадки (або останнє внесення ЗЗР):
             </label>
             <input
               type="date"
