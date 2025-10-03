@@ -181,22 +181,31 @@ export default function Step3Run({
   };
 
   return (
+  <main className="flex justify-center items-start min-h-[70vh] px-4">
     <div className="w-full max-w-xl mx-auto bg-white rounded-xl shadow-md px-6 sm:px-10 py-6 space-y-6 text-base sm:text-lg">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+      {/* Заголовок */}
+      <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
         Крок 3: Розрахунок <span role="img" aria-label="lab">🧪</span>
       </h2>
-      <p className="text-sm text-gray-600 mb-4">
-        Натисніть кнопку, щоб розрахувати систему захисту на весь сезон: від <strong>{plantingDate}</strong> до <strong>{harvestDate}</strong>.
+
+      {/* Опис */}
+      <p className="text-base text-gray-700 mb-4">
+        Натисніть кнопку, щоб розрахувати систему захисту на весь сезон: від{" "}
+        <strong>{plantingDate}</strong> до <strong>{harvestDate}</strong>.
       </p>
 
+      {/* Помилка */}
       {error && (
-        <div className="text-red-600 font-medium mb-4">⚠️ {error}</div>
+        <div className="text-red-600 font-medium mb-4">
+          ⚠️ {error}
+        </div>
       )}
 
+      {/* Кнопки дій */}
       <div className="flex gap-4 mt-4">
         <button
           onClick={onBack}
-          className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800 transition"
+          className="px-5 py-2 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium transition"
         >
           Назад
         </button>
@@ -204,11 +213,17 @@ export default function Step3Run({
         <button
           onClick={runModel}
           disabled={loading}
-          className={`px-4 py-2 rounded text-white transition ${loading ? "bg-gray-500 cursor-wait" : "bg-blue-600 hover:bg-blue-700"}`}
+          className={`px-6 py-2 rounded-md text-white font-medium transition ${
+            loading
+              ? "bg-gray-500 cursor-wait"
+              : "bg-blue-600 hover:bg-blue-700"
+          }`}
         >
           {loading ? "Обчислення..." : "Запустити розрахунок"}
         </button>
       </div>
     </div>
-  );
+  </main>
+);
+
 }
