@@ -21,7 +21,7 @@ export default function Step2Season({
   };
 
   return (
-    <div className="w-full max-w-xl mx-auto bg-white rounded-xl shadow-md p-6 space-y-6">
+    <div className="w-full max-w-xl mx-auto bg-white rounded-xl shadow-md px-6 py-6 sm:px-8 space-y-6">
       {/* Заголовок з кнопкою "Інфо" */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-800">
