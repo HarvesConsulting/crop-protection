@@ -1,5 +1,10 @@
 import React, { useState } from "react";
-import { Info } from "lucide-react"; // ⬅️ переконайся, що встановлено: npm i lucide-react
+import DatePicker, { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { Info } from "lucide-react";
+import uk from "date-fns/locale/uk";
+
+registerLocale("uk", uk); // локалізація
 
 export default function Step2Season({
   plantingDate,
@@ -10,7 +15,7 @@ export default function Step2Season({
   onBack,
 }) {
   const [diseases, setDiseases] = useState(["lateBlight"]);
-  const [showInfo, setShowInfo] = useState(false); // ⬅️ новий стейт
+  const [showInfo, setShowInfo] = useState(false);
 
   const toggleDisease = (disease) => {
     setDiseases((prev) =>
@@ -20,9 +25,13 @@ export default function Step2Season({
     );
   };
 
+  const isDateInvalid =
+    plantingDate && harvestDate && harvestDate < plantingDate;
+
   return (
     <div className="w-full max-w-xl mx-auto bg-white rounded-xl shadow-md p-6 space-y-6">
-      {/* Заголовок з кнопкою "Інфо" */}
+
+      {/* Заголовок з інфо-кнопкою */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-800">
           Крок 2: Дані про сезон
@@ -36,38 +45,52 @@ export default function Step2Season({
         </button>
       </div>
 
-      {/* Інфо-бокс */}
+      {/* Інформаційний блок */}
       {showInfo && (
         <div className="bg-blue-50 border border-blue-200 text-sm text-gray-700 p-4 rounded-md shadow-sm">
           Вкажіть початок і кінець сезону, а також оберіть хвороби для прогнозування.
         </div>
       )}
 
-      {/* Поля для введення дат */}
+      {/* Дати */}
       <div className="flex flex-col sm:flex-row sm:gap-6 gap-4">
         <div className="flex flex-col w-full sm:w-1/2">
           <label className="text-sm font-medium text-gray-700 mb-1">
             Дата висадки (або останнє внесення фунгіциду):
           </label>
-          <input
-            type="date"
-            value={plantingDate}
-            onChange={(e) => setPlantingDate(e.target.value)}
-            className="border border-gray-300 rounded-md px-3 py-2 text-[16px] focus:outline-none focus:ring-2 focus:ring-green-500 transition"
+          <DatePicker
+            selected={plantingDate}
+            onChange={(date) => setPlantingDate(date)}
+            dateFormat="dd.MM.yyyy"
+            placeholderText="Оберіть дату"
+            locale="uk"
+            maxDate={new Date()}
+            className="w-full border border-gray-300 rounded-md px-3 py-2 text-[16px] focus:outline-none focus:ring-2 focus:ring-green-500"
           />
         </div>
+
         <div className="flex flex-col w-full sm:w-1/2">
           <label className="text-sm font-medium text-gray-700 mb-1">
             Дата збирання:
           </label>
-          <input
-            type="date"
-            value={harvestDate}
-            onChange={(e) => setHarvestDate(e.target.value)}
-            className="border border-gray-300 rounded-md px-3 py-2 text-[16px] focus:outline-none focus:ring-2 focus:ring-green-500 transition"
+          <DatePicker
+            selected={harvestDate}
+            onChange={(date) => setHarvestDate(date)}
+            dateFormat="dd.MM.yyyy"
+            placeholderText="Оберіть дату"
+            locale="uk"
+            minDate={plantingDate}
+            className="w-full border border-gray-300 rounded-md px-3 py-2 text-[16px] focus:outline-none focus:ring-2 focus:ring-green-500"
           />
         </div>
       </div>
+
+      {/* Помилка при некоректних датах */}
+      {isDateInvalid && (
+        <div className="text-sm text-red-600">
+          ⚠️ Дата збирання не може бути раніше дати висадки.
+        </div>
+      )}
 
       {/* Чекбокси */}
       <div>
@@ -93,7 +116,7 @@ export default function Step2Season({
         </div>
       </div>
 
-      {/* Кнопки навігації */}
+      {/* Кнопки */}
       <div className="flex justify-between pt-4">
         <button
           onClick={onBack}
@@ -103,11 +126,11 @@ export default function Step2Season({
         </button>
         <button
           onClick={() => onNext({ diseases })}
-          disabled={!plantingDate || !harvestDate}
+          disabled={!plantingDate || !harvestDate || isDateInvalid}
           className={`px-4 py-2 rounded text-white font-medium transition ${
-            plantingDate && harvestDate
-              ? "bg-green-600 hover:bg-green-700"
-              : "bg-gray-400 cursor-not-allowed"
+            !plantingDate || !harvestDate || isDateInvalid
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-green-600 hover:bg-green-700"
           }`}
         >
           Продовжити
