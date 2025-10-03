@@ -5,8 +5,9 @@
   margin-top: 10px;
   position: relative;
   z-index: 1;
-  width: 100%;          /* ⬅️ завжди по ширині картки */
+  width: 100%;
   box-sizing: border-box;
+  padding: 0 4px;       /* ⬅️ невеликий внутрішній відступ */
 }
 
 /* ───────────────────────────────
@@ -14,10 +15,12 @@
 ──────────────────────────────── */
 .timeline-bar {
   display: flex;
+  width: 100%;
   border: 1px solid #ccc;
   border-radius: 6px;
-  overflow: visible; /* дозволяє тултіпу виходити за межі */
+  overflow: hidden;     /* ⬅️ обрізає те, що вилазить за межі */
   position: relative;
+  box-sizing: border-box;
 }
 
 /* ───────────────────────────────
