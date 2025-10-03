@@ -571,7 +571,7 @@ integratedSystem.sort(
       {showMenu && (
         <div className="menu-dropdown">
           <button className="menu-item" onClick={onRestart}>
-            🔄 Почати спочатку
+             Почати спочатку
           </button>
 
           <button
@@ -591,7 +591,7 @@ integratedSystem.sort(
             className="menu-item"
             onClick={() => setShowIntegrated(!showIntegrated)}
           >
-            🍅 {showIntegrated
+             {showIntegrated
               ? "Сховати інтегровану систему"
               : "Сформувати інтегровану систему"}
           </button>
@@ -623,7 +623,7 @@ integratedSystem.sort(
         />
 
         <button onClick={exportToExcel} className="toggle-button">
-          ⬇️ Експорт в Excel
+           Експорт в Excel
         </button>
       </>
     ) : (
@@ -650,7 +650,7 @@ integratedSystem.sort(
         ))}
 
         <button className="restart-button" onClick={onRestart}>
-          🔄 Почати спочатку
+           Почати спочатку
         </button>
       </>
     )}
