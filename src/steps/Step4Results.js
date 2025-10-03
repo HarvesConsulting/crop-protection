@@ -4,7 +4,6 @@ import "./Step4Results.css";
 import * as XLSX from "xlsx";
 import HourTimeline from "../components/HourTimeline";
 import Layout from "../components/Layout";
-const [showInfo, setShowInfo] = useState(false);
 
 const productInfo = {
   "Зорвек Інкантія": "0,5л/га",
@@ -344,6 +343,7 @@ function aggregateDailyRain(hourlyData = []) {
 export default function Step4Results({ result, onRestart }) {
   const [showIntegrated, setShowIntegrated] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
   if (!result) return <p>Дані відсутні</p>;
 
 const {
