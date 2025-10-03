@@ -4,6 +4,7 @@ import "./Step4Results.css";
 import * as XLSX from "xlsx";
 import HourTimeline from "../components/HourTimeline";
 import Layout from "../components/Layout";
+const [showInfo, setShowInfo] = useState(false);
 
 const productInfo = {
   "Зорвек Інкантія": "0,5л/га",
@@ -599,17 +600,47 @@ integratedSystem.sort(
       )}
     </div>
 
-    <h2>Крок 4: Результати</h2>
+    <h2 style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+  Крок 4: Результати
+  <button
+    onClick={(e) => {
+      e.stopPropagation();
+      setShowInfo(!showInfo);
+    }}
+    style={{
+      background: "none",
+      border: "none",
+      cursor: "pointer",
+      color: "#007bff",
+      fontSize: "18px",
+    }}
+    title="Показати інформацію"
+  >
+    ℹ️
+  </button>
+</h2>
 
+{showInfo && (
+  <div
+    style={{
+      marginTop: "10px",
+      background: "#f0f8ff",
+      padding: "12px 16px",
+      borderRadius: "8px",
+      border: "1px solid #cce5ff",
+    }}
+  >
     <p>
       Період розрахунку:{" "}
       <strong>{format(new Date(result.plantingDate), "dd.MM.yyyy")}</strong> —{" "}
       <strong>{format(new Date(result.harvestDate), "dd.MM.yyyy")}</strong>
     </p>
-    <p className="description">
+    <p>
       Нижче показано рекомендовані дати обробки. Ви можете сформувати інтегровану систему
       захисту.
     </p>
+  </div>
+)}
 
     {showIntegrated ? (
       <>
