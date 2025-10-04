@@ -630,29 +630,6 @@ export function extractSuitableSprayHours(hourlyData) {
   const suitableByDate = {};
 
   hourlyData.forEach((entry) => {
-    const { date, hour, temperature, windspeed, precipitation } = entry;
-
-    // ✅ умови для сприятливої години
-    const tempOK = temperature >= 10 && temperature <= 25;
-    const windOK = Number.isFinite(windspeed) && windspeed <= MAX_WIND_SPEED;
-    const rainOK = precipitation <= 0;
-
-    if (tempOK && windOK && rainOK) {
-      const dateStr = date instanceof Date ? date.toISOString().split("T")[0] : String(date);
-      const hourStr = String(hour).padStart(2, "0") + ":00";
-
-      if (!suitableByDate[dateStr]) suitableByDate[dateStr] = [];
-      suitableByDate[dateStr].push(hourStr);
-    }
-  });
-
-  return suitableByDate;
-}export function extractSuitableSprayHours(hourlyData) {
-  if (!Array.isArray(hourlyData)) return {};
-
-  const suitableByDate = {};
-
-  hourlyData.forEach((entry) => {
     const { date, hour, temperature, windspeed, precipitation, humidity } = entry;
 
     // ✅ умови для сприятливої години
