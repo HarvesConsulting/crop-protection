@@ -3,13 +3,12 @@ import "./IntegratedTableView.css";
 
 /**
  * 📊 Таблиця інтегрованої системи захисту
- * Відображає всі дати у рядках та основні хвороби у стовпцях.
+ * Дані розподіляються за хворобами відповідно до джерела diseaseCardsGrouped.
  */
 export default function IntegratedTableView({ integratedSystem = [], diseaseCardsGrouped = [] }) {
-  // 🧭 Список основних хвороб
   const diseases = ["Фітофтороз", "Сіра гниль", "Альтернаріоз", "Бактеріоз"];
 
-  // 🗓️ Формуємо унікальний список дат і сортуємо
+  // 🗓️ Формуємо список унікальних дат
   const uniqueDates = [
     ...new Set(integratedSystem.map((item) => item.Дата)),
   ].sort((a, b) => {
@@ -18,49 +17,34 @@ export default function IntegratedTableView({ integratedSystem = [], diseaseCard
     return new Date(yA, mA - 1, dA) - new Date(yB, mB - 1, dB);
   });
 
-  // 🧩 Окремі набори препаратів по хворобах
-  const sets = {
-    "Фітофтороз": [
-      "Зорвек", "Ридоміл", "Танос", "Акробат", "Орондіс", "Ревус", "Курзат", "Ранман", "Інфініто"
-    ],
-    "Сіра гниль": [
-      "Луна Експірієнс", "Сігнум", "Скала", "Тельдор", "Скор", "Натіво"
-    ],
-    "Альтернаріоз": [
-      "Альтер", "Сігнум", "Скор", "Натіво", "Луна Експірієнс" // дубльовані, бо ефективні і тут
-    ],
-    "Бактеріоз": [
-      "Медян", "Казумін", "Серенада"
-    ]
-  };
-
-  // 🧮 Створюємо карту вигляду { дата: { хвороба: препарат } }
+  // 🧮 Підготовка карти: { дата: { хвороба: препарат } }
   const diseaseMap = {};
   for (const date of uniqueDates) {
     diseaseMap[date] = {};
     for (const dis of diseases) diseaseMap[date][dis] = "";
   }
 
-  // 🧩 Розподіляємо препарати по стовпцях
+  // 🧩 1️⃣ Заповнюємо препарати проти фітофторозу з integratedSystem
   for (const entry of integratedSystem) {
     const date = entry.Дата;
-    const prepList = (entry.Препарат || "").split(",").map((p) => p.trim());
+    const prep = entry.Препарат;
+    if (!date || !prep) continue;
+    diseaseMap[date]["Фітофтороз"] +=
+      (diseaseMap[date]["Фітофтороз"] ? ", " : "") + prep;
+  }
 
-    for (const prep of prepList) {
-      let matched = false;
+  // 🧩 2️⃣ Заповнюємо з diseaseCardsGrouped (інші хвороби)
+  for (const diseaseGroup of diseaseCardsGrouped) {
+    const { name, entries } = diseaseGroup;
+    if (!entries || !diseases.includes(name)) continue;
 
-      for (const disease of diseases) {
-        if (sets[disease].some((key) => prep.includes(key))) {
-          diseaseMap[date][disease] += (diseaseMap[date][disease] ? ", " : "") + prep;
-          matched = true;
-          break;
-        }
-      }
+    for (const item of entries) {
+      const date = item.Дата;
+      const prep = item.Препарат;
+      if (!date || !prep) continue;
 
-      // якщо не знайшли категорію, підкидаємо у "Фітофтороз" (як дефолт)
-      if (!matched) {
-        diseaseMap[date]["Фітофтороз"] += (diseaseMap[date]["Фітофтороз"] ? ", " : "") + prep;
-      }
+      diseaseMap[date][name] +=
+        (diseaseMap[date][name] ? ", " : "") + prep;
     }
   }
 
