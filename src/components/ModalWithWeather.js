@@ -41,6 +41,7 @@ export default function ModalWithWeather({
                 endDate={endDate}
                 lat={lat}
                 lon={lon}
+                hourlyData={hourlyData}
               />
             </div>
           </div>
