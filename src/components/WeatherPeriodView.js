@@ -22,36 +22,47 @@ export default function WeatherPeriodView({
   const [loading, setLoading] = useState(!externalHourlyData);
   const [error, setError] = useState("");
 
-  // 🔍 Логування пропсів
   useEffect(() => {
-    console.log("🔎 Props у WeatherPeriodView:");
-    console.log({ startDate, endDate, lat, lon, externalHourlyData });
-  }, []);
+    console.group("🧩 WeatherPeriodView Debug");
+    console.log("📥 Вхідні параметри:");
+    console.log("startDate:", startDate, "→", start);
+    console.log("endDate:", endDate, "→", end);
+    console.log("lat:", lat);
+    console.log("lon:", lon);
+    console.log("externalHourlyData:", externalHourlyData?.length ?? 0);
+    console.groupEnd();
+  }, [startDate, endDate, lat, lon, externalHourlyData]);
 
-  // 🔁 Якщо немає зовнішніх даних — завантажуємо з API
   useEffect(() => {
     if (externalHourlyData) {
-      console.log("✅ Використовуємо зовнішні погодинні дані");
+      console.log("✅ Використовуємо передані погодинні дані (hourlyData)");
       setHourlyData(externalHourlyData);
       setLoading(false);
       return;
     }
 
     if (!start || !end || !lat || !lon) {
-      console.warn("⚠️ Відсутні координати або дати");
-      setError("Некоректні вхідні дані");
+      console.warn("⚠️ Некоректні або неповні вхідні дані для запиту архіву погоди");
+      setError("Некоректні координати або дати");
       setLoading(false);
       return;
     }
 
-    console.log("📡 Завантаження погодинних даних через fetchArchiveHourlyExtras...");
     setLoading(true);
     setError("");
     setHourlyData([]);
 
+    console.log("🌐 Викликаємо fetchArchiveHourlyExtras із параметрами:");
+    console.log({ lat, lon, start, end });
+
     fetchArchiveHourlyExtras(lat, lon, start, end)
       .then((res) => {
-        console.log("📦 Отримано відповідь:", res);
+        console.group("📦 Результат fetchArchiveHourlyExtras");
+        console.log("res:", res);
+        if (res.url) console.log("🔗 URL:", res.url);
+        if (res.error) console.error("❌ Помилка:", res.error);
+        console.groupEnd();
+
         if (res.error) {
           setError(res.error);
         } else {
@@ -59,17 +70,17 @@ export default function WeatherPeriodView({
         }
       })
       .catch((e) => {
-        console.error("❌ Помилка запиту:", e);
+        console.error("🚨 Виняток під час запиту:", e);
         setError(String(e));
       })
       .finally(() => {
         setLoading(false);
+        console.log("✅ Завершено запит архіву погоди.");
       });
   }, [start, end, lat, lon, externalHourlyData]);
 
-  // 🔁 Формування рядків таблиці
   const rows = useMemo(() => {
-    return (hourlyData || [])
+    const result = (hourlyData || [])
       .map((h) => {
         const d = asDate(h.date);
         if (!d) return null;
@@ -84,6 +95,9 @@ export default function WeatherPeriodView({
       })
       .filter((r) => r && (!start || r.date >= start) && (!end || r.date <= end))
       .sort((a, b) => a.date - b.date || a.hour - b.hour);
+
+    console.log("🧾 Готово рядків для таблиці:", result.length);
+    return result;
   }, [hourlyData, start, end]);
 
   return (
