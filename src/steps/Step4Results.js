@@ -231,7 +231,7 @@ function Card({ frontData, backData }) {
     <strong>{key}:</strong>{" "}
     {key === "Рекомендація" ? (
       <InfoToggle content={value} />
-    ) : key === "Рекомендовані години" ? (
+    ) : key === "Рекомендовані години для обприскування" ? (
       <HourTimeline
         date={frontData.fields["Дата"]}
         suitableHours={(value || "").split(", ").map((h) => h.trim())}
