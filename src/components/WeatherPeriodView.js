@@ -17,7 +17,7 @@ export default function WeatherPeriodView({ hourlyData = [] }) {
         })
       : [];
 
-  const wetHours = filtered.filter((h) => Number(h.humidity) >= 80).length;
+  const wetHours = filtered.filter((h) => Number(h.humidity) >= 90).length;
   const avgTemp =
     filtered.reduce((sum, h) => sum + (Number(h.temp) || 0), 0) /
       (filtered.length || 1);
@@ -60,7 +60,7 @@ export default function WeatherPeriodView({ hourlyData = [] }) {
         <>
           <ul className="list-disc pl-6 space-y-1 text-gray-700">
             <li>
-              🌫 Вологі години (RH ≥ 80%): <strong>{wetHours}</strong>
+              🌫 Вологі години (RH ≥ 90%): <strong>{wetHours}</strong>
             </li>
             <li>
               🌡 Середня температура:{" "}
