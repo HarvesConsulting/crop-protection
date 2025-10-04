@@ -179,4 +179,9 @@
   z-index: 90;
   background: transparent;
 }
-
+@media (min-width: 769px) {
+  .menu-wrapper:hover .menu-dropdown {
+    display: block;
+  }
+}
+ 
