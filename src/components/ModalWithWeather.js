@@ -9,6 +9,7 @@ export default function ModalWithWeather({
   endDate,
   lat,
   lon,
+  hourlyData,
 }) {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
