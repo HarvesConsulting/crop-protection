@@ -4,6 +4,7 @@ import "./Step4Results.css";
 import * as XLSX from "xlsx";
 import HourTimeline from "../components/HourTimeline";
 import Layout from "../components/Layout";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 const productInfo = {
   "Зорвек Інкантія": "0,5л/га",
@@ -603,24 +604,14 @@ integratedSystem.sort(
     <h2 style={{ display: "flex", alignItems: "center", gap: "8px" }}>
   Крок 4: Результати
   <button
-    onClick={(e) => {
-      e.stopPropagation();
-      setShowInfo(!showInfo);
-    }}
-    style={{
-      background: "none",
-      border: "1px solid #ccc",
-      borderRadius: "6px",
-      padding: "2px 6px",
-      cursor: "pointer",
-      fontSize: "16px",
-      color: "#007bff",
-    }}
+    className="info-button"
+    onClick={() => setShowInfo(!showInfo)}
     title="Показати інформацію"
   >
-    ℹ️
+    <InfoOutlinedIcon style={{ color: "#1976d2" }} />
   </button>
 </h2>
+
 
 {showInfo && (
   <div

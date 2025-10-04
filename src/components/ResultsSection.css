@@ -52,4 +52,20 @@
   position: relative;
   box-sizing: border-box;
 }
+.info-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.info-button:hover {
+  background: #f5f5f5;
+}
 
