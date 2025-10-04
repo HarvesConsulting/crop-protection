@@ -5,11 +5,11 @@ import "./IntegratedTableView.css";
  * 📊 Таблиця інтегрованої системи захисту
  * Відображає всі дати у рядках та основні хвороби у стовпцях.
  */
-export default function IntegratedTableView({ integratedSystem = [], diseaseCardsGrouped = [] }) {
-  // 🧭 Список основних хвороб
+export default function IntegratedTableView({ integratedSystem = [] }) {
+  // 🧭 Основні хвороби
   const diseases = ["Фітофтороз", "Сіра гниль", "Альтернаріоз", "Бактеріоз"];
 
-  // 🗓️ Формуємо унікальний список дат і сортуємо
+  // 🗓️ Унікальні дати (сортуємо за зростанням)
   const uniqueDates = [
     ...new Set(integratedSystem.map((item) => item.Дата)),
   ].sort((a, b) => {
@@ -18,43 +18,43 @@ export default function IntegratedTableView({ integratedSystem = [], diseaseCard
     return new Date(yA, mA - 1, dA) - new Date(yB, mB - 1, dB);
   });
 
-  // 🧮 Створюємо карту вигляду { дата: { хвороба: препарат } }
+  // 🧮 Ініціалізація карти { дата: { хвороба: препарат } }
   const diseaseMap = {};
   for (const date of uniqueDates) {
     diseaseMap[date] = {};
     for (const dis of diseases) diseaseMap[date][dis] = "";
   }
 
-  // 🧩 Розподіляємо препарати по стовпцях
+  // 🧩 Заповнення таблиці препаратами
   for (const entry of integratedSystem) {
-  const date = entry.Дата;
-  const prepList = (entry.Препарат || "").split(",").map((p) => p.trim());
+    const date = entry.Дата;
+    const prepList = (entry.Препарат || "").split(",").map((p) => p.trim());
 
-  for (const prep of prepList) {
-    // 1️⃣ Спочатку бактеріоз (унікальні)
-    if (/Медян|Казумін|Серенада/i.test(prep)) {
-      diseaseMap[date]["Бактеріоз"] +=
-        (diseaseMap[date]["Бактеріоз"] ? ", " : "") + prep;
+    for (const prep of prepList) {
+      // 🦠 Бактеріоз — окремі препарати
+      if (/Медян|Казумін|Серенада/i.test(prep)) {
+        diseaseMap[date]["Бактеріоз"] +=
+          (diseaseMap[date]["Бактеріоз"] ? ", " : "") + prep;
 
-    // 2️⃣ Потім альтернаріоз (має пріоритет над сірою гниллю)
-    } else if (/Альтер|Луна|Сігнум|Скала|Тельдор|Скор|Натіво/i.test(prep)) {
-      diseaseMap[date]["Альтернаріоз"] +=
-        (diseaseMap[date]["Альтернаріоз"] ? ", " : "") + prep;
+      // 🍃 Альтернаріоз (препарати також застосовуються проти сірої гнилі)
+      } else if (/Альтер|Луна|Сігнум|Скала|Тельдор|Скор|Натіво/i.test(prep)) {
+        diseaseMap[date]["Альтернаріоз"] +=
+          (diseaseMap[date]["Альтернаріоз"] ? ", " : "") + prep;
 
-    // 3️⃣ Потім сіра гниль (але без повторів альтернаріозу)
-    } else if (/Луна|Сігнум|Скала|Тельдор|Скор|Натіво/i.test(prep)) {
-      if (!diseaseMap[date]["Альтернаріоз"].includes(prep)) {
-        diseaseMap[date]["Сіра гниль"] +=
-          (diseaseMap[date]["Сіра гниль"] ? ", " : "") + prep;
+      // 🧫 Сіра гниль (уникати дублювання з альтернаріозом)
+      } else if (/Луна|Сігнум|Скала|Тельдор|Скор|Натіво/i.test(prep)) {
+        if (!diseaseMap[date]["Альтернаріоз"].includes(prep)) {
+          diseaseMap[date]["Сіра гниль"] +=
+            (diseaseMap[date]["Сіра гниль"] ? ", " : "") + prep;
+        }
+
+      // 🌱 Фітофтороз — базова група
+      } else if (/Зорвек|Ридоміл|Танос|Акробат|Орондіс|Ревус|Курзат|Ранман|Інфініто/i.test(prep)) {
+        diseaseMap[date]["Фітофтороз"] +=
+          (diseaseMap[date]["Фітофтороз"] ? ", " : "") + prep;
       }
-
-    // 4️⃣ Нарешті фітофтороз
-    } else if (/Зорвек|Ридоміл|Танос|Акробат|Орондіс|Ревус|Курзат|Ранман|Інфініто/i.test(prep)) {
-      diseaseMap[date]["Фітофтороз"] +=
-        (diseaseMap[date]["Фітофтороз"] ? ", " : "") + prep;
     }
   }
-}
 
   return (
     <div className="integrated-table-container">
@@ -75,7 +75,9 @@ export default function IntegratedTableView({ integratedSystem = [], diseaseCard
               <td className="date-cell">{date}</td>
               {diseases.map((d) => (
                 <td key={d} className="table-cell">
-                  {diseaseMap[date][d] || "—"}
+                  <span className="cell-text">
+                    {diseaseMap[date][d] || "—"}
+                  </span>
                 </td>
               ))}
             </tr>
