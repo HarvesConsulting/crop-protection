@@ -5,6 +5,7 @@ import { format, parseISO } from "date-fns";
 export default function HourTimeline({ date, suitableHours = [], hourlyData = [] }) {
   const [activeHour, setActiveHour] = useState(null);
 
+  // Форматуємо дату, щоб зіставляти з hourlyData
   const formattedDate = format(
     parseISO(date.split(".").reverse().join("-")),
     "yyyy-MM-dd"
@@ -12,6 +13,7 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
   console.log("🟡 hourlyData:", hourlyData);
   console.log("📅 formattedDate:", formattedDate);
 
+  // Вибираємо лише дані для потрібного дня
   const hoursToday = hourlyData.filter((h) => {
     const hDate =
       h.date instanceof Date
@@ -28,11 +30,18 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
       <div className="timeline-scroll">
         <div className="timeline-bar" onTouchEnd={closeTooltip}>
           {[...Array(24).keys()].map((hour) => {
+            // Шукаємо дані для конкретної години
             const hourData = hoursToday.find((h) => Number(h.hour) === hour);
             const isActive = activeHour === hour;
 
-            // 🔎 Перевірки
-            const isSuitable = suitableHours.includes(hourStr);
+            // 🟢 Виправлено: формуємо строку для порівняння
+            const hourStr = hour.toString().padStart(2, "0") + ":00";
+
+            // 🟢 Виправлено: перевірка вологості
+            const isHumidityTooHigh = hourData?.humidity >= 90;
+
+            // 🟢 Виправлено: визначаємо чи підходить година
+            const isSuitable = suitableHours.includes(hourStr) && !isHumidityTooHigh;
 
             return (
               <div
@@ -61,6 +70,7 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
                   {hour}
                 </div>
 
+                {/* Тултіп з даними */}
                 {hourData && isActive && (
                   <div className="hour-details-tooltip mobile">
                     <strong>{hour}:00</strong> <br />
