@@ -505,19 +505,30 @@ export async function fetchWeatherFromNASA(lat, lon, start, end) {
   }
 }
 export async function fetchArchiveHourlyExtras(lat, lon, startISO, endISO) {
+  // 1️⃣ Перевіряємо координати
   const { ok, lat: la, lon: lo } = coerceLatLon(lat, lon);
-  const s = toISOyyyy_mm_dd(startISO);
-  const e = toISOyyyy_mm_dd(endISO);
-  if (!ok || !s || !e) return { hourly: [], error: "Invalid lat/lon or dates", url: "" };
 
+  // 2️⃣ Обрізаємо діапазон дат до дозволеного (до вчорашнього дня)
+  const clamped = clampDateRange(startISO, endISO); 
+  if (!ok || clamped.error) {
+    return { hourly: [], error: "Invalid lat/lon or dates", url: "" };
+  }
+
+  // 3️⃣ Форматуємо дати вже після обрізання
+  const s = toISOyyyy_mm_dd(clamped.start);
+  const e = toISOyyyy_mm_dd(clamped.end);
+
+  // 4️⃣ Формуємо параметри запиту
   const params = new URLSearchParams({
     latitude: String(la),
     longitude: String(lo),
     timezone: "auto",
-    hourly: "temperature_2m,windspeed_10m,precipitation", // ⚡ беремо як є з ERA5 (10м)
+    // ⚡ додали вологість, щоб точно було
+    hourly: "temperature_2m,relative_humidity_2m,windspeed_10m,precipitation",
     start_date: s,
     end_date: e,
   });
+
   const url = `https://archive-api.open-meteo.com/v1/era5?${params.toString()}`;
 
   try {
@@ -525,13 +536,14 @@ export async function fetchArchiveHourlyExtras(lat, lon, startISO, endISO) {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
 
+    // 5️⃣ Розбираємо дані
     const h = json?.hourly || {};
     const times = h.time || [];
     const temps = h.temperature_2m || [];
     const winds10m = h.windspeed_10m || [];
     const rain = h.precipitation || [];
-
     const rhs = h.relative_humidity_2m || [];
+
     const n = Math.min(times.length, temps.length, winds10m.length, rain.length, rhs.length);
     const out = [];
 
@@ -548,7 +560,7 @@ export async function fetchArchiveHourlyExtras(lat, lon, startISO, endISO) {
         hour,
         temperature: Number(temps[i]),
         humidity: Number(rhs[i]),
-        windspeed: Number(winds10m[i]),    // ⚡ залишаємо 10м без перерахунку
+        windspeed: Number(winds10m[i]),
         precipitation: Number(rain[i]),
       });
     }
