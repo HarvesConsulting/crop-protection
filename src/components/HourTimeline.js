@@ -24,17 +24,17 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
   return (
     <div className="timeline-wrapper">
       <div className="timeline-scroll">
-        <div
-          className="timeline-bar"
-          onTouchEnd={closeTooltip}
-        >
+        <div className="timeline-bar" onTouchEnd={closeTooltip}>
           {[...Array(24).keys()].map((hour) => {
-            const isSuitable = suitableHours.includes(
-              hour.toString().padStart(2, "0") + ":00"
-            );
-
             const hourData = hoursToday.find((h) => Number(h.hour) === hour);
             const isActive = activeHour === hour;
+
+            // 🔎 Перевірки
+            const isHumidityTooHigh = hourData?.humidity >= 90;
+
+            const isSuitable =
+              suitableHours.includes(hour.toString().padStart(2, "0") + ":00") &&
+              !isHumidityTooHigh;
 
             return (
               <div
@@ -45,14 +45,19 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
                 onTouchStart={() => setActiveHour(hour)}
                 onTouchMove={(e) => {
                   const touch = e.touches[0];
-                  const element = document.elementFromPoint(touch.clientX, touch.clientY);
+                  const element = document.elementFromPoint(
+                    touch.clientX,
+                    touch.clientY
+                  );
                   if (element && element.dataset.hour) {
                     setActiveHour(Number(element.dataset.hour));
                   }
                 }}
               >
                 <div
-                  className={`hour-segment ${isSuitable ? "suitable" : "not-suitable"}`}
+                  className={`hour-segment ${
+                    isSuitable ? "suitable" : "not-suitable"
+                  }`}
                   data-hour={hour}
                 >
                   {hour}
@@ -62,8 +67,20 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
                   <div className="hour-details-tooltip mobile">
                     <strong>{hour}:00</strong> <br />
                     🌡 Температура: {hourData.temperature}°C <br />
+                    💧 Вологість: {hourData.humidity ?? "—"}% <br />
                     💨 Вітер: {hourData.windspeed} км/год <br />
-                    🌧 Опади: {hourData.precipitation ?? 0} мм
+                    🌧 Опади: {hourData.precipitation ?? 0} мм <br />
+                    {!isSuitable && (
+                      <span style={{ color: "red", fontWeight: "bold" }}>
+                        ❌ Не рекомендовано
+                        {isHumidityTooHigh && " (надто висока вологість)"}
+                      </span>
+                    )}
+                    {isSuitable && (
+                      <span style={{ color: "green", fontWeight: "bold" }}>
+                        ✅ Рекомендовано
+                      </span>
+                    )}
                   </div>
                 )}
               </div>
