@@ -531,7 +531,8 @@ export async function fetchArchiveHourlyExtras(lat, lon, startISO, endISO) {
     const winds10m = h.windspeed_10m || [];
     const rain = h.precipitation || [];
 
-    const n = Math.min(times.length, temps.length, winds10m.length, rain.length);
+    const rhs = h.relative_humidity_2m || [];
+    const n = Math.min(times.length, temps.length, winds10m.length, rain.length, rhs.length);
     const out = [];
 
     for (let i = 0; i < n; i++) {
@@ -658,7 +659,7 @@ export function transformArchiveToHourlyData(json) {
   const rain  = h.precipitation || [];
   const rhs   = h.relative_humidity_2m || []; // ⚡ додали вологість
 
-  const n = Math.min(times.length, temps.length, winds.length, rain.length);
+  const n = Math.min(times.length, temps.length, winds.length, rain.length, rhs.length);
   const out = [];
 
   for (let i = 0; i < n; i++) {
@@ -696,7 +697,7 @@ export function transformForecastToHourlyData(json) {
   const rain  = h.precipitation || [];
   const rhs   = h.relative_humidity_2m || []; // ⚡ додали вологість
 
-  const n = Math.min(times.length, temps.length, winds.length, rain.length);
+  const n = Math.min(times.length, temps.length, winds.length, rain.length, rhs.length);
   const out = [];
 
   for (let i = 0; i < n; i++) {
