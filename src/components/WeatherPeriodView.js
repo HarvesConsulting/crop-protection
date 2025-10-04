@@ -1,6 +1,5 @@
-import React, { useMemo, useEffect, useState } from "react";
+import React, { useMemo, useEffect } from "react";
 import { format, isValid } from "date-fns";
-import { fetchArchiveHourlyExtras } from "../engine"; // Переконайся, що цей імпорт працює
 
 function asDate(v) {
   if (v instanceof Date) return isValid(v) ? v : null;
@@ -8,56 +7,24 @@ function asDate(v) {
   return isValid(d) ? d : null;
 }
 
-export default function WeatherPeriodView({ startDate, endDate, lat, lon }) {
+export default function WeatherPeriodView({
+  startDate,
+  endDate,
+  hourlyData,
+}) {
   const start = asDate(startDate);
   const end = asDate(endDate);
 
-  const [hourlyData, setHourlyData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  // 🐞 Логування вхідних параметрів
+  // 🔎 Логування вхідних параметрів
   useEffect(() => {
-    console.group("🌦 WeatherPeriodView [debug]");
+    console.group("📊 WeatherPeriodView Debug");
+    console.log("✅ Вхідні параметри:");
     console.log("startDate:", startDate, "→", start);
     console.log("endDate:", endDate, "→", end);
-    console.log("lat:", lat);
-    console.log("lon:", lon);
+    console.log("externalHourlyData:", hourlyData?.length);
     console.groupEnd();
-  }, [startDate, endDate, lat, lon]);
+  }, [startDate, endDate, hourlyData]);
 
-  // 📡 Запит на погоду
-  useEffect(() => {
-    if (!start || !end || !lat || !lon) {
-      console.warn("❌ Не передані або невалідні координати / дати");
-      setError("Невірні вхідні дані для запиту погоди.");
-      return;
-    }
-
-    setLoading(true);
-    setError("");
-    setHourlyData([]);
-
-    console.log("🔄 Запит погоди...");
-    fetchArchiveHourlyExtras(lat, lon, start, end)
-      .then((res) => {
-        console.log("📦 Відповідь fetchArchiveHourlyExtras:", res);
-        if (res.error) {
-          setError(res.error);
-        } else {
-          setHourlyData(res.hourly || []);
-        }
-      })
-      .catch((e) => {
-        console.error("🚨 Помилка запиту:", e);
-        setError("Помилка отримання погодних даних.");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [start, end, lat, lon]);
-
-  // 🧾 Обробка даних
   const rows = useMemo(() => {
     return (hourlyData || [])
       .map((h) => {
@@ -83,15 +50,9 @@ export default function WeatherPeriodView({ startDate, endDate, lat, lon }) {
         <h4 className="font-semibold text-lg">Погодні умови (погодинно)</h4>
       </div>
 
-      {loading && (
-        <div className="text-center text-gray-500 p-4">Завантаження погодних даних…</div>
-      )}
-
-      {error && (
-        <div className="text-center text-red-500 p-4">Помилка: {error}</div>
-      )}
-
-      {!loading && !error && (
+      {rows.length === 0 ? (
+        <div className="text-center text-gray-500 p-4">Немає погодинних даних</div>
+      ) : (
         <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
           <table className="min-w-[720px] w-full border-collapse text-sm">
             <thead className="sticky top-0 bg-gray-100">
@@ -115,13 +76,6 @@ export default function WeatherPeriodView({ startDate, endDate, lat, lon }) {
                   <td className="p-2 border-b text-right">{isFinite(r.precipitation) ? r.precipitation.toFixed(1) : "—"}</td>
                 </tr>
               ))}
-              {rows.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="p-4 text-center text-gray-500">
-                    Немає погодинних даних
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>
