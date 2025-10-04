@@ -1,3 +1,6 @@
+console.log("🟡 hourlyData:", hourlyData);
+console.log("📅 formattedDate:", formattedDate);
+
 import React, { useState } from "react";
 import "./HourTimeline.css";
 import { format, parseISO } from "date-fns";
