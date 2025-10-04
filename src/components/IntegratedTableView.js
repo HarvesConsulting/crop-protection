@@ -3,15 +3,24 @@ import "./IntegratedTableView.css";
 
 /**
  * 📊 Таблиця інтегрованої системи захисту
- * Побудована лише на diseaseCardsGrouped, де є точні відповідності хворобам
+ * Об’єднує препарати проти фітофторозу (sprayData) та інших хвороб (diseaseCardsGrouped)
  */
-export default function IntegratedTableView({ diseaseCardsGrouped = [] }) {
+export default function IntegratedTableView({
+  sprayData = [],
+  diseaseCardsGrouped = [],
+}) {
   const diseases = ["Фітофтороз", "Сіра гниль", "Альтернаріоз", "Бактеріоз"];
 
-  // 🗓️ Усі унікальні дати
+  // 🧩 Об'єднуємо дані: додаємо фітофтороз як окрему групу
+  const allGroups = [
+    { name: "Фітофтороз", entries: sprayData || [] },
+    ...(diseaseCardsGrouped || []),
+  ];
+
+  // 🗓️ Отримуємо всі унікальні дати
   const allDates = [
     ...new Set(
-      diseaseCardsGrouped.flatMap((group) =>
+      allGroups.flatMap((group) =>
         group.entries?.map((e) => e.Дата)
       )
     ),
@@ -21,15 +30,15 @@ export default function IntegratedTableView({ diseaseCardsGrouped = [] }) {
     return new Date(yA, mA - 1, dA) - new Date(yB, mB - 1, dB);
   });
 
-  // 🧮 Готуємо таблицю
+  // 🧮 Створюємо карту: { дата: { хвороба: препарат } }
   const diseaseMap = {};
   for (const date of allDates) {
     diseaseMap[date] = {};
     for (const dis of diseases) diseaseMap[date][dis] = "";
   }
 
-  // 🧩 Заповнюємо таблицю препаратами
-  for (const group of diseaseCardsGrouped) {
+  // 🧩 Заповнюємо таблицю
+  for (const group of allGroups) {
     const { name, entries } = group;
     if (!diseases.includes(name)) continue;
 
@@ -38,7 +47,6 @@ export default function IntegratedTableView({ diseaseCardsGrouped = [] }) {
       const prep = entry.Препарат;
       if (!date || !prep) continue;
 
-      // Якщо в цій даті вже є препарат для цієї хвороби, додаємо через новий рядок
       diseaseMap[date][name] += (diseaseMap[date][name] ? "\n" : "") + prep;
     }
   }

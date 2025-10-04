@@ -666,7 +666,7 @@ onClick={() => setWeatherModalOpen(true)}
    {showIntegrated ? (
   <>
     <IntegratedTableView
-      integratedSystem={integratedSystem}
+      sprayData={sprayData}
       diseaseCardsGrouped={diseaseCardsGrouped}
     />
 
