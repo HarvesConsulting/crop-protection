@@ -1,35 +1,72 @@
+.integrated-table-container {
+  overflow-x: auto;
+  margin-top: 1.5rem;
+  border-radius: 12px;
+  background-color: #f9fffa;
+}
+
+/* Заголовок секції */
+.integrated-table-title {
+  text-align: center;
+  color: #155724;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+/* Основна таблиця */
 .integrated-table {
   width: 100%;
   border-collapse: collapse;
-  text-align: center;
   background-color: #ffffff;
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: "Inter", "Segoe UI", sans-serif;
 }
 
-.integrated-table th,
+/* Заголовки */
+.integrated-table th {
+  background-color: #d4edda;
+  color: #155724;
+  font-weight: 600;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #c3e6cb;
+  text-align: center;
+}
+
+/* Рядки */
 .integrated-table td {
-  border: 1px solid #ddd;
+  border: 1px solid #c3e6cb;
   padding: 10px;
   font-size: 15px;
+  color: #212529;
+  text-align: center;
+  background-color: #f9fffa;
+  line-height: 1.5;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 250px;
+  font-style: normal; /* ✅ Прибираємо курсив */
 }
 
-.integrated-table th {
-  background-color: #e9f5ff;
-  color: #004d80;
+/* Зебра для рядків */
+.integrated-table tr:nth-child(even) td {
+  background-color: #f3fdf5;
+}
+
+/* Комірка з датою */
+.date-cell {
   font-weight: 600;
+  color: #155724;
+  background-color: #e3f7e8;
+  min-width: 110px;
 }
 
-.integrated-table tr:nth-child(even) {
-  background-color: #f8fafc;
-}
-
-.integrated-table .date-cell {
-  font-weight: 600;
-  color: #333;
-  background: #f0f8ff;
-}
-
-.integrated-table .cell {
-  font-style: italic;
-  color: #333;
+/* При наведенні */
+.integrated-table tr:hover td {
+  background-color: #eaf9ef;
+  transition: 0.2s ease;
 }
