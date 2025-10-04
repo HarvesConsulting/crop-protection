@@ -584,22 +584,27 @@ integratedSystem.sort(
   <main className="flex justify-center items-start min-h-[70vh] px-4">
   <div className="w-full max-w-xl mx-auto bg-white rounded-xl shadow-md px-6 sm:px-10 py-6 space-y-6 text-base sm:text-lg">
   <div
-  className={`menu-wrapper ${window.innerWidth <= 768 ? (showMenu ? "open" : "") : ""}`}
+  className="menu-wrapper"
   onMouseEnter={() => {
+    // Показуємо меню тільки на ПК
     if (window.innerWidth > 768) setShowMenu(true);
   }}
   onMouseLeave={() => {
+    // Ховаємо меню після наведення тільки на ПК
     if (window.innerWidth > 768) setShowMenu(false);
   }}
 >
-  <div
+  <button
     className="menu-toggle"
     onClick={() => {
-      if (window.innerWidth <= 768) setShowMenu(!showMenu);
+      // На мобільних – меню відкривається при кліку
+      if (window.innerWidth <= 768) {
+        setShowMenu((prev) => !prev);
+      }
     }}
   >
     ☰ Меню дій
-  </div>
+  </button>
 
   <div className={`menu-dropdown ${showMenu ? "visible" : ""}`}>
     <button className="menu-item" onClick={onRestart}>
@@ -619,7 +624,10 @@ integratedSystem.sort(
       Інформація про кольори карток
     </button>
 
-    <button className="menu-item" onClick={() => setWeatherModalOpen(true)}>
+    <button
+      className="menu-item"
+      onClick={() => setWeatherModalOpen(true)}
+    >
       Погодні умови за період
     </button>
 
