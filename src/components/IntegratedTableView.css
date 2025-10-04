@@ -4,7 +4,8 @@
   margin-top: 1.5rem;
   border-radius: 12px;
   background-color: #f9fffa;
-  overflow-x: visible; /* 🚫 прибираємо горизонтальну прокрутку */
+  overflow-x: auto; /* 🟢 Додаємо горизонтальну прокрутку */
+  -webkit-overflow-scrolling: touch; /* 🟢 Плавна прокрутка на iOS */
 }
 
 /* Заголовок */
@@ -23,7 +24,8 @@
   background-color: #ffffff;
   border-radius: 12px;
   font-family: "Inter", "Segoe UI", sans-serif;
-  table-layout: fixed; /* 🟢 тепер ширина стовпців рівномірна */
+  table-layout: fixed; /* рівна ширина стовпців */
+  min-width: 600px; /* 🟢 Щоб на мобільних не зливалося */
 }
 
 /* Заголовки */
@@ -46,12 +48,12 @@
   color: #1a1a1a;
   background-color: #f3fff4;
   text-align: center;
-  vertical-align: top; /* 🟢 текст вирівняно вгору, якщо багато рядків */
+  vertical-align: top;
   line-height: 1.5;
   font-style: normal;
-  white-space: normal; /* 🟢 дозволяє перенос рядків */
-  word-break: break-word; /* 🟢 переносить слово, якщо воно довге */
-  overflow-wrap: anywhere; /* 🟢 додатковий перенос */
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 /* Зебра */
@@ -69,17 +71,25 @@
   width: 120px;
 }
 
-/* Текст у клітинках */
-.cell-text {
-  display: block;
-  width: 100%;
-  white-space: normal;
-  word-break: break-word;
-  overflow-wrap: anywhere;
-}
-
 /* При наведенні */
 .integrated-table tr:hover td {
   background-color: #d5f0d8;
   transition: background-color 0.2s ease;
+}
+
+/* 🟢 Адаптація під мобільні: прокрутка та зменшений текст */
+@media (max-width: 768px) {
+  .integrated-table-container {
+    overflow-x: auto;
+  }
+
+  .integrated-table {
+    min-width: 700px; /* дозволяє горизонтальний скрол */
+  }
+
+  .integrated-table td,
+  .integrated-table th {
+    font-size: 14px;
+    padding: 10px 6px;
+  }
 }
