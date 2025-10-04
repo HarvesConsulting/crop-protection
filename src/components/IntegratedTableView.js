@@ -27,25 +27,34 @@ export default function IntegratedTableView({ integratedSystem = [], diseaseCard
 
   // 🧩 Розподіляємо препарати по стовпцях
   for (const entry of integratedSystem) {
-    const date = entry.Дата;
-    const prepList = (entry.Препарат || "").split(",").map((p) => p.trim());
+  const date = entry.Дата;
+  const prepList = (entry.Препарат || "").split(",").map((p) => p.trim());
 
-    for (const prep of prepList) {
-      if (/Зорвек|Ридоміл|Танос|Акробат|Орондіс|Ревус|Курзат|Ранман|Інфініто/i.test(prep)) {
-        diseaseMap[date]["Фітофтороз"] +=
-          (diseaseMap[date]["Фітофтороз"] ? ", " : "") + prep;
-      } else if (/Луна|Сігнум|Скала|Тельдор|Скор|Натіво/i.test(prep)) {
+  for (const prep of prepList) {
+    // 1️⃣ Спочатку бактеріоз (унікальні)
+    if (/Медян|Казумін|Серенада/i.test(prep)) {
+      diseaseMap[date]["Бактеріоз"] +=
+        (diseaseMap[date]["Бактеріоз"] ? ", " : "") + prep;
+
+    // 2️⃣ Потім альтернаріоз (має пріоритет над сірою гниллю)
+    } else if (/Альтер|Луна|Сігнум|Скала|Тельдор|Скор|Натіво/i.test(prep)) {
+      diseaseMap[date]["Альтернаріоз"] +=
+        (diseaseMap[date]["Альтернаріоз"] ? ", " : "") + prep;
+
+    // 3️⃣ Потім сіра гниль (але без повторів альтернаріозу)
+    } else if (/Луна|Сігнум|Скала|Тельдор|Скор|Натіво/i.test(prep)) {
+      if (!diseaseMap[date]["Альтернаріоз"].includes(prep)) {
         diseaseMap[date]["Сіра гниль"] +=
           (diseaseMap[date]["Сіра гниль"] ? ", " : "") + prep;
-      } else if (/Альтер/i.test(prep)) {
-        diseaseMap[date]["Альтернаріоз"] +=
-          (diseaseMap[date]["Альтернаріоз"] ? ", " : "") + prep;
-      } else if (/Медян|Казумін|Серенада/i.test(prep)) {
-        diseaseMap[date]["Бактеріоз"] +=
-          (diseaseMap[date]["Бактеріоз"] ? ", " : "") + prep;
       }
+
+    // 4️⃣ Нарешті фітофтороз
+    } else if (/Зорвек|Ридоміл|Танос|Акробат|Орондіс|Ревус|Курзат|Ранман|Інфініто/i.test(prep)) {
+      diseaseMap[date]["Фітофтороз"] +=
+        (diseaseMap[date]["Фітофтороз"] ? ", " : "") + prep;
     }
   }
+}
 
   return (
     <div className="integrated-table-container">
