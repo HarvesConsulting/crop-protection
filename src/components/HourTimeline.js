@@ -1,6 +1,3 @@
-console.log("🟡 hourlyData:", hourlyData);
-console.log("📅 formattedDate:", formattedDate);
-
 import React, { useState } from "react";
 import "./HourTimeline.css";
 import { format, parseISO } from "date-fns";
@@ -12,6 +9,8 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
     parseISO(date.split(".").reverse().join("-")),
     "yyyy-MM-dd"
   );
+  console.log("🟡 hourlyData:", hourlyData);
+  console.log("📅 formattedDate:", formattedDate);
 
   const hoursToday = hourlyData.filter((h) => {
     const hDate =
