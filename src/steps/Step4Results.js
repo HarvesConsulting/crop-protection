@@ -7,6 +7,7 @@ import Layout from "../components/Layout";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import WeatherPeriodView from "../components/WeatherPeriodView";
 import ModalWithWeather from "../components/ModalWithWeather";
+import { extractSuitableSprayHours } from "../engine";
 
 const productInfo = {
   "Зорвек Інкантія": "0,5л/га",
@@ -261,7 +262,7 @@ function Card({ frontData, backData }) {
   );
 }
 
-function CardView({ title, entries, diagnostics = [], plantingDate, rainDaily = [], hourlyData = [] }) {
+function CardView({ title, entries, diagnostics = [], plantingDate, rainDaily = [], hourlyData: enrichedHourlyData = [] }) {
   return (
     <div className="card-section">
       <h3>{title}</h3>
@@ -309,7 +310,7 @@ function CardView({ title, entries, diagnostics = [], plantingDate, rainDaily = 
   frontData={{
     index: `#${i + 1}`,
     fields: frontFields,
-    hourlyData, // ✅ сюди передаємо повні метео-дані
+    hourlyData: enrichedHourlyData,
   }}
   backData={backDataResult}
 />
@@ -361,6 +362,19 @@ const {
   plantingDate,
   harvestDate,
 } = result;
+// 🧠 Додаємо "suitable: true/false" до кожної години
+const suitableMap = extractSuitableSprayHours(hourlyData);
+
+const enrichedHourlyData = hourlyData.map((entry) => {
+  const dateStr = entry.date.toISOString().split("T")[0];
+  const hourStr = String(entry.hour).padStart(2, "0") + ":00";
+  const suitableEntry = suitableMap[dateStr]?.find((h) => h.hour === hourStr);
+  return {
+    ...entry,
+    suitable: suitableEntry?.suitable === true,
+  };
+});
+
 // ✅ ВСТАВКА ЛОГІВ ДЛЯ ПЕРЕВІРКИ ДАНИХ
   console.log("🔬 Перевірка diagnostics:");
   console.table(diagnostics.slice(0, 10));
@@ -656,7 +670,7 @@ onClick={() => setWeatherModalOpen(true)}
           diagnostics={diagnostics}
           plantingDate={plantingDate}
           rainDaily={aggregatedRain}
-          hourlyData={hourlyData}
+          hourlyData={enrichedHourlyData}
         />
 
         <button onClick={exportToExcel} className="toggle-button">
@@ -671,7 +685,7 @@ onClick={() => setWeatherModalOpen(true)}
           diagnostics={diagnostics}
           plantingDate={plantingDate}
           rainDaily={aggregatedRain}
-          hourlyData={hourlyData}
+          hourlyData={enrichedHourlyData}
         />
 
         {diseaseCardsGrouped?.map(({ name, entries }) => (
@@ -682,7 +696,7 @@ onClick={() => setWeatherModalOpen(true)}
             diagnostics={diagnostics}
             plantingDate={plantingDate}
             rainDaily={aggregatedRain}
-            hourlyData={hourlyData}
+            hourlyData={enrichedHourlyData}
           />
         ))}
 
