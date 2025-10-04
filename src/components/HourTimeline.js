@@ -5,12 +5,13 @@ import { format, parseISO } from "date-fns";
 export default function HourTimeline({ date, hourlyData = [] }) {
   const [activeHour, setActiveHour] = useState(null);
 
+  // Перетворюємо dd.MM.yyyy → yyyy-MM-dd
   const formattedDate = format(
     parseISO(date.split(".").reverse().join("-")),
     "yyyy-MM-dd"
   );
 
-  // Знайти записи з потрібного дня
+  // Фільтруємо всі записи на поточний день
   const hoursToday = hourlyData.filter((h) => {
     const hDate =
       h.date instanceof Date
@@ -28,19 +29,7 @@ export default function HourTimeline({ date, hourlyData = [] }) {
           {[...Array(24).keys()].map((hour) => {
             const hourData = hoursToday.find((h) => Number(h.hour) === hour);
             const isActive = activeHour === hour;
-
-            const hourStr = String(hour).padStart(2, "0") + ":00";
-
-            // Отримаємо запис про день із даними engine
-            const dayData = hourlyData.find((h) => {
-              const hDate =
-                h.date instanceof Date
-                  ? format(h.date, "yyyy-MM-dd")
-                  : format(parseISO(h.date), "yyyy-MM-dd");
-              return hDate === formattedDate;
-            });
-
-            const isSuitable = dayData?.isSuitable === true;
+            const isSuitable = hourData?.suitable === true;
 
             return (
               <div
@@ -66,24 +55,23 @@ export default function HourTimeline({ date, hourlyData = [] }) {
                   }`}
                   data-hour={hour}
                 >
-                  {hour}
+                  {String(hour).padStart(2, "0")}:00
                 </div>
 
                 {hourData && isActive && (
                   <div className="hour-details-tooltip mobile">
-                    <strong>{hour}:00</strong> <br />
+                    <strong>{String(hour).padStart(2, "0")}:00</strong> <br />
                     🌡 Температура: {hourData.temperature}°C <br />
                     💧 Вологість: {hourData.humidity ?? "—"}% <br />
                     💨 Вітер: {hourData.windspeed} км/год <br />
                     🌧 Опади: {hourData.precipitation ?? 0} мм <br />
-                    {!isSuitable && (
-                      <span style={{ color: "red", fontWeight: "bold" }}>
-                        ❌ Не рекомендовано (умови не сприятливі)
-                      </span>
-                    )}
-                    {isSuitable && (
+                    {isSuitable ? (
                       <span style={{ color: "green", fontWeight: "bold" }}>
                         ✅ Рекомендовано
+                      </span>
+                    ) : (
+                      <span style={{ color: "red", fontWeight: "bold" }}>
+                        ❌ Не рекомендовано
                       </span>
                     )}
                   </div>
