@@ -566,6 +566,14 @@ integratedSystem.sort(
   return (
   <main className="flex justify-center items-start min-h-[70vh] px-4">
   <div className="w-full max-w-xl mx-auto bg-white rounded-xl shadow-md px-6 sm:px-10 py-6 space-y-6 text-base sm:text-lg">
+    <WeatherPeriodModal
+  open={showWeather}
+  onClose={() => setShowWeather(false)}
+  hourlyData={hourlyData}
+  startDate={plantingDate}
+  endDate={harvestDate}
+  humidThreshold={90}
+/>
       <div className="menu-wrapper">
 
       <button className="menu-toggle" onClick={() => setShowMenu(!showMenu)}>
