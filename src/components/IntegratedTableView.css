@@ -1,0 +1,26 @@
+.integrated-table-wrapper {
+  overflow-x: auto;
+}
+
+.integrated-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 16px;
+}
+
+.integrated-table th,
+.integrated-table td {
+  border: 1px solid #ccc;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.integrated-table th {
+  background-color: #f0f0f0;
+  font-weight: bold;
+}
+
+.integrated-table td {
+  background-color: #fff;
+}

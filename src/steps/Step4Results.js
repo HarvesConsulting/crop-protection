@@ -8,6 +8,7 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import WeatherPeriodView from "../components/WeatherPeriodView";
 import ModalWithWeather from "../components/ModalWithWeather";
 import { extractSuitableSprayHours } from "../engine";
+import IntegratedTableView from "../components/IntegratedTableView";
 
 const productInfo = {
   "Зорвек Інкантія": "0,5л/га",
@@ -662,51 +663,48 @@ onClick={() => setWeatherModalOpen(true)}
 )}
 
 
-    {showIntegrated ? (
-      <>
-        <CardView
-          title="Інтегрована система захисту"
-          entries={integratedSystem}
-          diagnostics={diagnostics}
-          plantingDate={plantingDate}
-          rainDaily={aggregatedRain}
-          hourlyData={enrichedHourlyData}
-        />
+   {showIntegrated ? (
+  <>
+    <IntegratedTableView
+      integratedSystem={integratedSystem}
+      diseaseCardsGrouped={diseaseCardsGrouped}
+    />
 
-        <button onClick={exportToExcel} className="toggle-button">
-           Експорт в Excel
-        </button>
-      </>
-    ) : (
-      <>
-        <CardView
-          title="Рекомендовані внесення (проти фітофторозу)"
-          entries={sprayData}
-          diagnostics={diagnostics}
-          plantingDate={plantingDate}
-          rainDaily={aggregatedRain}
-          hourlyData={enrichedHourlyData}
-        />
+    <button onClick={exportToExcel} className="toggle-button">
+      Експорт в Excel
+    </button>
+  </>
+) : (
+  <>
+    <CardView
+      title="Рекомендовані внесення (проти фітофторозу)"
+      entries={sprayData}
+      diagnostics={diagnostics}
+      plantingDate={plantingDate}
+      rainDaily={aggregatedRain}
+      hourlyData={enrichedHourlyData}
+    />
 
-        {diseaseCardsGrouped?.map(({ name, entries }) => (
-          <CardView
-            key={name}
-            title={`Рекомендовані внесення (проти: ${name})`}
-            entries={entries}
-            diagnostics={diagnostics}
-            plantingDate={plantingDate}
-            rainDaily={aggregatedRain}
-            hourlyData={enrichedHourlyData}
-          />
-        ))}
+    {diseaseCardsGrouped?.map(({ name, entries }) => (
+      <CardView
+        key={name}
+        title={`Рекомендовані внесення (проти: ${name})`}
+        entries={entries}
+        diagnostics={diagnostics}
+        plantingDate={plantingDate}
+        rainDaily={aggregatedRain}
+        hourlyData={enrichedHourlyData}
+      />
+    ))}
 
-        <button className="restart-button" onClick={onRestart}>
-           Почати спочатку
-        </button>
-      </>
-    )}
-        </div>
-    <ModalWithWeather
+    <button className="restart-button" onClick={onRestart}>
+      Почати спочатку
+    </button>
+  </>
+)}
+</div>
+
+<ModalWithWeather
   open={weatherModalOpen}
   onOpenChange={setWeatherModalOpen}
   startDate={plantingDate}
@@ -716,7 +714,6 @@ onClick={() => setWeatherModalOpen(true)}
   hourlyData={hourlyData}
 />
 
-  </main>
-  );
+</main>
+);
 }
-
