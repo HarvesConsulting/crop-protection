@@ -9,6 +9,7 @@ import WeatherPeriodView from "../components/WeatherPeriodView";
 import ModalWithWeather from "../components/ModalWithWeather";
 import { extractSuitableSprayHours } from "../engine";
 import IntegratedTableView from "../components/IntegratedTableView";
+import ActionMenu from "../components/ActionMenu";
 
 const productInfo = {
   "Зорвек Інкантія": "0,5л/га",
@@ -591,44 +592,14 @@ integratedSystem.sort(
   return (
   <main className="flex justify-center items-start min-h-[70vh] px-4">
   <div className="w-full max-w-xl mx-auto bg-white rounded-xl shadow-md px-6 sm:px-10 py-6 space-y-6 text-base sm:text-lg">
-  <div className="menu-wrapper">
-  <button
-    className="menu-toggle"
-    onClick={(e) => {
-      if (isMobile) {
-        e.stopPropagation();
-        setShowMenu((prev) => !prev);
-      }
-    }}
-  >
-    ☰ Меню дій
-  </button>
+  <ActionMenu
+  isMobile={isMobile}
+  onRestart={onRestart}
+  onShowWeather={() => setWeatherModalOpen(true)}
+  onToggleIntegrated={() => setShowIntegrated((prev) => !prev)}
+  showIntegrated={showIntegrated}
+/>
 
-  {/* Мобільний бекдроп — закрити по дотику за межами */}
-  {isMobile && showMenu && (
-    <div className="menu-backdrop" onClick={() => setShowMenu(false)} />
-  )}
-
-  <div className={`menu-dropdown ${isMobile && showMenu ? "visible" : ""}`}>
-    <button className="menu-item" onClick={onRestart}>
-      Почати спочатку
-    </button>
-    <button
-      className="menu-item"
-      onClick={() =>
-        alert("🟢 Зелений — помірний ризик\n🟡 Жовтий — середній\n🔴 Червоний — високий")
-      }
-    >
-      Інформація про кольори карток
-    </button>
-    <button className="menu-item" onClick={() => setWeatherModalOpen(true)}>
-      Погодні умови за період
-    </button>
-    <button className="menu-item" onClick={() => setShowIntegrated((prev) => !prev)}>
-      {showIntegrated ? "Сховати інтегровану систему" : "Сформувати інтегровану систему"}
-    </button>
-  </div>
-</div>
 
     <h2 style={{ display: "flex", alignItems: "center", gap: "8px" }}>
   Крок 4: Результати
