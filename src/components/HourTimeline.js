@@ -5,13 +5,12 @@ import { format, parseISO } from "date-fns";
 export default function HourTimeline({ date, hourlyData = [] }) {
   const [activeHour, setActiveHour] = useState(null);
 
-  // Перетворюємо dd.MM.yyyy → yyyy-MM-dd
   const formattedDate = format(
     parseISO(date.split(".").reverse().join("-")),
     "yyyy-MM-dd"
   );
 
-  // Фільтруємо всі записи на поточний день
+  // Знайти записи з потрібного дня
   const hoursToday = hourlyData.filter((h) => {
     const hDate =
       h.date instanceof Date
@@ -29,6 +28,7 @@ export default function HourTimeline({ date, hourlyData = [] }) {
           {[...Array(24).keys()].map((hour) => {
             const hourData = hoursToday.find((h) => Number(h.hour) === hour);
             const isActive = activeHour === hour;
+
             const isSuitable = hourData?.suitable === true;
 
             return (
@@ -55,12 +55,12 @@ export default function HourTimeline({ date, hourlyData = [] }) {
                   }`}
                   data-hour={hour}
                 >
-                  {String(hour).padStart(2, "0")}:00
+                  {hour}
                 </div>
 
                 {hourData && isActive && (
                   <div className="hour-details-tooltip mobile">
-                    <strong>{String(hour).padStart(2, "0")}:00</strong> <br />
+                    <strong>{hour}:00</strong> <br />
                     🌡 Температура: {hourData.temperature}°C <br />
                     💧 Вологість: {hourData.humidity ?? "—"}% <br />
                     💨 Вітер: {hourData.windspeed} км/год <br />
@@ -71,7 +71,7 @@ export default function HourTimeline({ date, hourlyData = [] }) {
                       </span>
                     ) : (
                       <span style={{ color: "red", fontWeight: "bold" }}>
-                        ❌ Не рекомендовано
+                        ❌ Не рекомендовано (умови не сприятливі)
                       </span>
                     )}
                   </div>
