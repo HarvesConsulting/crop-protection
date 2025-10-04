@@ -1,56 +1,68 @@
 import React from "react";
 import "./IntegratedTableView.css";
 
-const DISEASES = ["Фітофтороз", "Сіра гниль", "Альтернаріоз", "Бактеріоз"];
+/**
+ * Таблиця інтегрованої системи захисту
+ * Відображає всі дати у рядках та основні хвороби у стовпцях.
+ */
+export default function IntegratedTableView({ integratedSystem = [], diseaseCardsGrouped = [] }) {
+  // 🧭 Список усіх можливих хвороб
+  const diseases = ["Фітофтороз", "Сіра гниль", "Альтернаріоз", "Бактеріоз"];
 
-export default function IntegratedTableView({ entries }) {
-  const tableData = {};
+  // 🗓️ Формуємо список унікальних дат
+  const uniqueDates = [
+    ...new Set(integratedSystem.map((item) => item.Дата)),
+  ].sort((a, b) => {
+    const [dA, mA, yA] = a.split(".");
+    const [dB, mB, yB] = b.split(".");
+    return new Date(yA, mA - 1, dA) - new Date(yB, mB - 1, dB);
+  });
 
-  entries.forEach((entry) => {
+  // 🧮 Створюємо карту: { дата: { хвороба: препарат } }
+  const diseaseMap = {};
+  for (const date of uniqueDates) {
+    diseaseMap[date] = {};
+    for (const dis of diseases) diseaseMap[date][dis] = "";
+  }
+
+  // 🧩 Заповнюємо таблицю препаратами з integratedSystem
+  for (const entry of integratedSystem) {
     const date = entry.Дата;
-    if (!tableData[date]) tableData[date] = {};
-
-    const products = Array.isArray(entry.Препарат)
-      ? entry.Препарат
-      : [entry.Препарат];
-
-    products.forEach((product) => {
-      if (product.includes("Зорвек") || product.includes("Ридоміл")) {
-        tableData[date]["Фітофтороз"] = product;
-      } else if (product.includes("Тельдор") || product.includes("Сігнум")) {
-        tableData[date]["Сіра гниль"] = product;
-      } else if (product.includes("Скор") || product.includes("Натіво")) {
-        tableData[date]["Альтернаріоз"] = product;
-      } else if (product.includes("Казумін") || product.includes("Медян")) {
-        tableData[date]["Бактеріоз"] = product;
-      }
-    });
-  });
-
-  const sortedDates = Object.keys(tableData).sort((a, b) => {
-    const [d1, m1, y1] = a.split(".");
-    const [d2, m2, y2] = b.split(".");
-    return new Date(`${y1}-${m1}-${d1}`) - new Date(`${y2}-${m2}-${d2}`);
-  });
+    const prepText = entry.Препарат || "";
+    // Автоматично визначаємо до якої хвороби належить
+    if (/Зорвек|Ридоміл|Танос|Акробат|Орондіс|Ревус|Курзат|Ранман|Інфініто/i.test(prepText)) {
+      diseaseMap[date]["Фітофтороз"] = prepText;
+    } else if (/Луна|Сігнум|Скала|Тельдор|Скор|Натіво/i.test(prepText)) {
+      diseaseMap[date]["Сіра гниль"] = prepText;
+    } else if (/Альтер/i.test(prepText)) {
+      diseaseMap[date]["Альтернаріоз"] = prepText;
+    } else if (/Медян|Казумін|Серенада/i.test(prepText)) {
+      diseaseMap[date]["Бактеріоз"] = prepText;
+    }
+  }
 
   return (
-    <div className="integrated-table-wrapper">
+    <div style={{ overflowX: "auto", marginTop: "1rem" }}>
+      <h3 style={{ textAlign: "center", marginBottom: "1rem" }}>
+        Інтегрована система захисту
+      </h3>
+
       <table className="integrated-table">
         <thead>
           <tr>
             <th>Дата</th>
-            {DISEASES.map((disease) => (
-              <th key={disease}>{disease}</th>
+            {diseases.map((d) => (
+              <th key={d}>{d}</th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {sortedDates.map((date) => (
+          {uniqueDates.map((date) => (
             <tr key={date}>
-              <td>{date}</td>
-              {DISEASES.map((disease) => (
-                <td key={disease}>
-                  {tableData[date][disease] || ""}
+              <td className="date-cell">{date}</td>
+              {diseases.map((d) => (
+                <td key={d} className="cell">
+                  {diseaseMap[date][d] || "—"}
                 </td>
               ))}
             </tr>

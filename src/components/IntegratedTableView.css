@@ -1,26 +1,35 @@
-.integrated-table-wrapper {
-  overflow-x: auto;
-}
-
 .integrated-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 1rem;
-  font-size: 16px;
+  text-align: center;
+  background-color: #ffffff;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
 }
 
 .integrated-table th,
 .integrated-table td {
-  border: 1px solid #ccc;
-  padding: 8px 12px;
-  text-align: left;
+  border: 1px solid #ddd;
+  padding: 10px;
+  font-size: 15px;
 }
 
 .integrated-table th {
-  background-color: #f0f0f0;
-  font-weight: bold;
+  background-color: #e9f5ff;
+  color: #004d80;
+  font-weight: 600;
 }
 
-.integrated-table td {
-  background-color: #fff;
+.integrated-table tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+.integrated-table .date-cell {
+  font-weight: 600;
+  color: #333;
+  background: #f0f8ff;
+}
+
+.integrated-table .cell {
+  font-style: italic;
+  color: #333;
 }
