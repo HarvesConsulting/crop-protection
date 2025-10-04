@@ -498,7 +498,7 @@ export async function fetchWeatherFromNASA(lat, lon, start, end) {
     res = await fetch(omUrl);
     if (!res.ok) throw new Error(`ERA5 error ${res.status}`);
     const json2 = await res.json();
-    return { daily: transformOpenMeteoHourly(json2), error: "", url: omUrl };
+    return { daily: transformArchiveToHourlyData(json2), error: "", url: omUrl };
 
   } catch (e) {
     return { daily: [], error: String(e), url };
