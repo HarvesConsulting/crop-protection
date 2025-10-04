@@ -77,13 +77,14 @@
   background: #f5f5f5;
 }
 
-/* ====== МЕНЮ ДІЙ ====== */
+/* ====== МЕНЮ ДІЙ (ОНОВЛЕНА ВЕРСІЯ) ====== */
 
 /* Обгортка */
 .menu-wrapper {
   position: relative;
   display: inline-block;
   margin-bottom: 1rem;
+  width: 100%;
 }
 
 /* Кнопка “Меню дій” */
@@ -96,6 +97,9 @@
   font-weight: 600;
   user-select: none;
   transition: background 0.25s ease, transform 0.2s ease;
+  width: 100%;
+  text-align: center;
+  border: none;
 }
 
 .menu-toggle:hover {
@@ -118,15 +122,15 @@
   transform: translateY(-8px);
   transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
   z-index: 100;
+  pointer-events: none;
 }
 
-/* Плавна поява при hover або класах .visible / .open */
-.menu-wrapper:hover .menu-dropdown,
-.menu-dropdown.visible,
-.menu-wrapper.open .menu-dropdown {
+/* Показати меню через клас */
+.menu-dropdown.visible {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
+  pointer-events: auto;
 }
 
 /* Пункти меню */
@@ -152,16 +156,6 @@
   color: #0b3d16;
 }
 
-/* ====== АНІМАЦІЯ ЗАТРИМКИ ПРИ ЗНИКНЕННІ ====== */
-.menu-wrapper .menu-dropdown {
-  pointer-events: none;
-}
-
-.menu-wrapper:hover .menu-dropdown,
-.menu-dropdown.visible {
-  pointer-events: auto;
-}
-
 /* ====== МОБІЛЬНА АДАПТАЦІЯ ====== */
 @media (max-width: 768px) {
   .menu-wrapper {
@@ -181,18 +175,32 @@
     border-radius: 8px;
     border: 1px solid #c3e6cb;
     margin-top: 8px;
-    opacity: 1;
+    opacity: 0;
     visibility: hidden;
     transform: none;
     transition: none;
+    pointer-events: none;
   }
 
-  .menu-wrapper.open .menu-dropdown {
+  .menu-dropdown.visible {
+    opacity: 1;
     visibility: visible;
+    pointer-events: auto;
   }
 
   .menu-item {
     text-align: center;
   }
+}
+
+/* ====== БЕКДРОП ДЛЯ МОБІЛЬНОГО МЕНЮ ====== */
+.menu-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 90;
+  background: transparent;
 }
 

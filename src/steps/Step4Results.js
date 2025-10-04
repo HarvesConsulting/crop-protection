@@ -350,6 +350,14 @@ export default function Step4Results({ result, onRestart }) {
   const [showMenu, setShowMenu] = useState(false);
   const [showWeather, setShowWeather] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+React.useEffect(() => {
+  const handleResize = () => setIsMobile(window.innerWidth <= 768);
+  window.addEventListener("resize", handleResize);
+  return () => window.removeEventListener("resize", handleResize);
+}, []);
+
   const [weatherModalOpen, setWeatherModalOpen] = useState(false);
   if (!result) return <p>Дані відсутні</p>;
 
@@ -586,25 +594,31 @@ integratedSystem.sort(
   <div
   className="menu-wrapper"
   onMouseEnter={() => {
-    // Показуємо меню тільки на ПК
-    if (window.innerWidth > 768) setShowMenu(true);
+    if (!isMobile) setShowMenu(true);
   }}
   onMouseLeave={() => {
-    // Ховаємо меню після наведення тільки на ПК
-    if (window.innerWidth > 768) setShowMenu(false);
+    if (!isMobile) setShowMenu(false);
   }}
 >
   <button
     className="menu-toggle"
-    onClick={() => {
-      // На мобільних – меню відкривається при кліку
-      if (window.innerWidth <= 768) {
+    onClick={(e) => {
+      if (isMobile) {
+        e.stopPropagation();
         setShowMenu((prev) => !prev);
       }
     }}
   >
     ☰ Меню дій
   </button>
+
+  {/* Бекдроп для закриття меню на мобільному */}
+  {isMobile && showMenu && (
+    <div
+      className="menu-backdrop"
+      onClick={() => setShowMenu(false)}
+    />
+  )}
 
   <div className={`menu-dropdown ${showMenu ? "visible" : ""}`}>
     <button className="menu-item" onClick={onRestart}>
