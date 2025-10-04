@@ -26,7 +26,7 @@
 
 .menu-dropdown {
   display: none;
-  position: absolute;
+  position: relative;
   top: 110%;
   left: 0;
   min-width: 240px;
