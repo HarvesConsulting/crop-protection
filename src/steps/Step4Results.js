@@ -612,7 +612,6 @@ integratedSystem.sort(
     ☰ Меню дій
   </button>
 
-  {/* Бекдроп для закриття меню на мобільному */}
   {isMobile && showMenu && (
     <div
       className="menu-backdrop"
@@ -621,34 +620,29 @@ integratedSystem.sort(
   )}
 
   <div
-  className={`menu-dropdown ${
-    isMobile && showMenu ? "visible" : ""
-  }`}
->
+    className={`menu-dropdown ${showMenu ? "visible" : ""}`}
+  >
     <button className="menu-item" onClick={onRestart}>
       Почати спочатку
     </button>
-
     <button
       className="menu-item"
       onClick={() =>
         alert(
           "🟢 Зелений — помірний ризик (до 10 годин)\n" +
-            "🟡 Жовтий — середній ризик (11–20 годин)\n" +
-            "🔴 Червоний — високий ризик (понад 20 годин)"
+          "🟡 Жовтий — середній ризик (11–20 годин)\n" +
+          "🔴 Червоний — високий ризик (понад 20 годин)"
         )
       }
     >
       Інформація про кольори карток
     </button>
-
     <button
       className="menu-item"
       onClick={() => setWeatherModalOpen(true)}
     >
       Погодні умови за період
     </button>
-
     <button
       className="menu-item"
       onClick={() => setShowIntegrated(!showIntegrated)}
