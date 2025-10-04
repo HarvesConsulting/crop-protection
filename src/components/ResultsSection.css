@@ -77,14 +77,13 @@
   background: #f5f5f5;
 }
 
-/* ====== МЕНЮ ДІЙ (ОНОВЛЕНА ВЕРСІЯ) ====== */
+/* ====== МЕНЮ ДІЙ (АДАПТИВНЕ) ====== */
 
-/* Обгортка */
 .menu-wrapper {
   position: relative;
   display: inline-block;
-  margin-bottom: 1rem;
   width: 100%;
+  margin-bottom: 1rem;
 }
 
 /* Кнопка “Меню дій” */
@@ -96,10 +95,10 @@
   cursor: pointer;
   font-weight: 600;
   user-select: none;
-  transition: background 0.25s ease, transform 0.2s ease;
   width: 100%;
-  text-align: center;
   border: none;
+  text-align: center;
+  transition: background 0.25s ease, transform 0.2s ease;
 }
 
 .menu-toggle:hover {
@@ -107,8 +106,9 @@
   transform: translateY(-1px);
 }
 
-/* Випадаюче меню */
+/* Випадаюче меню (загальні стилі) */
 .menu-dropdown {
+  display: none; /* 🔥 приховано за замовчуванням */
   position: absolute;
   top: 110%;
   left: 0;
@@ -117,34 +117,26 @@
   border: 1px solid #c3e6cb;
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-8px);
-  transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
   z-index: 100;
-  pointer-events: none;
 }
 
-/* Показати меню через клас */
+/* Показати меню */
 .menu-dropdown.visible {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-  pointer-events: auto;
+  display: block;
 }
 
 /* Пункти меню */
 .menu-item {
   width: 100%;
-  text-align: left;
   background: none;
   border: none;
   padding: 10px 14px;
-  cursor: pointer;
+  text-align: left;
   font-size: 15px;
+  cursor: pointer;
   color: #155724;
-  transition: background 0.2s ease, color 0.2s ease;
   border-bottom: 1px solid #e2f0e5;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .menu-item:last-child {
@@ -163,29 +155,13 @@
     width: 100%;
   }
 
-  .menu-toggle {
-    width: 100%;
-    text-align: center;
-  }
-
   .menu-dropdown {
-    width: 100%;
     position: static;
+    width: 100%;
     box-shadow: none;
     border-radius: 8px;
     border: 1px solid #c3e6cb;
     margin-top: 8px;
-    opacity: 0;
-    visibility: hidden;
-    transform: none;
-    transition: none;
-    pointer-events: none;
-  }
-
-  .menu-dropdown.visible {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
   }
 
   .menu-item {
@@ -203,12 +179,10 @@
   z-index: 90;
   background: transparent;
 }
+
+/* ====== ДЕСKTOP-HOVER ====== */
 @media (min-width: 769px) {
   .menu-wrapper:hover .menu-dropdown {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-    pointer-events: auto;
+    display: block; /* 🔥 меню показується по ховеру */
   }
 }
-
