@@ -71,7 +71,7 @@ export default function HourTimeline({ date, hourlyData = [] }) {
                       </span>
                     ) : (
                       <span style={{ color: "red", fontWeight: "bold" }}>
-                        ❌ Не рекомендовано (умови не сприятливі)
+                        ❌ Не рекомендовано
                       </span>
                     )}
                   </div>
