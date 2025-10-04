@@ -1,3 +1,4 @@
+/* ===== ГОЛОВНИЙ ФОН ===== */
 .page-wrapper {
   background-image: url("../images/bg.jpg");
   background-size: cover;
@@ -9,6 +10,7 @@
   padding: 40px;
 }
 
+/* ===== ГОЛОВНА КАРТКА (СКЛЯНИЙ СТИЛЬ) ===== */
 .glass-card {
   background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(12px);
@@ -22,6 +24,7 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
+/* ===== КНОПКИ ===== */
 .glass-button {
   margin-top: 16px;
   padding: 12px 20px;
@@ -38,6 +41,7 @@
   transform: translateY(-2px);
 }
 
+/* ===== КАРТКА РЕКОМЕНДАЦІЙ ===== */
 .recommendation-card {
   background: rgba(255, 255, 255, 0.5);
   border-radius: 12px;
@@ -45,6 +49,8 @@
   padding: 16px;
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
+
+/* ===== КАРТКА ПЕРЕДНЯ ===== */
 .flip-card-front {
   display: flex;
   flex-direction: column;
@@ -52,6 +58,8 @@
   position: relative;
   box-sizing: border-box;
 }
+
+/* ===== ІНФО-КНОПКА ===== */
 .info-button {
   display: inline-flex;
   align-items: center;
@@ -68,7 +76,10 @@
 .info-button:hover {
   background: #f5f5f5;
 }
-/* Обгортка меню */
+
+/* ====== МЕНЮ ДІЙ ====== */
+
+/* Обгортка */
 .menu-wrapper {
   position: relative;
   display: inline-block;
@@ -84,11 +95,12 @@
   cursor: pointer;
   font-weight: 600;
   user-select: none;
-  transition: background 0.2s ease;
+  transition: background 0.25s ease, transform 0.2s ease;
 }
 
 .menu-toggle:hover {
   background-color: #157347;
+  transform: translateY(-1px);
 }
 
 /* Випадаюче меню */
@@ -96,18 +108,25 @@
   position: absolute;
   top: 110%;
   left: 0;
-  min-width: 220px;
+  min-width: 240px;
   background-color: #ffffff;
   border: 1px solid #c3e6cb;
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  display: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
   z-index: 100;
 }
 
-/* Показ при наведенні */
-.menu-wrapper:hover .menu-dropdown {
-  display: block;
+/* Плавна поява при hover або класах .visible / .open */
+.menu-wrapper:hover .menu-dropdown,
+.menu-dropdown.visible,
+.menu-wrapper.open .menu-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }
 
 /* Пункти меню */
@@ -120,33 +139,60 @@
   cursor: pointer;
   font-size: 15px;
   color: #155724;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease;
+  border-bottom: 1px solid #e2f0e5;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
 }
 
 .menu-item:hover {
   background-color: #e8f5e9;
-}
-/* Випадаюче меню */
-.menu-dropdown {
-  position: absolute;
-  top: 110%;
-  left: 0;
-  min-width: 220px;
-  background-color: #ffffff;
-  border: 1px solid #c3e6cb;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-5px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
-  z-index: 100;
+  color: #0b3d16;
 }
 
-/* Плавне появлення при наведенні */
-.menu-wrapper:hover .menu-dropdown {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
+/* ====== АНІМАЦІЯ ЗАТРИМКИ ПРИ ЗНИКНЕННІ ====== */
+.menu-wrapper .menu-dropdown {
+  pointer-events: none;
+}
+
+.menu-wrapper:hover .menu-dropdown,
+.menu-dropdown.visible {
+  pointer-events: auto;
+}
+
+/* ====== МОБІЛЬНА АДАПТАЦІЯ ====== */
+@media (max-width: 768px) {
+  .menu-wrapper {
+    display: block;
+    width: 100%;
+  }
+
+  .menu-toggle {
+    width: 100%;
+    text-align: center;
+  }
+
+  .menu-dropdown {
+    width: 100%;
+    position: static;
+    box-shadow: none;
+    border-radius: 8px;
+    border: 1px solid #c3e6cb;
+    margin-top: 8px;
+    opacity: 1;
+    visibility: hidden;
+    transform: none;
+    transition: none;
+  }
+
+  .menu-wrapper.open .menu-dropdown {
+    visibility: visible;
+  }
+
+  .menu-item {
+    text-align: center;
+  }
 }
 

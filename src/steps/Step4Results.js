@@ -583,10 +583,25 @@ integratedSystem.sort(
   return (
   <main className="flex justify-center items-start min-h-[70vh] px-4">
   <div className="w-full max-w-xl mx-auto bg-white rounded-xl shadow-md px-6 sm:px-10 py-6 space-y-6 text-base sm:text-lg">
-      <div className="menu-wrapper">
-  <div className="menu-toggle">☰ Меню дій</div>
+  <div
+  className={`menu-wrapper ${window.innerWidth <= 768 ? (showMenu ? "open" : "") : ""}`}
+  onMouseEnter={() => {
+    if (window.innerWidth > 768) setShowMenu(true);
+  }}
+  onMouseLeave={() => {
+    if (window.innerWidth > 768) setShowMenu(false);
+  }}
+>
+  <div
+    className="menu-toggle"
+    onClick={() => {
+      if (window.innerWidth <= 768) setShowMenu(!showMenu);
+    }}
+  >
+    ☰ Меню дій
+  </div>
 
-  <div className="menu-dropdown">
+  <div className={`menu-dropdown ${showMenu ? "visible" : ""}`}>
     <button className="menu-item" onClick={onRestart}>
       Почати спочатку
     </button>
@@ -595,9 +610,9 @@ integratedSystem.sort(
       className="menu-item"
       onClick={() =>
         alert(
-          "🟢 Зелений — помірний ризик захворювання (до 10 годин)\n" +
-          "🟡 Жовтий — середній ризик (11–20 годин)\n" +
-          "🔴 Червоний — високий ризик (понад 20 годин)"
+          "🟢 Зелений — помірний ризик (до 10 годин)\n" +
+            "🟡 Жовтий — середній ризик (11–20 годин)\n" +
+            "🔴 Червоний — високий ризик (понад 20 годин)"
         )
       }
     >
@@ -608,12 +623,16 @@ integratedSystem.sort(
       Погодні умови за період
     </button>
 
-    <button className="menu-item" onClick={() => setShowIntegrated(!showIntegrated)}>
-      {showIntegrated ? "Сховати інтегровану систему" : "Сформувати інтегровану систему"}
+    <button
+      className="menu-item"
+      onClick={() => setShowIntegrated(!showIntegrated)}
+    >
+      {showIntegrated
+        ? "Сховати інтегровану систему"
+        : "Сформувати інтегровану систему"}
     </button>
   </div>
 </div>
-
 
     <h2 style={{ display: "flex", alignItems: "center", gap: "8px" }}>
   Крок 4: Результати
