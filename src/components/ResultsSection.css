@@ -120,11 +120,6 @@
   z-index: 100;
 }
 
-/* Показати меню */
-.menu-dropdown.visible {
-  display: none;
-}
-
 /* Пункти меню */
 .menu-item {
   width: 100%;
