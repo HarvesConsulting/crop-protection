@@ -546,6 +546,7 @@ export async function fetchArchiveHourlyExtras(lat, lon, startISO, endISO) {
         date,
         hour,
         temperature: Number(temps[i]),
+        humidity: Number(rhs[i]),
         windspeed: Number(winds10m[i]),    // ⚡ залишаємо 10м без перерахунку
         precipitation: Number(rain[i]),
       });
@@ -655,6 +656,7 @@ export function transformArchiveToHourlyData(json) {
   const temps = h.temperature_2m || [];
   const winds = h.windspeed_10m || [];   // ERA5 дає вітер на 10 м
   const rain  = h.precipitation || [];
+  const rhs   = h.relative_humidity_2m || []; // ⚡ додали вологість
 
   const n = Math.min(times.length, temps.length, winds.length, rain.length);
   const out = [];
@@ -674,6 +676,7 @@ out.push({
   date,
   hour,
   temperature: Number(temps[i]),
+  humidity: Number(rhs[i]), 
   windspeed: wind10m,   // 10 м
   precipitation: Number(rain[i]),
 });
@@ -691,6 +694,7 @@ export function transformForecastToHourlyData(json) {
   const temps = h.temperature_2m || [];
   const winds = h.windspeed_10m || [];   // ⚡ беремо напряму з 10м
   const rain  = h.precipitation || [];
+  const rhs   = h.relative_humidity_2m || []; // ⚡ додали вологість
 
   const n = Math.min(times.length, temps.length, winds.length, rain.length);
   const out = [];
@@ -707,6 +711,7 @@ export function transformForecastToHourlyData(json) {
       date,
       hour,
       temperature: Number(temps[i]),
+      humidity: Number(rhs[i]),
       windspeed: Number(winds[i]),        // ⚡ вже 10м
       precipitation: Number(rain[i]),
     });
