@@ -3,77 +3,68 @@ import "./IntegratedTableView.css";
 
 /**
  * 📊 Таблиця інтегрованої системи захисту
- * Відображає всі дати у рядках та основні хвороби у стовпцях.
+ * Розподіляє препарати по хворобах на основі назв.
  */
-export default function IntegratedTableView({
-  integratedSystem = [],
-  diseaseCardsGrouped = [],
-}) {
-  // 🧭 Основні хвороби
+export default function IntegratedTableView({ integratedSystem = [] }) {
   const diseases = ["Фітофтороз", "Сіра гниль", "Альтернаріоз", "Бактеріоз"];
 
-  // 🧩 Збираємо всі унікальні дати (з обох джерел)
-  const allDates = [
-    ...new Set([
-      ...integratedSystem.map((item) => item.Дата),
-      ...diseaseCardsGrouped.flatMap((group) =>
-        group.entries?.map((e) => e.Дата)
-      ),
-    ]),
+  // 🧭 Ключові слова для визначення хвороби за препаратом
+  const diseaseKeywords = {
+    "Фітофтороз": [
+      "Зорвек", "Ридоміл", "Танос", "Акробат", "Орондіс", "Ревус",
+      "Курзат", "Ранман", "Інфініто"
+    ],
+    "Сіра гниль": [
+      "Луна Експірієнс", "Сігнум", "Скала", "Тельдор"
+    ],
+    "Альтернаріоз": [
+      "Скор", "Натіво", "Луна Експірієнс", "Сігнум"
+    ],
+    "Бактеріоз": [
+      "Медян", "Казумін", "Серенада"
+    ]
+  };
+
+  // 🗓️ Формуємо унікальні дати
+  const uniqueDates = [
+    ...new Set(integratedSystem.map((item) => item.Дата)),
   ].sort((a, b) => {
     const [dA, mA, yA] = a.split(".");
     const [dB, mB, yB] = b.split(".");
     return new Date(yA, mA - 1, dA) - new Date(yB, mB - 1, dB);
   });
 
-  // 🧮 Структура { дата: { хвороба: препарат } }
+  // 🧮 Створюємо структуру таблиці
   const diseaseMap = {};
-  for (const date of allDates) {
+  for (const date of uniqueDates) {
     diseaseMap[date] = {};
     for (const dis of diseases) diseaseMap[date][dis] = "";
   }
 
-  // 🧩 1️⃣ Заповнюємо фітофтороз ТІЛЬКИ з integratedSystem
+  // 🧩 Розподіляємо препарати по хворобах
   for (const entry of integratedSystem) {
     const date = entry.Дата;
-    const prep = entry.Препарат;
-    if (!date || !prep) continue;
-    diseaseMap[date]["Фітофтороз"] +=
-      (diseaseMap[date]["Фітофтороз"] ? ", " : "") + prep;
-  }
+    const prepList = (entry.Препарат || "")
+      .split(",")
+      .map((p) => p.trim())
+      .filter((p) => p.length > 0);
 
-  // 🧩 2️⃣ Заповнюємо решту хвороб із diseaseCardsGrouped
-  for (const diseaseGroup of diseaseCardsGrouped) {
-    const { name, entries } = diseaseGroup;
-    if (!entries || !diseases.includes(name)) continue;
+    for (const prep of prepList) {
+      let matchedDisease = null;
 
-    for (const item of entries) {
-      const date = item.Дата;
-      const prep = item.Препарат;
-      if (!date || !prep) continue;
-
-      // ❗ Не дублюємо препарат у "Фітофтороз", якщо така дата вже існує там
-      if (diseaseMap[date]["Фітофтороз"]?.includes(prep)) continue;
-
-      diseaseMap[date][name] +=
-        (diseaseMap[date][name] ? ", " : "") + prep;
-    }
-  }
-
-  // 🧩 3️⃣ Очищаємо випадки, коли "Фітофтороз" дублює інші препарати
-  for (const date of allDates) {
-    const phytoText = diseaseMap[date]["Фітофтороз"];
-    if (!phytoText) continue;
-
-    // Якщо цей препарат зустрічається в інших хворобах — прибираємо його з Фітофторозу
-    for (const dis of diseases.filter((d) => d !== "Фітофтороз")) {
-      const other = diseaseMap[date][dis];
-      if (other && phytoText.includes(other)) {
-        diseaseMap[date]["Фітофтороз"] = phytoText
-          .split(", ")
-          .filter((t) => !other.includes(t))
-          .join(", ");
+      // 🩺 Визначаємо, до якої хвороби належить препарат
+      for (const disease of diseases) {
+        if (diseaseKeywords[disease].some((word) => prep.includes(word))) {
+          matchedDisease = disease;
+          break;
+        }
       }
+
+      // Якщо не знайдено — залишаємо в колонці "Фітофтороз" як резерв
+      const targetDisease = matchedDisease || "Фітофтороз";
+
+      diseaseMap[date][targetDisease] +=
+        (diseaseMap[date][targetDisease] ? "\n" : "") + prep;
     }
   }
 
@@ -91,12 +82,16 @@ export default function IntegratedTableView({
           </tr>
         </thead>
         <tbody>
-          {allDates.map((date) => (
+          {uniqueDates.map((date) => (
             <tr key={date}>
               <td className="date-cell">{date}</td>
               {diseases.map((d) => (
                 <td key={d} className="table-cell">
-                  {diseaseMap[date][d] || "—"}
+                  {diseaseMap[date][d]
+                    ? diseaseMap[date][d].split("\n").map((line, i) => (
+                        <div key={i}>{line}</div>
+                      ))
+                    : "—"}
                 </td>
               ))}
             </tr>
