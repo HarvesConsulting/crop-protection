@@ -32,11 +32,7 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
             const isActive = activeHour === hour;
 
             // 🔎 Перевірки
-            const isHumidityTooHigh = hourData?.humidity >= 90;
-
-            const isSuitable =
-              suitableHours.includes(hour.toString().padStart(2, "0") + ":00") &&
-              !isHumidityTooHigh;
+            const isSuitable = suitableHours.includes(hourStr);
 
             return (
               <div
