@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import LogoutButton from "./LogoutButton";
+import { AiOutlineInfoCircle } from "react-icons/ai"; // краще ніж звичайний ℹ️
 
 export default function Layout({ children, step, onLogout }) {
   const [showInfo, setShowInfo] = useState(false);
@@ -9,25 +10,26 @@ export default function Layout({ children, step, onLogout }) {
     <div className="min-h-screen bg-gray-50 text-gray-800 font-sans">
       {/* Header */}
       <header className="flex justify-between items-center p-4 bg-green-700 text-white shadow">
-        <div className="flex items-center gap-3 text-lg font-semibold">
+        <div className="flex items-center gap-2 text-lg font-semibold">
           🍅 Crop Protection
           <button
-            className="hover:text-yellow-200 transition"
+            className="p-1 rounded-full hover:bg-green-600 transition"
             onClick={() => setShowInfo(!showInfo)}
             title="Інформація про застосунок"
           >
-            ℹ️
+            <AiOutlineInfoCircle size={22} />
           </button>
         </div>
         <LogoutButton onLogout={onLogout} />
       </header>
 
-      {/* Info Box (без бітого скла) */}
+      {/* Info Box */}
       {showInfo && (
-        <div className="bg-yellow-50 border border-yellow-200 text-sm text-gray-800 px-6 py-4">
+        <div className="bg-yellow-50 border-t border-yellow-300 text-sm text-gray-800 px-6 py-4 animate-fadeIn">
           <p>
-            Застосунок для аграріїв: прогнозує дати обробки томатів від фітофторозу, сірої гнилі,
-            альтернаріозу та бактеріозу на основі погодних даних.
+            🌱 Застосунок для аграріїв: прогнозує дати обробки томатів від
+            фітофторозу, сірої гнилі, альтернаріозу та бактеріозу на основі
+            погодних даних.
           </p>
         </div>
       )}
@@ -48,10 +50,8 @@ export default function Layout({ children, step, onLogout }) {
         ))}
       </div>
 
-      {/* Main content without extra "glass" wrapper */}
-      <main className="max-w-3xl mx-auto px-4 py-8">
-        {children}
-      </main>
+      {/* Main content */}
+      <main className="max-w-3xl mx-auto px-4 py-8">{children}</main>
     </div>
   );
 }
