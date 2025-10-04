@@ -5,11 +5,11 @@ import "./IntegratedTableView.css";
  * 📊 Таблиця інтегрованої системи захисту
  * Відображає всі дати у рядках та основні хвороби у стовпцях.
  */
-export default function IntegratedTableView({ integratedSystem = [] }) {
-  // 🧭 Основні хвороби
+export default function IntegratedTableView({ integratedSystem = [], diseaseCardsGrouped = [] }) {
+  // 🧭 Список основних хвороб
   const diseases = ["Фітофтороз", "Сіра гниль", "Альтернаріоз", "Бактеріоз"];
 
-  // 🗓️ Унікальні дати (сортуємо за зростанням)
+  // 🗓️ Формуємо унікальний список дат і сортуємо
   const uniqueDates = [
     ...new Set(integratedSystem.map((item) => item.Дата)),
   ].sort((a, b) => {
@@ -18,40 +18,48 @@ export default function IntegratedTableView({ integratedSystem = [] }) {
     return new Date(yA, mA - 1, dA) - new Date(yB, mB - 1, dB);
   });
 
-  // 🧮 Ініціалізація карти { дата: { хвороба: препарат } }
+  // 🧩 Окремі набори препаратів по хворобах
+  const sets = {
+    "Фітофтороз": [
+      "Зорвек", "Ридоміл", "Танос", "Акробат", "Орондіс", "Ревус", "Курзат", "Ранман", "Інфініто"
+    ],
+    "Сіра гниль": [
+      "Луна Експірієнс", "Сігнум", "Скала", "Тельдор", "Скор", "Натіво"
+    ],
+    "Альтернаріоз": [
+      "Альтер", "Сігнум", "Скор", "Натіво", "Луна Експірієнс" // дубльовані, бо ефективні і тут
+    ],
+    "Бактеріоз": [
+      "Медян", "Казумін", "Серенада"
+    ]
+  };
+
+  // 🧮 Створюємо карту вигляду { дата: { хвороба: препарат } }
   const diseaseMap = {};
   for (const date of uniqueDates) {
     diseaseMap[date] = {};
     for (const dis of diseases) diseaseMap[date][dis] = "";
   }
 
-  // 🧩 Заповнення таблиці препаратами
+  // 🧩 Розподіляємо препарати по стовпцях
   for (const entry of integratedSystem) {
     const date = entry.Дата;
     const prepList = (entry.Препарат || "").split(",").map((p) => p.trim());
 
     for (const prep of prepList) {
-      // 🦠 Бактеріоз — окремі препарати
-      if (/Медян|Казумін|Серенада/i.test(prep)) {
-        diseaseMap[date]["Бактеріоз"] +=
-          (diseaseMap[date]["Бактеріоз"] ? ", " : "") + prep;
+      let matched = false;
 
-      // 🍃 Альтернаріоз (препарати також застосовуються проти сірої гнилі)
-      } else if (/Альтер|Луна|Сігнум|Скала|Тельдор|Скор|Натіво/i.test(prep)) {
-        diseaseMap[date]["Альтернаріоз"] +=
-          (diseaseMap[date]["Альтернаріоз"] ? ", " : "") + prep;
-
-      // 🧫 Сіра гниль (уникати дублювання з альтернаріозом)
-      } else if (/Луна|Сігнум|Скала|Тельдор|Скор|Натіво/i.test(prep)) {
-        if (!diseaseMap[date]["Альтернаріоз"].includes(prep)) {
-          diseaseMap[date]["Сіра гниль"] +=
-            (diseaseMap[date]["Сіра гниль"] ? ", " : "") + prep;
+      for (const disease of diseases) {
+        if (sets[disease].some((key) => prep.includes(key))) {
+          diseaseMap[date][disease] += (diseaseMap[date][disease] ? ", " : "") + prep;
+          matched = true;
+          break;
         }
+      }
 
-      // 🌱 Фітофтороз — базова група
-      } else if (/Зорвек|Ридоміл|Танос|Акробат|Орондіс|Ревус|Курзат|Ранман|Інфініто/i.test(prep)) {
-        diseaseMap[date]["Фітофтороз"] +=
-          (diseaseMap[date]["Фітофтороз"] ? ", " : "") + prep;
+      // якщо не знайшли категорію, підкидаємо у "Фітофтороз" (як дефолт)
+      if (!matched) {
+        diseaseMap[date]["Фітофтороз"] += (diseaseMap[date]["Фітофтороз"] ? ", " : "") + prep;
       }
     }
   }
@@ -75,9 +83,7 @@ export default function IntegratedTableView({ integratedSystem = [] }) {
               <td className="date-cell">{date}</td>
               {diseases.map((d) => (
                 <td key={d} className="table-cell">
-                  <span className="cell-text">
-                    {diseaseMap[date][d] || "—"}
-                  </span>
+                  {diseaseMap[date][d] || "—"}
                 </td>
               ))}
             </tr>

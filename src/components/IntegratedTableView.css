@@ -1,8 +1,10 @@
+/* Контейнер таблиці */
 .integrated-table-container {
-  overflow-x: auto;
+  width: 100%;
   margin-top: 1.5rem;
   border-radius: 12px;
   background-color: #f9fffa;
+  overflow-x: visible; /* 🚫 прибираємо горизонтальну прокрутку */
 }
 
 /* Заголовок */
@@ -14,15 +16,14 @@
   margin-bottom: 1rem;
 }
 
-/* Таблиця */
+/* Основна таблиця */
 .integrated-table {
   width: 100%;
   border-collapse: collapse;
   background-color: #ffffff;
   border-radius: 12px;
-  overflow: hidden;
   font-family: "Inter", "Segoe UI", sans-serif;
-  table-layout: auto;
+  table-layout: fixed; /* 🟢 тепер ширина стовпців рівномірна */
 }
 
 /* Заголовки */
@@ -40,27 +41,17 @@
 /* Комірки */
 .integrated-table td {
   border: 1px solid #c3e6cb;
-  padding: 12px 10px;
+  padding: 12px 8px;
   font-size: 15px;
   color: #1a1a1a;
   background-color: #f3fff4;
   text-align: center;
-  white-space: normal;
-  word-break: break-word;
-  overflow-wrap: anywhere;
-  vertical-align: middle;
+  vertical-align: top; /* 🟢 текст вирівняно вгору, якщо багато рядків */
+  line-height: 1.5;
   font-style: normal;
-  line-height: 1.6;
-  min-width: 130px;
-}
-
-/* Текст у клітинках */
-.cell-text {
-  display: inline-block;
-  max-width: 100%;
-  word-break: break-word;
-  overflow-wrap: anywhere;
-  white-space: normal;
+  white-space: normal; /* 🟢 дозволяє перенос рядків */
+  word-break: break-word; /* 🟢 переносить слово, якщо воно довге */
+  overflow-wrap: anywhere; /* 🟢 додатковий перенос */
 }
 
 /* Зебра */
@@ -75,10 +66,20 @@
   background-color: #d9f5db;
   white-space: nowrap;
   text-align: center;
+  width: 120px;
 }
 
-/* Hover */
+/* Текст у клітинках */
+.cell-text {
+  display: block;
+  width: 100%;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* При наведенні */
 .integrated-table tr:hover td {
   background-color: #d5f0d8;
-  transition: 0.2s ease;
+  transition: background-color 0.2s ease;
 }
