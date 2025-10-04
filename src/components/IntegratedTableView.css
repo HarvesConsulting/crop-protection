@@ -23,7 +23,7 @@
   border-radius: 12px;
   overflow: hidden;
   font-family: "Inter", "Segoe UI", sans-serif;
-  table-layout: fixed; /* ✅ Контроль ширини стовпців */
+  table-layout: auto; /* ✅ Контроль ширини стовпців */
 }
 
 /* Заголовки */
