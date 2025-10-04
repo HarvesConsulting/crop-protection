@@ -3,31 +3,32 @@ import "./IntegratedTableView.css";
 
 /**
  * 📊 Таблиця інтегрованої системи захисту
- * Використовує diseaseCardsGrouped для коректного відображення всіх хвороб
+ * Побудована лише на diseaseCardsGrouped, де є точні відповідності хворобам
  */
-export default function IntegratedTableView({ integratedSystem = [], diseaseCardsGrouped = [] }) {
+export default function IntegratedTableView({ diseaseCardsGrouped = [] }) {
   const diseases = ["Фітофтороз", "Сіра гниль", "Альтернаріоз", "Бактеріоз"];
 
-  // 🗓️ Збираємо всі дати (з усіх груп)
+  // 🗓️ Усі унікальні дати
   const allDates = [
-    ...new Set([
-      ...integratedSystem.map((i) => i.Дата),
-      ...diseaseCardsGrouped.flatMap((g) => g.entries?.map((e) => e.Дата)),
-    ]),
+    ...new Set(
+      diseaseCardsGrouped.flatMap((group) =>
+        group.entries?.map((e) => e.Дата)
+      )
+    ),
   ].sort((a, b) => {
     const [dA, mA, yA] = a.split(".");
     const [dB, mB, yB] = b.split(".");
     return new Date(yA, mA - 1, dA) - new Date(yB, mB - 1, dB);
   });
 
-  // 🧮 Підготовка таблиці
+  // 🧮 Готуємо таблицю
   const diseaseMap = {};
   for (const date of allDates) {
     diseaseMap[date] = {};
-    for (const d of diseases) diseaseMap[date][d] = "";
+    for (const dis of diseases) diseaseMap[date][dis] = "";
   }
 
-  // 🧩 Заповнюємо дані з diseaseCardsGrouped (бо там є назви хвороб)
+  // 🧩 Заповнюємо таблицю препаратами
   for (const group of diseaseCardsGrouped) {
     const { name, entries } = group;
     if (!diseases.includes(name)) continue;
@@ -37,27 +38,15 @@ export default function IntegratedTableView({ integratedSystem = [], diseaseCard
       const prep = entry.Препарат;
       if (!date || !prep) continue;
 
+      // Якщо в цій даті вже є препарат для цієї хвороби, додаємо через новий рядок
       diseaseMap[date][name] += (diseaseMap[date][name] ? "\n" : "") + prep;
-    }
-  }
-
-  // 🧩 Додаємо дані з integratedSystem лише якщо вони не дублюються
-  for (const entry of integratedSystem) {
-    const date = entry.Дата;
-    const prep = entry.Препарат;
-    if (!date || !prep) continue;
-
-    // Якщо цей препарат ще не потрапив у жодну колонку — додаємо у фітофтороз
-    const exists = diseases.some((d) => diseaseMap[date][d]?.includes(prep));
-    if (!exists) {
-      diseaseMap[date]["Фітофтороз"] +=
-        (diseaseMap[date]["Фітофтороз"] ? "\n" : "") + prep;
     }
   }
 
   return (
     <div className="integrated-table-container">
       <h3 className="integrated-table-title">Інтегрована система захисту</h3>
+
       <table className="integrated-table">
         <thead>
           <tr>
