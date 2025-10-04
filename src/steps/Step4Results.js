@@ -699,6 +699,7 @@ onClick={() => setWeatherModalOpen(true)}
   endDate={harvestDate}
   lat={result.lat}
   lon={result.lon}
+  hourlyData={hourlyData}
 />
 
   </main>
