@@ -622,7 +622,7 @@ integratedSystem.sort(
 
   <div
   className={`menu-dropdown ${
-    isMobile ? (showMenu ? "visible" : "") : ""
+    isMobile && showMenu ? "visible" : ""
   }`}
 >
     <button className="menu-item" onClick={onRestart}>
