@@ -122,7 +122,7 @@
 
 /* Показати меню */
 .menu-dropdown.visible {
-  display: block;
+  display: none;
 }
 
 /* Пункти меню */
@@ -162,6 +162,7 @@
     border-radius: 8px;
     border: 1px solid #c3e6cb;
     margin-top: 8px;
+    display: none;
   }
 
   .menu-item {
@@ -179,4 +180,7 @@
   z-index: 90;
   background: transparent;
 }
-
+@media (min-width: 769px) {
+  .menu-wrapper:hover .menu-dropdown {
+    display: block !important;
+  }
