@@ -13,31 +13,61 @@ export default function WeatherPeriodView({
   endDate,
   lat,
   lon,
+  hourlyData: externalHourlyData = null,
 }) {
   const start = asDate(startDate);
   const end = asDate(endDate);
 
-  const [hourlyData, setHourlyData] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [hourlyData, setHourlyData] = useState(externalHourlyData || []);
+  const [loading, setLoading] = useState(!externalHourlyData);
   const [error, setError] = useState("");
 
-  // ⏬ Фетчимо архівні погодинні дані при зміні дат
+  // 🔍 Логування пропсів
   useEffect(() => {
-    if (!start || !end || !lat || !lon) return;
+    console.log("🔎 Props у WeatherPeriodView:");
+    console.log({ startDate, endDate, lat, lon, externalHourlyData });
+  }, []);
 
+  // 🔁 Якщо немає зовнішніх даних — завантажуємо з API
+  useEffect(() => {
+    if (externalHourlyData) {
+      console.log("✅ Використовуємо зовнішні погодинні дані");
+      setHourlyData(externalHourlyData);
+      setLoading(false);
+      return;
+    }
+
+    if (!start || !end || !lat || !lon) {
+      console.warn("⚠️ Відсутні координати або дати");
+      setError("Некоректні вхідні дані");
+      setLoading(false);
+      return;
+    }
+
+    console.log("📡 Завантаження погодинних даних через fetchArchiveHourlyExtras...");
     setLoading(true);
     setError("");
     setHourlyData([]);
 
     fetchArchiveHourlyExtras(lat, lon, start, end)
       .then((res) => {
-        if (res.error) setError(res.error);
-        else setHourlyData(res.hourly || []);
+        console.log("📦 Отримано відповідь:", res);
+        if (res.error) {
+          setError(res.error);
+        } else {
+          setHourlyData(res.hourly || []);
+        }
       })
-      .catch((e) => setError(String(e)))
-      .finally(() => setLoading(false));
-  }, [start, end, lat, lon]);
+      .catch((e) => {
+        console.error("❌ Помилка запиту:", e);
+        setError(String(e));
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [start, end, lat, lon, externalHourlyData]);
 
+  // 🔁 Формування рядків таблиці
   const rows = useMemo(() => {
     return (hourlyData || [])
       .map((h) => {
