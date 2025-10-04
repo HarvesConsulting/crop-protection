@@ -180,9 +180,3 @@
   background: transparent;
 }
 
-/* ====== ДЕСKTOP-HOVER ====== */
-@media (min-width: 769px) {
-  .menu-wrapper:hover .menu-dropdown {
-    display: block; /* 🔥 меню показується по ховеру */
-  }
-}
