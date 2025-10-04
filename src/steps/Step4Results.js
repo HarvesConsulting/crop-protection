@@ -6,6 +6,7 @@ import HourTimeline from "../components/HourTimeline";
 import Layout from "../components/Layout";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import WeatherPeriodView from "../components/WeatherPeriodView";
+import ModalWithWeather from "../components/ModalWithWeather";
 
 const productInfo = {
   "Зорвек Інкантія": "0,5л/га",
@@ -347,6 +348,7 @@ export default function Step4Results({ result, onRestart }) {
   const [showMenu, setShowMenu] = useState(false);
   const [showWeather, setShowWeather] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+  const [weatherModalOpen, setWeatherModalOpen] = useState(false);
   if (!result) return <p>Дані відсутні</p>;
 
 const {
@@ -591,10 +593,10 @@ integratedSystem.sort(
             Інформація про кольори карток
           </button>
           <button
-  className="menu-item"
-  onClick={() => setShowWeather(!showWeather)}
+className="menu-item"
+onClick={() => setWeatherModalOpen(true)}
 >
-  {showWeather ? "Сховати погодні умови" : "Погодні умови за період"}
+Погодні умови за період
 </button>
 
 
@@ -612,14 +614,7 @@ integratedSystem.sort(
 
     <h2 style={{ display: "flex", alignItems: "center", gap: "8px" }}>
   Крок 4: Результати
-  {showWeather && (
-  <WeatherPeriodView
-    hourlyData={hourlyData}
-    startDate={plantingDate}
-    endDate={harvestDate}
-    humidThreshold={90}
-  />
-)}
+  
   <button
     className="info-button"
     onClick={() => setShowInfo(!showInfo)}
@@ -697,7 +692,15 @@ integratedSystem.sort(
       </>
     )}
         </div>
-    
+    <ModalWithWeather
+  open={weatherModalOpen}
+  onOpenChange={setWeatherModalOpen}
+  startDate={plantingDate}
+  endDate={harvestDate}
+  lat={result.lat}
+  lon={result.lon}
+/>
+
   </main>
   );
 }
