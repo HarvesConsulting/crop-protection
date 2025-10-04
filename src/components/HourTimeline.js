@@ -30,18 +30,18 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
       <div className="timeline-scroll">
         <div className="timeline-bar" onTouchEnd={closeTooltip}>
           {[...Array(24).keys()].map((hour) => {
-            // Шукаємо дані для конкретної години
-            const hourData = hoursToday.find((h) => Number(h.hour) === hour);
-            const isActive = activeHour === hour;
+  const hourData = hoursToday.find((h) => Number(h.hour) === hour);
+  const isActive = activeHour === hour;
 
-            // 🟢 Виправлено: формуємо строку для порівняння
-            const hourStr = hour.toString().padStart(2, "0") + ":00";
+  // 🔧 Оголошуємо hourStr
+  const hourStr = String(hour).padStart(2, "0") + ":00";
 
-            // 🟢 Виправлено: перевірка вологості
-            const isHumidityTooHigh = hourData?.humidity >= 90;
+  // 🔎 Перевіряємо вологість
+  const isHumidityTooHigh = hourData?.humidity >= 90;
 
-            // 🟢 Виправлено: визначаємо чи підходить година
-            const isSuitable = suitableHours.includes(hourStr) && !isHumidityTooHigh;
+  // ✅ Фінальна перевірка
+  const isSuitable = suitableHours.includes(hourStr) && !isHumidityTooHigh;
+
 
             return (
               <div
