@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect, useState } from "react";
 import { format, isValid } from "date-fns";
-import { fetchArchiveHourlyExtras } from "../engine";
+import { fetchArchiveHourlyExtras } from "../engine"; // Переконайся, що цей імпорт працює
 
 function asDate(v) {
   if (v instanceof Date) return isValid(v) ? v : null;
@@ -8,43 +8,29 @@ function asDate(v) {
   return isValid(d) ? d : null;
 }
 
-export default function WeatherPeriodView({
-  startDate,
-  endDate,
-  lat,
-  lon,
-  hourlyData: externalHourlyData = null,
-}) {
+export default function WeatherPeriodView({ startDate, endDate, lat, lon }) {
   const start = asDate(startDate);
   const end = asDate(endDate);
 
-  const [hourlyData, setHourlyData] = useState(externalHourlyData || []);
-  const [loading, setLoading] = useState(!externalHourlyData);
+  const [hourlyData, setHourlyData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // 🐞 Логування вхідних параметрів
   useEffect(() => {
-    console.group("🧩 WeatherPeriodView Debug");
-    console.log("📥 Вхідні параметри:");
+    console.group("🌦 WeatherPeriodView [debug]");
     console.log("startDate:", startDate, "→", start);
     console.log("endDate:", endDate, "→", end);
     console.log("lat:", lat);
     console.log("lon:", lon);
-    console.log("externalHourlyData:", externalHourlyData?.length ?? 0);
     console.groupEnd();
-  }, [startDate, endDate, lat, lon, externalHourlyData]);
+  }, [startDate, endDate, lat, lon]);
 
+  // 📡 Запит на погоду
   useEffect(() => {
-    if (externalHourlyData) {
-      console.log("✅ Використовуємо передані погодинні дані (hourlyData)");
-      setHourlyData(externalHourlyData);
-      setLoading(false);
-      return;
-    }
-
     if (!start || !end || !lat || !lon) {
-      console.warn("⚠️ Некоректні або неповні вхідні дані для запиту архіву погоди");
-      setError("Некоректні координати або дати");
-      setLoading(false);
+      console.warn("❌ Не передані або невалідні координати / дати");
+      setError("Невірні вхідні дані для запиту погоди.");
       return;
     }
 
@@ -52,17 +38,10 @@ export default function WeatherPeriodView({
     setError("");
     setHourlyData([]);
 
-    console.log("🌐 Викликаємо fetchArchiveHourlyExtras із параметрами:");
-    console.log({ lat, lon, start, end });
-
+    console.log("🔄 Запит погоди...");
     fetchArchiveHourlyExtras(lat, lon, start, end)
       .then((res) => {
-        console.group("📦 Результат fetchArchiveHourlyExtras");
-        console.log("res:", res);
-        if (res.url) console.log("🔗 URL:", res.url);
-        if (res.error) console.error("❌ Помилка:", res.error);
-        console.groupEnd();
-
+        console.log("📦 Відповідь fetchArchiveHourlyExtras:", res);
         if (res.error) {
           setError(res.error);
         } else {
@@ -70,17 +49,17 @@ export default function WeatherPeriodView({
         }
       })
       .catch((e) => {
-        console.error("🚨 Виняток під час запиту:", e);
-        setError(String(e));
+        console.error("🚨 Помилка запиту:", e);
+        setError("Помилка отримання погодних даних.");
       })
       .finally(() => {
         setLoading(false);
-        console.log("✅ Завершено запит архіву погоди.");
       });
-  }, [start, end, lat, lon, externalHourlyData]);
+  }, [start, end, lat, lon]);
 
+  // 🧾 Обробка даних
   const rows = useMemo(() => {
-    const result = (hourlyData || [])
+    return (hourlyData || [])
       .map((h) => {
         const d = asDate(h.date);
         if (!d) return null;
@@ -95,9 +74,6 @@ export default function WeatherPeriodView({
       })
       .filter((r) => r && (!start || r.date >= start) && (!end || r.date <= end))
       .sort((a, b) => a.date - b.date || a.hour - b.hour);
-
-    console.log("🧾 Готово рядків для таблиці:", result.length);
-    return result;
   }, [hourlyData, start, end]);
 
   return (
