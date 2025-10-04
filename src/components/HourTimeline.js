@@ -2,24 +2,20 @@ import React, { useState } from "react";
 import "./HourTimeline.css";
 import { format, parseISO } from "date-fns";
 
-export default function HourTimeline({ date, suitableHours = [], hourlyData = [] }) {
+export default function HourTimeline({ date, hourlyData = [] }) {
   const [activeHour, setActiveHour] = useState(null);
 
-  // Форматуємо дату, щоб зіставляти з hourlyData
   const formattedDate = format(
     parseISO(date.split(".").reverse().join("-")),
     "yyyy-MM-dd"
   );
-  console.log("🟡 hourlyData:", hourlyData);
-  console.log("📅 formattedDate:", formattedDate);
 
-  // Вибираємо лише дані для потрібного дня
+  // Знайти записи з потрібного дня
   const hoursToday = hourlyData.filter((h) => {
     const hDate =
       h.date instanceof Date
         ? format(h.date, "yyyy-MM-dd")
         : format(parseISO(h.date), "yyyy-MM-dd");
-
     return hDate === formattedDate;
   });
 
@@ -30,18 +26,21 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
       <div className="timeline-scroll">
         <div className="timeline-bar" onTouchEnd={closeTooltip}>
           {[...Array(24).keys()].map((hour) => {
-  const hourData = hoursToday.find((h) => Number(h.hour) === hour);
-  const isActive = activeHour === hour;
+            const hourData = hoursToday.find((h) => Number(h.hour) === hour);
+            const isActive = activeHour === hour;
 
-  // 🔧 Оголошуємо hourStr
-  const hourStr = String(hour).padStart(2, "0") + ":00";
+            const hourStr = String(hour).padStart(2, "0") + ":00";
 
-  // 🔎 Перевіряємо вологість
-  const isHumidityTooHigh = hourData?.humidity >= 90;
+            // Отримаємо запис про день із даними engine
+            const dayData = hourlyData.find((h) => {
+              const hDate =
+                h.date instanceof Date
+                  ? format(h.date, "yyyy-MM-dd")
+                  : format(parseISO(h.date), "yyyy-MM-dd");
+              return hDate === formattedDate;
+            });
 
-  // ✅ Фінальна перевірка
-  const isSuitable = suitableHours.includes(hourStr) && !isHumidityTooHigh;
-
+            const isSuitable = dayData?.isSuitable === true;
 
             return (
               <div
@@ -70,7 +69,6 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
                   {hour}
                 </div>
 
-                {/* Тултіп з даними */}
                 {hourData && isActive && (
                   <div className="hour-details-tooltip mobile">
                     <strong>{hour}:00</strong> <br />
@@ -80,8 +78,7 @@ export default function HourTimeline({ date, suitableHours = [], hourlyData = []
                     🌧 Опади: {hourData.precipitation ?? 0} мм <br />
                     {!isSuitable && (
                       <span style={{ color: "red", fontWeight: "bold" }}>
-                        ❌ Не рекомендовано
-                        {isHumidityTooHigh && " (надто висока вологість)"}
+                        ❌ Не рекомендовано (умови не сприятливі)
                       </span>
                     )}
                     {isSuitable && (
