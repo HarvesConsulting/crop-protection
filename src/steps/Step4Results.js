@@ -620,7 +620,11 @@ integratedSystem.sort(
     />
   )}
 
-  <div className={`menu-dropdown ${showMenu ? "visible" : ""}`}>
+  <div
+  className={`menu-dropdown ${
+    isMobile ? (showMenu ? "visible" : "") : ""
+  }`}
+>
     <button className="menu-item" onClick={onRestart}>
       Почати спочатку
     </button>

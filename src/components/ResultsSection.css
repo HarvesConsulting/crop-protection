@@ -203,4 +203,12 @@
   z-index: 90;
   background: transparent;
 }
+@media (min-width: 769px) {
+  .menu-wrapper:hover .menu-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+}
 
