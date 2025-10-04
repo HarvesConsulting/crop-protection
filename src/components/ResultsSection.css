@@ -175,7 +175,14 @@
   z-index: 90;
   background: transparent;
 }
+@media (max-width: 768px) {
+  .menu-dropdown.visible {
+    display: block;
+  }
+}
+
 @media (min-width: 769px) {
   .menu-wrapper:hover .menu-dropdown {
-    display: block !important;
+    display: block;
   }
+}
