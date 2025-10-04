@@ -5,6 +5,7 @@ import * as XLSX from "xlsx";
 import HourTimeline from "../components/HourTimeline";
 import Layout from "../components/Layout";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import WeatherPeriodView from "../components/WeatherPeriodView";
 
 const productInfo = {
   "Зорвек Інкантія": "0,5л/га",
@@ -344,6 +345,7 @@ function aggregateDailyRain(hourlyData = []) {
 export default function Step4Results({ result, onRestart }) {
   const [showIntegrated, setShowIntegrated] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [showWeather, setShowWeather] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   if (!result) return <p>Дані відсутні</p>;
 
@@ -588,6 +590,13 @@ integratedSystem.sort(
           >
             Інформація про кольори карток
           </button>
+          <button
+  className="menu-item"
+  onClick={() => setShowWeather(!showWeather)}
+>
+  {showWeather ? "Сховати погодні умови" : "Погодні умови за період"}
+</button>
+
 
           <button
             className="menu-item"
@@ -603,6 +612,9 @@ integratedSystem.sort(
 
     <h2 style={{ display: "flex", alignItems: "center", gap: "8px" }}>
   Крок 4: Результати
+  {showWeather && (
+  <WeatherPeriodView hourlyData={hourlyData} />
+)}
   <button
     className="info-button"
     onClick={() => setShowInfo(!showInfo)}
