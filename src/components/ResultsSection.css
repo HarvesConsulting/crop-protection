@@ -8,9 +8,10 @@
   align-items: center;
   justify-content: center;
   padding: 40px;
+  position: relative; /* ✅ Додано */
+  z-index: 1;
 }
 
-/* ===== ГОЛОВНА КАРТКА (СКЛЯНИЙ СТИЛЬ) ===== */
 .glass-card {
   background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(12px);
@@ -22,7 +23,10 @@
   width: 100%;
   color: #000;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  position: relative; /* ✅ Додано */
+  z-index: 2; /* ✅ Додано */
 }
+
 
 /* ===== КНОПКИ ===== */
 .glass-button {

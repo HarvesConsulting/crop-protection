@@ -20,6 +20,8 @@ export default function ActionMenu({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const handleBackdropClick = () => setShowMenu(false);
+
   return (
     <div className="menu-wrapper">
       <button
@@ -36,13 +38,10 @@ export default function ActionMenu({
 
       {isMobile && showMenu && (
         <>
-          <div
-            className="menu-backdrop"
-            onClick={() => setShowMenu(false)}
-          />
+          <div className="menu-backdrop" onClick={handleBackdropClick} />
           <div
             className="menu-dropdown visible"
-            onClick={(e) => e.stopPropagation()} // зупиняє клік, щоб не закривало меню
+            onClick={(e) => e.stopPropagation()}
           >
             <button className="menu-item" onClick={onRestart}>
               Почати спочатку
