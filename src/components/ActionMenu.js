@@ -13,17 +13,29 @@ export default function ActionMenu({
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth > 768) {
-        setShowMenu(false); // скидувати при переході на десктоп
+        setShowMenu(false);
       }
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const handleMouseEnter = () => {
+    if (!isMobile) setShowMenu(true);
+  };
+
+  const handleMouseLeave = () => {
+    if (!isMobile) setShowMenu(false);
+  };
+
   const handleBackdropClick = () => setShowMenu(false);
 
   return (
-    <div className="menu-wrapper">
+    <div
+      className="menu-wrapper"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <button
         className="menu-toggle"
         onClick={(e) => {
@@ -68,8 +80,8 @@ export default function ActionMenu({
         </>
       )}
 
-      {!isMobile && (
-        <div className="menu-dropdown visible-on-hover">
+      {!isMobile && showMenu && (
+        <div className="menu-dropdown visible">
           <button className="menu-item" onClick={onRestart}>
             Почати спочатку
           </button>
