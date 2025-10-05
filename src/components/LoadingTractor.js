@@ -8,7 +8,7 @@ export default function LoadingTractor() {
       <div className="relative w-full overflow-hidden h-16 bg-green-50 rounded-lg shadow-inner">
         <div className="animate-tractorMove inline-flex items-center space-x-4 relative">
           
-          {/* 💦 Крапелька — препарат, який розпилюється */}
+          {/* 💦 Крапелька — препарат */}
           <div
             className="w-8 h-8 animate-sprayPulse text-2xl z-10 text-blue-400"
             title="Обприскування"
@@ -22,6 +22,7 @@ export default function LoadingTractor() {
         </div>
       </div>
 
+      {/* Підпис */}
       <p className="text-gray-700 text-lg font-medium">
         Обчислення системи захисту...
       </p>

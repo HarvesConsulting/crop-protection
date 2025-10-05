@@ -8,7 +8,7 @@ module.exports = {
       keyframes: {
         tractorMove: {
           '0%': { transform: 'translateX(-100%)' },
-          '100%': { transform: 'translateX(100%)' },
+          '100%': { transform: 'translateX(calc(100% + 80px))' }, // До самого краю контейнера
         },
         sprayPulse: {
           '0%, 100%': { transform: 'scale(1)', opacity: 0.6 },
