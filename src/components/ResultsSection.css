@@ -90,7 +90,7 @@
   }
 }
 /* ===== ПРОГРЕС КРОКІВ ===== */
-.progress-steps {
+.progress-bar {
   display: flex;
   flex-wrap: nowrap;
   overflow-x: auto;
@@ -122,9 +122,8 @@
   font-weight: 700;
 }
 
-/* Для мобільних пристроїв */
 @media (max-width: 768px) {
-  .progress-steps {
+  .progress-bar {
     overflow-x: auto;
     justify-content: flex-start;
   }
@@ -133,8 +132,7 @@
     min-width: max-content;
   }
 
-  .progress-steps::-webkit-scrollbar {
-    display: none; /* приховує горизонтальну прокрутку */
+  .progress-bar::-webkit-scrollbar {
+    display: none;
   }
 }
-
