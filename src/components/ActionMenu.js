@@ -34,37 +34,67 @@ export default function ActionMenu({
         ☰ Меню дій
       </button>
 
+      {/* Меню (вище за backdrop) */}
+      {isMobile && showMenu && (
+        <div
+          className="menu-dropdown visible"
+          onClick={(e) => e.stopPropagation()} // щоб не закривалось при кліку
+        >
+          <button className="menu-item" onClick={onRestart}>
+            Почати спочатку
+          </button>
+          <button
+            className="menu-item"
+            onClick={() =>
+              alert(
+                "🟢 Зелений — помірний ризик\n🟡 Жовтий — середній\n🔴 Червоний — високий"
+              )
+            }
+          >
+            Інформація про кольори карток
+          </button>
+          <button className="menu-item" onClick={onShowWeather}>
+            Погодні умови за період
+          </button>
+          <button className="menu-item" onClick={onToggleIntegrated}>
+            {showIntegrated
+              ? "Сховати інтегровану систему"
+              : "Сформувати інтегровану систему"}
+          </button>
+        </div>
+      )}
+
+      {/* Бекдроп (нижче за меню) */}
       {isMobile && showMenu && (
         <div className="menu-backdrop" onClick={() => setShowMenu(false)} />
       )}
 
-      <div
-        className={`menu-dropdown ${
-          isMobile ? (showMenu ? "visible" : "") : "visible-on-hover"
-        }`}
-      >
-        <button className="menu-item" onClick={onRestart}>
-          Почати спочатку
-        </button>
-        <button
-          className="menu-item"
-          onClick={() =>
-            alert(
-              "🟢 Зелений — помірний ризик\n🟡 Жовтий — середній\n🔴 Червоний — високий"
-            )
-          }
-        >
-          Інформація про кольори карток
-        </button>
-        <button className="menu-item" onClick={onShowWeather}>
-          Погодні умови за період
-        </button>
-        <button className="menu-item" onClick={onToggleIntegrated}>
-          {showIntegrated
-            ? "Сховати інтегровану систему"
-            : "Сформувати інтегровану систему"}
-        </button>
-      </div>
+      {/* На десктопі — меню з hover */}
+      {!isMobile && (
+        <div className="menu-dropdown desktop-menu">
+          <button className="menu-item" onClick={onRestart}>
+            Почати спочатку
+          </button>
+          <button
+            className="menu-item"
+            onClick={() =>
+              alert(
+                "🟢 Зелений — помірний ризик\n🟡 Жовтий — середній\n🔴 Червоний — високий"
+              )
+            }
+          >
+            Інформація про кольори карток
+          </button>
+          <button className="menu-item" onClick={onShowWeather}>
+            Погодні умови за період
+          </button>
+          <button className="menu-item" onClick={onToggleIntegrated}>
+            {showIntegrated
+              ? "Сховати інтегровану систему"
+              : "Сформувати інтегровану систему"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
