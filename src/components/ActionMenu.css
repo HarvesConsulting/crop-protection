@@ -3,7 +3,6 @@
   display: inline-block;
   width: 100%;
   margin-bottom: 1rem;
-  z-index: 10;
 }
 
 .menu-toggle {
@@ -27,6 +26,10 @@
 
 .menu-dropdown {
   display: none;
+  position: relative;
+  top: 110%;
+  left: 0;
+  min-width: 240px;
   background-color: #ffffff;
   border: 1px solid #c3e6cb;
   border-radius: 10px;
@@ -62,7 +65,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 90; /* нижче за меню */
+  z-index: 90;
   background: transparent;
 }
 
@@ -86,17 +89,8 @@
   }
 }
 
-/* Десктоп */
 @media (min-width: 769px) {
-  .desktop-menu {
-    display: none;
-    position: absolute;
-    top: 110%;
-    left: 0;
-    min-width: 240px;
-  }
-
-  .menu-wrapper:hover .desktop-menu {
+  .menu-wrapper:hover .menu-dropdown {
     display: block;
   }
 }
