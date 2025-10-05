@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { regions as allRegions } from "../regions";
+import { norm, searchTextFor, placeKey } from "../helpers";
+import { Info } from "lucide-react"; // npm i lucide-react
 
 // 🔁 Фільтрація лише унікальних назв
 const regions = allRegions.filter(
   (r, i, arr) =>
     i === arr.findIndex((x) => x.name === r.name)
 );
-
-import { norm, searchTextFor, placeKey } from "../helpers";
-import { Info } from "lucide-react"; // npm i lucide-react
 
 export default function Step1Region({ region, setRegion, onNext }) {
   const [inputValue, setInputValue] = useState(region?.name || "");
