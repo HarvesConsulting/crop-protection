@@ -7,6 +7,7 @@ export default function ActionMenu({
   onShowWeather,
   onToggleIntegrated,
   showIntegrated,
+  onGoToCards, // ✅ новий проп
 }) {
   const [showMenu, setShowMenu] = useState(false);
   const closeTimeoutRef = useRef(null);
@@ -29,7 +30,7 @@ export default function ActionMenu({
     }
   };
 
-  // десктоп: закриття меню з невеликою затримкою
+  // десктоп: закриття меню з затримкою
   const handleMouseLeave = () => {
     if (!isMobile) {
       closeTimeoutRef.current = setTimeout(() => {
@@ -38,7 +39,7 @@ export default function ActionMenu({
     }
   };
 
-  // хелпер для виконання дії та закриття меню на мобільному
+  // хелпер для мобільного: викликає дію і закриває меню
   const handleMenuAction = (action) => {
     if (isMobile) {
       setShowMenu(false);
@@ -64,6 +65,7 @@ export default function ActionMenu({
         ☰ Меню дій
       </button>
 
+      {/* === МОБІЛЬНИЙ ВАРІАНТ === */}
       {isMobile && showMenu && (
         <>
           <div className="menu-backdrop" onClick={() => setShowMenu(false)} />
@@ -71,6 +73,12 @@ export default function ActionMenu({
             className="menu-dropdown visible"
             onClick={(e) => e.stopPropagation()}
           >
+            <button
+              className="menu-item"
+              onClick={() => handleMenuAction(onGoToCards)}
+            >
+              Повернутися до карток
+            </button>
             <button
               className="menu-item"
               onClick={() => handleMenuAction(onRestart)}
@@ -106,8 +114,15 @@ export default function ActionMenu({
         </>
       )}
 
+      {/* === ДЕСКТОПНИЙ ВАРІАНТ === */}
       {!isMobile && (
         <div className={`menu-dropdown ${showMenu ? "visible" : ""}`}>
+          <button
+            className="menu-item"
+            onClick={() => handleMenuAction(onGoToCards)}
+          >
+            Повернутися до карток
+          </button>
           <button
             className="menu-item"
             onClick={() => handleMenuAction(onRestart)}
@@ -116,11 +131,11 @@ export default function ActionMenu({
           </button>
           <button
             className="menu-item"
-            onClick={() => {
+            onClick={() =>
               alert(
                 "🟢 Зелений — помірний ризик\n🟡 Жовтий — середній\n🔴 Червоний — високий"
-              );
-            }}
+              )
+            }
           >
             Інформація про кольори карток
           </button>

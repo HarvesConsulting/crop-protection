@@ -360,6 +360,9 @@ React.useEffect(() => {
 }, []);
 
   const [weatherModalOpen, setWeatherModalOpen] = useState(false);
+  const handleGoToCards = () => {
+  setShowIntegrated(false); // повертаємося до карток
+};
   if (!result) return <p>Дані відсутні</p>;
 
 const {
@@ -598,6 +601,7 @@ integratedSystem.sort(
   onShowWeather={() => setWeatherModalOpen(true)}
   onToggleIntegrated={() => setShowIntegrated((prev) => !prev)}
   showIntegrated={showIntegrated}
+  onGoToCards={handleGoToCards}
 />
 
 
