@@ -80,7 +80,6 @@ export default function Step1Region({ region, setRegion, onNext }) {
             placeholder="Почніть вводити (мін. 2 букви)"
           />
         </div>
-
         {/* Список підказок */}
         {inputValue.trim().length >= 2 && !region && (
           <div className="max-w-sm mx-auto mt-2 border border-gray-200 rounded-md bg-white max-h-60 overflow-y-auto shadow-md">
