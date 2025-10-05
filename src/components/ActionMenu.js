@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./ActionMenu.css";
 
 export default function ActionMenu({
@@ -9,6 +9,7 @@ export default function ActionMenu({
   showIntegrated,
 }) {
   const [showMenu, setShowMenu] = useState(false);
+  const closeTimeoutRef = useRef(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -21,14 +22,20 @@ export default function ActionMenu({
   }, []);
 
   const handleMouseEnter = () => {
-    if (!isMobile) setShowMenu(true);
+    if (!isMobile) {
+      clearTimeout(closeTimeoutRef.current); // не дозволяємо закриття
+      setShowMenu(true);
+    }
   };
 
   const handleMouseLeave = () => {
-    if (!isMobile) setShowMenu(false);
+    if (!isMobile) {
+      // затримка перед закриттям меню
+      closeTimeoutRef.current = setTimeout(() => {
+        setShowMenu(false);
+      }, 200); // ← можна змінити тривалість (мс)
+    }
   };
-
-  const handleBackdropClick = () => setShowMenu(false);
 
   return (
     <div
@@ -50,7 +57,7 @@ export default function ActionMenu({
 
       {isMobile && showMenu && (
         <>
-          <div className="menu-backdrop" onClick={handleBackdropClick} />
+          <div className="menu-backdrop" onClick={() => setShowMenu(false)} />
           <div
             className="menu-dropdown visible"
             onClick={(e) => e.stopPropagation()}
@@ -80,8 +87,8 @@ export default function ActionMenu({
         </>
       )}
 
-      {!isMobile && showMenu && (
-        <div className="menu-dropdown visible">
+      {!isMobile && (
+        <div className={`menu-dropdown ${showMenu ? "visible" : ""}`}>
           <button className="menu-item" onClick={onRestart}>
             Почати спочатку
           </button>
