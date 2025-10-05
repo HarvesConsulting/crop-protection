@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Info } from "lucide-react"; // ⬅️ переконайся, що встановлено: npm i lucide-react
+import { Info } from "lucide-react";
 
 export default function Step2Season({
   plantingDate,
@@ -49,14 +49,13 @@ export default function Step2Season({
 
           {showInfo && (
             <div className="bg-blue-50 border border-blue-200 text-sm text-gray-700 p-4 rounded-md shadow-sm">
-              Вкажіть початок і кінець сезону, а також оберіть хвороби для
-              прогнозування.
+              Вкажіть початок і кінець сезону, а також оберіть хвороби для прогнозування.
             </div>
           )}
 
           {/* Поля дат */}
           <div className="flex flex-col sm:flex-row items-end gap-4 sm:gap-6">
-            <div className="flex flex-col flex-1">
+            <div className="flex flex-col w-full">
               <label className="text-sm font-medium text-gray-700 mb-1 block">
                 Дата висадки (або останнє внесення фунгіциду):
               </label>
@@ -68,7 +67,7 @@ export default function Step2Season({
               />
             </div>
 
-            <div className="flex flex-col flex-1">
+            <div className="flex flex-col w-full">
               <label className="text-sm font-medium text-gray-700 mb-1 block">
                 Дата збирання:
               </label>
