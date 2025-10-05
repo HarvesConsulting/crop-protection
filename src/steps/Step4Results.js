@@ -579,18 +579,63 @@ integratedSystem.sort(
 
   
   const exportToExcel = () => {
-    const simplified = integratedSystem.map(
-      ({ Дата, Препарат }) => ({
-        Дата,
-        Препарат,
-       
-      })
-    );
-    const ws = XLSX.utils.json_to_sheet(simplified);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Захист");
-    XLSX.writeFile(wb, "Інтегрована_система_захисту.xlsx");
-  };
+  const diseases = ["Фітофтороз", "Сіра гниль", "Альтернаріоз", "Бактеріоз"];
+
+  // 🧩 Об'єднуємо всі препарати по хворобах
+  const allGroups = [
+    { name: "Фітофтороз", entries: sprayData || [] },
+    ...(diseaseCardsGrouped || []),
+  ];
+
+  // 🗓️ Отримуємо всі унікальні дати
+  const allDates = [
+    ...new Set(
+      allGroups.flatMap((group) =>
+        group.entries?.map((e) => e.Дата)
+      )
+    ),
+  ].sort((a, b) => {
+    const [dA, mA, yA] = a.split(".");
+    const [dB, mB, yB] = b.split(".");
+    return new Date(yA, mA - 1, dA) - new Date(yB, mB - 1, dB);
+  });
+
+  // 🗺️ Заповнюємо мапу diseaseMap[дата][хвороба] = препарат
+  const diseaseMap = {};
+  for (const date of allDates) {
+    diseaseMap[date] = {};
+    for (const dis of diseases) diseaseMap[date][dis] = "";
+  }
+
+  for (const group of allGroups) {
+    const { name, entries } = group;
+    if (!diseases.includes(name)) continue;
+
+    for (const entry of entries) {
+      const date = entry.Дата;
+      const prep = entry.Препарат;
+      if (!date || !prep) continue;
+
+      diseaseMap[date][name] += (diseaseMap[date][name] ? "\n" : "") + prep;
+    }
+  }
+
+  // 📊 Готуємо масив об'єктів для експорту
+  const exportData = allDates.map((date) => {
+    const row = { Дата: date };
+    for (const d of diseases) {
+      row[d] = diseaseMap[date][d] || "—";
+    }
+    return row;
+  });
+
+  // 📁 Експортуємо в Excel
+  const ws = XLSX.utils.json_to_sheet(exportData);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Інтегрована таблиця");
+  XLSX.writeFile(wb, "Інтегрована_таблиця_захисту.xlsx");
+};
+
 
   return (
   <main className="flex justify-center items-start min-h-[70vh] px-4">
