@@ -80,4 +80,13 @@
 .info-button:hover {
   background: #f5f5f5;
 }
+@media (max-width: 480px) {
+  .page-wrapper {
+    padding: 20px 10px; /* менші відступи по боках на мобільних */
+  }
+
+  .glass-card {
+    padding: 12px 16px; /* трохи менше всередині картки */
+  }
+}
 
