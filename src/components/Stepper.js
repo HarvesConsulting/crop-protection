@@ -4,8 +4,8 @@ import React from "react";
 const steps = [
   { id: 1, name: "Місто" },
   { id: 2, name: "Сезон" },
-  { id: 3, name: "Рахуємо" },
-  { id: 4, name: "Фініш" },
+  { id: 3, name: "Розрахунок" },
+  { id: 4, name: "Результат" },
 ];
 
 export default function Stepper({ currentStep }) {
