@@ -581,18 +581,14 @@ integratedSystem.sort(
   const exportToExcel = () => {
   const diseases = ["Фітофтороз", "Сіра гниль", "Альтернаріоз", "Бактеріоз"];
 
-  // 🧩 Об'єднуємо всі препарати по хворобах
   const allGroups = [
     { name: "Фітофтороз", entries: sprayData || [] },
     ...(diseaseCardsGrouped || []),
   ];
 
-  // 🗓️ Отримуємо всі унікальні дати
   const allDates = [
     ...new Set(
-      allGroups.flatMap((group) =>
-        group.entries?.map((e) => e.Дата)
-      )
+      allGroups.flatMap((group) => group.entries?.map((e) => e.Дата))
     ),
   ].sort((a, b) => {
     const [dA, mA, yA] = a.split(".");
@@ -600,7 +596,6 @@ integratedSystem.sort(
     return new Date(yA, mA - 1, dA) - new Date(yB, mB - 1, dB);
   });
 
-  // 🗺️ Заповнюємо мапу diseaseMap[дата][хвороба] = препарат
   const diseaseMap = {};
   for (const date of allDates) {
     diseaseMap[date] = {};
@@ -620,7 +615,6 @@ integratedSystem.sort(
     }
   }
 
-  // 📊 Готуємо масив об'єктів для експорту
   const exportData = allDates.map((date) => {
     const row = { Дата: date };
     for (const d of diseases) {
@@ -629,13 +623,25 @@ integratedSystem.sort(
     return row;
   });
 
-  // 📁 Експортуємо в Excel
   const ws = XLSX.utils.json_to_sheet(exportData);
+
+  // ✅ Заголовок таблиці
+  XLSX.utils.sheet_add_aoa(ws, [["Інтегрована система захисту"]], { origin: "A1" });
+
+  // ✅ Автоширина колонок
+  const columnWidths = Object.keys(exportData[0]).map((key) => {
+    const maxLength = Math.max(
+      key.length,
+      ...exportData.map((row) => (row[key] || "").length)
+    );
+    return { wch: Math.min(Math.max(maxLength + 2, 10), 40) };
+  });
+  ws["!cols"] = columnWidths;
+
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Інтегрована таблиця");
   XLSX.writeFile(wb, "Інтегрована_таблиця_захисту.xlsx");
 };
-
 
   return (
   <main className="flex justify-center items-start min-h-[70vh] px-4">
