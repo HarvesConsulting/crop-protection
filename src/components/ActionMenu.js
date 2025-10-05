@@ -21,20 +21,29 @@ export default function ActionMenu({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // десктоп: відкриття меню
   const handleMouseEnter = () => {
     if (!isMobile) {
-      clearTimeout(closeTimeoutRef.current); // не дозволяємо закриття
+      clearTimeout(closeTimeoutRef.current);
       setShowMenu(true);
     }
   };
 
+  // десктоп: закриття меню з невеликою затримкою
   const handleMouseLeave = () => {
     if (!isMobile) {
-      // затримка перед закриттям меню
       closeTimeoutRef.current = setTimeout(() => {
         setShowMenu(false);
-      }, 200); // ← можна змінити тривалість (мс)
+      }, 200);
     }
+  };
+
+  // хелпер для виконання дії та закриття меню на мобільному
+  const handleMenuAction = (action) => {
+    if (isMobile) {
+      setShowMenu(false);
+    }
+    action();
   };
 
   return (
@@ -62,23 +71,33 @@ export default function ActionMenu({
             className="menu-dropdown visible"
             onClick={(e) => e.stopPropagation()}
           >
-            <button className="menu-item" onClick={onRestart}>
+            <button
+              className="menu-item"
+              onClick={() => handleMenuAction(onRestart)}
+            >
               Почати спочатку
             </button>
             <button
               className="menu-item"
-              onClick={() =>
+              onClick={() => {
+                if (isMobile) setShowMenu(false);
                 alert(
                   "🟢 Зелений — помірний ризик\n🟡 Жовтий — середній\n🔴 Червоний — високий"
-                )
-              }
+                );
+              }}
             >
               Інформація про кольори карток
             </button>
-            <button className="menu-item" onClick={onShowWeather}>
+            <button
+              className="menu-item"
+              onClick={() => handleMenuAction(onShowWeather)}
+            >
               Погодні умови за період
             </button>
-            <button className="menu-item" onClick={onToggleIntegrated}>
+            <button
+              className="menu-item"
+              onClick={() => handleMenuAction(onToggleIntegrated)}
+            >
               {showIntegrated
                 ? "Сховати інтегровану систему"
                 : "Сформувати інтегровану систему"}
@@ -89,23 +108,32 @@ export default function ActionMenu({
 
       {!isMobile && (
         <div className={`menu-dropdown ${showMenu ? "visible" : ""}`}>
-          <button className="menu-item" onClick={onRestart}>
+          <button
+            className="menu-item"
+            onClick={() => handleMenuAction(onRestart)}
+          >
             Почати спочатку
           </button>
           <button
             className="menu-item"
-            onClick={() =>
+            onClick={() => {
               alert(
                 "🟢 Зелений — помірний ризик\n🟡 Жовтий — середній\n🔴 Червоний — високий"
-              )
-            }
+              );
+            }}
           >
             Інформація про кольори карток
           </button>
-          <button className="menu-item" onClick={onShowWeather}>
+          <button
+            className="menu-item"
+            onClick={() => handleMenuAction(onShowWeather)}
+          >
             Погодні умови за період
           </button>
-          <button className="menu-item" onClick={onToggleIntegrated}>
+          <button
+            className="menu-item"
+            onClick={() => handleMenuAction(onToggleIntegrated)}
+          >
             {showIntegrated
               ? "Сховати інтегровану систему"
               : "Сформувати інтегровану систему"}
