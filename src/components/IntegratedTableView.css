@@ -6,15 +6,18 @@
   background-color: #f9fffa;
   overflow-x: auto; /* 🟢 Додаємо горизонтальну прокрутку */
   -webkit-overflow-scrolling: touch; /* 🟢 Плавна прокрутка на iOS */
+  padding: 0;
 }
 
 /* Заголовок */
 .integrated-table-title {
-  text-align: center;
+  text-align: left;
   color: #155724;
   font-size: 20px;
   font-weight: 700;
   margin-bottom: 1rem;
+  padding-left: 0;
+  margin-left: 0;
 }
 
 /* Основна таблиця */
