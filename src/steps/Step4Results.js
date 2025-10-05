@@ -358,6 +358,39 @@ React.useEffect(() => {
   window.addEventListener("resize", handleResize);
   return () => window.removeEventListener("resize", handleResize);
 }, []);
+React.useEffect(() => {
+  const tooltip = document.getElementById("global-tooltip");
+
+  const showTooltip = (e) => {
+    const target = e.target.closest("[data-tooltip]");
+    if (!target) {
+      tooltip.style.display = "none";
+      return;
+    }
+
+    tooltip.innerHTML = target.getAttribute("data-tooltip");
+    tooltip.style.left = `${e.clientX + 10}px`;
+    tooltip.style.top = `${e.clientY + 10}px`;
+    tooltip.style.display = "block";
+  };
+
+  const hideTooltip = () => {
+    tooltip.style.display = "none";
+  };
+
+  document.addEventListener("mousemove", showTooltip);
+  document.addEventListener("touchmove", showTooltip);
+  document.addEventListener("mouseleave", hideTooltip);
+  document.addEventListener("touchend", hideTooltip);
+
+  return () => {
+    document.removeEventListener("mousemove", showTooltip);
+    document.removeEventListener("touchmove", showTooltip);
+    document.removeEventListener("mouseleave", hideTooltip);
+    document.removeEventListener("touchend", hideTooltip);
+  };
+}, []);
+
 
   const [weatherModalOpen, setWeatherModalOpen] = useState(false);
   const handleGoToCards = () => {
@@ -645,6 +678,16 @@ integratedSystem.sort(
 
   return (
   <main className="flex justify-center items-start min-h-[70vh] px-4">
+    <div
+    id="global-tooltip"
+    className="hour-details-tooltip"
+    style={{
+      display: "none",
+      position: "fixed",
+      zIndex: 9999,
+      pointerEvents: "none",
+    }}
+  ></div>
   <div className="w-full max-w-xl mx-auto bg-white rounded-xl shadow-md px-6 sm:px-10 py-6 space-y-6 text-base sm:text-lg">
   <ActionMenu
   isMobile={isMobile}

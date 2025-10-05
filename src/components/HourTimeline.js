@@ -50,13 +50,13 @@ export default function HourTimeline({ date, hourlyData = [] }) {
                 }}
               >
                 <div
-                  className={`hour-segment ${
-                    isSuitable ? "suitable" : "not-suitable"
-                  }`}
-                  data-hour={hour}
-                >
-                  {hour}
-                </div>
+  className={`hour-segment ${isSuitable ? "suitable" : "not-suitable"}`}
+  data-hour={hour}
+  data-tooltip={`🌡 ${hourData.temperature}°C, 💧 ${hourData.humidity ?? "—"}%, 💨 ${hourData.windspeed} км/год, 🌧 ${hourData.precipitation ?? 0} мм`}
+>
+  {hour}
+</div>
+
 
                 {hourData && isActive && (
                   <div className="hour-details-tooltip mobile">
