@@ -5,7 +5,7 @@ const steps = [
   { id: 1, name: "Місто" },
   { id: 2, name: "Сезон" },
   { id: 3, name: "Розрахунок" },
-  { id: 4, name: "Результат" },
+  { id: 4, name: "Результати" },
 ];
 
 export default function Stepper({ currentStep }) {
