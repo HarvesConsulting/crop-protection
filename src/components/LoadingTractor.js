@@ -1,26 +1,27 @@
 import React from "react";
-import { Tractor } from "lucide-react"; // Іконка трактора з lucide-react
+import { Tractor } from "lucide-react";
 
 export default function LoadingTractor() {
   return (
     <div className="flex flex-col items-center justify-center space-y-4 py-8">
-      {/* Анімація з монстром і трактором */}
-      <div className="w-full overflow-hidden">
+      {/* Дорога + анімація */}
+      <div className="relative w-screen overflow-hidden h-16 bg-green-50 rounded-lg shadow-inner">
         <div className="animate-tractorMove inline-flex items-center space-x-4">
-          {/* Монстр — хвороба, яка тікає */}
+          
+          {/* 👾 Монстр тікає */}
           <div
-            className="w-8 h-8 text-red-600 animate-monsterShake text-2xl"
-            title="Хвороба втікає!"
+            className="w-8 h-8 animate-monsterShake text-2xl transform -scale-x-100"
+            title="Хвороба тікає!"
           >
             👾
           </div>
 
-          {/* Тракторець — їде захищати урожай */}
+          {/* 🚜 Трактор їде за ним */}
           <Tractor size={36} className="text-green-600" />
         </div>
       </div>
 
-      {/* Текстове повідомлення */}
+      {/* Підпис */}
       <p className="text-gray-700 text-lg font-medium">
         Обчислення системи захисту...
       </p>
