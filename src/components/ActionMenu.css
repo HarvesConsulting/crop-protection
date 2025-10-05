@@ -80,11 +80,6 @@
 }
 
 /* ===== ХОВЕР НА ДЕСКТОПІ ===== */
-@media (min-width: 769px) {
-  .menu-wrapper:hover .menu-dropdown {
-    display: block;
-  }
-}
 
 /* ===== МЕДІА ЗАПИТ ДЛЯ МОБІЛЬНОГО ===== */
 @media (max-width: 768px) {
