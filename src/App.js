@@ -115,8 +115,6 @@ export default function App() {
           <CalendarView events={extractCalendarEvents(result)} />
         </>
       )}
-      <div id="global-tooltip" className="hour-details-tooltip" style={{ display: "none" }}></div>
-
     </Layout>
   );
 }
