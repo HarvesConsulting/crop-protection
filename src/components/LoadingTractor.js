@@ -5,11 +5,10 @@ export default function LoadingTractor() {
   return (
     <div className="flex flex-col items-center justify-center space-y-4 py-8 w-full">
       
-      {/* Доріжка для обприскування */}
+      {/* Доріжка (в межах glass-container) */}
       <div className="relative w-full max-w-xl overflow-hidden h-16 bg-green-50 rounded-lg shadow-inner">
         <div
-          className="animate-tractorMove flex items-center space-x-4 absolute left-0 top-1/2 -translate-y-1/2"
-          style={{ width: "120px", minWidth: "120px" }} // фіксована ширина блока
+          className="absolute left-[-150px] top-1/2 -translate-y-1/2 animate-tractorMove flex items-center space-x-4 w-[120px]"
         >
           {/* 💦 Крапелька */}
           <div
@@ -24,7 +23,6 @@ export default function LoadingTractor() {
         </div>
       </div>
 
-      {/* Текст нижче */}
       <p className="text-gray-700 text-lg font-medium">
         Обчислення системи захисту...
       </p>

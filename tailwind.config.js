@@ -1,14 +1,14 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./src/**/*.{js,jsx,ts,tsx}", // розпізнавання Tailwind класів
+    "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
     extend: {
       keyframes: {
         tractorMove: {
-          '0%': { transform: 'translateX(-130px)' },  // Починає за межами зліва
-          '100%': { transform: 'translateX(100%)' },  // До правого краю контейнера
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(calc(100vw + 150px))' },
         },
         sprayPulse: {
           '0%, 100%': { transform: 'scale(1)', opacity: 0.6 },
@@ -16,7 +16,7 @@ module.exports = {
         },
       },
       animation: {
-        tractorMove: 'tractorMove 5s linear infinite',
+        tractorMove: 'tractorMove 6s linear infinite',
         sprayPulse: 'sprayPulse 1s ease-in-out infinite',
       },
     },
