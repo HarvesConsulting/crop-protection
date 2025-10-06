@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
 import "./SplashScreen.css";
-import bgImage from "../assets/images/bg0.jpg"; // ✅ правильний файл
 
-function SplashScreen(props) {
-  const { ready = false, minDuration = 1200, onFinish } = props;
+function SplashScreen({ ready = false, minDuration = 1500, onFinish }) {
   const [visible, setVisible] = useState(true);
 
-  // Блокуємо прокрутку під час splash screen
+  // 🚫 Блокуємо прокрутку під час splash screen
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -14,15 +12,13 @@ function SplashScreen(props) {
     };
   }, []);
 
-  // Ховаємо splash після того, як додаток готовий і пройшов мінімальний час
+  // ⏳ Ховаємо splash після готовності + мінімальний час
   useEffect(() => {
     let timer;
     if (ready) {
       timer = setTimeout(() => {
         setVisible(false);
-        if (typeof onFinish === "function") {
-          onFinish();
-        }
+        if (typeof onFinish === "function") onFinish();
       }, minDuration);
     }
     return () => clearTimeout(timer);
@@ -31,20 +27,9 @@ function SplashScreen(props) {
   if (!visible) return null;
 
   return (
-    <div
-      className="splash-wrapper"
-      style={{
-        backgroundImage: `url(${bgImage})`, // ✅ ось тут фон
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-      role="status"
-      aria-live="polite"
-      aria-busy="true"
-    >
-      <div className="splash-overlay" />
+    <div className="splash-wrapper" role="status" aria-live="polite" aria-busy="true">
       <div className="splash-content">
-        <div className="splash-logo">🌾 Crop Protection</div>
+        <div className="splash-logo animate-logo">🌾 Crop Protection</div>
         <div className="splash-subtitle">завантаження застосунку…</div>
         <div className="splash-loader">
           <div className="loader-bar"></div>

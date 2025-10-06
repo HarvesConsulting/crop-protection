@@ -1,76 +1,70 @@
-/* SplashScreen.css */
-
 .splash-wrapper {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: #184e2f; /* Зелений фон */
+  color: white;
+  font-family: "Segoe UI", Roboto, sans-serif;
   z-index: 9999;
+  transition: opacity 0.8s ease;
 }
 
-/* Напівпрозора затемнена плівка поверх зображення */
-.splash-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  z-index: 1;
-}
-
-/* Основний блок (вміст) */
 .splash-content {
-  position: relative;
-  z-index: 2;
   text-align: center;
   padding: 40px 56px;
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.35);
   backdrop-filter: blur(14px) saturate(140%);
-  -webkit-backdrop-filter: blur(14px) saturate(140%);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
   animation: splashIn 0.6s ease both;
 }
 
-/* Логотип */
 .splash-logo {
   font-weight: 800;
-  font-size: 32px;
-  color: #184e2f;
+  font-size: 30px;
+  color: #ffffff;
   letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
-/* Підпис */
+.animate-logo {
+  animation: logoMove 2.4s ease-in-out infinite;
+}
+
+@keyframes logoMove {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
 .splash-subtitle {
   margin-top: 8px;
-  font-size: 14px;
-  color: #e9f5ee;
+  font-size: 15px;
+  color: #e8f5e9;
   opacity: 0.9;
 }
 
-/* Лоадер (контейнер) */
 .splash-loader {
   position: relative;
   margin: 22px auto 0;
   width: 180px;
   height: 6px;
-  background: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.45);
   border-radius: 999px;
   overflow: hidden;
 }
 
-/* Анімація лоадера */
 .loader-bar {
   position: absolute;
   inset: 0 auto 0 0;
   width: 60px;
-  background: #2f7a4f;
+  background: #ffffff;
   border-radius: 999px;
   animation: loaderMove 1.2s infinite ease-in-out;
 }
@@ -90,7 +84,6 @@
   }
 }
 
-/* Анімація появи */
 @keyframes splashIn {
   from {
     opacity: 0;
