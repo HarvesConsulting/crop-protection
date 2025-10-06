@@ -367,10 +367,7 @@ export default function Step4Results({ result, onRestart }) {
   const [showWeather, setShowWeather] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  const hasPhytophthora = Array.isArray(diseaseSummary)
-  ? diseaseSummary.some((d) => d.name === "Фітофтороз")
-  : true; // для сумісності зі старими даними
-
+  
 React.useEffect(() => {
   const handleResize = () => setIsMobile(window.innerWidth <= 768);
   window.addEventListener("resize", handleResize);
@@ -393,6 +390,9 @@ const {
   plantingDate,
   harvestDate,
 } = result;
+const hasPhytophthora = Array.isArray(diseaseSummary)
+  ? diseaseSummary.some((d) => d.name === "Фітофтороз")
+  : true; // для сумісності зі старими даними
 // 🧠 Додаємо "suitable: true/false" до кожної години
 const suitableMap = extractSuitableSprayHours(hourlyData);
 
