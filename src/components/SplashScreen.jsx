@@ -44,7 +44,7 @@ function SplashScreen(props) {
     >
       <div className="splash-overlay" />
       <div className="splash-content">
-        <div className="splash-logo">🌾 AgroSense</div>
+        <div className="splash-logo">🌾 Crop Protection</div>
         <div className="splash-subtitle">завантаження застосунку…</div>
         <div className="splash-loader">
           <div className="loader-bar"></div>
