@@ -95,16 +95,18 @@ function InfoToggle({ content }) {
           fontSize: "16px",
           marginLeft: 6,
         }}
-        title="Показати рекомендації"
+        title="Показати рекомендацію"
       >
         ℹ️
       </button>
+
       {show && (
         <div style={{ marginTop: 6 }}>
-          {typeof content === "string" || typeof content === "number" ? (
-            <div>{content}</div>
-          ) : React.isValidElement(content) ? (
+          {/* Ось тут гарантуємо рендер JSX */}
+          {React.isValidElement(content) ? (
             content
+          ) : typeof content === "string" || typeof content === "number" ? (
+            <div>{content}</div>
           ) : (
             <pre>{JSON.stringify(content, null, 2)}</pre>
           )}
