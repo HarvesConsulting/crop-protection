@@ -101,7 +101,14 @@ function InfoToggle({ content }) {
       </button>
 
       {show && (
-        <div style={{ marginTop: 6 }}>
+        <div
+  style={{
+    marginTop: 6,
+    color: "#007bff",
+    textDecoration: "underline",
+    cursor: "pointer",
+  }}
+>
           {/* Ось тут гарантуємо рендер JSX */}
           {React.isValidElement(content) ? (
             content
