@@ -84,7 +84,7 @@ function InfoToggle({ content }) {
     <span style={{ display: "inline-block" }}>
       <button
         onClick={(e) => {
-          e.stopPropagation(); // 🛑 не перевертати картку
+          e.stopPropagation();
           setShow(!show);
         }}
         style={{
@@ -101,7 +101,13 @@ function InfoToggle({ content }) {
       </button>
       {show && (
         <div style={{ marginTop: 6 }}>
-          {Array.isArray(content) ? content : <div>{content}</div>}
+          {typeof content === "string" || typeof content === "number" ? (
+            <div>{content}</div>
+          ) : React.isValidElement(content) ? (
+            content
+          ) : (
+            <pre>{JSON.stringify(content, null, 2)}</pre>
+          )}
         </div>
       )}
     </span>
