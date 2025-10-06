@@ -37,7 +37,7 @@ html, body, #root {
   border:none; background:#fff; color:#184e2f; padding:8px 14px;
   border-radius:10px; font-weight:600; cursor:pointer;
 }
-.main-content{ display:flex; justify-content:center; padding:40px 16px; }
+.main-content{ display:flex; justify-content:center; padding:40px 8px; }
 .glass-container{
   width:100%; max-width:720px;
   background: rgba(255,255,255,0.18);
