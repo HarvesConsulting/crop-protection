@@ -1,20 +1,95 @@
 ﻿<!doctype html>
 <html lang="uk">
   <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Crop Protection</title>
-  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-<link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-<meta name="theme-color" content="#222222" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crop Protection</title>
 
-<!-- iOS -->
-<link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-touch-icon.png" />
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="theme-color" content="#184e2f" />
 
-</head>
+    <!-- iOS -->
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- 🔹 SPLASH SCREEN СТИЛІ -->
+    <style>
+      /* Контейнер сплешу */
+      #initial-splash {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #184e2f;
+        z-index: 99999;
+        overflow: hidden;
+      }
+
+      /* Фонове зображення */
+      #initial-splash::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: url("./images/bg.jpg") center/cover no-repeat;
+        opacity: 0.8;
+        filter: brightness(0.85);
+      }
+
+      /* Текст/логотип зверху */
+      .splash-logo-box {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        color: #fff;
+        font-family: system-ui, Arial, sans-serif;
+      }
+
+      .splash-title {
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: 1px;
+      }
+
+      .splash-subtitle {
+        font-size: 14px;
+        opacity: 0.9;
+        margin-top: 6px;
+      }
+
+      /* Плавне зникнення після завантаження React */
+      .fade-out {
+        opacity: 0;
+        transition: opacity 0.6s ease;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+
   <body>
+    <!-- 🔹 SPLASH SCREEN (з’являється миттєво) -->
+    <div id="initial-splash">
+      <div class="splash-logo-box">
+        <h1 class="splash-title">Crop Protection</h1>
+        <p class="splash-subtitle">Завантаження...</p>
+      </div>
+    </div>
+
+    <!-- Основний React root -->
     <div id="root"></div>
+
+    <!-- 🔹 Скрипт: прибирає splash, коли React готовий -->
+    <script>
+      window.addEventListener("load", () => {
+        const splash = document.getElementById("initial-splash");
+        if (splash) {
+          splash.classList.add("fade-out");
+          setTimeout(() => splash.remove(), 600);
+        }
+      });
+    </script>
   </body>
 </html>
+
