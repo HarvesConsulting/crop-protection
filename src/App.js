@@ -6,6 +6,7 @@ import Step4Results from "./steps/Step4Results";
 import LoginPage from "./components/LoginPage";
 import CalendarView from "./components/CalendarView";
 import Layout from "./components/Layout";
+import SplashScreen from "./components/SplashScreen";
 
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase";
@@ -27,6 +28,7 @@ function extractCalendarEvents(result) {
     return new Date(`${year}-${month}-${day}`);
   };
 
+  // Фітофтороз
   sprayDates.forEach((dateStr, i) => {
     events.push({
       date: parseDateStr(dateStr),
@@ -35,6 +37,7 @@ function extractCalendarEvents(result) {
     });
   });
 
+  // Інші хвороби
   diseaseSummary?.forEach(({ name, riskDates }) => {
     const rotation = {
       "Сіра гниль": rotationGrayMold,
@@ -63,20 +66,38 @@ export default function App() {
   const [harvestDate, setHarvestDate] = useState("");
   const [diseases, setDiseases] = useState(["lateBlight"]);
   const [result, setResult] = useState(null);
+  const [appReady, setAppReady] = useState(false); // 🆕 splash screen state
 
+  // Перевірка авторизації Firebase + splash
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, setUser);
+    const unsubscribe = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      // затримка splash для плавності
+      setTimeout(() => setAppReady(true), 1000);
+    });
     return () => unsubscribe();
   }, []);
 
-  if (!user) return <LoginPage onLogin={setUser} />;
+  // Якщо додаток ще завантажується — показуємо splash
+  if (!appReady) {
+    return <SplashScreen />;
+  }
 
+  // Якщо користувач не авторизований
+  if (!user) {
+    return <LoginPage onLogin={setUser} />;
+  }
+
+  // Логіка кроків
   const next = () => setStep((s) => Math.min(s + 1, 4));
   const back = () => setStep((s) => Math.max(s - 1, 1));
 
   return (
     <Layout step={step} onLogout={() => setUser(null)}>
-      {step === 1 && <Step1Region region={region} setRegion={setRegion} onNext={next} />}
+      {step === 1 && (
+        <Step1Region region={region} setRegion={setRegion} onNext={next} />
+      )}
+
       {step === 2 && (
         <Step2Season
           plantingDate={plantingDate}
@@ -90,6 +111,7 @@ export default function App() {
           onBack={back}
         />
       )}
+
       {step === 3 && (
         <Step3Run
           region={region}
@@ -103,6 +125,7 @@ export default function App() {
           onBack={back}
         />
       )}
+
       {step === 4 && (
         <>
           <Step4Results
@@ -118,5 +141,3 @@ export default function App() {
     </Layout>
   );
 }
-
-

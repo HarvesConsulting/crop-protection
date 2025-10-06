@@ -1,0 +1,87 @@
+/* SplashScreen.css */
+
+.splash-wrapper {
+  /* стиль перенесено до JSX */
+  position: relative;
+}
+
+.splash-overlay {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 0;
+}
+
+.splash-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 40px 56px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+  animation: splashIn 0.6s ease both;
+}
+
+.splash-logo {
+  font-weight: 800;
+  font-size: 32px;
+  color: #184e2f;
+  letter-spacing: 0.5px;
+}
+
+.splash-subtitle {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #e9f5ee;
+  opacity: 0.9;
+}
+
+.splash-loader {
+  position: relative;
+  margin: 22px auto 0;
+  width: 180px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.loader-bar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 60px;
+  background: #2f7a4f;
+  border-radius: 999px;
+  animation: loaderMove 1.2s infinite ease-in-out;
+}
+
+@keyframes loaderMove {
+  0% {
+    left: -60px;
+    width: 60px;
+  }
+  50% {
+    left: 120px;
+    width: 90px;
+  }
+  100% {
+    left: 180px;
+    width: 60px;
+  }
+}
+
+@keyframes splashIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
