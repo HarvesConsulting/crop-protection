@@ -7,6 +7,7 @@ export default function ActionMenu({
   onShowWeather,
   onToggleIntegrated,
   showIntegrated,
+  onShowSummary
 }) {
   const [showMenu, setShowMenu] = useState(false);
   const closeTimeoutRef = useRef(null);
@@ -81,6 +82,13 @@ export default function ActionMenu({
             >
               Погодні умови за період
             </button>
+            <button
+  className="menu-button"
+  onClick={() => onShowSummary(true)}
+>
+  📊 Агрономічний підсумок
+</button>
+
             <button
               className="menu-item"
               onClick={() => handleMenuAction(onToggleIntegrated)}

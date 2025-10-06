@@ -1,4 +1,5 @@
 import { format, parseISO, differenceInDays, isValid } from "date-fns";
+import ModalWithSummary from "../components/ModalWithSummary"; // адаптуй шлях, якщо потрібно
 import React, { useState } from "react";
 import "./Step4Results.css";
 import * as XLSX from "xlsx";
@@ -373,7 +374,7 @@ React.useEffect(() => {
   window.addEventListener("resize", handleResize);
   return () => window.removeEventListener("resize", handleResize);
 }, []);
-
+  const [summaryModalOpen, setSummaryModalOpen] = useState(false);
   const [weatherModalOpen, setWeatherModalOpen] = useState(false);
   const handleGoToCards = () => {
   setShowIntegrated(false); // повертаємося до карток
@@ -670,6 +671,7 @@ integratedSystem.sort(
   onToggleIntegrated={() => setShowIntegrated((prev) => !prev)}
   showIntegrated={showIntegrated}
   onGoToCards={handleGoToCards}
+  onShowSummary={() => setSummaryModalOpen(true)}
 />
 
 
@@ -797,6 +799,14 @@ integratedSystem.sort(
   lat={result.lat}
   lon={result.lon}
   hourlyData={hourlyData}
+/>
+<ModalWithSummary
+  open={summaryModalOpen}
+  onOpenChange={setSummaryModalOpen}
+  startDate={plantingDate}
+  endDate={harvestDate}
+  diagnostics={diagnostics}
+  rainDaily={rainDaily}
 />
 
 </main>
