@@ -720,46 +720,45 @@ integratedSystem.sort(
   </>
 ) : (
   <>
-    <CardView
-      title="Рекомендовані внесення (проти фітофторозу)"
-      entries={sprayData}
-      diagnostics={diagnostics}
-      plantingDate={plantingDate}
-      rainDaily={aggregatedRain}
-      hourlyData={enrichedHourlyData}
-    />
+    {sprayData.length > 0 ? (
+  <CardView
+    title="Рекомендовані внесення (проти фітофторозу)"
+    entries={sprayData}
+    diagnostics={diagnostics}
+    plantingDate={plantingDate}
+    rainDaily={aggregatedRain}
+    hourlyData={enrichedHourlyData}
+  />
+) : (
+  <div
+    className="card-section"
+    style={{
+      padding: "1rem",
+      marginTop: "1rem",
+      border: "1px dashed #ccc",
+      borderRadius: "8px",
+      background: "#f9f9f9",
+    }}
+  >
+    <h3>Рекомендовані внесення (проти фітофторозу)</h3>
+    <p style={{ color: "#666", fontStyle: "italic" }}>
+      Ризиків за обраний період не визначено
+    </p>
+  </div>
+)}
+
 
     {diseaseCardsGrouped?.map(({ name, entries }) => (
-  entries.length > 0 ? (
-    <CardView
-      key={name}
-      title={`Рекомендовані внесення (проти: ${name})`}
-      entries={entries}
-      diagnostics={diagnostics}
-      plantingDate={plantingDate}
-      rainDaily={aggregatedRain}
-      hourlyData={enrichedHourlyData}
-    />
-  ) : (
-    <div
-      key={name}
-      className="card-section"
-      style={{
-        padding: "1rem",
-        marginTop: "1rem",
-        border: "1px dashed #ccc",
-        borderRadius: "8px",
-        background: "#f9f9f9",
-      }}
-    >
-      <h3>{`Рекомендовані внесення (проти: ${name})`}</h3>
-      <p style={{ color: "#666", fontStyle: "italic" }}>
-        Ризиків за обраний період не визначено
-      </p>
-    </div>
-  )
-))}
-
+      <CardView
+        key={name}
+        title={`Рекомендовані внесення (проти: ${name})`}
+        entries={entries}
+        diagnostics={diagnostics}
+        plantingDate={plantingDate}
+        rainDaily={aggregatedRain}
+        hourlyData={enrichedHourlyData}
+      />
+    ))}
 
     <button className="restart-button" onClick={onRestart}>
       Почати спочатку
