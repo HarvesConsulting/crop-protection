@@ -7,7 +7,6 @@ export default function ActionMenu({
   onShowWeather,
   onToggleIntegrated,
   showIntegrated,
-  onGoToCards, // ✅ новий проп
 }) {
   const [showMenu, setShowMenu] = useState(false);
   const closeTimeoutRef = useRef(null);
@@ -22,7 +21,6 @@ export default function ActionMenu({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // десктоп: відкриття меню
   const handleMouseEnter = () => {
     if (!isMobile) {
       clearTimeout(closeTimeoutRef.current);
@@ -30,7 +28,6 @@ export default function ActionMenu({
     }
   };
 
-  // десктоп: закриття меню з затримкою
   const handleMouseLeave = () => {
     if (!isMobile) {
       closeTimeoutRef.current = setTimeout(() => {
@@ -39,7 +36,6 @@ export default function ActionMenu({
     }
   };
 
-  // хелпер для мобільного: викликає дію і закриває меню
   const handleMenuAction = (action) => {
     if (isMobile) {
       setShowMenu(false);
@@ -65,7 +61,7 @@ export default function ActionMenu({
         ☰ Меню дій
       </button>
 
-      {/* === МОБІЛЬНИЙ ВАРІАНТ === */}
+      {/* === МОБІЛЬНЕ МЕНЮ === */}
       {isMobile && showMenu && (
         <>
           <div className="menu-backdrop" onClick={() => setShowMenu(false)} />
@@ -75,26 +71,9 @@ export default function ActionMenu({
           >
             <button
               className="menu-item"
-              onClick={() => handleMenuAction(onGoToCards)}
-            >
-              Повернутися до карток
-            </button>
-            <button
-              className="menu-item"
               onClick={() => handleMenuAction(onRestart)}
             >
               Почати спочатку
-            </button>
-            <button
-              className="menu-item"
-              onClick={() => {
-                if (isMobile) setShowMenu(false);
-                alert(
-                  "🟢 Зелений — помірний ризик\n🟡 Жовтий — середній\n🔴 Червоний — високий"
-                );
-              }}
-            >
-              Інформація про кольори карток
             </button>
             <button
               className="menu-item"
@@ -114,30 +93,14 @@ export default function ActionMenu({
         </>
       )}
 
-      {/* === ДЕСКТОПНИЙ ВАРІАНТ === */}
+      {/* === ДЕСКТОПНЕ МЕНЮ === */}
       {!isMobile && (
         <div className={`menu-dropdown ${showMenu ? "visible" : ""}`}>
-          <button
-            className="menu-item"
-            onClick={() => handleMenuAction(onGoToCards)}
-          >
-            Повернутися до карток
-          </button>
           <button
             className="menu-item"
             onClick={() => handleMenuAction(onRestart)}
           >
             Почати спочатку
-          </button>
-          <button
-            className="menu-item"
-            onClick={() =>
-              alert(
-                "🟢 Зелений — помірний ризик\n🟡 Жовтий — середній\n🔴 Червоний — високий"
-              )
-            }
-          >
-            Інформація про кольори карток
           </button>
           <button
             className="menu-item"
