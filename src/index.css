@@ -181,4 +181,14 @@ body {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
+.byline {
+  font-size: 14px; /* або як тобі потрібно */
+  color: #888;     /* м'який сірий — за бажанням */
+  margin-top: 10px;
+}
+
+.byline em {
+  font-style: italic;
+  text-transform: lowercase;
+}
 
