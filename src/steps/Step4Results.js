@@ -390,9 +390,8 @@ const {
   plantingDate,
   harvestDate,
 } = result;
-const hasPhytophthora = Array.isArray(diseaseSummary)
-  ? diseaseSummary.some((d) => d.name === "Фітофтороз")
-  : true; // для сумісності зі старими даними
+const hasPhytophthora = true;
+
 // 🧠 Додаємо "suitable: true/false" до кожної години
 const suitableMap = extractSuitableSprayHours(hourlyData);
 
