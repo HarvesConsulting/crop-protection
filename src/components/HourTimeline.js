@@ -1,16 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./HourTimeline.css";
 import { format, parseISO } from "date-fns";
 
 export default function HourTimeline({ date, hourlyData = [] }) {
-  const [activeHour, setActiveHour] = useState(null);
+  const [activeTooltip, setActiveTooltip] = useState(null);
 
   const formattedDate = format(
     parseISO(date.split(".").reverse().join("-")),
     "yyyy-MM-dd"
   );
 
-  // Знайти записи з потрібного дня
   const hoursToday = hourlyData.filter((h) => {
     const hDate =
       h.date instanceof Date
@@ -19,63 +18,89 @@ export default function HourTimeline({ date, hourlyData = [] }) {
     return hDate === formattedDate;
   });
 
-  const closeTooltip = () => setActiveHour(null);
+  useEffect(() => {
+    const handleScroll = () => {
+      // Видаляємо тултіп при скролі
+      removeTooltip();
+    };
+
+    window.addEventListener("scroll", handleScroll, true);
+    return () => {
+      window.removeEventListener("scroll", handleScroll, true);
+    };
+  }, []);
+
+  const showTooltip = (event, hourData, hour) => {
+    removeTooltip();
+
+    const rect = event.target.getBoundingClientRect();
+    const tooltip = document.createElement("div");
+    tooltip.className = "hour-details-tooltip floating-tooltip";
+
+    tooltip.innerHTML = `
+      <strong>${hour}:00</strong><br/>
+      🌡 Температура: ${hourData.temperature}°C<br/>
+      💧 Вологість: ${hourData.humidity ?? "—"}%<br/>
+      💨 Вітер: ${hourData.windspeed ?? "—"} км/год<br/>
+      🌧 Опади: ${hourData.precipitation ?? 0} мм<br/>
+      ${
+        hourData.suitable
+          ? '<span style="color:green;font-weight:bold;">✅ Рекомендовано</span>'
+          : '<span style="color:red;font-weight:bold;">❌ Не рекомендовано</span>'
+      }
+    `;
+
+    tooltip.style.position = "fixed";
+    tooltip.style.left = `${rect.left + rect.width / 2}px`;
+    tooltip.style.top = `${rect.top - 8}px`;
+    tooltip.style.transform = "translateX(-50%) translateY(-100%)";
+    tooltip.style.pointerEvents = "none";
+    tooltip.dataset.tooltip = "true";
+
+    document.body.appendChild(tooltip);
+    setActiveTooltip(tooltip);
+  };
+
+  const removeTooltip = () => {
+    if (activeTooltip) {
+      activeTooltip.remove();
+      setActiveTooltip(null);
+    }
+  };
 
   return (
     <div className="timeline-wrapper">
       <div className="timeline-scroll">
-        <div className="timeline-bar" onTouchEnd={closeTooltip}>
+        <div className="timeline-bar">
           {[...Array(24).keys()].map((hour) => {
             const hourData = hoursToday.find((h) => Number(h.hour) === hour);
-            const isActive = activeHour === hour;
-
             const isSuitable = hourData?.suitable === true;
 
             return (
               <div
                 key={hour}
                 className="hour-segment-wrapper"
-                onMouseEnter={() => setActiveHour(hour)}
-                onMouseLeave={closeTooltip}
-                onTouchStart={() => setActiveHour(hour)}
-                onTouchMove={(e) => {
-                  const touch = e.touches[0];
-                  const element = document.elementFromPoint(
-                    touch.clientX,
-                    touch.clientY
-                  );
-                  if (element && element.dataset.hour) {
-                    setActiveHour(Number(element.dataset.hour));
-                  }
+                onMouseEnter={(e) =>
+                  hourData && window.innerWidth > 768
+                    ? showTooltip(e, hourData, hour)
+                    : null
+                }
+                onMouseLeave={() =>
+                  window.innerWidth > 768 ? removeTooltip() : null
+                }
+                onTouchStart={(e) => {
+                  if (!hourData) return;
+                  showTooltip(e, hourData, hour);
+                  setTimeout(() => removeTooltip(), 3000); // автохов тултіп на мобільному
                 }}
               >
                 <div
                   className={`hour-segment ${
                     isSuitable ? "suitable" : "not-suitable"
                   }`}
-                  data-hour={hour}
                 >
                   {hour}
                 </div>
-
-                {hourData && isActive && (
-                  <div className="hour-details-tooltip mobile">
-                    <strong>{hour}:00</strong> <br />
-                    🌡 Температура: {hourData.temperature}°C <br />
-                    💧 Вологість: {hourData.humidity ?? "—"}% <br />
-                    💨 Вітер: {hourData.windspeed} км/год <br />
-                    🌧 Опади: {hourData.precipitation ?? 0} мм <br />
-                    {isSuitable ? (
-                      <span style={{ color: "green", fontWeight: "bold" }}>
-                        ✅ Рекомендовано
-                      </span>
-                    ) : (
-                      <span style={{ color: "red", fontWeight: "bold" }}>
-                        ❌ Не рекомендовано
-                      </span>
-                    )}
-                  </div>
-                )}
               </div>
             );
           })}
