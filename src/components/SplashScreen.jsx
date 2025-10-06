@@ -29,7 +29,7 @@ function SplashScreen({ ready = false, minDuration = 1500, onFinish }) {
   return (
     <div className="splash-wrapper" role="status" aria-live="polite" aria-busy="true">
       <div className="splash-content">
-        <div className="splash-logo animate-logo">🌾 Crop Protection</div>
+        <div className="splash-logo animate-logo">🍅 Crop Protection</div>
         <div className="splash-subtitle">завантаження застосунку…</div>
         <div className="splash-loader">
           <div className="loader-bar"></div>
