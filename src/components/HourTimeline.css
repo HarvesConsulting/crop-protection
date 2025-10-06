@@ -93,6 +93,7 @@
 .hour-details-tooltip.mobile {
   display: block;
   pointer-events: auto;
+  position: absolute;
 }
 
 /* 🔻 Маленький трикутник під тултіпом */
