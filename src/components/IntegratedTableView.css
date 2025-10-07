@@ -1,12 +1,11 @@
 /* Контейнер таблиці */
 .integrated-table-container {
-  width: 100%;
-  margin-top: 1.5rem;
-  border-radius: 12px;
+  max-width: 760px; /* 🔧 обмеження ширини */
+  margin: 1.5rem auto;
   background-color: #f9fffa;
-  overflow-x: auto; /* 🟢 Додаємо горизонтальну прокрутку */
-  -webkit-overflow-scrolling: touch; /* 🟢 Плавна прокрутка на iOS */
-  padding: 0;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 /* Заголовок */
@@ -28,7 +27,7 @@
   border-radius: 12px;
   font-family: "Inter", "Segoe UI", sans-serif;
   table-layout: fixed; /* рівна ширина стовпців */
-  min-width: 600px; /* 🟢 Щоб на мобільних не зливалося */
+  /*min-width: 600px; /* 🟢 Щоб на мобільних не зливалося */
 }
 
 /* Заголовки */
