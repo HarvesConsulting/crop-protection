@@ -124,17 +124,6 @@ export default function ModalWithSummary({
                 </span>
               </div>
 
-              <div className="space-x-4">
-                <label className="inline-flex items-center">
-                  <input type="checkbox" className="form-checkbox h-4 w-4 text-green-600" checked={showHours} onChange={() => setShowHours(!showHours)} />
-                  <span className="ml-2">Сприятливі години</span>
-                </label>
-                <label className="inline-flex items-center">
-                  <input type="checkbox" className="form-checkbox h-4 w-4 text-blue-600" checked={showTreatments} onChange={() => setShowTreatments(!showTreatments)} />
-                  <span className="ml-2">Обробки</span>
-                </label>
-              </div>
-
               <div className="h-96 w-full bg-white rounded-md p-4 shadow-sm border">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
@@ -146,25 +135,29 @@ export default function ModalWithSummary({
                       labelStyle={{ color: '#000', fontWeight: 'bold' }}
                       itemStyle={{ color: '#000' }}
                     />
-                    <Legend />
+                    <Legend
+                      payload={[
+                        { value: "Сприятливі години", type: "line", color: lineColor },
+                        { value: "Синій пунктир — внесення фунгіцидів", type: "line", color: "#3b82f6" }
+                      ]}
+                    />
 
-                    {showHours && (
-                      <Line
-                        type="monotone"
-                        dataKey="hours"
-                        stroke={lineColor}
-                        name="Сприятливі години"
-                        strokeWidth={2}
-                        dot={{ r: 3 }}
-                      />
-                    )}
+                    <Line
+                      type="monotone"
+                      dataKey="hours"
+                      stroke={lineColor}
+                      name="Сприятливі години"
+                      strokeWidth={2}
+                      dot={{ r: 3 }}
+                    />
 
-                    {showTreatments && sprayLines.map((spray, index) => (
+                    {sprayLines.map((spray, index) => (
                       <ReferenceLine
                         key={index}
                         x={spray.date}
                         stroke="#3b82f6"
                         strokeDasharray="3 3"
+                        strokeWidth={2} // 🔵 зробили пунктир товщим
                       >
                         <Label value={`#${index + 1}`} position="top" fill="#3b82f6" fontSize={10} />
                       </ReferenceLine>
