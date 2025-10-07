@@ -11,7 +11,7 @@ import {
   Legend,
   ResponsiveContainer,
   ReferenceLine,
-  Label
+  Label,
 } from "recharts";
 import { useState, useMemo } from "react";
 
@@ -24,8 +24,10 @@ export default function ModalWithSummary({
   sprayData = [],
 }) {
   const [showHours, setShowHours] = useState(true);
+  const [showTreatments, setShowTreatments] = useState(true); // 🆕 перемикач обробок
 
-  const numDays = differenceInDays(new Date(endDate), new Date(startDate)) + 1;
+  const numDays =
+    differenceInDays(new Date(endDate), new Date(startDate)) + 1;
 
   const totalHours = diagnostics.reduce((sum, entry) => {
     const h = Number(entry.condHours ?? entry.cond_hours ?? entry.hours);
@@ -34,6 +36,7 @@ export default function ModalWithSummary({
 
   const hoursPerDay = totalHours / numDays;
 
+  // 🎯 Визначення ризику
   let riskLevel = "Низький ризик захворювання";
   let riskColor = "text-green-700 bg-green-100";
   let riskDot = "🟢";
@@ -51,6 +54,7 @@ export default function ModalWithSummary({
     lineColor = "#facc15"; // жовтий
   }
 
+  // 🧮 Дані для графіка
   const chartData = useMemo(() => {
     return diagnostics.map((entry) => {
       const date = format(new Date(entry.date), "dd.MM");
@@ -62,6 +66,7 @@ export default function ModalWithSummary({
     });
   }, [diagnostics]);
 
+  // 🟦 Обробки
   const sprayLines = useMemo(() => {
     return (sprayData || []).map((entry) => {
       const parsedDate = parse(entry.Дата, "dd.MM.yyyy", new Date());
@@ -99,19 +104,28 @@ export default function ModalWithSummary({
 
             {/* Body */}
             <div className="flex-1 overflow-auto p-5 bg-gray-50 space-y-5 text-base leading-relaxed">
+              {/* Загальні метрики */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div><strong>Кількість днів:</strong> {numDays}</div>
-                <div><strong>Сприятливих годин на добу:</strong> {hoursPerDay.toFixed(1)}</div>
+                <div>
+                  <strong>Кількість днів:</strong> {numDays}
+                </div>
+                <div>
+                  <strong>Сприятливих годин на добу:</strong>{" "}
+                  {hoursPerDay.toFixed(1)}
+                </div>
               </div>
 
+              {/* Рівень ризику */}
               <div>
                 <strong>Рівень ризику:</strong>{" "}
-                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-sm font-medium ${riskColor}`}>
+                <span
+                  className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-sm font-medium ${riskColor}`}
+                >
                   {riskDot} {riskLevel}
                 </span>
               </div>
 
-              {/* Перемикач */}
+              {/* Перемикачі */}
               <div className="space-x-4">
                 <label className="inline-flex items-center">
                   <input
@@ -122,21 +136,49 @@ export default function ModalWithSummary({
                   />
                   <span className="ml-2">Сприятливі години</span>
                 </label>
+
+                <label className="inline-flex items-center">
+                  <input
+                    type="checkbox"
+                    className="form-checkbox h-4 w-4 text-blue-600"
+                    checked={showTreatments}
+                    onChange={() => setShowTreatments(!showTreatments)}
+                  />
+                  <span className="ml-2">Обробки</span>
+                </label>
               </div>
 
               {/* Графік */}
               <div className="h-96 w-full bg-white rounded-md p-4 shadow-sm border">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <LineChart
+                    data={chartData}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                  >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
-                    <YAxis label={{ value: "Години", angle: -90, position: "insideLeft" }} />
+                    <YAxis
+                      label={{
+                        value: "Години",
+                        angle: -90,
+                        position: "insideLeft",
+                      }}
+                    />
                     <Tooltip
-                      contentStyle={{ backgroundColor: '#f9fafb', borderColor: '#d1d5db', color: '#000' }}
-                      labelStyle={{ color: '#000', fontWeight: 'bold' }}
-                      itemStyle={{ color: '#000' }}
+                      contentStyle={{
+                        backgroundColor: "#f9fafb",
+                        borderColor: "#d1d5db",
+                        color: "#000",
+                      }}
+                      labelStyle={{
+                        color: "#000",
+                        fontWeight: "bold",
+                      }}
+                      itemStyle={{ color: "#000" }}
                     />
                     <Legend />
+
+                    {/* Лінія сприятливих годин */}
                     {showHours && (
                       <Line
                         type="monotone"
@@ -147,16 +189,24 @@ export default function ModalWithSummary({
                         dot={{ r: 3 }}
                       />
                     )}
-                    {sprayLines.map((spray, index) => (
-                      <ReferenceLine
-                        key={index}
-                        x={spray.date}
-                        stroke="#3b82f6"
-                        strokeDasharray="3 3"
-                      >
-                        <Label value={spray.label} position="top" fill="#3b82f6" fontSize={12} />
-                      </ReferenceLine>
-                    ))}
+
+                    {/* Обробки */}
+                    {showTreatments &&
+                      sprayLines.map((spray, index) => (
+                        <ReferenceLine
+                          key={index}
+                          x={spray.date}
+                          stroke="#3b82f6"
+                          strokeDasharray="3 3"
+                        >
+                          <Label
+                            value={spray.label}
+                            position="top"
+                            fill="#3b82f6"
+                            fontSize={12}
+                          />
+                        </ReferenceLine>
+                      ))}
                   </LineChart>
                 </ResponsiveContainer>
               </div>
