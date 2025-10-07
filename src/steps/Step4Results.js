@@ -391,6 +391,34 @@ const {
   plantingDate,
   harvestDate,
 } = result;
+
+// 📅 Створення groupedSprayDates для графіку в ModalWithSummary
+const groupedSprayDates = (() => {
+  if (!sprayData?.length) return [];
+
+  const baseDates = sprayData.map(e =>
+    parse(e.Дата, "dd.MM.yyyy", new Date())
+  );
+
+  const additionalDates = (diseaseCardsGrouped || [])
+    .flatMap(g => g.entries || [])
+    .map(e => parse(e.Дата, "dd.MM.yyyy", new Date()))
+    .filter(otherDate =>
+      baseDates.some(base =>
+        Math.abs(differenceInCalendarDays(base, otherDate)) <= 3
+      )
+    );
+
+  const all = [...baseDates, ...additionalDates];
+  const unique = Array.from(
+    new Set(all.map(d => format(d, "dd.MM.yyyy")))
+  );
+
+  return unique.sort((a, b) =>
+    parse(a, "dd.MM.yyyy", new Date()) - parse(b, "dd.MM.yyyy", new Date())
+  );
+})();
+
 const hasPhytophthora = true;
 
 // 🧠 Додаємо "suitable: true/false" до кожної години
