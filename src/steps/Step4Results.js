@@ -517,84 +517,65 @@ let lastDatesByDisease = {
   "Бактеріоз": plantingDate,
 };
 
-  const integratedSystem = Object.entries(groupedByDate)
-  .sort(([dateA], [dateB]) => {
-    const dA = parseISO(dateA.split(".").reverse().join("-"));
-    const dB = parseISO(dateB.split(".").reverse().join("-"));
-    return dA - dB;
-  })
-  .map(([date, entries]) => {
-    const currentDate = parseISO(date.split(".").reverse().join("-"));
+const mergeThreshold = 3 * 24 * 60 * 60 * 1000; // 3 дні
 
-    // 🔁 сюди зберемо backData по кожній хворобі
-    const perDiseaseBackData = [];
+const integratedMap = sprayData.map((spray) => {
+  const dateObj = parseISO(spray.Дата.split(".").reverse().join("-"));
+  return {
+    Дата: spray.Дата,
+    timestamp: dateObj.getTime(),
+    Препарати: [spray.Препарат],
+    Рекомендації: [spray.Рекомендація],
+    diseases: new Set(["Фітофтороз"]),
+    backData: spray.backData,
+  };
+});
 
-    for (const entry of entries) {
-      let disease = null;
+for (const group of diseaseCardsGrouped) {
+  for (const entry of group.entries) {
+    const diseaseDate = parseISO(entry.Дата.split(".").reverse().join("-"));
+    const diseaseTime = diseaseDate.getTime();
 
-      // визначаємо хворобу по препарату
-      if (rotationProducts.some((p) => entry.Препарат.includes(p))) {
-        disease = "Фітофтороз";
-      } else if (rotationAlternaria.some((p) => entry.Препарат.includes(p))) {
-        disease = "Альтернаріоз";
-      } else if (rotationBacteriosis.some((p) => entry.Препарат.includes(p))) {
-        disease = "Бактеріоз";
-      }
+    let merged = false;
 
-      if (disease) {
-        const prev = lastDatesByDisease[disease] || plantingDate;
+    for (const record of integratedMap) {
+      const diff = Math.abs(record.timestamp - diseaseTime);
 
-        const bd = getAccumulatedStats(
-          diagnostics,
-          prev,
-          currentDate,
-          aggregatedRain
-        );
-
-        perDiseaseBackData.push({ disease, ...bd });
-
-        // 🔁 оновлюємо останню дату для цієї хвороби
-        lastDatesByDisease[disease] = currentDate;
+      if (diff <= mergeThreshold) {
+        record.Препарати.push(entry.Препарат);
+        record.Рекомендації.push(entry.Рекомендація);
+        record.diseases.add(group.name);
+        merged = true;
+        break;
       }
     }
 
-    // 📈 беремо backData з найбільшим condHours
-    const worst =
-      perDiseaseBackData.length > 0
-        ? perDiseaseBackData.reduce((max, cur) =>
-            cur.condHours > max.condHours ? cur : max
-          )
-        : { condHours: 0, rain: 0 };
+    if (!merged) {
+      integratedMap.push({
+        Дата: entry.Дата,
+        timestamp: diseaseTime,
+        Препарати: [entry.Препарат],
+        Рекомендації: [entry.Рекомендація],
+        diseases: new Set([group.name]),
+        backData: entry.backData,
+      });
+    }
+  }
+}
 
-    return {
-  Дата: format(currentDate, "dd.MM.yyyy"),
-  Препарат: entries.map((e) => e.Препарат).join(", "),
-  Рекомендація: entries
-    .map((e) => {
-      if (typeof e.Рекомендація === "string") return null;
-      const href = e.Рекомендація?.props?.href;
-      return href ? (
-        <div key={href}>
-          <a href={href} target="_blank" rel="noreferrer">
-            {href}
-          </a>
-        </div>
-      ) : null;
-    })
-    .filter(Boolean),
-  backData: worst, // 🎯 тут тільки backData, без інтервалу чи рекоменд. годин
-};
-
+const integratedSystem = integratedMap
+  .map((entry) => ({
+    Дата: entry.Дата,
+    Препарат: entry.Препарати.join(", "),
+    Рекомендація: entry.Рекомендації,
+    backData: entry.backData,
+    Хвороби: Array.from(entry.diseases).join(", "),
+  }))
+  .sort((a, b) => {
+    const dA = parseISO(a.Дата.split(".").reverse().join("-"));
+    const dB = parseISO(b.Дата.split(".").reverse().join("-"));
+    return dA - dB;
   });
-
-// 🔁 Сортування за датою
-integratedSystem.sort(
-  (a, b) =>
-    (a.Дата instanceof Date ? a.Дата : parseISO(a.Дата.split(".").reverse().join("-"))) -
-    (b.Дата instanceof Date ? b.Дата : parseISO(b.Дата.split(".").reverse().join("-")))
-);
-
-
   
   const exportToExcel = () => {
   const diseases = ["Фітофтороз", "Сіра гниль", "Альтернаріоз", "Бактеріоз"];
@@ -713,10 +694,7 @@ integratedSystem.sort(
 
    {showIntegrated ? (
   <>
-    <IntegratedTableView
-      sprayData={sprayData}
-      diseaseCardsGrouped={diseaseCardsGrouped}
-    />
+    <IntegratedTableView data={integratedSystem} />
 
     <button onClick={exportToExcel} className="toggle-button">
       Експорт в Excel
