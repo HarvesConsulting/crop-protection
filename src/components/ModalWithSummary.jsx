@@ -13,7 +13,7 @@ import {
   Label,
   Legend,
 } from "recharts";
-import { useMemo } from "react";
+import { useState, useMemo } from "react";
 
 export default function ModalWithSummary({
   open,
@@ -21,9 +21,11 @@ export default function ModalWithSummary({
   startDate,
   endDate,
   diagnostics = [],
-  sprayData = [],
-  diseaseCardsGrouped = [],
+  rainDaily = [],
+  integratedTreatments = [],
 }) {
+  const [hoveredLabel, setHoveredLabel] = useState(null);
+
   const numDays = differenceInDays(new Date(endDate), new Date(startDate)) + 1;
 
   const totalHours = diagnostics.reduce((sum, entry) => {
@@ -61,32 +63,18 @@ export default function ModalWithSummary({
     });
   }, [diagnostics]);
 
-  const allSprays = useMemo(() => {
-    const phyto = (sprayData || []).map((entry, index) => ({
-      ...entry,
-      number: index + 1,
-    }));
-    const others = (diseaseCardsGrouped || []).flatMap((group) =>
-      group.entries.map((entry, i) => ({
-        ...entry,
-        number: phyto.length + i + 1,
-      }))
-    );
-    return [...phyto, ...others];
-  }, [sprayData, diseaseCardsGrouped]);
-
   const sprayLines = useMemo(() => {
-    return allSprays.map((entry, i) => {
+    return integratedTreatments.map((entry, i) => {
       const parsedDate = parse(entry.Дата, "dd.MM.yyyy", new Date());
       const formatted = format(parsedDate, "dd.MM");
-      const label = `#${i + 1}`;
-      const product = entry.Препарат?.split("(")[0]?.trim() ?? entry.Препарат;
+      const tooltip = `${formatted}: ${entry.Препарат}`;
       return {
         date: formatted,
-        tooltip: `${label}\n${product}`,
+        label: `#${i + 1}`,
+        tooltip,
       };
     });
-  }, [allSprays]);
+  }, [integratedTreatments]);
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -95,17 +83,18 @@ export default function ModalWithSummary({
         <Dialog.Content className="fixed inset-0 flex items-center justify-center z-50 p-4">
           <div className="w-full max-w-5xl max-h-[90vh] bg-white rounded-xl shadow-xl flex flex-col overflow-hidden border border-gray-200">
             <div className="flex items-center justify-between px-5 py-3 border-b bg-gray-100">
-              <h2 className="text-xl font-bold text-gray-800">
-                📊 Графік обприскувань
-              </h2>
+              <h2 className="text-xl font-bold text-gray-800">Графік обприскуань</h2>
               <Dialog.Close asChild>
-                <button className="text-gray-500 hover:text-red-500 transition">
+                <button
+                  className="text-gray-500 hover:text-red-500 transition"
+                  aria-label="Закрити"
+                >
                   <Cross2Icon />
                 </button>
               </Dialog.Close>
             </div>
 
-            <div className="flex-1 overflow-auto p-5 bg-gray-50 space-y-5">
+            <div className="flex-1 overflow-auto p-5 bg-gray-50 space-y-5 text-base">
               <div>
                 <strong>Рівень ризику захворювання:</strong>{" "}
                 <span
@@ -115,7 +104,7 @@ export default function ModalWithSummary({
                 </span>
               </div>
 
-              <div className="h-96 w-full bg-white rounded-md p-4 shadow-sm border">
+              <div className="h-96 w-full bg-white rounded-md p-4 shadow-sm border relative">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
                     data={chartData}
@@ -124,8 +113,31 @@ export default function ModalWithSummary({
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
                     <YAxis label={{ value: "Години", angle: -90, position: "insideLeft" }} />
-                    <Tooltip />
-                    <Legend verticalAlign="bottom" align="center" height={36} />
+                    <Tooltip
+                      contentStyle={{ backgroundColor: '#f9fafb', borderColor: '#d1d5db', color: '#000' }}
+                      labelStyle={{ color: '#000', fontWeight: 'bold' }}
+                      itemStyle={{ color: '#000' }}
+                    />
+                    <Legend
+                      verticalAlign="bottom"
+                      align="center"
+                      height={36}
+                      payload={[
+                        {
+                          value: "Сприятливі години",
+                          type: "line",
+                          id: "hours",
+                          color: lineColor,
+                        },
+                        {
+                          value: "Дати внесення фунгіцидів",
+                          type: "line",
+                          color: "#3b82f6",
+                          id: "fungicide-dates",
+                          strokeDasharray: "4 4",
+                        },
+                      ]}
+                    />
                     <Line
                       type="monotone"
                       dataKey="hours"
@@ -134,6 +146,7 @@ export default function ModalWithSummary({
                       strokeWidth={2}
                       dot={{ r: 3 }}
                     />
+
                     {sprayLines.map((spray, index) => (
                       <ReferenceLine
                         key={index}
@@ -142,16 +155,32 @@ export default function ModalWithSummary({
                         strokeDasharray="4 4"
                       >
                         <Label
-                          value={spray.tooltip}
+                          value={spray.label}
                           position="top"
                           fill="#3b82f6"
                           fontSize={10}
-                          style={{ whiteSpace: "pre-line", textAnchor: "middle" }}
+                          style={{ cursor: "pointer" }}
+                          onMouseEnter={() => setHoveredLabel(index)}
+                          onMouseLeave={() => setHoveredLabel(null)}
+                          onTouchStart={() => setHoveredLabel(index)}
+                          onTouchEnd={() => setHoveredLabel(null)}
                         />
                       </ReferenceLine>
                     ))}
                   </LineChart>
                 </ResponsiveContainer>
+
+                {hoveredLabel !== null && (
+                  <div
+                    className="absolute z-50 px-3 py-2 bg-white border border-gray-300 rounded shadow text-sm text-gray-700"
+                    style={{
+                      top: 0,
+                      left: `calc(${(hoveredLabel + 1) * 6}% - 60px)`
+                    }}
+                  >
+                    {sprayLines[hoveredLabel]?.tooltip}
+                  </div>
+                )}
               </div>
             </div>
           </div>
