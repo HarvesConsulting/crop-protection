@@ -808,7 +808,7 @@ integratedSystem.sort(
   diagnostics={diagnostics}
   rainDaily={rainDaily}
   sprayData={sprayData}
-  diseaseCardsGrouped={diseaseCardsGrouped}
+  groupedSprayDates={groupedSprayDates}
 />
 
 </main>
