@@ -14,6 +14,50 @@ import {
 } from "recharts";
 import { useState, useMemo } from "react";
 
+const CustomLabelWithTooltip = ({ label, text }) => {
+  const [show, setShow] = useState(false);
+
+  return (
+    <foreignObject x={-10} y={-25} width={50} height={30}>
+      <div
+        onMouseEnter={() => setShow(true)}
+        onMouseLeave={() => setShow(false)}
+        onTouchStart={() => setShow(!show)}
+        style={{
+          textAlign: "center",
+          fontSize: "10px",
+          fontWeight: "bold",
+          color: "#3b82f6",
+          cursor: "pointer",
+          position: "relative",
+        }}
+      >
+        {label}
+        {show && (
+          <div
+            style={{
+              position: "absolute",
+              top: "-50px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              background: "#fff",
+              border: "1px solid #ccc",
+              padding: "6px 8px",
+              borderRadius: "6px",
+              fontSize: "11px",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+              zIndex: 100,
+              whiteSpace: "nowrap",
+            }}
+          >
+            {text}
+          </div>
+        )}
+      </div>
+    </foreignObject>
+  );
+};
+
 export default function ModalWithSummary({
   open,
   onOpenChange,
@@ -23,9 +67,6 @@ export default function ModalWithSummary({
   sprayData = [],
   diseaseCardsGrouped = [],
 }) {
-  const [hoveredIndex, setHoveredIndex] = useState(null);
-  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
-
   const numDays = differenceInDays(new Date(endDate), new Date(startDate)) + 1;
 
   const totalHours = diagnostics.reduce((sum, entry) => {
@@ -94,16 +135,6 @@ export default function ModalWithSummary({
     });
   }, [allSprays]);
 
-  const handleMouseEnter = (index, event) => {
-    const rect = event.target.getBoundingClientRect();
-    setTooltipPos({ x: rect.left + rect.width / 2, y: rect.top });
-    setHoveredIndex(index);
-  };
-
-  const handleMouseLeave = () => {
-    setHoveredIndex(null);
-  };
-
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
@@ -132,7 +163,7 @@ export default function ModalWithSummary({
 
               <div className="h-96 w-full bg-white rounded-md p-4 shadow-sm border relative">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 30 }}>
+                  <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 40 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
                     <YAxis label={{ value: "Години", angle: -90, position: "insideLeft" }} />
@@ -158,31 +189,16 @@ export default function ModalWithSummary({
                         strokeWidth={2}
                       >
                         <Label
-                          value={spray.label}
                           position="top"
-                          fill="#3b82f6"
-                          fontSize={10}
-                          onMouseEnter={(e) => handleMouseEnter(index, e)}
-                          onMouseLeave={handleMouseLeave}
-                          style={{ cursor: "pointer" }}
+                          content={<CustomLabelWithTooltip label={spray.label} text={spray.tooltip} />}
                         />
                       </ReferenceLine>
                     ))}
                   </LineChart>
                 </ResponsiveContainer>
 
-                {/* Tooltip для препаратів */}
-                {hoveredIndex !== null && (
-                  <div
-                    className="absolute z-50 bg-white text-sm text-gray-800 px-3 py-2 border rounded shadow-md"
-                    style={{ top: tooltipPos.y - 40, left: tooltipPos.x, transform: "translateX(-50%)" }}
-                  >
-                    {sprayLines[hoveredIndex]?.tooltip}
-                  </div>
-                )}
-
-                {/* Кастомна легенда */}
-                <div className="absolute bottom-1 left-4 text-sm flex items-center gap-3 mt-2">
+                {/* Кастомна легенда по центру */}
+                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-sm flex items-center gap-6">
                   <span className="inline-flex items-center gap-1 text-gray-600">
                     <span className="w-4 h-1 rounded-full bg-current" style={{ color: lineColor }}></span>
                     Сприятливі години
