@@ -22,8 +22,11 @@ export default function ModalWithSummary({
   endDate,
   diagnostics = [],
   sprayData = [],
-  diseaseCardsGrouped = [], // інші хвороби
+  diseaseCardsGrouped = [],
 }) {
+  const [selectedTooltip, setSelectedTooltip] = useState(null);
+  const [showTooltipModal, setShowTooltipModal] = useState(false);
+
   const numDays = differenceInDays(new Date(endDate), new Date(startDate)) + 1;
 
   const totalHours = diagnostics.reduce((sum, entry) => {
@@ -36,21 +39,20 @@ export default function ModalWithSummary({
   let riskLevel = "Низький ризик захворювання";
   let riskColor = "text-green-700 bg-green-100";
   let riskDot = "🟢";
-  let lineColor = "#22c55e"; // зелений
+  let lineColor = "#22c55e";
 
   if (hoursPerDay > 2.5) {
     riskLevel = "Високий ризик захворювання";
     riskColor = "text-red-700 bg-red-100";
     riskDot = "🔴";
-    lineColor = "#ef4444"; // червоний
+    lineColor = "#ef4444";
   } else if (hoursPerDay > 1.5) {
     riskLevel = "Середній ризик захворювання";
     riskColor = "text-yellow-700 bg-yellow-100";
     riskDot = "🟡";
-    lineColor = "#facc15"; // жовтий
+    lineColor = "#facc15";
   }
 
-  // Дані для графіка
   const chartData = useMemo(() => {
     return diagnostics.map((entry) => {
       const date = format(new Date(entry.date), "dd.MM");
@@ -62,7 +64,6 @@ export default function ModalWithSummary({
     });
   }, [diagnostics]);
 
-  // Об'єднані обробки
   const allSprays = useMemo(() => {
     const phytophthora = (sprayData || []).map((entry, index) => ({
       ...entry,
@@ -99,7 +100,6 @@ export default function ModalWithSummary({
         <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40" />
         <Dialog.Content className="fixed inset-0 flex items-center justify-center z-50 p-4">
           <div className="w-full max-w-5xl max-h-[90vh] bg-white rounded-xl shadow-xl flex flex-col overflow-hidden border border-gray-200">
-            {/* Header */}
             <div className="flex items-center justify-between px-5 py-3 border-b bg-gray-100">
               <h2 className="text-xl font-bold text-gray-800">📊 Агрономічний підсумок</h2>
               <Dialog.Close asChild>
@@ -109,7 +109,6 @@ export default function ModalWithSummary({
               </Dialog.Close>
             </div>
 
-            {/* Body */}
             <div className="flex-1 overflow-auto p-5 bg-gray-50 space-y-5 text-base">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div><strong>Кількість днів:</strong> {numDays}</div>
@@ -132,17 +131,7 @@ export default function ModalWithSummary({
                       labelStyle={{ color: '#000', fontWeight: 'bold' }}
                       itemStyle={{ color: '#000' }}
                     />
-                    <Legend
-                      verticalAlign="bottom"
-                      align="center"
-                      content={() => (
-                        <div style={{ fontSize: 13, textAlign: "center", marginTop: 8 }}>
-                          <span style={{ color: lineColor, fontWeight: 500 }}>🟢 Сприятливі години</span>{" "}
-                          &nbsp;&nbsp;&nbsp;
-                          <span style={{ color: "#3b82f6" }}>🟦 Синій пунктир — дати внесення фунгіцидів</span>
-                        </div>
-                      )}
-                    />
+                    <Legend />
 
                     <Line
                       type="monotone"
@@ -160,20 +149,43 @@ export default function ModalWithSummary({
                         stroke="#3b82f6"
                         strokeDasharray="3 3"
                         strokeWidth={2}
-                      >
-                        <Label
-                          value={spray.label}
-                          position="top"
-                          fill="#3b82f6"
-                          fontSize={10}
-                        />
-                      </ReferenceLine>
+                        ifOverflow="extendDomain"
+                        label={{
+                          value: spray.label,
+                          position: "top",
+                          fill: "#3b82f6",
+                          fontSize: 10,
+                          cursor: "pointer",
+                          onClick: () => {
+                            setSelectedTooltip(spray.tooltip);
+                            setShowTooltipModal(true);
+                          },
+                        }}
+                      />
                     ))}
                   </LineChart>
                 </ResponsiveContainer>
               </div>
+
+              <div className="text-sm text-gray-600 pt-2 text-center">
+                🟢 Сприятливі години &nbsp;&nbsp;&nbsp; 🟦 Синій пунктир — дати внесення фунгіцидів
+              </div>
             </div>
           </div>
+
+          {showTooltipModal && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+              <div className="bg-white p-4 rounded-md shadow-md max-w-sm w-full text-center">
+                <p className="text-base text-gray-800 font-medium">{selectedTooltip}</p>
+                <button
+                  className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                  onClick={() => setShowTooltipModal(false)}
+                >
+                  Закрити
+                </button>
+              </div>
+            </div>
+          )}
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
