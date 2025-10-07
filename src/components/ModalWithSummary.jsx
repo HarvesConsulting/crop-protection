@@ -35,18 +35,18 @@ export default function ModalWithSummary({
 
   const hoursPerDay = totalHours / numDays;
 
-  let riskLevel = "Низький ризик захворювання";
+  let riskLevel = "Низький";
   let riskColor = "text-green-700 bg-green-100";
   let riskDot = "🟢";
   let lineColor = "#22c55e"; // зелений
 
   if (hoursPerDay > 2.5) {
-    riskLevel = "Високий ризик захворювання";
+    riskLevel = "Високий";
     riskColor = "text-red-700 bg-red-100";
     riskDot = "🔴";
     lineColor = "#ef4444";
   } else if (hoursPerDay > 1.5) {
-    riskLevel = "Середній ризик захворювання";
+    riskLevel = "Середній";
     riskColor = "text-yellow-700 bg-yellow-100";
     riskDot = "🟡";
     lineColor = "#facc15";
@@ -63,35 +63,37 @@ export default function ModalWithSummary({
     });
   }, [diagnostics]);
 
-  const allSprays = useMemo(() => {
-    const phytophthora = (sprayData || []).map((entry, index) => ({
-      ...entry,
-      disease: "Фітофтороз",
-      number: index + 1,
-    }));
-
-    const others = (diseaseCardsGrouped || []).flatMap((group) =>
-      group.entries.map((entry, i) => ({
-        ...entry,
-        disease: group.name,
-        number: phytophthora.length + i + 1,
-      }))
-    );
-
-    return [...phytophthora, ...others];
-  }, [sprayData, diseaseCardsGrouped]);
-
   const sprayLines = useMemo(() => {
-    return allSprays.map((entry, i) => {
-      const parsedDate = parse(entry.Дата, "dd.MM.yyyy", new Date());
-      const formatted = format(parsedDate, "dd.MM");
+    const all = [];
+
+    for (const entry of sprayData) {
+      const date = format(parse(entry.Дата, "dd.MM.yyyy", new Date()), "dd.MM.yyyy");
+      all.push({ ...entry, disease: "Фітофтороз", date });
+    }
+
+    for (const group of diseaseCardsGrouped) {
+      for (const entry of group.entries) {
+        const date = format(parse(entry.Дата, "dd.MM.yyyy", new Date()), "dd.MM.yyyy");
+        all.push({ ...entry, disease: group.name, date });
+      }
+    }
+
+    const groupedByDate = all.reduce((acc, entry) => {
+      if (!acc[entry.date]) acc[entry.date] = [];
+      acc[entry.date].push(entry);
+      return acc;
+    }, {});
+
+    return Object.entries(groupedByDate).map(([dateStr, entries], i) => {
+      const formattedDate = format(parse(dateStr, "dd.MM.yyyy", new Date()), "dd.MM");
+      const tooltip = entries.map(e => `${e.Препарат} (${e.disease})`).join(", ");
       return {
-        date: formatted,
-        label: `${i + 1}`,
-        tooltip: `${formatted}: ${entry.Препарат} (${entry.disease})`,
+        date: formattedDate,
+        label: `#${i + 1}`,
+        tooltip: `${formattedDate}: ${tooltip}`,
       };
     });
-  }, [allSprays]);
+  }, [sprayData, diseaseCardsGrouped]);
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -112,7 +114,7 @@ export default function ModalWithSummary({
             {/* Body */}
             <div className="flex-1 overflow-auto p-5 bg-gray-50 space-y-5 text-base">
               <div>
-                <strong>Рівень ризику:</strong>{" "}
+                <strong>Рівень ризику захворювання:</strong>{" "}
                 <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-sm font-medium ${riskColor}`}>
                   {riskDot} {riskLevel}
                 </span>
@@ -169,7 +171,7 @@ export default function ModalWithSummary({
                         strokeDasharray="4 4"
                       >
                         <Label
-                          value={`#${index + 1}`}
+                          value={spray.label}
                           position="top"
                           fill="#3b82f6"
                           fontSize={10}
@@ -184,7 +186,6 @@ export default function ModalWithSummary({
                   </LineChart>
                 </ResponsiveContainer>
 
-                {/* Tooltip above the line */}
                 {hoveredLabel !== null && (
                   <div
                     className="absolute z-50 px-3 py-2 bg-white border border-gray-300 rounded shadow text-sm text-gray-700"
