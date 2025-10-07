@@ -8,10 +8,9 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
-  ResponsiveContainer,
   ReferenceLine,
   Label,
+  ResponsiveContainer,
 } from "recharts";
 import { useState, useMemo } from "react";
 
@@ -24,8 +23,8 @@ export default function ModalWithSummary({
   sprayData = [],
   diseaseCardsGrouped = [],
 }) {
-  const [selectedTooltip, setSelectedTooltip] = useState(null);
-  const [showTooltipModal, setShowTooltipModal] = useState(false);
+  const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
 
   const numDays = differenceInDays(new Date(endDate), new Date(startDate)) + 1;
 
@@ -88,11 +87,22 @@ export default function ModalWithSummary({
       const formatted = format(parsedDate, "dd.MM");
       return {
         date: formatted,
+        number: i + 1,
         label: `#${i + 1}`,
-        tooltip: `${formatted}: ${entry.Препарат} (${entry.disease})`,
+        tooltip: `${entry.Препарат} (${entry.disease})`,
       };
     });
   }, [allSprays]);
+
+  const handleMouseEnter = (index, event) => {
+    const rect = event.target.getBoundingClientRect();
+    setTooltipPos({ x: rect.left + rect.width / 2, y: rect.top });
+    setHoveredIndex(index);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredIndex(null);
+  };
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -111,26 +121,26 @@ export default function ModalWithSummary({
 
             <div className="flex-1 overflow-auto p-5 bg-gray-50 space-y-5 text-base">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                
+                <div><strong>Кількість днів:</strong> {numDays}</div>
+              </div>
+              <div>
                 <strong>Рівень ризику:</strong>{" "}
                 <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-sm font-medium ${riskColor}`}>
                   {riskDot} {riskLevel}
                 </span>
               </div>
 
-              <div className="h-96 w-full bg-white rounded-md p-4 shadow-sm border">
+              <div className="h-96 w-full bg-white rounded-md p-4 shadow-sm border relative">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 30 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
                     <YAxis label={{ value: "Години", angle: -90, position: "insideLeft" }} />
                     <Tooltip
-                      contentStyle={{ backgroundColor: '#f9fafb', borderColor: '#d1d5db', color: '#000' }}
-                      labelStyle={{ color: '#000', fontWeight: 'bold' }}
-                      itemStyle={{ color: '#000' }}
+                      contentStyle={{ backgroundColor: "#f9fafb", borderColor: "#d1d5db", color: "#000" }}
+                      labelStyle={{ color: "#000", fontWeight: "bold" }}
+                      itemStyle={{ color: "#000" }}
                     />
-                    <Legend />
-
                     <Line
                       type="monotone"
                       dataKey="hours"
@@ -139,51 +149,52 @@ export default function ModalWithSummary({
                       strokeWidth={2}
                       dot={{ r: 3 }}
                     />
-
                     {sprayLines.map((spray, index) => (
                       <ReferenceLine
                         key={index}
                         x={spray.date}
                         stroke="#3b82f6"
-                        strokeDasharray="3 3"
+                        strokeDasharray="4 4"
                         strokeWidth={2}
-                        ifOverflow="extendDomain"
-                        label={{
-                          value: spray.label,
-                          position: "top",
-                          fill: "#3b82f6",
-                          fontSize: 10,
-                          cursor: "pointer",
-                          onClick: () => {
-                            setSelectedTooltip(spray.tooltip);
-                            setShowTooltipModal(true);
-                          },
-                        }}
-                      />
+                      >
+                        <Label
+                          value={spray.label}
+                          position="top"
+                          fill="#3b82f6"
+                          fontSize={10}
+                          onMouseEnter={(e) => handleMouseEnter(index, e)}
+                          onMouseLeave={handleMouseLeave}
+                          style={{ cursor: "pointer" }}
+                        />
+                      </ReferenceLine>
                     ))}
                   </LineChart>
                 </ResponsiveContainer>
-              </div>
 
-              <div className="text-sm text-gray-600 pt-2 text-center">
-                🟢 Сприятливі години &nbsp;&nbsp;&nbsp; 🟦 Синій пунктир — дати внесення фунгіцидів
+                {/* Tooltip для препаратів */}
+                {hoveredIndex !== null && (
+                  <div
+                    className="absolute z-50 bg-white text-sm text-gray-800 px-3 py-2 border rounded shadow-md"
+                    style={{ top: tooltipPos.y - 40, left: tooltipPos.x, transform: "translateX(-50%)" }}
+                  >
+                    {sprayLines[hoveredIndex]?.tooltip}
+                  </div>
+                )}
+
+                {/* Кастомна легенда */}
+                <div className="absolute bottom-1 left-4 text-sm flex items-center gap-3 mt-2">
+                  <span className="inline-flex items-center gap-1 text-gray-600">
+                    <span className="w-4 h-1 rounded-full bg-current" style={{ color: lineColor }}></span>
+                    Сприятливі години
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-gray-600">
+                    <span className="w-2 h-2 bg-blue-600 rounded-sm"></span>
+                    Дати внесення фунгіцидів
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-
-          {showTooltipModal && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-              <div className="bg-white p-4 rounded-md shadow-md max-w-sm w-full text-center">
-                <p className="text-base text-gray-800 font-medium">{selectedTooltip}</p>
-                <button
-                  className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-                  onClick={() => setShowTooltipModal(false)}
-                >
-                  Закрити
-                </button>
-              </div>
-            </div>
-          )}
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
