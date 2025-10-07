@@ -19,7 +19,6 @@ export default function ModalWithSummary({
   startDate,
   endDate,
   diagnostics = [],
-  rainDaily = [],
 }) {
   const [showHours, setShowHours] = useState(true);
 
@@ -28,11 +27,6 @@ export default function ModalWithSummary({
   const totalHours = diagnostics.reduce((sum, entry) => {
     const h = Number(entry.condHours ?? entry.cond_hours ?? entry.hours);
     return sum + (isNaN(h) ? 0 : h);
-  }, 0);
-
-  const totalRain = rainDaily.reduce((sum, entry) => {
-    const v = Number(entry.rain ?? entry.precip ?? entry.opad);
-    return sum + (isNaN(v) || v < 0 || v > 500 ? 0 : v);
   }, 0);
 
   const hoursPerDay = totalHours / numDays;
@@ -93,9 +87,7 @@ export default function ModalWithSummary({
             <div className="flex-1 overflow-auto p-5 bg-gray-50 space-y-5 text-base leading-relaxed">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div><strong>Кількість днів:</strong> {numDays}</div>
-                <div><strong>Сумарна кількість сприятливих годин:</strong> {totalHours.toFixed(1)}</div>
                 <div><strong>Сприятливих годин на добу:</strong> {hoursPerDay.toFixed(1)}</div>
-                <div><strong>Опадів за період:</strong> {totalRain.toFixed(1)} мм</div>
               </div>
 
               <div>
