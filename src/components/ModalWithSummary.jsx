@@ -135,12 +135,7 @@ export default function ModalWithSummary({
                       labelStyle={{ color: '#000', fontWeight: 'bold' }}
                       itemStyle={{ color: '#000' }}
                     />
-                    <Legend
-                      payload={[
-                        { value: "Сприятливі години", type: "line", color: lineColor },
-                        { value: "Синій пунктир — внесення фунгіцидів", type: "line", color: "#3b82f6" }
-                      ]}
-                    />
+                    <Legend />
 
                     <Line
                       type="monotone"
@@ -157,13 +152,16 @@ export default function ModalWithSummary({
                         x={spray.date}
                         stroke="#3b82f6"
                         strokeDasharray="3 3"
-                        strokeWidth={2} // 🔵 зробили пунктир товщим
+                        strokeWidth={2}
                       >
                         <Label value={`#${index + 1}`} position="top" fill="#3b82f6" fontSize={10} />
                       </ReferenceLine>
                     ))}
                   </LineChart>
                 </ResponsiveContainer>
+              </div>
+              <div className="text-sm text-gray-500 pt-2 italic">
+                🟦 Синій пунктир — дати внесення фунгіцидів
               </div>
             </div>
           </div>
