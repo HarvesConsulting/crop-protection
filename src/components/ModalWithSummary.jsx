@@ -120,49 +120,69 @@ export default function ModalWithSummary({
               <div className="h-96 w-full bg-white rounded-md p-4 shadow-sm border relative">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
-                    data={chartData}
-                    margin={{ top: 50, right: 30, left: 20, bottom: 30 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis label={{ value: "Години", angle: -90, position: "insideLeft" }} />
-                    <Tooltip
-                      contentStyle={{ backgroundColor: '#f9fafb', borderColor: '#d1d5db', color: '#000' }}
-                      labelStyle={{ color: '#000', fontWeight: 'bold' }}
-                      itemStyle={{ color: '#000' }}
-                    />
+  data={chartData}
+  margin={{ top: 50, right: 30, left: 20, bottom: 30 }} // 👈 трішки більше місця знизу
+>
+  <CartesianGrid strokeDasharray="3 3" />
+  <XAxis dataKey="date" />
+  <YAxis label={{ value: "Години", angle: -90, position: "insideLeft" }} />
+  <Tooltip
+    contentStyle={{ backgroundColor: '#f9fafb', borderColor: '#d1d5db', color: '#000' }}
+    labelStyle={{ color: '#000', fontWeight: 'bold' }}
+    itemStyle={{ color: '#000' }}
+  />
 
-                    <Line
-                      type="monotone"
-                      dataKey="hours"
-                      stroke={lineColor}
-                      name="Сприятливі години"
-                      strokeWidth={2}
-                      dot={{ r: 3 }}
-                    />
+  {/* ✅ Додаємо ЛЕГЕНДУ в графік */}
+  <Legend
+    verticalAlign="bottom"
+    align="center"
+    height={36}
+    payload={[
+      {
+        value: "Сприятливі години",
+        type: "line",
+        id: "hours",
+        color: lineColor, // 👈 динамічний колір відповідно до ризику
+      },
+      {
+        value: "Дати внесення фунгіцидів",
+        type: "line",
+        color: "#3b82f6", // синій пунктир
+        id: "fungicide-dates",
+        strokeDasharray: "4 4",
+      },
+    ]}
+  />
 
-                    {sprayLines.map((spray, index) => (
-                      <ReferenceLine
-                        key={index}
-                        x={spray.date}
-                        stroke="#3b82f6"
-                        strokeDasharray="4 4"
-                        strokeWidth={2}
-                      >
-                        <Label
-                          value={`#${index + 1}`}
-                          position="top"
-                          offset={15}
-                          fontSize={10}
-                          fill="#3b82f6"
-                          onMouseEnter={() => setHoveredLabel(index)}
-                          onMouseLeave={() => setHoveredLabel(null)}
-                          onTouchStart={() => setHoveredLabel(index)}
-                          onTouchEnd={() => setHoveredLabel(null)}
-                        />
-                      </ReferenceLine>
-                    ))}
-                  </LineChart>
+  {/* решта графіку */}
+  <Line
+    type="monotone"
+    dataKey="hours"
+    stroke={lineColor}
+    name="Сприятливі години"
+    strokeWidth={2}
+    dot={{ r: 3 }}
+  />
+
+  {showTreatments && sprayLines.map((spray, index) => (
+    <ReferenceLine
+      key={index}
+      x={spray.date}
+      stroke="#3b82f6"
+      strokeDasharray="4 4"
+    >
+      <Label
+        value={`#${index + 1}`}
+        position="top"
+        fill="#3b82f6"
+        fontSize={10}
+        onClick={() => handleTreatmentClick(index)} // якщо є
+        style={{ cursor: "pointer" }}
+      />
+    </ReferenceLine>
+  ))}
+</LineChart>
+
                 </ResponsiveContainer>
 
                 {/* Custom Tooltip Over Number */}
