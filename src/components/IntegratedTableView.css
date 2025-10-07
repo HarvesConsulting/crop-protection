@@ -26,7 +26,7 @@
   background-color: #ffffff;
   border-radius: 12px;
   font-family: "Inter", "Segoe UI", sans-serif;
-  table-layout: fixed; /* рівна ширина стовпців */
+  table-layout: auto; /* ✅ Автоматична ширина по вмісту */
   /*min-width: 600px; /* 🟢 Щоб на мобільних не зливалося */
 }
 
