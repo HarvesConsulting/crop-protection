@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
   ReferenceLine,
   Label,
+  Legend,
 } from "recharts";
 import { useState, useMemo } from "react";
 
@@ -164,7 +165,7 @@ export default function ModalWithSummary({
     dot={{ r: 3 }}
   />
 
-  {showTreatments && sprayLines.map((spray, index) => (
+  {showTreatments ((spray, index) => (
     <ReferenceLine
       key={index}
       x={spray.date}
@@ -176,7 +177,6 @@ export default function ModalWithSummary({
         position="top"
         fill="#3b82f6"
         fontSize={10}
-        onClick={() => handleTreatmentClick(index)} // якщо є
         style={{ cursor: "pointer" }}
       />
     </ReferenceLine>
