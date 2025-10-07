@@ -1,16 +1,17 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { Cross2Icon } from "@radix-ui/react-icons";
-import { useState, useMemo } from "react";
 import { format, differenceInDays } from "date-fns";
 import {
   LineChart,
   Line,
   XAxis,
   YAxis,
+  CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
   Legend,
+  ResponsiveContainer,
 } from "recharts";
+import { useState, useMemo } from "react";
 
 export default function ModalWithSummary({
   open,
@@ -32,33 +33,35 @@ export default function ModalWithSummary({
 
   const totalRain = rainDaily.reduce((sum, entry) => {
     const v = Number(entry.rain ?? entry.precip ?? entry.opad);
-    return sum + (isNaN(v) || v < 0 ? 0 : v);
+    return sum + (isNaN(v) || v < 0 || v > 500 ? 0 : v);
   }, 0);
 
-  const hoursPerDay = +(totalHours / numDays).toFixed(1);
-
-  const riskLevel =
-    hoursPerDay <= 1.5
-      ? { text: "Низький ризик захворювання", color: "green" }
-      : hoursPerDay <= 2.5
-      ? { text: "Середній ризик захворювання", color: "orange" }
-      : { text: "Високий ризик захворювання", color: "red" };
+  const hoursPerDay = totalHours / numDays;
+  let riskLevel = "Низький ризик захворювання";
+  let riskColor = "text-green-600";
+  let riskDot = "🟢";
+  if (hoursPerDay > 2.5) {
+    riskLevel = "Високий ризик захворювання";
+    riskColor = "text-red-600";
+    riskDot = "🔴";
+  } else if (hoursPerDay > 1.5) {
+    riskLevel = "Середній ризик захворювання";
+    riskColor = "text-orange-500";
+    riskDot = "🟠";
+  }
 
   const chartData = useMemo(() => {
-    return diagnostics.map((d, idx) => {
-      const date = d.date || d.day || d.timestamp;
+    return diagnostics.map((entry) => {
+      const date = format(new Date(entry.date), "dd.MM");
+      const h = Number(entry.condHours ?? entry.cond_hours ?? entry.hours);
+      const rainValue = Number(entry.rain ?? entry.precip ?? entry.opad);
       return {
-        date: format(new Date(date), "dd.MM"),
-        hours: Number(d.condHours ?? d.cond_hours ?? d.hours) || 0,
-        rain:
-          Number(
-            rainDaily[idx]?.rain ??
-              rainDaily[idx]?.precip ??
-              rainDaily[idx]?.opad
-          ) || 0,
+        date,
+        hours: isNaN(h) ? 0 : h,
+        rain: isNaN(rainValue) || rainValue < 0 || rainValue > 500 ? 0 : rainValue,
       };
     });
-  }, [diagnostics, rainDaily]);
+  }, [diagnostics]);
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -68,17 +71,24 @@ export default function ModalWithSummary({
           className="fixed inset-0 flex items-center justify-center z-50 p-4"
           style={{ animation: "fadeIn 0.2s ease-out" }}
         >
-          <div className="w-full max-w-5xl bg-white rounded-xl shadow-xl flex flex-col overflow-hidden border border-gray-200">
+          <div className="w-full max-w-5xl max-h-[90vh] bg-white rounded-xl shadow-xl flex flex-col overflow-hidden border border-gray-200">
+            {/* Header */}
             <div className="flex items-center justify-between px-5 py-3 border-b bg-gray-50">
-              <h2 className="text-lg font-semibold">📊 Агрономічний підсумок</h2>
+              <h2 className="text-lg font-semibold text-gray-800">
+                📊 Агрономічний підсумок
+              </h2>
               <Dialog.Close asChild>
-                <button className="text-gray-500 hover:text-red-500">
+                <button
+                  className="text-gray-500 hover:text-red-500 transition"
+                  aria-label="Закрити"
+                >
                   <Cross2Icon />
                 </button>
               </Dialog.Close>
             </div>
 
-            <div className="p-5 space-y-4 text-base">
+            {/* Body */}
+            <div className="flex-1 overflow-auto p-5 bg-white space-y-4 text-base leading-relaxed">
               <p>
                 <strong>Кількість днів:</strong> {numDays}
               </p>
@@ -86,44 +96,67 @@ export default function ModalWithSummary({
                 <strong>Сумарна кількість сприятливих годин:</strong> {totalHours.toFixed(1)}
               </p>
               <p>
-                <strong>Сприятливих годин на добу (в середньому):</strong> {hoursPerDay}
+                <strong>Сприятливих годин на добу (в середньому):</strong> {hoursPerDay.toFixed(1)}
               </p>
               <p>
                 <strong>Опадів за період:</strong> {totalRain.toFixed(1)} мм
               </p>
               <p>
                 <strong>Рівень ризику:</strong>{" "}
-                <span style={{ color: riskLevel.color }}>● {riskLevel.text}</span>
+                <span className={riskColor}>{riskDot} {riskLevel}</span>
               </p>
 
-              <div className="flex gap-6 items-center">
+              {/* Перемикачі */}
+              <div className="space-x-4">
                 <label>
                   <input
                     type="checkbox"
+                    className="mr-1"
                     checked={showHours}
                     onChange={() => setShowHours(!showHours)}
-                  />{" "}
+                  />
                   Сприятливі години
                 </label>
                 <label>
                   <input
                     type="checkbox"
+                    className="mr-1"
                     checked={showRain}
                     onChange={() => setShowRain(!showRain)}
-                  />{" "}
+                  />
                   Опади
                 </label>
               </div>
 
-              <div className="h-72 w-full">
+              {/* Графік */}
+              <div className="h-96 w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                    <XAxis dataKey="date" fontSize={12} />
-                    <YAxis fontSize={12} />
+                  <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
                     <Tooltip />
                     <Legend />
-                    {showRain && <Line type="monotone" dataKey="rain" stroke="#3366cc" dot={{ r: 3 }} name="Опади, мм" />}
-                    {showHours && <Line type="monotone" dataKey="hours" stroke="#00cc66" dot={{ r: 3 }} name="Сприятливі години" />}
+                    {showHours && (
+                      <Line
+                        type="monotone"
+                        dataKey="hours"
+                        stroke="#16a34a"
+                        name="Сприятливі години"
+                        strokeWidth={2}
+                        dot={{ r: 3 }}
+                      />
+                    )}
+                    {showRain && (
+                      <Line
+                        type="monotone"
+                        dataKey="rain"
+                        stroke="#3b82f6"
+                        name="Опади, мм"
+                        strokeWidth={2}
+                        dot={{ r: 3 }}
+                      />
+                    )}
                   </LineChart>
                 </ResponsiveContainer>
               </div>
