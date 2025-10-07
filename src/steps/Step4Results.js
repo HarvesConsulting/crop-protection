@@ -785,7 +785,7 @@ const integratedSystem = integratedMap
   endDate={harvestDate}
   diagnostics={diagnostics}
   rainDaily={rainDaily}
-  sprayData={sprayData}
+  integratedTreatments={integratedSystem}
 />
 
 </main>

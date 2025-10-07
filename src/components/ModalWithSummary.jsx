@@ -21,8 +21,8 @@ export default function ModalWithSummary({
   startDate,
   endDate,
   diagnostics = [],
-  sprayData = [],
-  diseaseCardsGrouped = [],
+  rainDaily = [],
+  integratedTreatments = [],
 }) {
   const [hoveredLabel, setHoveredLabel] = useState(null);
 
@@ -38,7 +38,7 @@ export default function ModalWithSummary({
   let riskLevel = "Низький";
   let riskColor = "text-green-700 bg-green-100";
   let riskDot = "🟢";
-  let lineColor = "#22c55e"; // зелений
+  let lineColor = "#22c55e";
 
   if (hoursPerDay > 2.5) {
     riskLevel = "Високий";
@@ -64,36 +64,17 @@ export default function ModalWithSummary({
   }, [diagnostics]);
 
   const sprayLines = useMemo(() => {
-    const all = [];
-
-    for (const entry of sprayData) {
-      const date = format(parse(entry.Дата, "dd.MM.yyyy", new Date()), "dd.MM.yyyy");
-      all.push({ ...entry, disease: "Фітофтороз", date });
-    }
-
-    for (const group of diseaseCardsGrouped) {
-      for (const entry of group.entries) {
-        const date = format(parse(entry.Дата, "dd.MM.yyyy", new Date()), "dd.MM.yyyy");
-        all.push({ ...entry, disease: group.name, date });
-      }
-    }
-
-    const groupedByDate = all.reduce((acc, entry) => {
-      if (!acc[entry.date]) acc[entry.date] = [];
-      acc[entry.date].push(entry);
-      return acc;
-    }, {});
-
-    return Object.entries(groupedByDate).map(([dateStr, entries], i) => {
-      const formattedDate = format(parse(dateStr, "dd.MM.yyyy", new Date()), "dd.MM");
-      const tooltip = entries.map(e => `${e.Препарат} (${e.disease})`).join(", ");
+    return integratedTreatments.map((entry, i) => {
+      const parsedDate = parse(entry.Дата, "dd.MM.yyyy", new Date());
+      const formatted = format(parsedDate, "dd.MM");
+      const tooltip = `${formatted}: ${entry.Препарат} (${entry.Хвороби})`;
       return {
-        date: formattedDate,
+        date: formatted,
         label: `#${i + 1}`,
-        tooltip: `${formattedDate}: ${tooltip}`,
+        tooltip,
       };
     });
-  }, [sprayData, diseaseCardsGrouped]);
+  }, [integratedTreatments]);
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -101,21 +82,24 @@ export default function ModalWithSummary({
         <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40" />
         <Dialog.Content className="fixed inset-0 flex items-center justify-center z-50 p-4">
           <div className="w-full max-w-5xl max-h-[90vh] bg-white rounded-xl shadow-xl flex flex-col overflow-hidden border border-gray-200">
-            {/* Header */}
             <div className="flex items-center justify-between px-5 py-3 border-b bg-gray-100">
               <h2 className="text-xl font-bold text-gray-800">📊 Агрономічний підсумок</h2>
               <Dialog.Close asChild>
-                <button className="text-gray-500 hover:text-red-500 transition" aria-label="Закрити">
+                <button
+                  className="text-gray-500 hover:text-red-500 transition"
+                  aria-label="Закрити"
+                >
                   <Cross2Icon />
                 </button>
               </Dialog.Close>
             </div>
 
-            {/* Body */}
             <div className="flex-1 overflow-auto p-5 bg-gray-50 space-y-5 text-base">
               <div>
                 <strong>Рівень ризику захворювання:</strong>{" "}
-                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-sm font-medium ${riskColor}`}>
+                <span
+                  className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-sm font-medium ${riskColor}`}
+                >
                   {riskDot} {riskLevel}
                 </span>
               </div>
@@ -191,7 +175,7 @@ export default function ModalWithSummary({
                     className="absolute z-50 px-3 py-2 bg-white border border-gray-300 rounded shadow text-sm text-gray-700"
                     style={{
                       top: 0,
-                      left: `calc(${(hoveredLabel + 1) * 6}% - 60px)`,
+                      left: `calc(${(hoveredLabel + 1) * 6}% - 60px)`
                     }}
                   >
                     {sprayLines[hoveredLabel]?.tooltip}
