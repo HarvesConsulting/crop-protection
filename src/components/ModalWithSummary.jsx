@@ -116,8 +116,7 @@ export default function ModalWithSummary({
             <div className="flex-1 overflow-auto p-5 bg-gray-50 space-y-5 text-base">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div><strong>Кількість днів:</strong> {numDays}</div>
-                <div><strong>Сприятливих годин на добу:</strong> {hoursPerDay.toFixed(1)}</div>
-              </div>
+                </div>
               <div>
                 <strong>Рівень ризику:</strong>{" "}
                 <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-sm font-medium ${riskColor}`}>
