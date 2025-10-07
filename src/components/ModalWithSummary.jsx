@@ -118,8 +118,9 @@ export default function ModalWithSummary({
                     <XAxis dataKey="date" />
                     <YAxis label={{ value: "Години", angle: -90, position: "insideLeft" }} />
                     <Tooltip
-                      contentStyle={{ backgroundColor: '#f9fafb', borderColor: '#d1d5db' }}
-                      labelStyle={{ fontWeight: 'bold' }}
+                      contentStyle={{ backgroundColor: '#f9fafb', borderColor: '#d1d5db', color: '#000' }}
+                      labelStyle={{ color: '#000', fontWeight: 'bold' }}
+                      itemStyle={{ color: '#000' }}
                     />
                     <Legend />
                     {showHours && (
