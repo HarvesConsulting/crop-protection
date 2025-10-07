@@ -517,84 +517,77 @@ let lastDatesByDisease = {
   "Бактеріоз": plantingDate,
 };
 
-  const integratedSystem = Object.entries(groupedByDate)
-  .sort(([dateA], [dateB]) => {
-    const dA = parseISO(dateA.split(".").reverse().join("-"));
-    const dB = parseISO(dateB.split(".").reverse().join("-"));
-    return dA - dB;
-  })
-  .map(([date, entries]) => {
-    const currentDate = parseISO(date.split(".").reverse().join("-"));
+// 🔄 НОВА логіка об'єднання обробок проти хвороб із фітофторозом
 
-    // 🔁 сюди зберемо backData по кожній хворобі
-    const perDiseaseBackData = [];
+const MERGE_WINDOW_DAYS = 3;
+const mergedEntries = [];
+const usedDates = new Set();
 
-    for (const entry of entries) {
-      let disease = null;
+for (const spray of sprayData) {
+  const sprayDate = parseISO(spray.Дата.split(".").reverse().join("-"));
 
-      // визначаємо хворобу по препарату
-      if (rotationProducts.some((p) => entry.Препарат.includes(p))) {
-        disease = "Фітофтороз";
-      } else if (rotationAlternaria.some((p) => entry.Препарат.includes(p))) {
-        disease = "Альтернаріоз";
-      } else if (rotationBacteriosis.some((p) => entry.Препарат.includes(p))) {
-        disease = "Бактеріоз";
-      }
+  const relatedEntries = [];
 
-      if (disease) {
-        const prev = lastDatesByDisease[disease] || plantingDate;
+  // Додаємо обробки проти інших хвороб у вікні ±3 дні
+  for (const group of diseaseCardsGrouped) {
+    for (const entry of group.entries) {
+      const diseaseDate = parseISO(entry.Дата.split(".").reverse().join("-"));
+      const diff = Math.abs(differenceInDays(sprayDate, diseaseDate));
 
-        const bd = getAccumulatedStats(
-          diagnostics,
-          prev,
-          currentDate,
-          aggregatedRain
-        );
-
-        perDiseaseBackData.push({ disease, ...bd });
-
-        // 🔁 оновлюємо останню дату для цієї хвороби
-        lastDatesByDisease[disease] = currentDate;
+      if (diff <= MERGE_WINDOW_DAYS && !usedDates.has(entry.Дата)) {
+        relatedEntries.push(entry);
+        usedDates.add(entry.Дата);
       }
     }
+  }
 
-    // 📈 беремо backData з найбільшим condHours
-    const worst =
-      perDiseaseBackData.length > 0
-        ? perDiseaseBackData.reduce((max, cur) =>
-            cur.condHours > max.condHours ? cur : max
-          )
-        : { condHours: 0, rain: 0 };
+  const allEntries = [spray, ...relatedEntries];
+  const recommendationLinks = allEntries
+    .map((e) => e.Рекомендація)
+    .filter(Boolean);
 
-    return {
-  Дата: format(currentDate, "dd.MM.yyyy"),
-  Препарат: entries.map((e) => e.Препарат).join(", "),
-  Рекомендація: entries
-    .map((e) => {
-      if (typeof e.Рекомендація === "string") return null;
-      const href = e.Рекомендація?.props?.href;
-      return href ? (
-        <div key={href}>
-          <a href={href} target="_blank" rel="noreferrer">
-            {href}
-          </a>
-        </div>
-      ) : null;
-    })
-    .filter(Boolean),
-  backData: worst, // 🎯 тут тільки backData, без інтервалу чи рекоменд. годин
-};
+  const backData = getAccumulatedStats(
+    diagnostics,
+    plantingDate,
+    sprayDate,
+    rainDaily
+  );
 
+  mergedEntries.push({
+    Дата: spray.Дата,
+    Препарат: allEntries.map((e) => e.Препарат).join(", "),
+    Рекомендація: recommendationLinks,
+    backData,
   });
+}
 
-// 🔁 Сортування за датою
-integratedSystem.sort(
-  (a, b) =>
-    (a.Дата instanceof Date ? a.Дата : parseISO(a.Дата.split(".").reverse().join("-"))) -
-    (b.Дата instanceof Date ? b.Дата : parseISO(b.Дата.split(".").reverse().join("-")))
-);
+// 🔁 Додаємо обробки інших хвороб, які не були об’єднані
+for (const group of diseaseCardsGrouped) {
+  for (const entry of group.entries) {
+    if (!usedDates.has(entry.Дата)) {
+      const date = parseISO(entry.Дата.split(".").reverse().join("-"));
 
+      const backData = getAccumulatedStats(
+        diagnostics,
+        plantingDate,
+        date,
+        rainDaily
+      );
 
+      mergedEntries.push({
+        ...entry,
+        backData,
+      });
+    }
+  }
+}
+
+// 🔃 Сортуємо за датою
+const integratedSystem = mergedEntries.sort((a, b) => {
+  const dA = parseISO(a.Дата.split(".").reverse().join("-"));
+  const dB = parseISO(b.Дата.split(".").reverse().join("-"));
+  return dA - dB;
+});
   
   const exportToExcel = () => {
   const diseases = ["Фітофтороз", "Сіра гниль", "Альтернаріоз", "Бактеріоз"];
