@@ -67,7 +67,7 @@ export default function ModalWithSummary({
     return integratedTreatments.map((entry, i) => {
       const parsedDate = parse(entry.Дата, "dd.MM.yyyy", new Date());
       const formatted = format(parsedDate, "dd.MM");
-      const tooltip = `${formatted}: ${entry.Препарат} (${entry.Хвороби})`;
+      const tooltip = `${formatted}: ${entry.Препарат}`;
       return {
         date: formatted,
         label: `#${i + 1}`,
@@ -83,7 +83,7 @@ export default function ModalWithSummary({
         <Dialog.Content className="fixed inset-0 flex items-center justify-center z-50 p-4">
           <div className="w-full max-w-5xl max-h-[90vh] bg-white rounded-xl shadow-xl flex flex-col overflow-hidden border border-gray-200">
             <div className="flex items-center justify-between px-5 py-3 border-b bg-gray-100">
-              <h2 className="text-xl font-bold text-gray-800">📊 Агрономічний підсумок</h2>
+              <h2 className="text-xl font-bold text-gray-800">Графік обприскуань</h2>
               <Dialog.Close asChild>
                 <button
                   className="text-gray-500 hover:text-red-500 transition"

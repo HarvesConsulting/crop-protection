@@ -86,7 +86,7 @@ export default function ActionMenu({
               className="menu-item"
               onClick={() => handleMenuAction(onShowSummary)}
             >
-              📊 Агрономічний підсумок
+              Графік обприскуаань
             </button>
             <button
               className="menu-item"
