@@ -807,6 +807,7 @@ integratedSystem.sort(
   endDate={harvestDate}
   diagnostics={diagnostics}
   rainDaily={rainDaily}
+  sprayData={sprayData}
 />
 
 </main>
