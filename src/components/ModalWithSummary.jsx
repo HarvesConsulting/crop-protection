@@ -11,6 +11,7 @@ import {
   Legend,
   ResponsiveContainer,
   ReferenceLine,
+  ReferenceDot,
   Label,
 } from "recharts";
 import { useState, useMemo } from "react";
@@ -154,24 +155,52 @@ export default function ModalWithSummary({
                     />
 
                     {sprayLines.map((spray, index) => (
-                      <ReferenceLine
-                        key={index}
-                        x={spray.date}
-                        stroke="#3b82f6"
-                        strokeDasharray="3 3"
-                        strokeWidth={2}
-                        ifOverflow="extendDomain"
-                      >
-                        <Label
-                          value={spray.label}
-                          position="top"
-                          fill="#3b82f6"
-                          fontSize={10}
-                          style={{ cursor: "pointer" }}
-                          offset={10}
-                          formatter={() => spray.tooltip}
+                      <>
+                        <ReferenceLine
+                          key={`line-${index}`}
+                          x={spray.date}
+                          stroke="#3b82f6"
+                          strokeDasharray="3 3"
+                          strokeWidth={2}
+                          ifOverflow="extendDomain"
                         />
-                      </ReferenceLine>
+                        <ReferenceDot
+                          key={`dot-${index}`}
+                          x={spray.date}
+                          y={0}
+                          r={10}
+                          fillOpacity={0}
+                          stroke="none"
+                          isFront={true}
+                        >
+                          <Label
+                            position="top"
+                            content={({ viewBox }) => {
+                              const { x, y } = viewBox;
+                              return (
+                                <foreignObject x={x - 40} y={y - 50} width={120} height={40}>
+                                  <div xmlns="http://www.w3.org/1999/xhtml" style={{ pointerEvents: "auto" }}>
+                                    <div
+                                      style={{
+                                        position: "relative",
+                                        backgroundColor: "#fff",
+                                        border: "1px solid #ccc",
+                                        padding: "4px 6px",
+                                        borderRadius: "4px",
+                                        boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+                                        fontSize: "12px",
+                                        whiteSpace: "nowrap",
+                                      }}
+                                    >
+                                      <strong>{spray.label}</strong>: {spray.tooltip}
+                                    </div>
+                                  </div>
+                                </foreignObject>
+                              );
+                            }}
+                          />
+                        </ReferenceDot>
+                      </>
                     ))}
                   </LineChart>
                 </ResponsiveContainer>
