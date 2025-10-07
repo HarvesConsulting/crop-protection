@@ -38,20 +38,20 @@ export default function ModalWithSummary({
   const hoursPerDay = totalHours / numDays;
 
   let riskLevel = "Низький ризик захворювання";
-  let riskColor = "text-green-600";
+  let riskColor = "text-green-700 bg-green-100";
   let riskDot = "🟢";
-  let lineColor = "#16a34a"; // зелений
+  let lineColor = "#22c55e"; // зелений
 
   if (hoursPerDay > 2.5) {
     riskLevel = "Високий ризик захворювання";
-    riskColor = "text-red-600";
+    riskColor = "text-red-700 bg-red-100";
     riskDot = "🔴";
-    lineColor = "#dc2626";
+    lineColor = "#ef4444"; // червоний
   } else if (hoursPerDay > 1.5) {
     riskLevel = "Середній ризик захворювання";
-    riskColor = "text-yellow-500";
+    riskColor = "text-yellow-700 bg-yellow-100";
     riskDot = "🟡";
-    lineColor = "#facc15";
+    lineColor = "#facc15"; // жовтий
   }
 
   const chartData = useMemo(() => {
@@ -75,8 +75,8 @@ export default function ModalWithSummary({
         >
           <div className="w-full max-w-5xl max-h-[90vh] bg-white rounded-xl shadow-xl flex flex-col overflow-hidden border border-gray-200">
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-3 border-b bg-gray-50">
-              <h2 className="text-lg font-semibold text-gray-800">
+            <div className="flex items-center justify-between px-5 py-3 border-b bg-gray-100">
+              <h2 className="text-xl font-bold text-gray-800 tracking-tight">
                 📊 Агрономічний підсумок
               </h2>
               <Dialog.Close asChild>
@@ -90,52 +90,45 @@ export default function ModalWithSummary({
             </div>
 
             {/* Body */}
-            <div className="flex-1 overflow-auto p-5 bg-white space-y-4 text-base leading-relaxed">
-              <p>
-                <strong>Кількість днів:</strong> {numDays}
-              </p>
-              <p>
-                <strong>Сумарна кількість сприятливих годин:</strong>{" "}
-                {totalHours.toFixed(1)}
-              </p>
-              <p>
-                <strong>Сприятливих годин на добу (в середньому):</strong>{" "}
-                {hoursPerDay.toFixed(1)}
-              </p>
-              <p>
-                <strong>Опадів за період:</strong> {totalRain.toFixed(1)} мм
-              </p>
-              <p>
+            <div className="flex-1 overflow-auto p-5 bg-gray-50 space-y-5 text-base leading-relaxed">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div><strong>Кількість днів:</strong> {numDays}</div>
+                <div><strong>Сумарна кількість сприятливих годин:</strong> {totalHours.toFixed(1)}</div>
+                <div><strong>Сприятливих годин на добу:</strong> {hoursPerDay.toFixed(1)}</div>
+                <div><strong>Опадів за період:</strong> {totalRain.toFixed(1)} мм</div>
+              </div>
+
+              <div>
                 <strong>Рівень ризику:</strong>{" "}
-                <span className={riskColor}>
+                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-sm font-medium ${riskColor}`}>
                   {riskDot} {riskLevel}
                 </span>
-              </p>
+              </div>
 
               {/* Перемикач */}
               <div className="space-x-4">
-                <label>
+                <label className="inline-flex items-center">
                   <input
                     type="checkbox"
-                    className="mr-1"
+                    className="form-checkbox h-4 w-4 text-green-600"
                     checked={showHours}
                     onChange={() => setShowHours(!showHours)}
                   />
-                  Сприятливі години
+                  <span className="ml-2">Сприятливі години</span>
                 </label>
               </div>
 
               {/* Графік */}
-              <div className="h-96 w-full">
+              <div className="h-96 w-full bg-white rounded-md p-4 shadow-sm border">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
-                    data={chartData}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                  >
+                  <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
-                    <YAxis />
-                    <Tooltip />
+                    <YAxis label={{ value: "Години", angle: -90, position: "insideLeft" }} />
+                    <Tooltip
+                      contentStyle={{ backgroundColor: '#f9fafb', borderColor: '#d1d5db' }}
+                      labelStyle={{ fontWeight: 'bold' }}
+                    />
                     <Legend />
                     {showHours && (
                       <Line
