@@ -1,4 +1,4 @@
-import { format, parseISO, parse, differenceInDays, differenceInCalendarDays, isValid } from "date-fns";
+import { format, parseISO, differenceInDays, isValid } from "date-fns";
 import ModalWithSummary from "../components/ModalWithSummary"; // адаптуй шлях, якщо потрібно
 import React, { useState } from "react";
 import "./Step4Results.css";
@@ -245,22 +245,22 @@ function Card({ frontData, backData }) {
         <div className="flip-card-front">
           <div className="card-index">{frontData.index}</div>
           {Object.entries(frontData.fields).map(([key, value]) => (
-<div key={key} className="card-row">
-<strong>{key}:</strong>{" "}
-{key === "Рекомендація" ? (
-<InfoToggle content={value} />
-) : key === "Рекомендовані години" ? (
-<HourTimeline
-date={frontData.fields["Дата"]}
-suitableHours={(value || "").split(", ").map((h) => h.trim())}
-hourlyData={frontData.hourlyData || []}
-/>
-) : typeof value === "object" && value !== null ? (
-JSON.stringify(value)
-) : (
-value
-)}
-</div>
+  <div key={key} className="card-row">
+    <strong>{key}:</strong>{" "}
+    {key === "Рекомендація" ? (
+      <InfoToggle content={value} />
+    ) : key === "Рекомендовані години" ? (
+      <HourTimeline
+        date={frontData.fields["Дата"]}
+        suitableHours={(value || "").split(", ").map((h) => h.trim())}
+        hourlyData={frontData.hourlyData || []}
+      />
+    ) : typeof value === "object" && value !== null ? (
+      JSON.stringify(value)
+    ) : (
+      value
+    )}
+  </div>
 ))}
 
         </div>
@@ -391,7 +391,6 @@ const {
   plantingDate,
   harvestDate,
 } = result;
-
 const hasPhytophthora = true;
 
 // 🧠 Додаємо "suitable: true/false" до кожної години
@@ -415,39 +414,41 @@ const enrichedHourlyData = hourlyData.map((entry) => {
   console.table(rainDaily.slice(0, 10));
 
 const aggregatedRain = rainDaily;
+
+
+
   const sprayData = sprayDates.map((d, i) => {
-const cur = parseISO(d.split(".").reverse().join("-"));
-const prev = i > 0
-? parseISO(sprayDates[i - 1].split(".").reverse().join("-"))
-: plantingDate;
+  const cur = parseISO(d.split(".").reverse().join("-"));
+  const prev =
+    i > 0
+      ? parseISO(sprayDates[i - 1].split(".").reverse().join("-"))
+      : plantingDate;
 
+  const gap = prev
+    ? `${differenceInDays(cur, prev)} діб після попередньої`
+    : "—";
 
-const gap = prev ? `${differenceInDays(cur, prev)} діб після попередньої` : "—";
+  const product = rotationProducts[i % rotationProducts.length];
+  const recommendedHours = suitableHours[d] || [];
 
+  const backData = getAccumulatedStats(diagnostics, prev, cur, aggregatedRain);
 
-const product = rotationProducts[i % rotationProducts.length];
-const recommendedHours = suitableHours[d] || [];
-const backData = getAccumulatedStats(diagnostics, prev, cur, aggregatedRain);
-
-
-const url = productLinks[product] || null;
-
-
-return {
-Дата: d,
-Препарат: `${product} (${productInfo[product] || "—"})`,
-Рекомендація: url ? (
-<a href={url} target="_blank" rel="noreferrer">
-Перейти
-</a>
-) : (
-"—"
-),
-РекомендаціяURL: url,
-Інтервал: gap,
-"Рекомендовані години": recommendedHours.length ? recommendedHours.join(", ") : "—",
-backData,
-};
+  return {
+    Дата: d,
+    Препарат: `${product} (${productInfo[product] || "—"})`,
+    Рекомендація: productLinks[product] ? (
+      <a href={productLinks[product]} target="_blank" rel="noreferrer">
+        Перейти
+      </a>
+    ) : (
+      "—"
+    ),
+    Інтервал: gap,
+    "Рекомендовані години": recommendedHours.length
+      ? recommendedHours.join(", ")
+      : "—",
+    backData, // 🔥 Ось що ми додаємо
+  };
 });
 
   const diseaseCardsGrouped = diseaseSummary?.map(({ name, riskDates }) => {
@@ -496,33 +497,6 @@ backData,
 
     return { name, entries };
   });
-  
-// 📅 Створення groupedSprayDates для графіку в ModalWithSummary
-const groupedSprayDates = (() => {
-  if (!sprayDates?.length) return [];
-
-  const baseDates = sprayDates.map(d =>
-    parse(d, "dd.MM.yyyy", new Date())
-  );
-
-  const additionalDates = (diseaseSummary || [])
-    .flatMap(({ riskDates }) => riskDates || [])
-    .map(d => parse(d, "dd.MM.yyyy", new Date()))
-    .filter(date =>
-      baseDates.some(base =>
-        Math.abs(differenceInCalendarDays(base, date)) <= 3
-      )
-    );
-
-  const all = [...baseDates, ...additionalDates];
-  const unique = Array.from(
-    new Set(all.map(d => format(d, "dd.MM.yyyy")))
-  );
-
-  return unique.sort((a, b) =>
-    parse(a, "dd.MM.yyyy", new Date()) - parse(b, "dd.MM.yyyy", new Date())
-  );
-})();
 
   const rawEntries = [
     ...sprayData,
@@ -660,13 +634,12 @@ integratedSystem.sort(
   }
 
   const exportData = allDates.map((date) => {
-const row = { Дата: date };
-for (const d of diseases) {
-const item = diseaseMap[date][d] || "—";
-row[d] = typeof item === "string" ? item : "—";
-}
-return row;
-});
+    const row = { Дата: date };
+    for (const d of diseases) {
+      row[d] = diseaseMap[date][d] || "—";
+    }
+    return row;
+  });
 
   const ws = XLSX.utils.json_to_sheet(exportData);
 
@@ -835,7 +808,6 @@ return row;
   diagnostics={diagnostics}
   rainDaily={rainDaily}
   sprayData={sprayData}
-  groupedSprayDates={groupedSprayDates}
 />
 
 </main>
