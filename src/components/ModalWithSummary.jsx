@@ -1,6 +1,6 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { Cross2Icon } from "@radix-ui/react-icons";
-import { format, differenceInDays } from "date-fns";
+import { format, differenceInDays, parse } from "date-fns";
 import {
   LineChart,
   Line,
@@ -10,6 +10,8 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  ReferenceLine,
+  Label
 } from "recharts";
 import { useState, useMemo } from "react";
 
@@ -19,6 +21,7 @@ export default function ModalWithSummary({
   startDate,
   endDate,
   diagnostics = [],
+  sprayData = [],
 }) {
   const [showHours, setShowHours] = useState(true);
 
@@ -58,6 +61,17 @@ export default function ModalWithSummary({
       };
     });
   }, [diagnostics]);
+
+  const sprayLines = useMemo(() => {
+    return (sprayData || []).map((entry) => {
+      const parsedDate = parse(entry.Дата, "dd.MM.yyyy", new Date());
+      const formatted = format(parsedDate, "dd.MM");
+      return {
+        date: formatted,
+        label: entry.Препарат,
+      };
+    });
+  }, [sprayData]);
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -133,6 +147,16 @@ export default function ModalWithSummary({
                         dot={{ r: 3 }}
                       />
                     )}
+                    {sprayLines.map((spray, index) => (
+                      <ReferenceLine
+                        key={index}
+                        x={spray.date}
+                        stroke="#3b82f6"
+                        strokeDasharray="3 3"
+                      >
+                        <Label value={spray.label} position="top" fill="#3b82f6" fontSize={12} />
+                      </ReferenceLine>
+                    ))}
                   </LineChart>
                 </ResponsiveContainer>
               </div>
