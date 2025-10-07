@@ -392,33 +392,6 @@ const {
   harvestDate,
 } = result;
 
-// 📅 Створення groupedSprayDates для графіку в ModalWithSummary
-const groupedSprayDates = (() => {
-  if (!sprayData?.length) return [];
-
-  const baseDates = sprayData.map(e =>
-    parse(e.Дата, "dd.MM.yyyy", new Date())
-  );
-
-  const additionalDates = (diseaseCardsGrouped || [])
-    .flatMap(g => g.entries || [])
-    .map(e => parse(e.Дата, "dd.MM.yyyy", new Date()))
-    .filter(otherDate =>
-      baseDates.some(base =>
-        Math.abs(differenceInCalendarDays(base, otherDate)) <= 3
-      )
-    );
-
-  const all = [...baseDates, ...additionalDates];
-  const unique = Array.from(
-    new Set(all.map(d => format(d, "dd.MM.yyyy")))
-  );
-
-  return unique.sort((a, b) =>
-    parse(a, "dd.MM.yyyy", new Date()) - parse(b, "dd.MM.yyyy", new Date())
-  );
-})();
-
 const hasPhytophthora = true;
 
 // 🧠 Додаємо "suitable: true/false" до кожної години
@@ -442,9 +415,6 @@ const enrichedHourlyData = hourlyData.map((entry) => {
   console.table(rainDaily.slice(0, 10));
 
 const aggregatedRain = rainDaily;
-
-
-
   const sprayData = sprayDates.map((d, i) => {
   const cur = parseISO(d.split(".").reverse().join("-"));
   const prev =
@@ -525,6 +495,33 @@ const aggregatedRain = rainDaily;
 
     return { name, entries };
   });
+  
+// 📅 Створення groupedSprayDates для графіку в ModalWithSummary
+const groupedSprayDates = (() => {
+  if (!sprayDates?.length) return [];
+
+  const baseDates = sprayDates.map(d =>
+    parse(d, "dd.MM.yyyy", new Date())
+  );
+
+  const additionalDates = (diseaseSummary || [])
+    .flatMap(({ riskDates }) => riskDates || [])
+    .map(d => parse(d, "dd.MM.yyyy", new Date()))
+    .filter(date =>
+      baseDates.some(base =>
+        Math.abs(differenceInCalendarDays(base, date)) <= 3
+      )
+    );
+
+  const all = [...baseDates, ...additionalDates];
+  const unique = Array.from(
+    new Set(all.map(d => format(d, "dd.MM.yyyy")))
+  );
+
+  return unique.sort((a, b) =>
+    parse(a, "dd.MM.yyyy", new Date()) - parse(b, "dd.MM.yyyy", new Date())
+  );
+})();
 
   const rawEntries = [
     ...sprayData,
