@@ -24,9 +24,6 @@ export default function ModalWithSummary({
   sprayData = [],
   diseaseCardsGrouped = [], // інші хвороби
 }) {
-  const [showHours, setShowHours] = useState(true);
-  const [showTreatments, setShowTreatments] = useState(true);
-
   const numDays = differenceInDays(new Date(endDate), new Date(startDate)) + 1;
 
   const totalHours = diagnostics.reduce((sum, entry) => {
@@ -90,7 +87,7 @@ export default function ModalWithSummary({
       const formatted = format(parsedDate, "dd.MM");
       return {
         date: formatted,
-        label: `${i + 1}`,
+        label: `#${i + 1}`,
         tooltip: `${formatted}: ${entry.Препарат} (${entry.disease})`,
       };
     });
@@ -135,7 +132,17 @@ export default function ModalWithSummary({
                       labelStyle={{ color: '#000', fontWeight: 'bold' }}
                       itemStyle={{ color: '#000' }}
                     />
-                    <Legend />
+                    <Legend
+                      verticalAlign="bottom"
+                      align="center"
+                      content={() => (
+                        <div style={{ fontSize: 13, textAlign: "center", marginTop: 8 }}>
+                          <span style={{ color: lineColor, fontWeight: 500 }}>🟢 Сприятливі години</span>{" "}
+                          &nbsp;&nbsp;&nbsp;
+                          <span style={{ color: "#3b82f6" }}>🟦 Синій пунктир — дати внесення фунгіцидів</span>
+                        </div>
+                      )}
+                    />
 
                     <Line
                       type="monotone"
@@ -153,15 +160,21 @@ export default function ModalWithSummary({
                         stroke="#3b82f6"
                         strokeDasharray="3 3"
                         strokeWidth={2}
+                        ifOverflow="extendDomain"
                       >
-                        <Label value={`#${index + 1}`} position="top" fill="#3b82f6" fontSize={10} />
+                        <Label
+                          value={spray.label}
+                          position="top"
+                          fill="#3b82f6"
+                          fontSize={10}
+                          style={{ cursor: "pointer" }}
+                          offset={10}
+                          formatter={() => spray.tooltip}
+                        />
                       </ReferenceLine>
                     ))}
                   </LineChart>
                 </ResponsiveContainer>
-              </div>
-              <div className="text-sm text-gray-500 pt-2 italic">
-                🟦 Синій пунктир — дати внесення фунгіцидів
               </div>
             </div>
           </div>
