@@ -67,7 +67,7 @@ export default function ModalWithSummary({
     return integratedTreatments.map((entry, i) => {
       const parsedDate = parse(entry.Дата, "dd.MM.yyyy", new Date());
       const formatted = format(parsedDate, "dd.MM");
-      const tooltip = `${formatted}: ${entry.Препарат} (${entry.Хвороби})`;
+      const tooltip = `${formatted}: ${entry.Препарат}`;
       return {
         date: formatted,
         label: `#${i + 1}`,
