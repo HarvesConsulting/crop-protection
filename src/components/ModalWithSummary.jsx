@@ -9,9 +9,11 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  ReferenceLine,
+  Label,
   Legend,
 } from "recharts";
-import { useMemo } from "react";
+import { useState, useMemo } from "react";
 
 export default function ModalWithSummary({
   open,
@@ -59,6 +61,7 @@ export default function ModalWithSummary({
     });
   }, [diagnostics]);
 
+  // Об’єднання всіх обробок
   const allSprays = useMemo(() => {
     const phytophthora = (sprayData || []).map((entry, index) => ({
       ...entry,
@@ -77,17 +80,16 @@ export default function ModalWithSummary({
     return [...phytophthora, ...others];
   }, [sprayData, diseaseCardsGrouped]);
 
-  const sprayMarkers = useMemo(() => {
-    return allSprays.map((entry, index) => {
+  const sprayLines = useMemo(() => {
+    return allSprays.map((entry, i) => {
       const parsedDate = parse(entry.Дата, "dd.MM.yyyy", new Date());
-      const formattedDate = format(parsedDate, "dd.MM");
+      const formatted = format(parsedDate, "dd.MM");
+
       const product = entry.Препарат?.split("(")[0]?.trim() ?? entry.Препарат;
 
       return {
-        date: formattedDate,
-        x: formattedDate,
-        marker: `\u25B2 #${index + 1}`,
-        tooltip: `${product}`,
+        date: formatted,
+        tooltipLines: [`#${i + 1}`, product],
       };
     });
   }, [allSprays]);
@@ -98,6 +100,7 @@ export default function ModalWithSummary({
         <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40" />
         <Dialog.Content className="fixed inset-0 flex items-center justify-center z-50 p-4">
           <div className="w-full max-w-5xl max-h-[90vh] bg-white rounded-xl shadow-xl flex flex-col overflow-hidden border border-gray-200">
+            {/* Header */}
             <div className="flex items-center justify-between px-5 py-3 border-b bg-gray-100">
               <h2 className="text-xl font-bold text-gray-800">📊 Графік обприскувань</h2>
               <Dialog.Close asChild>
@@ -110,6 +113,7 @@ export default function ModalWithSummary({
               </Dialog.Close>
             </div>
 
+            {/* Body */}
             <div className="flex-1 overflow-auto p-5 bg-gray-50 space-y-5 text-base">
               <div>
                 <strong>Рівень ризику захворювання:</strong>{" "}
@@ -124,7 +128,7 @@ export default function ModalWithSummary({
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
                     data={chartData}
-                    margin={{ top: 60, right: 30, left: 20, bottom: 30 }}
+                    margin={{ top: 50, right: 30, left: 20, bottom: 30 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
@@ -151,6 +155,13 @@ export default function ModalWithSummary({
                           id: "hours",
                           color: lineColor,
                         },
+                        {
+                          value: "Дати внесення",
+                          type: "line",
+                          color: "#3b82f6",
+                          id: "fungicide-dates",
+                          strokeDasharray: "4 4",
+                        },
                       ]}
                     />
                     <Line
@@ -162,20 +173,26 @@ export default function ModalWithSummary({
                       dot={{ r: 3 }}
                     />
 
-                    {/* Spray markers */}
-                    {sprayMarkers.map((marker, index) => (
-                      <text
+                    {/* Reference lines for each spray */}
+                    {sprayLines.map((spray, index) => (
+                      <ReferenceLine
                         key={index}
-                        x={0}
-                        y={0}
-                        transform={`translate(${index * 35 + 40}, 20)`}
-                        textAnchor="middle"
-                        fontSize={10}
-                        fill="#3b82f6"
+                        x={spray.date}
+                        stroke="#3b82f6"
+                        strokeDasharray="4 4"
                       >
-                        <title>{marker.tooltip}</title>
-                        {marker.marker}
-                      </text>
+                        <Label
+                          value={spray.tooltipLines.join("\n")}
+                          position="top"
+                          fill="#3b82f6"
+                          fontSize={10}
+                          style={{
+                            whiteSpace: "pre-line",
+                            lineHeight: 1.2,
+                            textAnchor: "middle",
+                          }}
+                        />
+                      </ReferenceLine>
                     ))}
                   </LineChart>
                 </ResponsiveContainer>
