@@ -13,7 +13,7 @@ import {
   Label,
   Legend,
 } from "recharts";
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 
 export default function ModalWithSummary({
   open,
@@ -24,9 +24,8 @@ export default function ModalWithSummary({
   rainDaily = [],
   integratedTreatments = [],
 }) {
-  const [hoveredLabel, setHoveredLabel] = useState(null);
-
-  const numDays = differenceInDays(new Date(endDate), new Date(startDate)) + 1;
+  const numDays =
+    differenceInDays(new Date(endDate), new Date(startDate)) + 1;
 
   const totalHours = diagnostics.reduce((sum, entry) => {
     const h = Number(entry.condHours ?? entry.cond_hours ?? entry.hours);
@@ -67,11 +66,10 @@ export default function ModalWithSummary({
     return integratedTreatments.map((entry, i) => {
       const parsedDate = parse(entry.Дата, "dd.MM.yyyy", new Date());
       const formatted = format(parsedDate, "dd.MM");
-      const tooltip = `${formatted}: ${entry.Препарат}`;
       return {
         date: formatted,
         label: `#${i + 1}`,
-        tooltip,
+        tooltip: `${formatted}: ${entry.Препарат}`,
       };
     });
   }, [integratedTreatments]);
@@ -83,7 +81,7 @@ export default function ModalWithSummary({
         <Dialog.Content className="fixed inset-0 flex items-center justify-center z-50 p-4">
           <div className="w-full max-w-5xl max-h-[90vh] bg-white rounded-xl shadow-xl flex flex-col overflow-hidden border border-gray-200">
             <div className="flex items-center justify-between px-5 py-3 border-b bg-gray-100">
-              <h2 className="text-xl font-bold text-gray-800">Графік обприскуань</h2>
+              <h2 className="text-xl font-bold text-gray-800">Графік обприскувань</h2>
               <Dialog.Close asChild>
                 <button
                   className="text-gray-500 hover:text-red-500 transition"
@@ -112,11 +110,21 @@ export default function ModalWithSummary({
                   >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
-                    <YAxis label={{ value: "Години", angle: -90, position: "insideLeft" }} />
+                    <YAxis
+                      label={{
+                        value: "Години",
+                        angle: -90,
+                        position: "insideLeft",
+                      }}
+                    />
                     <Tooltip
-                      contentStyle={{ backgroundColor: '#f9fafb', borderColor: '#d1d5db', color: '#000' }}
-                      labelStyle={{ color: '#000', fontWeight: 'bold' }}
-                      itemStyle={{ color: '#000' }}
+                      contentStyle={{
+                        backgroundColor: "#f9fafb",
+                        borderColor: "#d1d5db",
+                        color: "#000",
+                      }}
+                      labelStyle={{ color: "#000", fontWeight: "bold" }}
+                      itemStyle={{ color: "#000" }}
                     />
                     <Legend
                       verticalAlign="bottom"
@@ -153,34 +161,21 @@ export default function ModalWithSummary({
                         x={spray.date}
                         stroke="#3b82f6"
                         strokeDasharray="4 4"
-                      >
-                        <Label
-                          value={spray.label}
-                          position="top"
-                          fill="#3b82f6"
-                          fontSize={10}
-                          style={{ cursor: "pointer" }}
-                          onMouseEnter={() => setHoveredLabel(index)}
-                          onMouseLeave={() => setHoveredLabel(null)}
-                          onTouchStart={() => setHoveredLabel(index)}
-                          onTouchEnd={() => setHoveredLabel(null)}
-                        />
-                      </ReferenceLine>
+                        ifOverflow="extendDomain"
+                        label={
+                          <Label
+                            value={spray.label}
+                            position="top"
+                            fill="#3b82f6"
+                            fontSize={10}
+                            style={{ cursor: "pointer" }}
+                            title={spray.tooltip} // HTML-native tooltip
+                          />
+                        }
+                      />
                     ))}
                   </LineChart>
                 </ResponsiveContainer>
-
-                {hoveredLabel !== null && (
-                  <div
-                    className="absolute z-50 px-3 py-2 bg-white border border-gray-300 rounded shadow text-sm text-gray-700"
-                    style={{
-                      top: 0,
-                      left: `calc(${(hoveredLabel + 1) * 6}% - 60px)`
-                    }}
-                  >
-                    {sprayLines[hoveredLabel]?.tooltip}
-                  </div>
-                )}
               </div>
             </div>
           </div>
