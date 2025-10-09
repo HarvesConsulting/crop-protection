@@ -14,7 +14,7 @@ import {
 } from "recharts";
 import { useMemo, useState, useRef } from "react";
 
-// 🧩 Компонент для рендеру мітки обробки
+// 🧩 Компонент для підпису обробки з тултіпом
 function SprayLabel({ x, y, spray, setTooltipData }) {
   if (typeof x !== "number" || typeof y !== "number") return null;
 
@@ -96,6 +96,7 @@ export default function ModalWithSummary({
     return integratedTreatments.map((entry, i) => {
       const parsedDate = parse(entry.Дата, "dd.MM.yyyy", new Date());
       const formatted = format(parsedDate, "dd.MM");
+
       return {
         date: formatted,
         label: `#${i + 1}`,
@@ -114,9 +115,12 @@ export default function ModalWithSummary({
         >
           <div className="w-full max-w-5xl max-h-[90vh] bg-white rounded-xl shadow-xl flex flex-col overflow-hidden border border-gray-200">
             <div className="flex items-center justify-between px-5 py-3 border-b bg-gray-100">
-              <h2 id="dialog-title" className="text-xl font-bold text-gray-800">
+              <Dialog.Title
+                id="dialog-title"
+                className="text-xl font-bold text-gray-800"
+              >
                 Графік обприскувань
-              </h2>
+              </Dialog.Title>
               <Dialog.Close asChild>
                 <button
                   className="text-gray-500 hover:text-red-500 transition"
