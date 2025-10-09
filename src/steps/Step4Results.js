@@ -367,6 +367,7 @@ export default function Step4Results({ result, onRestart }) {
   const [showMenu, setShowMenu] = useState(false);
   const [showWeather, setShowWeather] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+  const [expandedDiseases, setExpandedDiseases] = useState({});
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   
 React.useEffect(() => {
@@ -405,6 +406,20 @@ const enrichedHourlyData = hourlyData.map((entry) => {
     suitable: suitableEntry?.suitable === true,
   };
 });
+const toggleDisease = (name) => {
+  setExpandedDiseases((prev) => ({
+    ...prev,
+    [name]: !prev[name],
+  }));
+};
+
+const collapseAll = () => {
+  const collapsed = {};
+  for (const { name } of diseaseCardsGrouped || []) {
+    collapsed[name] = false;
+  }
+  setExpandedDiseases(collapsed);
+};
 
 // ✅ ВСТАВКА ЛОГІВ ДЛЯ ПЕРЕВІРКИ ДАНИХ
   console.log("🔬 Перевірка diagnostics:");
@@ -731,36 +746,43 @@ const integratedSystem = integratedMap
   )
 )}
 
-    {diseaseCardsGrouped?.map(({ name, entries }) =>
-  entries.length > 0 ? (
-    <CardView
-      key={name}
-      title={`Рекомендовані внесення (проти: ${name})`}
-      entries={entries}
-      diagnostics={diagnostics}
-      plantingDate={plantingDate}
-      rainDaily={aggregatedRain}
-      hourlyData={enrichedHourlyData}
-    />
-  ) : (
-    <div
-      key={name}
-      className="card-section"
+{diseaseCardsGrouped?.map(({ name, entries }) => (
+  <div key={name} className="card-section">
+    <h3
+      onClick={() => toggleDisease(name)}
       style={{
-        padding: "1rem",
-        marginTop: "1rem",
-        border: "1px dashed #ccc",
-        borderRadius: "8px",
-        background: "#f9f9f9",
+        cursor: "pointer",
+        userSelect: "none",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
       }}
     >
-      <h3>Рекомендовані внесення (проти: {name})</h3>
-      <p style={{ color: "#666", fontStyle: "italic" }}>
+      Рекомендовані внесення (проти: {name})
+      <span style={{ fontSize: "18px", marginLeft: "10px" }}>
+        {expandedDiseases[name] ? "▲" : "▼"}
+      </span>
+    </h3>
+
+    {expandedDiseases[name] && entries.length > 0 ? (
+      <CardView
+        entries={entries}
+        title=""
+        diagnostics={diagnostics}
+        plantingDate={plantingDate}
+        rainDaily={aggregatedRain}
+        hourlyData={enrichedHourlyData}
+      />
+    ) : !expandedDiseases[name] ? null : (
+      <p style={{ color: "#666", fontStyle: "italic", marginLeft: "10px" }}>
         Ризиків за обраний період не визначено
       </p>
-    </div>
-  )
-)}
+    )}
+  </div>
+))}
+<button className="toggle-button" onClick={collapseAll}>
+  Згорнути всі картки
+</button>
 
     <button className="restart-button" onClick={onRestart}>
       Почати спочатку
