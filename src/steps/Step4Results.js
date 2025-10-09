@@ -367,7 +367,9 @@ export default function Step4Results({ result, onRestart }) {
   const [showMenu, setShowMenu] = useState(false);
   const [showWeather, setShowWeather] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
-  const [expandedDiseases, setExpandedDiseases] = useState({});
+  const [expandedDiseases, setExpandedDiseases] = useState({
+  "Фітофтороз": true,
+});
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   
 React.useEffect(() => {
@@ -414,10 +416,14 @@ const toggleDisease = (name) => {
 };
 
 const collapseAll = () => {
-  const collapsed = {};
+  const collapsed = {
+    "Фітофтороз": false, // 🔸 додаємо вручну
+  };
+
   for (const { name } of diseaseCardsGrouped || []) {
     collapsed[name] = false;
   }
+
   setExpandedDiseases(collapsed);
 };
 
@@ -718,32 +724,38 @@ const integratedSystem = integratedMap
 ) : (
   <>
     {hasPhytophthora && (
-  sprayData.length > 0 ? (
-    <CardView
-      title="Рекомендовані внесення (проти фітофторозу)"
-      entries={sprayData}
-      diagnostics={diagnostics}
-      plantingDate={plantingDate}
-      rainDaily={aggregatedRain}
-      hourlyData={enrichedHourlyData}
-    />
-  ) : (
-    <div
-      className="card-section"
+  <div className="card-section">
+    <h3
+      onClick={() => toggleDisease("Фітофтороз")}
       style={{
-        padding: "1rem",
-        marginTop: "1rem",
-        border: "1px dashed #ccc",
-        borderRadius: "8px",
-        background: "#f9f9f9",
+        cursor: "pointer",
+        userSelect: "none",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
       }}
     >
-      <h3>Рекомендовані внесення (проти фітофторозу)</h3>
-      <p style={{ color: "#666", fontStyle: "italic" }}>
+      Рекомендовані внесення (проти: Фітофтороз)
+      <span style={{ fontSize: "18px", marginLeft: "10px" }}>
+        {expandedDiseases["Фітофтороз"] ? "▲" : "▼"}
+      </span>
+    </h3>
+
+    {expandedDiseases["Фітофтороз"] && sprayData.length > 0 ? (
+      <CardView
+        entries={sprayData}
+        title=""
+        diagnostics={diagnostics}
+        plantingDate={plantingDate}
+        rainDaily={aggregatedRain}
+        hourlyData={enrichedHourlyData}
+      />
+    ) : !expandedDiseases["Фітофтороз"] ? null : (
+      <p style={{ color: "#666", fontStyle: "italic", marginLeft: "10px" }}>
         Ризиків за обраний період не визначено
       </p>
-    </div>
-  )
+    )}
+  </div>
 )}
 
 {diseaseCardsGrouped?.map(({ name, entries }) => (
