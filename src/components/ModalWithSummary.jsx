@@ -14,8 +14,10 @@ import {
 } from "recharts";
 import { useMemo, useState, useRef } from "react";
 
-// 🧩 Компонент для відображення мітки з тултіпом
+// 🧩 Компонент для рендеру мітки обробки
 function SprayLabel({ x, y, spray, setTooltipData }) {
+  if (typeof x !== "number" || typeof y !== "number") return null;
+
   return (
     <text
       x={x}
@@ -53,8 +55,7 @@ export default function ModalWithSummary({
   const chartWrapperRef = useRef(null);
   const [tooltipData, setTooltipData] = useState(null);
 
-  const numDays =
-    differenceInDays(new Date(endDate), new Date(startDate)) + 1;
+  const numDays = differenceInDays(new Date(endDate), new Date(startDate)) + 1;
 
   const totalHours = diagnostics.reduce((sum, entry) => {
     const h = Number(entry.condHours ?? entry.cond_hours ?? entry.hours);
@@ -107,10 +108,15 @@ export default function ModalWithSummary({
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40" />
-        <Dialog.Content className="fixed inset-0 flex items-center justify-center z-50 p-4">
+        <Dialog.Content
+          className="fixed inset-0 flex items-center justify-center z-50 p-4"
+          aria-labelledby="dialog-title"
+        >
           <div className="w-full max-w-5xl max-h-[90vh] bg-white rounded-xl shadow-xl flex flex-col overflow-hidden border border-gray-200">
             <div className="flex items-center justify-between px-5 py-3 border-b bg-gray-100">
-              <h2 className="text-xl font-bold text-gray-800">Графік обприскувань</h2>
+              <h2 id="dialog-title" className="text-xl font-bold text-gray-800">
+                Графік обприскувань
+              </h2>
               <Dialog.Close asChild>
                 <button
                   className="text-gray-500 hover:text-red-500 transition"
@@ -194,12 +200,14 @@ export default function ModalWithSummary({
                         stroke="#3b82f6"
                         strokeDasharray="4 4"
                         ifOverflow="extendDomain"
-                        label={
+                        label={({ x, y }) => (
                           <SprayLabel
+                            x={x}
+                            y={y}
                             spray={spray}
                             setTooltipData={setTooltipData}
                           />
-                        }
+                        )}
                       />
                     ))}
                   </LineChart>
