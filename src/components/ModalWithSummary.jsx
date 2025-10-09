@@ -19,7 +19,8 @@ export default function ModalWithSummary({
   startDate,
   endDate,
   diagnostics = [],
-  integratedTreatments = [],
+  sprayData = [],
+  diseaseCardsGrouped = [],
 }) {
   const numDays = differenceInDays(new Date(endDate), new Date(startDate)) + 1;
 
@@ -58,18 +59,36 @@ export default function ModalWithSummary({
     });
   }, [diagnostics]);
 
-  const markers = useMemo(() => {
-    return integratedTreatments.map((entry, index) => {
-      const parsedDate = parse(entry.Дата, "dd.MM.yyyy", new Date());
-      const formattedDate = format(parsedDate, "dd.MM");
+  const allSprays = useMemo(() => {
+    const phytophthora = (sprayData || []).map((entry, index) => ({
+      ...entry,
+      disease: "Фітофтороз",
+      number: index + 1,
+    }));
 
+    const others = (diseaseCardsGrouped || []).flatMap((group) =>
+      group.entries.map((entry, i) => ({
+        ...entry,
+        disease: group.name,
+        number: phytophthora.length + i + 1,
+      }))
+    );
+
+    return [...phytophthora, ...others];
+  }, [sprayData, diseaseCardsGrouped]);
+
+  const arrowMarkers = useMemo(() => {
+    return allSprays.map((entry, i) => {
+      const parsedDate = parse(entry.Дата, "dd.MM.yyyy", new Date());
+      const formatted = format(parsedDate, "dd.MM");
+      const product = entry.Препарат?.split("(")[0]?.trim() ?? entry.Препарат;
       return {
-        date: formattedDate,
-        number: `#${index + 1}`,
-        tooltip: entry.Препарат,
+        date: formatted,
+        label: `#${i + 1}`,
+        tooltip: `${product}`,
       };
     });
-  }, [integratedTreatments]);
+  }, [allSprays]);
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -77,7 +96,6 @@ export default function ModalWithSummary({
         <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40" />
         <Dialog.Content className="fixed inset-0 flex items-center justify-center z-50 p-4">
           <div className="w-full max-w-5xl max-h-[90vh] bg-white rounded-xl shadow-xl flex flex-col overflow-hidden border border-gray-200">
-            {/* Header */}
             <div className="flex items-center justify-between px-5 py-3 border-b bg-gray-100">
               <h2 className="text-xl font-bold text-gray-800">📊 Графік обприскувань</h2>
               <Dialog.Close asChild>
@@ -90,13 +108,10 @@ export default function ModalWithSummary({
               </Dialog.Close>
             </div>
 
-            {/* Body */}
             <div className="flex-1 overflow-auto p-5 bg-gray-50 space-y-5 text-base">
               <div>
                 <strong>Рівень ризику захворювання:</strong>{" "}
-                <span
-                  className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-sm font-medium ${riskColor}`}
-                >
+                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-sm font-medium ${riskColor}`}>
                   {riskDot} {riskLevel}
                 </span>
               </div>
@@ -109,15 +124,9 @@ export default function ModalWithSummary({
                   >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
-                    <YAxis
-                      label={{ value: "Години", angle: -90, position: "insideLeft" }}
-                    />
+                    <YAxis label={{ value: "Години", angle: -90, position: "insideLeft" }} />
                     <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#f9fafb",
-                        borderColor: "#d1d5db",
-                        color: "#000",
-                      }}
+                      contentStyle={{ backgroundColor: "#f9fafb", borderColor: "#d1d5db", color: "#000" }}
                       labelStyle={{ color: "#000", fontWeight: "bold" }}
                       itemStyle={{ color: "#000" }}
                     />
@@ -143,28 +152,16 @@ export default function ModalWithSummary({
                       dot={{ r: 3 }}
                     />
 
-                    {/* Стрілки-нагадування */}
-                    {markers.map((mark, i) => (
-                      <g key={i}>
-                        <svg
-                          x={0}
-                          y={-35}
-                          className="recharts-custom-marker"
-                        >
-                          <text
-                            x="0"
-                            y="0"
-                            fill="#3b82f6"
-                            fontSize="14"
-                            textAnchor="middle"
-                            dominantBaseline="middle"
-                            style={{ cursor: "pointer" }}
-                          >
-                            ↑
-                            <title>{`${mark.number}\n${mark.tooltip}`}</title>
-                          </text>
-                        </svg>
-                      </g>
+                    {/* Arrow markers */}
+                    {arrowMarkers.map((marker, index) => (
+                      <svg key={index} x="0" y="0" width="0" height="0">
+                        <foreignObject x="0" y="0" width="100%" height="100%">
+                          <div style={{ position: 'absolute', top: 10, left: `${(index / arrowMarkers.length) * 100}%`, transform: 'translateX(-50%)', color: '#3b82f6' }}>
+                            <div title={marker.tooltip} style={{ fontSize: '18px', lineHeight: '1' }}>↑</div>
+                            <div style={{ fontSize: '10px' }}>{marker.label}</div>
+                          </div>
+                        </foreignObject>
+                      </svg>
                     ))}
                   </LineChart>
                 </ResponsiveContainer>
