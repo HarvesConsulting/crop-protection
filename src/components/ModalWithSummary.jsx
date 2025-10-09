@@ -77,14 +77,16 @@ export default function ModalWithSummary({
     return [...phytophthora, ...others];
   }, [sprayData, diseaseCardsGrouped]);
 
-  const arrowMarkers = useMemo(() => {
+  const sprayMarkers = useMemo(() => {
     return allSprays.map((entry, i) => {
       const parsedDate = parse(entry.Дата, "dd.MM.yyyy", new Date());
       const formatted = format(parsedDate, "dd.MM");
+
       const product = entry.Препарат?.split("(")[0]?.trim() ?? entry.Препарат;
+
       return {
         date: formatted,
-        label: `#${i + 1}`,
+        number: `#${i + 1}`,
         tooltip: `${product}`,
       };
     });
@@ -99,10 +101,7 @@ export default function ModalWithSummary({
             <div className="flex items-center justify-between px-5 py-3 border-b bg-gray-100">
               <h2 className="text-xl font-bold text-gray-800">📊 Графік обприскувань</h2>
               <Dialog.Close asChild>
-                <button
-                  className="text-gray-500 hover:text-red-500 transition"
-                  aria-label="Закрити"
-                >
+                <button className="text-gray-500 hover:text-red-500 transition" aria-label="Закрити">
                   <Cross2Icon />
                 </button>
               </Dialog.Close>
@@ -118,10 +117,7 @@ export default function ModalWithSummary({
 
               <div className="h-96 w-full bg-white rounded-md p-4 shadow-sm border relative">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
-                    data={chartData}
-                    margin={{ top: 50, right: 30, left: 20, bottom: 30 }}
-                  >
+                  <LineChart data={chartData} margin={{ top: 50, right: 30, left: 20, bottom: 30 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
                     <YAxis label={{ value: "Години", angle: -90, position: "insideLeft" }} />
@@ -141,6 +137,12 @@ export default function ModalWithSummary({
                           id: "hours",
                           color: lineColor,
                         },
+                        {
+                          value: "Обробки",
+                          type: "line",
+                          id: "sprays",
+                          color: "#3b82f6",
+                        },
                       ]}
                     />
                     <Line
@@ -152,15 +154,21 @@ export default function ModalWithSummary({
                       dot={{ r: 3 }}
                     />
 
-                    {/* Arrow markers */}
-                    {arrowMarkers.map((marker, index) => (
-                      <svg key={index} x="0" y="0" width="0" height="0">
-                        <foreignObject x="0" y="0" width="100%" height="100%">
-                          <div style={{ position: 'absolute', top: 10, left: `${(index / arrowMarkers.length) * 100}%`, transform: 'translateX(-50%)', color: '#3b82f6' }}>
-                            <div title={marker.tooltip} style={{ fontSize: '18px', lineHeight: '1' }}>↑</div>
-                            <div style={{ fontSize: '10px' }}>{marker.label}</div>
-                          </div>
-                        </foreignObject>
+                    {/* Arrows for spray events */}
+                    {sprayMarkers.map((marker, index) => (
+                      <svg
+                        key={index}
+                        x={0}
+                        y={0}
+                        viewBox="0 0 100 100"
+                        width={0}
+                        height={0}
+                      >
+                        <g>
+                          <text x="0" y="0">
+                            <title>{marker.tooltip}</title>
+                          </text>
+                        </g>
                       </svg>
                     ))}
                   </LineChart>
