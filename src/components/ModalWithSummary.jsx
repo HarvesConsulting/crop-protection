@@ -35,6 +35,12 @@ export default function ModalWithSummary({
 
   const hoursPerDay = totalHours / numDays;
 
+  const [tooltipState, setTooltipState] = useState({
+    active: false,
+    label: null,
+    payload: [],
+  });
+
   let riskLevel = "Низький";
   let riskColor = "text-green-700 bg-green-100";
   let riskDot = "🟢";
@@ -82,7 +88,6 @@ export default function ModalWithSummary({
         <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40" />
         <Dialog.Content className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-auto">
           <div className="relative w-full max-w-full max-h-screen overflow-y-auto bg-white rounded-xl shadow-xl flex flex-col border border-gray-200">
-            
             {/* Кнопка закриття */}
             <Dialog.Close asChild>
               <button
@@ -104,10 +109,40 @@ export default function ModalWithSummary({
               </div>
 
               <div className="h-96 w-full bg-white rounded-md p-4 shadow-sm border relative min-w-0">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer
+                  width="100%"
+                  height="100%"
+                  debounce={100}
+                  onTouchEnd={() =>
+                    setTooltipState({ active: false, label: null, payload: [] })
+                  }
+                >
                   <LineChart
                     data={chartData}
                     margin={{ top: 50, right: 30, left: 20, bottom: 30 }}
+                    onMouseMove={(state) => {
+                      if (state && state.activePayload) {
+                        setTooltipState({
+                          active: true,
+                          label: state.activeLabel,
+                          payload: state.activePayload,
+                        });
+                      }
+                    }}
+                    onMouseLeave={() => {
+                      setTooltipState({ active: false, label: null, payload: [] });
+                    }}
+                    onTouchStart={(e) => {
+                      if (tooltipState.label && tooltipState.payload.length > 0) {
+                        setTooltipState((prev) => ({
+                          ...prev,
+                          active: true,
+                        }));
+                      }
+                    }}
+                    onTouchEnd={() => {
+                      setTooltipState({ active: false, label: null, payload: [] });
+                    }}
                   >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
@@ -120,6 +155,9 @@ export default function ModalWithSummary({
                       }}
                       labelStyle={{ color: "#000", fontWeight: "bold" }}
                       itemStyle={{ color: "#000" }}
+                      active={tooltipState.active}
+                      label={tooltipState.label}
+                      payload={tooltipState.payload}
                     />
                     <Legend
                       verticalAlign="bottom"
