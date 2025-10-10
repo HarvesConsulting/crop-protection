@@ -436,6 +436,18 @@ const collapseAll = () => {
   setExpandedDiseases(collapsed);
 };
 
+const expandAll = () => {
+  const expanded = {
+    "Фітофтороз": true,
+  };
+
+  for (const { name } of diseaseCardsGrouped || []) {
+    expanded[name] = true;
+  }
+
+  setExpandedDiseases(expanded);
+};
+
 // ✅ ВСТАВКА ЛОГІВ ДЛЯ ПЕРЕВІРКИ ДАНИХ
   console.log("🔬 Перевірка diagnostics:");
   console.table(diagnostics.slice(0, 10));
@@ -444,9 +456,6 @@ const collapseAll = () => {
   console.table(rainDaily.slice(0, 10));
 
 const aggregatedRain = rainDaily;
-
-
-
   const sprayData = sprayDates.map((d, i) => {
   const cur = parseISO(d.split(".").reverse().join("-"));
   const prev =
@@ -801,9 +810,14 @@ const integratedSystem = integratedMap
     )}
   </div>
 ))}
-<button className="toggle-button" onClick={collapseAll}>
-  Згорнути всі картки
-</button>
+<div style={{ display: "flex", gap: "12px", marginTop: "1rem" }}>
+  <button className="toggle-button" onClick={expandAll}>
+    Розгорнути всі картки
+  </button>
+  <button className="toggle-button" onClick={collapseAll}>
+    Згорнути всі картки
+  </button>
+</div>
 
     <button className="restart-button" onClick={onRestart}>
       Почати спочатку
