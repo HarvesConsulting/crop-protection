@@ -125,7 +125,15 @@ function InfoToggle({ content }) {
 }
 
 function getAdvancedTreatments(riskDates, minGap = 7, shortGap = 5) {
-  const sorted = [...riskDates].map((d) => new Date(d)).sort((a, b) => a - b);
+  const parsedDates = riskDates
+    .map((d) =>
+      typeof d === "string"
+        ? parseISO(d.includes(".") ? d.split(".").reverse().join("-") : d)
+        : d
+    )
+    .filter((d) => isValid(d));
+
+  const sorted = parsedDates.sort((a, b) => a - b);
   const selected = [];
   let i = 0;
 
@@ -152,6 +160,7 @@ function getAdvancedTreatments(riskDates, minGap = 7, shortGap = 5) {
     }
     i++;
   }
+
   return selected;
 }
 
