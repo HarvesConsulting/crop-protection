@@ -38,47 +38,6 @@ export default function Step2Season({
             <h2 className="text-2xl font-bold text-gray-800">
               Крок 2: Дані про сезон
             </h2>
-            {/* Обране користувачем */}  
-<div className="bg-gray-50 border border-gray-200 p-4 rounded-lg space-y-2 text-sm sm:text-base">
-  <div>
-    <strong>Обране місто:</strong>{" "}
-    <span className="text-gray-800">
-      {region?.name || "—"}
-    </span>
-  </div>
-
-  <div>
-    <strong>Період:</strong>{" "}
-    <span className="text-gray-800">
-      {plantingDate} — {harvestDate}
-    </span>
-  </div>
-
-  <div>
-    <strong>Обрані хвороби:</strong>{" "}
-    <span className="text-gray-800">
-      {diseases.length === 0
-        ? "Жодної"
-        : diseases
-            .map((id) => {
-              switch (id) {
-                case "lateBlight":
-                  return "Фітофтороз";
-                case "grayMold":
-                  return "Сіра гниль";
-                case "alternaria":
-                  return "Альтернаріоз";
-                case "bacteriosis":
-                  return "Бактеріоз";
-                default:
-                  return id;
-              }
-            })
-            .join(", ")}
-    </span>
-  </div>
-</div>
-
             <button
               onClick={() => setShowInfo(!showInfo)}
               className="text-blue-600 hover:text-blue-800 transition"
