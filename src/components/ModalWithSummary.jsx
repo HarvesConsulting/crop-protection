@@ -80,7 +80,7 @@ export default function ModalWithSummary({
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40" />
-        <Dialog.Content className="fixed inset-0 flex items-center justify-center z-50 p-4">
+        <Dialog.Content className="relative fixed inset-0 flex items-center justify-center z-50 p-4">
           <Dialog.Close asChild>
   <button
     className="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition"
