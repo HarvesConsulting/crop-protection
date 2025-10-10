@@ -26,7 +26,8 @@ export default function ModalWithSummary({
 }) {
   const [hoveredLabel, setHoveredLabel] = useState(null);
 
-  const numDays = differenceInDays(new Date(endDate), new Date(startDate)) + 1;
+  const numDays =
+    differenceInDays(new Date(endDate), new Date(startDate)) + 1;
 
   const totalHours = diagnostics.reduce((sum, entry) => {
     const h = Number(entry.condHours ?? entry.cond_hours ?? entry.hours);
@@ -80,9 +81,9 @@ export default function ModalWithSummary({
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40" />
-        <Dialog.Content className="fixed inset-0 flex items-center justify-center z-50 p-4">
+        <Dialog.Content className="relative fixed inset-0 flex items-center justify-center z-50 p-4">
           
-          {/* Хрестик для закриття */}
+          {/* ❌ Кнопка закриття — завжди працює */}
           <Dialog.Close asChild>
             <button
               className="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition z-50"
@@ -113,11 +114,15 @@ export default function ModalWithSummary({
                   >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
-                    <YAxis /> {/* Підпис "Години" прибрано */}
+                    <YAxis /> {/* Підпис осі Y прибрано */}
                     <Tooltip
-                      contentStyle={{ backgroundColor: '#f9fafb', borderColor: '#d1d5db', color: '#000' }}
-                      labelStyle={{ color: '#000', fontWeight: 'bold' }}
-                      itemStyle={{ color: '#000' }}
+                      contentStyle={{
+                        backgroundColor: "#f9fafb",
+                        borderColor: "#d1d5db",
+                        color: "#000",
+                      }}
+                      labelStyle={{ color: "#000", fontWeight: "bold" }}
+                      itemStyle={{ color: "#000" }}
                     />
                     <Legend
                       verticalAlign="bottom"
@@ -176,7 +181,7 @@ export default function ModalWithSummary({
                     className="absolute z-50 px-3 py-2 bg-white border border-gray-300 rounded shadow text-sm text-gray-700"
                     style={{
                       top: 0,
-                      left: `calc(${(hoveredLabel + 1) * 6}% - 60px)`
+                      left: `calc(${(hoveredLabel + 1) * 6}% - 60px)`,
                     }}
                   >
                     {sprayLines[hoveredLabel]?.tooltip}
