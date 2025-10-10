@@ -102,7 +102,9 @@ h2 {
 .flip-card {
   perspective: 1000px;
   width: 100%;
-  max-width: 360px;
+  max-width: 100%;
+  box-sizing: border-box;
+,
   margin: 12px 0;
 }
 
