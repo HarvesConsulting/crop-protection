@@ -24,6 +24,7 @@ export default function ModalWithSummary({
   integratedTreatments = [],
 }) {
   const [hoveredLabel, setHoveredLabel] = useState(null);
+  const [touchedOnce, setTouchedOnce] = useState(false); // нова змінна
 
   const numDays =
     differenceInDays(new Date(endDate), new Date(startDate)) + 1;
@@ -79,6 +80,16 @@ export default function ModalWithSummary({
   const handleTouchEnd = () => {
     const tooltip = document.querySelector(".recharts-tooltip-wrapper");
     if (tooltip) tooltip.style.display = "none";
+    setTouchedOnce(false);
+  };
+
+  const handleTouchMove = () => {
+    if (touchedOnce) {
+      const tooltip = document.querySelector(".recharts-tooltip-wrapper");
+      if (tooltip) tooltip.style.display = "block";
+    } else {
+      setTouchedOnce(true);
+    }
   };
 
   return (
@@ -119,6 +130,7 @@ export default function ModalWithSummary({
                     margin={{ top: 50, right: 30, left: 20, bottom: 30 }}
                     onMouseLeave={handleTouchEnd}
                     onTouchEnd={handleTouchEnd}
+                    onTouchMove={handleTouchMove}
                   >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
