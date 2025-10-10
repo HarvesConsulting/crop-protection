@@ -56,7 +56,7 @@ h2 {
 .card-section {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 16px;
   margin-bottom: 32px;
 }
