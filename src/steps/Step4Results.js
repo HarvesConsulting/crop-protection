@@ -383,13 +383,7 @@ export default function Step4Results({ result, onRestart }) {
 
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
-  // 🧠 Перевіряємо, чи всі хвороби розгорнуті
-  const isAllExpanded =
-    ["Фітофтороз", ...((diseaseSummary?.map((d) => d.name)) || [])].every(
-      (name) => expandedDiseases[name]
-    );
-
-   // 📱 Слухаємо зміну розміру екрана
+     // 📱 Слухаємо зміну розміру екрана
   React.useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener("resize", handleResize);
@@ -421,6 +415,12 @@ export default function Step4Results({ result, onRestart }) {
   } = result;
 
   const hasPhytophthora = true;
+  
+// 🧠 Перевіряємо, чи всі хвороби розгорнуті
+  const isAllExpanded =
+    ["Фітофтороз", ...((diseaseSummary?.map((d) => d.name)) || [])].every(
+      (name) => expandedDiseases[name]
+    );
 
 // 🧠 Додаємо "suitable: true/false" до кожної години
 const suitableMap = extractSuitableSprayHours(hourlyData);
