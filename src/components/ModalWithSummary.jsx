@@ -23,8 +23,7 @@ export default function ModalWithSummary({
   diagnostics = [],
   integratedTreatments = [],
 }) {
-  const [hoveredLabel, setHoveredLabel] = useState(null);
-  const [touchedOnce, setTouchedOnce] = useState(false); // нова змінна
+  const [tooltipData, setTooltipData] = useState(null);
 
   const numDays =
     differenceInDays(new Date(endDate), new Date(startDate)) + 1;
@@ -77,29 +76,12 @@ export default function ModalWithSummary({
     });
   }, [integratedTreatments]);
 
-  const handleTouchEnd = () => {
-    const tooltip = document.querySelector(".recharts-tooltip-wrapper");
-    if (tooltip) tooltip.style.display = "none";
-    setTouchedOnce(false);
-  };
-
-  const handleTouchMove = () => {
-    if (touchedOnce) {
-      const tooltip = document.querySelector(".recharts-tooltip-wrapper");
-      if (tooltip) tooltip.style.display = "block";
-    } else {
-      setTouchedOnce(true);
-    }
-  };
-
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40" />
         <Dialog.Content className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-auto">
           <div className="relative w-full max-w-full max-h-screen overflow-y-auto bg-white rounded-xl shadow-xl flex flex-col border border-gray-200">
-
-            {/* Кнопка закриття */}
             <Dialog.Close asChild>
               <button
                 className="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition"
@@ -120,17 +102,10 @@ export default function ModalWithSummary({
               </div>
 
               <div className="h-96 w-full bg-white rounded-md p-4 shadow-sm border relative min-w-0">
-                <ResponsiveContainer
-                  width="100%"
-                  height="100%"
-                  debounce={100}
-                >
+                <ResponsiveContainer width="100%" height="100%">
                   <LineChart
                     data={chartData}
                     margin={{ top: 50, right: 30, left: 20, bottom: 30 }}
-                    onMouseLeave={handleTouchEnd}
-                    onTouchEnd={handleTouchEnd}
-                    onTouchMove={handleTouchMove}
                   >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
@@ -186,25 +161,42 @@ export default function ModalWithSummary({
                           fill="#3b82f6"
                           fontSize={10}
                           style={{ cursor: "pointer" }}
-                          onMouseEnter={() => setHoveredLabel(index)}
-                          onMouseLeave={() => setHoveredLabel(null)}
-                          onTouchStart={() => setHoveredLabel(index)}
-                          onTouchEnd={() => setHoveredLabel(null)}
+                          onMouseEnter={(e) => {
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            setTooltipData({
+                              text: spray.tooltip,
+                              x: rect.left + rect.width / 2,
+                              y: rect.top - 10,
+                            });
+                          }}
+                          onMouseLeave={() => setTooltipData(null)}
+                          onTouchStart={(e) => {
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            setTooltipData({
+                              text: spray.tooltip,
+                              x: rect.left + rect.width / 2,
+                              y: rect.top - 10,
+                            });
+                          }}
+                          onTouchEnd={() => setTooltipData(null)}
                         />
                       </ReferenceLine>
                     ))}
                   </LineChart>
                 </ResponsiveContainer>
 
-                {hoveredLabel !== null && (
+                {tooltipData && (
                   <div
-                    className="absolute z-50 px-3 py-2 bg-white border border-gray-300 rounded shadow text-sm text-gray-700"
+                    className="fixed z-50 px-3 py-2 bg-white border border-gray-300 rounded shadow text-sm text-gray-700 pointer-events-none"
                     style={{
-                      top: 0,
-                      left: `calc(${(hoveredLabel + 1) * 6}% - 60px)`,
+                      top: tooltipData.y,
+                      left: tooltipData.x,
+                      transform: "translate(-50%, -100%)",
+                      maxWidth: "200px",
+                      whiteSpace: "normal",
                     }}
                   >
-                    {sprayLines[hoveredLabel]?.tooltip}
+                    {tooltipData.text}
                   </div>
                 )}
               </div>
