@@ -189,12 +189,46 @@ export default function Step3Run({
       <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
         Крок 3: Розрахунок <span role="img" aria-label="lab">🧪</span>
       </h2>
+      {/* Обране користувачем */}  
+<div className="bg-gray-50 border border-gray-200 p-4 rounded-lg space-y-2 text-sm sm:text-base">
+  <div>
+    <strong>Обране місто:</strong>{" "}
+    <span className="text-gray-800">
+      {region?.name || "—"}
+    </span>
+  </div>
 
-      {/* Опис сезону */}
-      <p className="text-base text-gray-700 mb-4">
-        Натисніть кнопку, щоб розрахувати систему захисту на весь сезон: від{" "}
-        <strong>{plantingDate}</strong> до <strong>{harvestDate}</strong>.
-      </p>
+  <div>
+    <strong>Період:</strong>{" "}
+    <span className="text-gray-800">
+      {plantingDate} — {harvestDate}
+    </span>
+  </div>
+
+  <div>
+    <strong>Обрані хвороби:</strong>{" "}
+    <span className="text-gray-800">
+      {diseases.length === 0
+        ? "Жодної"
+        : diseases
+            .map((id) => {
+              switch (id) {
+                case "lateBlight":
+                  return "Фітофтороз";
+                case "grayMold":
+                  return "Сіра гниль";
+                case "alternaria":
+                  return "Альтернаріоз";
+                case "bacteriosis":
+                  return "Бактеріоз";
+                default:
+                  return id;
+              }
+            })
+            .join(", ")}
+    </span>
+  </div>
+</div>
 
       {/* Повідомлення про помилку */}
       {error && (
