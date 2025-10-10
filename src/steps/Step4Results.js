@@ -376,34 +376,51 @@ export default function Step4Results({ result, onRestart }) {
   const [showMenu, setShowMenu] = useState(false);
   const [showWeather, setShowWeather] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+
   const [expandedDiseases, setExpandedDiseases] = useState({
-  "Фітофтороз": true,
-});
+    "Фітофтороз": true,
+  });
+
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  
-React.useEffect(() => {
-  const handleResize = () => setIsMobile(window.innerWidth <= 768);
-  window.addEventListener("resize", handleResize);
-  return () => window.removeEventListener("resize", handleResize);
-}, []);
+
+  // 🧠 Перевіряємо, чи всі хвороби розгорнуті
+  const isAllExpanded =
+    ["Фітофтороз", ...((diseaseSummary?.map((d) => d.name)) || [])].every(
+      (name) => expandedDiseases[name]
+    );
+
+   // 📱 Слухаємо зміну розміру екрана
+  React.useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // 🧾 Модалки
   const [summaryModalOpen, setSummaryModalOpen] = useState(false);
   const [weatherModalOpen, setWeatherModalOpen] = useState(false);
+
+  // ⏮ Повернення до карток
   const handleGoToCards = () => {
-  setShowIntegrated(false); // повертаємося до карток
-};
+    setShowIntegrated(false);
+  };
+
+  // 🛑 Якщо немає результату — повідомлення
   if (!result) return <p>Дані відсутні</p>;
 
-const {
-  sprayDates,
-  diseaseSummary,
-  suitableHours = {},
-  diagnostics = [],
-  rainDaily = [],
-  hourlyData = [],
-  plantingDate,
-  harvestDate,
-} = result;
-const hasPhytophthora = true;
+  // 📦 Розпаковка результату
+  const {
+    sprayDates,
+    diseaseSummary,
+    suitableHours = {},
+    diagnostics = [],
+    rainDaily = [],
+    hourlyData = [],
+    plantingDate,
+    harvestDate,
+  } = result;
+
+  const hasPhytophthora = true;
 
 // 🧠 Додаємо "suitable: true/false" до кожної години
 const suitableMap = extractSuitableSprayHours(hourlyData);
@@ -424,28 +441,17 @@ const toggleDisease = (name) => {
   }));
 };
 
-const collapseAll = () => {
-  const collapsed = {
-    "Фітофтороз": false, // 🔸 додаємо вручну
-  };
+const toggleAllCards = () => {
+  const allDiseaseNames = ["Фітофтороз", ...(diseaseCardsGrouped?.map((d) => d.name) || [])];
 
-  for (const { name } of diseaseCardsGrouped || []) {
-    collapsed[name] = false;
+  const allExpanded = allDiseaseNames.every((name) => expandedDiseases[name]);
+
+  const newState = {};
+  for (const name of allDiseaseNames) {
+    newState[name] = !allExpanded; // якщо всі відкриті — закриваємо, інакше відкриваємо
   }
 
-  setExpandedDiseases(collapsed);
-};
-
-const expandAll = () => {
-  const expanded = {
-    "Фітофтороз": true,
-  };
-
-  for (const { name } of diseaseCardsGrouped || []) {
-    expanded[name] = true;
-  }
-
-  setExpandedDiseases(expanded);
+  setExpandedDiseases(newState);
 };
 
 // ✅ ВСТАВКА ЛОГІВ ДЛЯ ПЕРЕВІРКИ ДАНИХ
@@ -811,12 +817,11 @@ const integratedSystem = integratedMap
   </div>
 ))}
 <div style={{ display: "flex", gap: "12px", marginTop: "1rem" }}>
-  <button className="toggle-button" onClick={expandAll}>
-    Розгорнути всі картки
+  <div style={{ display: "flex", justifyContent: "center", marginTop: "1rem" }}>
+  <button className="toggle-button" onClick={toggleAllCards}>
+    {isAllExpanded ? "Згорнути всі картки" : "Розгорнути всі картки"}
   </button>
-  <button className="toggle-button" onClick={collapseAll}>
-    Згорнути всі картки
-  </button>
+</div>
 </div>
 
     <button className="restart-button" onClick={onRestart}>
