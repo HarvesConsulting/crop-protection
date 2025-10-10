@@ -21,7 +21,6 @@ export default function ModalWithSummary({
   startDate,
   endDate,
   diagnostics = [],
-  rainDaily = [],
   integratedTreatments = [],
 }) {
   const [hoveredLabel, setHoveredLabel] = useState(null);
@@ -81,22 +80,20 @@ export default function ModalWithSummary({
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40" />
-        <Dialog.Content className="relative fixed inset-0 z-50 flex items-center justify-center p-4 overflow-auto">
-          
-          {/* ❌ Кнопка закриття */}
-          <Dialog.Close asChild>
-            <button
-              className="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition z-50"
-              aria-label="Закрити"
-            >
-              <Cross2Icon width={20} height={20} />
-            </button>
-          </Dialog.Close>
-
+        <Dialog.Content className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-auto">
           <div className="relative w-full max-w-5xl bg-white rounded-xl shadow-xl flex flex-col border border-gray-200">
             
+            {/* Кнопка закриття */}
+            <Dialog.Close asChild>
+              <button
+                className="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition"
+                aria-label="Закрити"
+              >
+                <Cross2Icon width={20} height={20} />
+              </button>
+            </Dialog.Close>
+
             <div className="flex-1 overflow-auto p-5 bg-gray-50 space-y-5 text-base">
-              
               <div>
                 <strong>Рівень ризику захворювання:</strong>{" "}
                 <span
@@ -114,7 +111,7 @@ export default function ModalWithSummary({
                   >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
-                    <YAxis /> {/* Підпис "Години" прибрано */}
+                    <YAxis />
                     <Tooltip
                       contentStyle={{
                         backgroundColor: "#f9fafb",
