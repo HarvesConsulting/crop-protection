@@ -9,9 +9,9 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  ReferenceArea,
+  ReferenceLine,
+  Label,
   Legend,
-  Customized,
 } from "recharts";
 import { useState, useMemo } from "react";
 
@@ -59,48 +59,18 @@ export default function ModalWithSummary({
     }));
   }, [diagnostics]);
 
-  // ⬇️ Замість ReferenceLine — формуємо зони
-  const sprayAreas = useMemo(() => {
+  const sprayLines = useMemo(() => {
     return integratedTreatments.map((entry, i) => {
-      const start = parse(entry.Дата, "dd.MM.yyyy", new Date());
-      const end = new Date(start);
-      end.setDate(start.getDate() + 1);
-
-      const x1 = format(start, "dd.MM");
-      const x2 = format(end, "dd.MM");
-      const tooltip = `${x1}: ${entry.Препарат}`;
+      const parsedDate = parse(entry.Дата, "dd.MM.yyyy", new Date());
+      const formatted = format(parsedDate, "dd.MM");
+      const tooltip = `${formatted}: ${entry.Препарат}`;
       return {
-        x1,
-        x2,
+        date: formatted,
         label: `#${i + 1}`,
         tooltip,
       };
     });
   }, [integratedTreatments]);
-
-  // ⬇️ Компонент для рендеру номерів обробок
-  const CustomizedTreatmentLabels = ({ xAxisMap }) => {
-    if (!xAxisMap || !xAxisMap["date"]) return null;
-    const { scale } = xAxisMap["date"];
-
-    return sprayAreas.map((area, index) => {
-      const x = scale(area.x1);
-      if (typeof x !== "number") return null;
-
-      return (
-        <text
-          key={index}
-          x={x}
-          y={20}
-          fill="#3b82f6"
-          fontSize={12}
-          textAnchor="middle"
-        >
-          {sprayAreas[index].label}
-        </text>
-      );
-    });
-  };
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -111,6 +81,7 @@ export default function ModalWithSummary({
           style={{ animation: "fadeIn 0.2s ease-out" }}
         >
           <div className="w-full max-w-5xl h-[85vh] bg-white rounded-xl shadow-xl flex flex-col overflow-hidden border border-gray-200">
+
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-3 border-b bg-gray-50">
               <h2 className="text-lg font-semibold text-gray-800">
@@ -167,52 +138,14 @@ export default function ModalWithSummary({
                           color: lineColor,
                         },
                         {
-                          value: "Дні обробки",
-                          type: "rect",
-                          id: "treatment-zones",
+                          value: "Дати внесення фунгіцидів",
+                          type: "line",
                           color: "#3b82f6",
+                          id: "fungicide-dates",
+                          strokeDasharray: "4 4",
                         },
                       ]}
                     />
-
-                    {/* 🔵 Зони обприскування */}
-                    {sprayAreas.map((area, index) => (
-                      <ReferenceArea
-                        key={index}
-                        x1={area.x1}
-                        x2={area.x2}
-                        stroke="transparent"
-                        fill="#3b82f6"
-                        fillOpacity={0.15}
-                        ifOverflow="visible"
-                        onMouseEnter={(e) => {
-                          const rect = e.currentTarget.getBoundingClientRect();
-                          setTooltipData({
-                            text: area.tooltip,
-                            x: rect.left + rect.width / 2,
-                            y: rect.top - 10,
-                          });
-                        }}
-                        onMouseLeave={() => setTooltipData(null)}
-                        onTouchStart={(e) => {
-                          const rect = e.currentTarget.getBoundingClientRect();
-                          setTooltipData({
-                            text: area.tooltip,
-                            x: rect.left + rect.width / 2,
-                            y: rect.top - 10,
-                          });
-                        }}
-                        onTouchEnd={() => setTooltipData(null)}
-                      />
-                    ))}
-
-                    {/* 🔢 Номери обробок */}
-                    <Customized
-                      component={(props) => (
-                        <CustomizedTreatmentLabels xAxisMap={props.xAxisMap} />
-                      )}
-                    />
-
                     <Line
                       type="monotone"
                       dataKey="hours"
@@ -221,6 +154,41 @@ export default function ModalWithSummary({
                       strokeWidth={2}
                       dot={{ r: 3 }}
                     />
+
+                    {sprayLines.map((spray, index) => (
+                      <ReferenceLine
+                        key={index}
+                        x={spray.date}
+                        stroke="#3b82f6"
+                        strokeDasharray="4 4"
+                      >
+                        <Label
+                          value={spray.label}
+                          position="top"
+                          fill="#3b82f6"
+                          fontSize={10}
+                          style={{ cursor: "pointer" }}
+                          onMouseEnter={(e) => {
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            setTooltipData({
+                              text: spray.tooltip,
+                              x: rect.left + rect.width / 2,
+                              y: rect.top - 10,
+                            });
+                          }}
+                          onMouseLeave={() => setTooltipData(null)}
+                          onTouchStart={(e) => {
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            setTooltipData({
+                              text: spray.tooltip,
+                              x: rect.left + rect.width / 2,
+                              y: rect.top - 10,
+                            });
+                          }}
+                          onTouchEnd={() => setTooltipData(null)}
+                        />
+                      </ReferenceLine>
+                    ))}
                   </LineChart>
                 </ResponsiveContainer>
 
