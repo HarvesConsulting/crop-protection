@@ -9,8 +9,7 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  ReferenceLine,
-  Label,
+  ReferenceArea,
   Legend,
 } from "recharts";
 import { useState, useMemo } from "react";
@@ -52,6 +51,7 @@ export default function ModalWithSummary({
     lineColor = "#facc15";
   }
 
+  // Графік: основні погодинні дані
   const chartData = useMemo(() => {
     return diagnostics.map((entry) => ({
       date: format(new Date(entry.date), "dd.MM"),
@@ -59,14 +59,19 @@ export default function ModalWithSummary({
     }));
   }, [diagnostics]);
 
-  const sprayLines = useMemo(() => {
+  // Масив зон обприскування
+  const sprayAreas = useMemo(() => {
     return integratedTreatments.map((entry, i) => {
-      const parsedDate = parse(entry.Дата, "dd.MM.yyyy", new Date());
-      const formatted = format(parsedDate, "dd.MM");
-      const tooltip = `${formatted}: ${entry.Препарат}`;
+      const start = parse(entry.Дата, "dd.MM.yyyy", new Date());
+      const end = new Date(start);
+      end.setDate(start.getDate() + 1); // наступна доба
+
+      const x1 = format(start, "dd.MM");
+      const x2 = format(end, "dd.MM");
+      const tooltip = `${x1}: ${entry.Препарат}`;
       return {
-        date: formatted,
-        label: `#${i + 1}`,
+        x1,
+        x2,
         tooltip,
       };
     });
@@ -81,7 +86,6 @@ export default function ModalWithSummary({
           style={{ animation: "fadeIn 0.2s ease-out" }}
         >
           <div className="w-full max-w-5xl h-[85vh] bg-white rounded-xl shadow-xl flex flex-col overflow-hidden border border-gray-200">
-
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-3 border-b bg-gray-50">
               <h2 className="text-lg font-semibold text-gray-800">
@@ -138,14 +142,27 @@ export default function ModalWithSummary({
                           color: lineColor,
                         },
                         {
-                          value: "Дати внесення фунгіцидів",
-                          type: "line",
+                          value: "Дні обробки",
+                          type: "rect",
+                          id: "treatment-zones",
                           color: "#3b82f6",
-                          id: "fungicide-dates",
-                          strokeDasharray: "4 4",
                         },
                       ]}
                     />
+
+                    {/* Зони обприскування */}
+                    {sprayAreas.map((area, index) => (
+                      <ReferenceArea
+                        key={index}
+                        x1={area.x1}
+                        x2={area.x2}
+                        stroke="transparent"
+                        fill="#3b82f6"
+                        fillOpacity={0.15}
+                        ifOverflow="visible"
+                      />
+                    ))}
+
                     <Line
                       type="monotone"
                       dataKey="hours"
@@ -154,58 +171,10 @@ export default function ModalWithSummary({
                       strokeWidth={2}
                       dot={{ r: 3 }}
                     />
-
-                    {sprayLines.map((spray, index) => (
-                      <ReferenceLine
-                        key={index}
-                        x={spray.date}
-                        stroke="#3b82f6"
-                        strokeDasharray="4 4"
-                      >
-                        <Label
-                          value={spray.label}
-                          position="top"
-                          fill="#3b82f6"
-                          fontSize={10}
-                          style={{ cursor: "pointer" }}
-                          onMouseEnter={(e) => {
-                            const rect = e.currentTarget.getBoundingClientRect();
-                            setTooltipData({
-                              text: spray.tooltip,
-                              x: rect.left + rect.width / 2,
-                              y: rect.top - 10,
-                            });
-                          }}
-                          onMouseLeave={() => setTooltipData(null)}
-                          onTouchStart={(e) => {
-                            const rect = e.currentTarget.getBoundingClientRect();
-                            setTooltipData({
-                              text: spray.tooltip,
-                              x: rect.left + rect.width / 2,
-                              y: rect.top - 10,
-                            });
-                          }}
-                          onTouchEnd={() => setTooltipData(null)}
-                        />
-                      </ReferenceLine>
-                    ))}
                   </LineChart>
                 </ResponsiveContainer>
 
-                {tooltipData && (
-                  <div
-                    className="fixed z-50 px-3 py-2 bg-white border border-gray-300 rounded shadow text-sm text-gray-700 pointer-events-none"
-                    style={{
-                      top: tooltipData.y,
-                      left: tooltipData.x,
-                      transform: "translate(-50%, -100%)",
-                      maxWidth: "200px",
-                      whiteSpace: "normal",
-                    }}
-                  >
-                    {tooltipData.text}
-                  </div>
-                )}
+                {/* Якщо потім захочеш – можна повернути tooltipData сюди */}
               </div>
             </div>
           </div>
