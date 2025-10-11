@@ -1,97 +1,53 @@
-import React from "react";
-import {
-  LineChart,
-  Line,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-import { format } from "date-fns";
+import * as Dialog from "@radix-ui/react-dialog";
+import { Cross2Icon } from "@radix-ui/react-icons";
+import WeatherPeriodView from "./WeatherPeriodView";
 
-export default function WeatherPeriodView({ hourlyData = [] }) {
-  if (!Array.isArray(hourlyData) || hourlyData.length === 0) {
-    return <p>Немає погодних даних для візуалізації</p>;
-  }
-
-  // 🧠 Групуємо погодинні дані по днях
-  const dailyMap = {};
-
-  hourlyData.forEach((entry) => {
-    const dateStr = format(new Date(entry.date), "dd.MM");
-    if (!dailyMap[dateStr]) {
-      dailyMap[dateStr] = {
-        date: dateStr,
-        temperatureSum: 0,
-        humiditySum: 0,
-        windSum: 0,
-        rainSum: 0,
-        count: 0,
-      };
-    }
-
-    const d = dailyMap[dateStr];
-    d.temperatureSum += entry.temperature;
-    d.humiditySum += entry.humidity;
-    d.windSum += entry.windspeed;
-    d.rainSum += entry.precipitation;
-    d.count += 1;
-  });
-
-  const chartData = Object.values(dailyMap).map((d) => ({
-    date: d.date,
-    temperature: +(d.temperatureSum / d.count).toFixed(1),
-    humidity: +(d.humiditySum / d.count).toFixed(1),
-    windspeed: +(d.windSum / d.count).toFixed(1),
-    precipitation: +d.rainSum.toFixed(1),
-  }));
-
-  const chartConfigs = [
-    {
-      dataKey: "temperature",
-      name: "Температура (°C)",
-      stroke: "#ff7300",
-    },
-    {
-      dataKey: "humidity",
-      name: "Вологість (%)",
-      stroke: "#007bff",
-    },
-    {
-      dataKey: "windspeed",
-      name: "Швидкість вітру (м/с)",
-      stroke: "#8884d8",
-    },
-    {
-      dataKey: "precipitation",
-      name: "Опади (мм)",
-      stroke: "#00b894",
-    },
-  ];
-
+export default function ModalWithWeather({
+  open,
+  onOpenChange,
+  startDate,
+  endDate,
+  lat,
+  lon,
+  hourlyData,
+}) {
   return (
-    <div className="space-y-8">
-      {chartConfigs.map((config) => (
-        <div key={config.dataKey} style={{ width: "100%", height: 300 }}>
-          <h3 className="text-md font-semibold mb-2">{config.name}</h3>
-          <ResponsiveContainer>
-            <LineChart data={chartData}>
-              <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
-              <Line
-                type="monotone"
-                dataKey={config.dataKey}
-                stroke={config.stroke}
-                strokeWidth={2}
-                dot={false}
+    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+      <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40" />
+        <Dialog.Content
+          className="fixed inset-0 flex items-center justify-center z-50 p-4"
+          style={{ animation: "fadeIn 0.2s ease-out" }}
+        >
+          <div className="w-full max-w-5xl h-[85vh] bg-white rounded-xl shadow-xl flex flex-col overflow-hidden border border-gray-200">
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-3 border-b bg-gray-50">
+              <h2 className="text-lg font-semibold text-gray-800">
+                ⛅ Погодні умови за період
+              </h2>
+              <Dialog.Close asChild>
+                <button
+                  className="text-gray-500 hover:text-red-500 transition"
+                  aria-label="Закрити"
+                >
+                  <Cross2Icon />
+                </button>
+              </Dialog.Close>
+            </div>
+
+            {/* Body */}
+            <div className="flex-1 overflow-auto p-5 bg-white">
+              <WeatherPeriodView
+                startDate={startDate}
+                endDate={endDate}
+                lat={lat}
+                lon={lon}
+                hourlyData={hourlyData}
               />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      ))}
-    </div>
+            </div>
+          </div>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }
