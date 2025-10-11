@@ -1,4 +1,5 @@
 // WeatherPeriodView.js
+import React from "react";
 import {
   LineChart,
   Line,
@@ -7,18 +8,19 @@ import {
   YAxis,
   Tooltip,
   Legend,
-  ResponsiveContainer,
   Bar,
   BarChart,
+  ComposedChart,
+  ResponsiveContainer,
 } from "recharts";
 import { format } from "date-fns";
 
 export default function WeatherPeriodView({ hourlyData = [] }) {
-  if (!hourlyData || hourlyData.length === 0) {
+  if (!Array.isArray(hourlyData) || hourlyData.length === 0) {
     return <p>Немає погодних даних для візуалізації</p>;
   }
 
-  // Перетворюємо погодинні дані на щоденні
+  // 🔄 Агрегуємо погодинні дані в щоденні
   const dailyMap = {};
 
   hourlyData.forEach((entry) => {
@@ -53,41 +55,50 @@ export default function WeatherPeriodView({ hourlyData = [] }) {
   return (
     <div className="w-full h-full">
       <ResponsiveContainer width="100%" height={400}>
-        <LineChart data={chartData}>
-          <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
+        <ComposedChart data={chartData}>
+          <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
           <XAxis dataKey="date" />
-          <YAxis yAxisId="left" />
+          <YAxis yAxisId="left" domain={[0, 100]} />
           <YAxis yAxisId="right" orientation="right" />
           <Tooltip />
           <Legend />
 
+          {/* 🔵 Вологість */}
+          <Line
+            yAxisId="left"
+            type="monotone"
+            dataKey="humidity"
+            stroke="#1e90ff"
+            name="Вологість (%)"
+            dot={false}
+          />
+
+          {/* 🟠 Температура */}
           <Line
             yAxisId="left"
             type="monotone"
             dataKey="temperature"
             stroke="#ff7300"
             name="Температура (°C)"
+            dot={false}
           />
-          <Line
-            yAxisId="left"
-            type="monotone"
-            dataKey="humidity"
-            stroke="#007bff"
-            name="Вологість (%)"
-          />
+
+          {/* 🌧️ Опади */}
           <Bar
             yAxisId="right"
             dataKey="precipitation"
-            fill="#5dade2"
+            fill="#90caf9"
             name="Опади (мм)"
           />
+
+          {/* ✅ Сприятливі години */}
           <Bar
             yAxisId="right"
             dataKey="condHours"
-            fill="#58d68d"
+            fill="#66bb6a"
             name="Сприятливі години"
           />
-        </LineChart>
+        </ComposedChart>
       </ResponsiveContainer>
     </div>
   );
