@@ -824,9 +824,9 @@ const integratedSystem = integratedMap
 </div>
 </div>
 
-    <button className="restart-button" onClick={onRestart}>
-      Почати спочатку
-    </button>
+    <button className="restart-button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
+  ↑ Вгору
+</button>
   </>
 )}
 </div>
