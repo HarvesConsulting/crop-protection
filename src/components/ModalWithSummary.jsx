@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
   ReferenceArea,
   Legend,
+  Customized,
 } from "recharts";
 import { useState, useMemo } from "react";
 
@@ -51,7 +52,6 @@ export default function ModalWithSummary({
     lineColor = "#facc15";
   }
 
-  // Графік: основні погодинні дані
   const chartData = useMemo(() => {
     return diagnostics.map((entry) => ({
       date: format(new Date(entry.date), "dd.MM"),
@@ -59,12 +59,12 @@ export default function ModalWithSummary({
     }));
   }, [diagnostics]);
 
-  // Масив зон обприскування
+  // ⬇️ Замість ReferenceLine — формуємо зони
   const sprayAreas = useMemo(() => {
     return integratedTreatments.map((entry, i) => {
       const start = parse(entry.Дата, "dd.MM.yyyy", new Date());
       const end = new Date(start);
-      end.setDate(start.getDate() + 1); // наступна доба
+      end.setDate(start.getDate() + 1);
 
       const x1 = format(start, "dd.MM");
       const x2 = format(end, "dd.MM");
@@ -72,10 +72,35 @@ export default function ModalWithSummary({
       return {
         x1,
         x2,
+        label: `#${i + 1}`,
         tooltip,
       };
     });
   }, [integratedTreatments]);
+
+  // ⬇️ Компонент для рендеру номерів обробок
+  const CustomizedTreatmentLabels = ({ xAxisMap }) => {
+    if (!xAxisMap || !xAxisMap["date"]) return null;
+    const { scale } = xAxisMap["date"];
+
+    return sprayAreas.map((area, index) => {
+      const x = scale(area.x1);
+      if (typeof x !== "number") return null;
+
+      return (
+        <text
+          key={index}
+          x={x}
+          y={20}
+          fill="#3b82f6"
+          fontSize={12}
+          textAnchor="middle"
+        >
+          {sprayAreas[index].label}
+        </text>
+      );
+    });
+  };
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -150,7 +175,7 @@ export default function ModalWithSummary({
                       ]}
                     />
 
-                    {/* Зони обприскування */}
+                    {/* 🔵 Зони обприскування */}
                     {sprayAreas.map((area, index) => (
                       <ReferenceArea
                         key={index}
@@ -160,8 +185,33 @@ export default function ModalWithSummary({
                         fill="#3b82f6"
                         fillOpacity={0.15}
                         ifOverflow="visible"
+                        onMouseEnter={(e) => {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setTooltipData({
+                            text: area.tooltip,
+                            x: rect.left + rect.width / 2,
+                            y: rect.top - 10,
+                          });
+                        }}
+                        onMouseLeave={() => setTooltipData(null)}
+                        onTouchStart={(e) => {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setTooltipData({
+                            text: area.tooltip,
+                            x: rect.left + rect.width / 2,
+                            y: rect.top - 10,
+                          });
+                        }}
+                        onTouchEnd={() => setTooltipData(null)}
                       />
                     ))}
+
+                    {/* 🔢 Номери обробок */}
+                    <Customized
+                      component={(props) => (
+                        <CustomizedTreatmentLabels xAxisMap={props.xAxisMap} />
+                      )}
+                    />
 
                     <Line
                       type="monotone"
@@ -174,7 +224,20 @@ export default function ModalWithSummary({
                   </LineChart>
                 </ResponsiveContainer>
 
-                {/* Якщо потім захочеш – можна повернути tooltipData сюди */}
+                {tooltipData && (
+                  <div
+                    className="fixed z-50 px-3 py-2 bg-white border border-gray-300 rounded shadow text-sm text-gray-700 pointer-events-none"
+                    style={{
+                      top: tooltipData.y,
+                      left: tooltipData.x,
+                      transform: "translate(-50%, -100%)",
+                      maxWidth: "200px",
+                      whiteSpace: "normal",
+                    }}
+                  >
+                    {tooltipData.text}
+                  </div>
+                )}
               </div>
             </div>
           </div>
