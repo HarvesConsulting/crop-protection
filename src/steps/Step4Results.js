@@ -636,14 +636,8 @@ const integratedSystem = integratedMap
   XLSX.utils.sheet_add_aoa(ws, [["Інтегрована система захисту"]], { origin: "A1" });
 
   // 🟢 Автоширина колонок
-  const columnWidths = Object.keys(exportData[0]).map((key) => {
-    const maxLength = Math.max(
-      key.length,
-      ...exportData.map((row) => (row[key] || "").length)
-    );
-    return { wch: Math.min(Math.max(maxLength + 2, 10), 40) };
-  });
-  ws["!cols"] = columnWidths;
+  ws["!cols"] = Object.keys(exportData[0]).map(() => ({ auto: 1 }));
+
 
   // 🟢 Створюємо книгу та додаємо лист
   const wb = XLSX.utils.book_new();
