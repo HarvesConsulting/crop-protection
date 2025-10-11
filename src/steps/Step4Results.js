@@ -624,56 +624,18 @@ const integratedSystem = integratedMap
   });
   
   const exportToExcel = () => {
-  const diseases = ["Фітофтороз", "Сіра гниль", "Альтернаріоз", "Бактеріоз"];
-
-  const allGroups = [
-    { name: "Фітофтороз", entries: sprayData || [] },
-    ...(diseaseCardsGrouped || []),
-  ];
-
-  const allDates = [
-    ...new Set(
-      allGroups.flatMap((group) => group.entries?.map((e) => e.Дата))
-    ),
-  ].sort((a, b) => {
-    const [dA, mA, yA] = a.split(".");
-    const [dB, mB, yB] = b.split(".");
-    return new Date(yA, mA - 1, dA) - new Date(yB, mB - 1, dB);
-  });
-
-  const diseaseMap = {};
-  for (const date of allDates) {
-    diseaseMap[date] = {};
-    for (const dis of diseases) diseaseMap[date][dis] = "";
-  }
-
-  for (const group of allGroups) {
-    const { name, entries } = group;
-    if (!diseases.includes(name)) continue;
-
-    for (const entry of entries) {
-      const date = entry.Дата;
-      const prep = entry.Препарат;
-      if (!date || !prep) continue;
-
-      diseaseMap[date][name] += (diseaseMap[date][name] ? "\n" : "") + prep;
-    }
-  }
-
-  const exportData = allDates.map((date) => {
-    const row = { Дата: date };
-    for (const d of diseases) {
-      row[d] = diseaseMap[date][d] || "—";
-    }
-    return row;
-  });
+  const exportData = integratedSystem.map((entry) => ({
+    Дата: entry.Дата,
+    Препарати: entry.Препарат,
+    Хвороби: entry.Хвороби,
+  }));
 
   const ws = XLSX.utils.json_to_sheet(exportData);
 
-  // ✅ Заголовок таблиці
+  // 🟢 Додаємо заголовок в A1
   XLSX.utils.sheet_add_aoa(ws, [["Інтегрована система захисту"]], { origin: "A1" });
 
-  // ✅ Автоширина колонок
+  // 🟢 Автоширина колонок
   const columnWidths = Object.keys(exportData[0]).map((key) => {
     const maxLength = Math.max(
       key.length,
@@ -683,10 +645,14 @@ const integratedSystem = integratedMap
   });
   ws["!cols"] = columnWidths;
 
+  // 🟢 Створюємо книгу та додаємо лист
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Інтегрована таблиця");
+
+  // 🟢 Зберігаємо файл
   XLSX.writeFile(wb, "Інтегрована_таблиця_захисту.xlsx");
 };
+
 
   return (
   <main ref={topRef} className="flex justify-center items-start min-h-[70vh] px-4">
