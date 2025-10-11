@@ -86,7 +86,7 @@ function ChartSection({ title, dataKey, color, data }) {
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="datetime" minTickGap={20} />
+            <XAxis dataKey="datetime" minTickGap={25} />
             <YAxis />
             <Tooltip />
             <Legend />
@@ -95,8 +95,14 @@ function ChartSection({ title, dataKey, color, data }) {
               dataKey={dataKey}
               stroke={color}
               strokeWidth={2}
-              dot={{ r: 2 }}
+              dot={false}
               activeDot={{ r: 5 }}
+            />
+            <Brush
+              dataKey="datetime"
+              height={30}
+              stroke={color}
+              travellerWidth={10}
             />
           </LineChart>
         </ResponsiveContainer>
