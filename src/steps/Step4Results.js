@@ -373,6 +373,7 @@ function aggregateDailyRain(hourlyData = []) {
 
 export default function Step4Results({ result, onRestart }) {
   const [showIntegrated, setShowIntegrated] = useState(false);
+  const topRef = React.useRef(null);
   const [showMenu, setShowMenu] = useState(false);
   const [showWeather, setShowWeather] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
@@ -688,7 +689,7 @@ const integratedSystem = integratedMap
 };
 
   return (
-  <main className="flex justify-center items-start min-h-[70vh] px-4">
+  <main ref={topRef} className="flex justify-center items-start min-h-[70vh] px-4">
   <div className="w-full max-w-xl mx-auto bg-white rounded-xl shadow-md px-6 sm:px-10 py-6 space-y-6 text-base sm:text-lg">
   <ActionMenu
   isMobile={isMobile}
@@ -824,13 +825,14 @@ const integratedSystem = integratedMap
 </div>
 </div>
 
-  <button
+ <button
   className="restart-button"
   onClick={() => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    if (topRef.current) {
+      topRef.current.scrollIntoView({ behavior: "smooth" });
+    } else {
+      console.warn("❗ topRef не знайдено");
+    }
   }}
 >
   ↑ Вгору
