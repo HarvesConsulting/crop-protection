@@ -52,16 +52,12 @@ export default function ModalWithSummary({
     lineColor = "#facc15";
   }
 
-  const chartData = useMemo(() => {
-    return diagnostics.map((entry) => {
-      const date = format(new Date(entry.date), "dd.MM");
-      const h = Number(entry.condHours ?? entry.cond_hours ?? entry.hours);
-      return {
-        date,
-        hours: isNaN(h) ? 0 : h,
-      };
-    });
-  }, [diagnostics]);
+ const chartData = useMemo(() => {
+  return diagnostics.map((entry) => ({
+    date: format(new Date(entry.date), "dd.MM"),
+    hours: Number(entry.condHours) || 0,
+  }));
+}, [diagnostics]);
 
   const sprayLines = useMemo(() => {
     return integratedTreatments.map((entry, i) => {
