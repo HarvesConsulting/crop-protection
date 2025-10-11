@@ -1,5 +1,15 @@
 import React, { useMemo, useEffect } from "react";
 import { format, isValid } from "date-fns";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  CartesianGrid,
+} from "recharts";
 
 function asDate(v) {
   if (v instanceof Date) return isValid(v) ? v : null;
@@ -7,15 +17,10 @@ function asDate(v) {
   return isValid(d) ? d : null;
 }
 
-export default function WeatherPeriodView({
-  startDate,
-  endDate,
-  hourlyData,
-}) {
+export default function WeatherPeriodView({ startDate, endDate, hourlyData }) {
   const start = asDate(startDate);
   const end = asDate(endDate);
 
-  // 🔎 Логування вхідних параметрів
   useEffect(() => {
     console.group("📊 WeatherPeriodView Debug");
     console.log("✅ Вхідні параметри:");
@@ -31,55 +36,64 @@ export default function WeatherPeriodView({
         const d = asDate(h.date);
         if (!d) return null;
         return {
-          date: d,
-          hour: h.hour ?? d.getHours(),
+          datetime: `${format(d, "dd.MM")} ${String(h.hour ?? d.getHours()).padStart(2, "0")}:00`,
           temperature: Number(h.temperature),
           humidity: Number(h.humidity),
           windspeed: Number(h.windspeed),
           precipitation: Number(h.precipitation),
         };
       })
-      .filter((r) => r && (!start || r.date >= start) && (!end || r.date <= end))
-      .sort((a, b) => a.date - b.date || a.hour - b.hour);
+      .filter((r) => r && (!start || new Date(r.datetime) >= start) && (!end || new Date(r.datetime) <= end));
   }, [hourlyData, start, end]);
 
+  const chartProps = {
+    data: rows,
+    margin: { top: 10, right: 30, left: 0, bottom: 0 },
+  };
+
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4 mb-4 shadow-sm">
-      <div className="flex items-center gap-2 mb-3">
-        <span role="img" aria-label="weather">⏱️</span>
-        <h4 className="font-semibold text-lg">Погодні умови (погодинно)</h4>
-      </div>
+    <div className="space-y-8">
+      <h4 className="font-semibold text-lg flex items-center gap-2">
+        ⏱️ Погодні умови (графіки)
+      </h4>
 
       {rows.length === 0 ? (
         <div className="text-center text-gray-500 p-4">Немає погодинних даних</div>
       ) : (
-        <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
-          <table className="min-w-[720px] w-full border-collapse text-sm">
-            <thead className="sticky top-0 bg-gray-100">
-              <tr>
-                <th className="p-2 border-b text-left">Дата</th>
-                <th className="p-2 border-b text-right">Година</th>
-                <th className="p-2 border-b text-right">Температура °C</th>
-                <th className="p-2 border-b text-right">Вологість %</th>
-                <th className="p-2 border-b text-right">Вітер (м/с)</th>
-                <th className="p-2 border-b text-right">Опади (мм)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r, i) => (
-                <tr key={i} className="odd:bg-white even:bg-gray-50">
-                  <td className="p-2 border-b">{format(r.date, "dd.MM.yyyy")}</td>
-                  <td className="p-2 border-b text-right">{String(r.hour).padStart(2, "0")}:00</td>
-                  <td className="p-2 border-b text-right">{isFinite(r.temperature) ? r.temperature.toFixed(1) : "—"}</td>
-                  <td className="p-2 border-b text-right">{isFinite(r.humidity) ? r.humidity.toFixed(0) : "—"}</td>
-                  <td className="p-2 border-b text-right">{isFinite(r.windspeed) ? r.windspeed.toFixed(1) : "—"}</td>
-                  <td className="p-2 border-b text-right">{isFinite(r.precipitation) ? r.precipitation.toFixed(1) : "—"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="space-y-10">
+          <ChartSection title="🌡️ Температура (°C)" dataKey="temperature" color="#ff6b6b" {...chartProps} />
+          <ChartSection title="💧 Вологість (%)" dataKey="humidity" color="#339af0" {...chartProps} />
+          <ChartSection title="🌬️ Швидкість вітру (м/с)" dataKey="windspeed" color="#20c997" {...chartProps} />
+          <ChartSection title="☔ Опади (мм)" dataKey="precipitation" color="#845ef7" {...chartProps} />
         </div>
       )}
+    </div>
+  );
+}
+
+function ChartSection({ title, dataKey, color, data, margin }) {
+  return (
+    <div>
+      <h5 className="text-md font-medium mb-2">{title}</h5>
+      <div className="w-full h-64">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={data} margin={margin}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="datetime" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Line
+              type="monotone"
+              dataKey={dataKey}
+              stroke={color}
+              strokeWidth={2}
+              dot={{ r: 2 }}
+              activeDot={{ r: 5 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }
