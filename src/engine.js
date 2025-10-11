@@ -127,51 +127,57 @@ export function computeMultiSpraySchedule(rows, rainDaily = [], plantingDate) {
   const sprays = [];
   const dayMs = 86400000;
 
-  // 👉 мінімальна дата першої обробки = plantingDate + 10 днів
   const planting = asDate(plantingDate);
-  const minFirstDate = planting ? new Date(planting.getTime() + 5 * dayMs) : null;
-
-  // Якщо є мінімум — відразу фільтруємо рядки, що раніше
-  if (minFirstDate) {
-    normRows = normRows.filter(r => r.date >= minFirstDate);
-  }
-
-  // перший день з умовами
-  const firstObj = normRows.find(hasCond);
-  const first = firstObj?.date || null;
-  if (!first) return sprays;
-
-  sprays.push(first);
-  let cursor = first;
+  const firstPossibleDate = planting ? new Date(planting.getTime() + 7 * dayMs) : null;
 
   // нормалізуємо опади
   const rain = Array.isArray(rainDaily)
     ? rainDaily
-        .map(x => ({ date: x?.date instanceof Date ? x.date : asDate(x?.date), rain: Number(x?.rain || 0) }))
+        .map(x => ({
+          date: x?.date instanceof Date ? x.date : asDate(x?.date),
+          rain: Number(x?.rain || 0),
+        }))
         .filter(x => x.date && isValidDate(x.date))
     : [];
 
+  if (!firstPossibleDate) return [];
+
+  // 🔸 Знаходимо перший день з умовами після 7 днів від висадки
+  const first = normRows.find(r => r.date >= firstPossibleDate && hasCond(r))?.date;
+  if (!first) return []; // якщо немає умов — немає обробок
+
+  sprays.push(first);
+  let lastSprayDate = first;
+
   while (true) {
-    const d1 = new Date(cursor.getTime() + 1 * dayMs);
-    const d5 = new Date(cursor.getTime() + 5 * dayMs);
-    const d7 = new Date(cursor.getTime() + 7 * dayMs);
+    const next5 = new Date(lastSprayDate.getTime() + 5 * dayMs);
+    const next7 = new Date(lastSprayDate.getTime() + 7 * dayMs);
 
-    const hadHeavyRain = rain.some((r) => r.date > cursor && r.date <= d7 && Number(r.rain) >= RAIN_HIGH_THRESHOLD_MM);
+    const rainWindow = rain.filter(
+      (r) => r.date > lastSprayDate && r.date <= next5
+    );
 
-    let next = null;
+    const hadHeavyRain = rainWindow.some((r) => r.rain >= RAIN_HIGH_THRESHOLD_MM);
+
+    let nextCandidateDate = null;
+
     if (hadHeavyRain) {
-      next = d5;
+      // Після 5 днів — наступна з умовами
+      nextCandidateDate = normRows.find(
+        (r) => r.date >= next5 && hasCond(r)
+      )?.date;
     } else {
-      const hadCondWithin7 = normRows.some((r) => r.date >= d1 && r.date <= d7 && hasCond(r));
-      if (hadCondWithin7) next = d7;
-      else next = normRows.find((r) => r.date > d7 && hasCond(r))?.date || null;
+      // Після 7 днів — наступна з умовами
+      nextCandidateDate = normRows.find(
+        (r) => r.date >= next7 && hasCond(r)
+      )?.date;
     }
 
-    if (!next) break;
-    if (sprays.length && next.getTime() <= sprays[sprays.length - 1].getTime()) break;
+    if (!nextCandidateDate) break;
+    if (nextCandidateDate <= lastSprayDate) break; // без зациклення
 
-    sprays.push(next);
-    cursor = next;
+    sprays.push(nextCandidateDate);
+    lastSprayDate = nextCandidateDate;
   }
 
   return sprays;
