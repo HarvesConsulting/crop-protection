@@ -204,4 +204,12 @@ body {
   text-transform: lowercase;
   margin-right: 5px; /* трохи відступу між "by" та назвою */
 }
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
 
