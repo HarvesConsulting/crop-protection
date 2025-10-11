@@ -1,53 +1,94 @@
-import * as Dialog from "@radix-ui/react-dialog";
-import { Cross2Icon } from "@radix-ui/react-icons";
-import WeatherPeriodView from "./WeatherPeriodView";
+// WeatherPeriodView.js
+import {
+  LineChart,
+  Line,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  Bar,
+  BarChart,
+} from "recharts";
+import { format } from "date-fns";
 
-export default function ModalWithWeather({
-  open,
-  onOpenChange,
-  startDate,
-  endDate,
-  lat,
-  lon,
-  hourlyData,
-}) {
+export default function WeatherPeriodView({ hourlyData = [] }) {
+  if (!hourlyData || hourlyData.length === 0) {
+    return <p>Немає погодних даних для візуалізації</p>;
+  }
+
+  // Перетворюємо погодинні дані на щоденні
+  const dailyMap = {};
+
+  hourlyData.forEach((entry) => {
+    const dateStr = format(new Date(entry.date), "dd.MM");
+    if (!dailyMap[dateStr]) {
+      dailyMap[dateStr] = {
+        date: dateStr,
+        tempSum: 0,
+        humiditySum: 0,
+        precipSum: 0,
+        condHours: 0,
+        count: 0,
+      };
+    }
+
+    const d = dailyMap[dateStr];
+    d.tempSum += entry.temperature;
+    d.humiditySum += entry.humidity;
+    d.condHours += entry.suitable ? 1 : 0;
+    d.precipSum += entry.precipitation;
+    d.count += 1;
+  });
+
+  const chartData = Object.values(dailyMap).map((d) => ({
+    date: d.date,
+    temperature: +(d.tempSum / d.count).toFixed(1),
+    humidity: +(d.humiditySum / d.count).toFixed(1),
+    precipitation: +d.precipSum.toFixed(1),
+    condHours: d.condHours,
+  }));
+
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40" />
-        <Dialog.Content
-          className="fixed inset-0 flex items-center justify-center z-50 p-4"
-          style={{ animation: "fadeIn 0.2s ease-out" }}
-        >
-          <div className="w-full max-w-5xl h-[85vh] bg-white rounded-xl shadow-xl flex flex-col overflow-hidden border border-gray-200">
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 py-3 border-b bg-gray-50">
-              <h2 className="text-lg font-semibold text-gray-800">
-                ⛅ Погодні умови за період
-              </h2>
-              <Dialog.Close asChild>
-                <button
-                  className="text-gray-500 hover:text-red-500 transition"
-                  aria-label="Закрити"
-                >
-                  <Cross2Icon />
-                </button>
-              </Dialog.Close>
-            </div>
+    <div className="w-full h-full">
+      <ResponsiveContainer width="100%" height={400}>
+        <LineChart data={chartData}>
+          <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
+          <XAxis dataKey="date" />
+          <YAxis yAxisId="left" />
+          <YAxis yAxisId="right" orientation="right" />
+          <Tooltip />
+          <Legend />
 
-            {/* Body */}
-            <div className="flex-1 overflow-auto p-5 bg-white">
-              <WeatherPeriodView
-                startDate={startDate}
-                endDate={endDate}
-                lat={lat}
-                lon={lon}
-                hourlyData={hourlyData}
-              />
-            </div>
-          </div>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+          <Line
+            yAxisId="left"
+            type="monotone"
+            dataKey="temperature"
+            stroke="#ff7300"
+            name="Температура (°C)"
+          />
+          <Line
+            yAxisId="left"
+            type="monotone"
+            dataKey="humidity"
+            stroke="#007bff"
+            name="Вологість (%)"
+          />
+          <Bar
+            yAxisId="right"
+            dataKey="precipitation"
+            fill="#5dade2"
+            name="Опади (мм)"
+          />
+          <Bar
+            yAxisId="right"
+            dataKey="condHours"
+            fill="#58d68d"
+            name="Сприятливі години"
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   );
 }
