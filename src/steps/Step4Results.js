@@ -629,7 +629,7 @@ const exportToPDF = () => {
   const doc = new jsPDF();
 
   // ✅ Використовуємо шрифт з підтримкою кирилиці
-  doc.setFont("RobotoCyrillic");
+  doc.setFont("Roboto-Regular");
   doc.setFontSize(16);
 
   // Заголовок
@@ -648,7 +648,7 @@ const exportToPDF = () => {
     head: [["Дата", "Препарати", "Хвороби"]],
     body: exportData,
     styles: {
-      font: "RobotoCyrillic", // ⚡ важливо для кирилиці
+      font: "Roboto-Regular", // ⚡ важливо для кирилиці
       fontSize: 10,
       cellPadding: 4,
       valign: "top",
