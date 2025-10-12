@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import "./Step4Results.css";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import "../fonts/RobotoCyrillic";
 import HourTimeline from "../components/HourTimeline";
 import Layout from "../components/Layout";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
@@ -627,27 +628,27 @@ const integratedSystem = integratedMap
 const exportToPDF = () => {
   const doc = new jsPDF();
 
-  // ✅ Установлюємо вбудований шрифт з підтримкою кирилиці
-  doc.setFont("Arial");
+  // ✅ Встановлюємо шрифт з підтримкою кирилиці
+  doc.setFont("RobotoCyrillic");
   doc.setFontSize(14);
 
   // Заголовок
   doc.text("Інтегрована система захисту", 105, 20, { align: "center" });
 
-  // Готуємо дані
+  // Дані для таблиці
   const exportData = integratedSystem.map((entry) => [
     entry.Дата || "",
     entry.Препарат || "",
     entry.Хвороби || "",
   ]);
 
-  // Побудова таблиці
+  // Таблиця
   autoTable(doc, {
     startY: 30,
     head: [["Дата", "Препарати", "Хвороби"]],
     body: exportData,
     styles: {
-      font: "Arial", // ✅ Шрифт з підтримкою кирилиці
+      font: "RobotoCyrillic", // 🔥 шрифт тут також
       fontSize: 10,
       cellPadding: 4,
       valign: "top",
@@ -667,7 +668,7 @@ const exportToPDF = () => {
     },
   });
 
-  // Збереження
+  // Збереження PDF
   doc.save("Інтегрована_таблиця_захисту.pdf");
 };
 
