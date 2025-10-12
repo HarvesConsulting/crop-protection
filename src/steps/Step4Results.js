@@ -627,19 +627,19 @@ const integratedSystem = integratedMap
 const exportToPDF = () => {
   const doc = new jsPDF();
 
-  // 🟢 Заголовок
+  // Заголовок
   doc.setFontSize(16);
   doc.text("Інтегрована система захисту", 105, 20, { align: "center" });
 
-  // 📊 Дані для таблиці
+  // Підготовка даних для таблиці
   const exportData = integratedSystem.map((entry) => [
     entry.Дата,
     entry.Препарат,
     entry.Хвороби,
   ]);
 
-  // 📋 Створення таблиці
-  doc.autoTable({
+  // Створення таблиці (замість doc.autoTable => autoTable(doc, {...}))
+  autoTable(doc, {
     startY: 30,
     head: [["Дата", "Препарати", "Хвороби"]],
     body: exportData,
@@ -659,13 +659,14 @@ const exportToPDF = () => {
       fontStyle: "bold",
     },
     alternateRowStyles: {
-      fillColor: [240, 240, 240], // сірий для чіткості
+      fillColor: [240, 240, 240], // світло-сірий фон для чіткості
     },
   });
 
-  // 💾 Збереження PDF
+  // Збереження PDF
   doc.save("Інтегрована_таблиця_захисту.pdf");
 };
+
   return (
   <main ref={topRef} className="flex justify-center items-start min-h-[70vh] px-4">
   <div className="w-full max-w-xl mx-auto bg-white rounded-xl shadow-md px-6 sm:px-10 py-6 space-y-6 text-base sm:text-lg">
