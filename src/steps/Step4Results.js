@@ -643,33 +643,34 @@ const exportToPDF = () => {
     entry.Хвороби || "",
   ]);
 
-  // 📊 Побудова таблиці
-  autoTable(doc, {
-    startY: 30,
-    head: [["Дата", "Препарати", "Хвороби"]],
-    body: exportData,
-    styles: {
-      font: "Roboto",         // 🟢 Головне — правильна назва шрифту!
-      fontStyle: "normal",    // або "bold"
-      fontSize: 10,
-      cellPadding: 4,
-      valign: "top",
-      textColor: 20,
-    },
-    columnStyles: {
-      0: { cellWidth: 30 },
-      1: { cellWidth: 80 },
-      2: { cellWidth: 80 },
-    },
-    headStyles: {
-      fillColor: [24, 78, 47], // 🟢 темно-зелений фон
-      textColor: 255,          // ⚪ білий текст
-      fontStyle: "bold",
-    },
-    alternateRowStyles: {
-      fillColor: [245, 245, 245], // 🔁 світло-сірі рядки
-    },
-  });
+ autoTable(doc, {
+  startY: 30,
+  head: [["Дата", "Препарати", "Хвороби"]],
+  body: exportData,
+  styles: {
+    font: "Roboto",
+    fontStyle: "normal",
+    fontSize: 10,
+    cellPadding: 4,
+    valign: "top",
+    textColor: 20,
+    overflow: 'linebreak',
+  },
+  columnStyles: {
+    0: { cellWidth: 30 },
+    1: { cellWidth: "wrap" },  // ✅ дозволяє адаптивну ширину
+    2: { cellWidth: 50 },
+  },
+  headStyles: {
+    fillColor: [24, 78, 47],
+    textColor: 255,
+    fontStyle: "bold",
+  },
+  alternateRowStyles: {
+    fillColor: [245, 245, 245],
+  },
+});
+
 
   // 💾 Зберігаємо
   doc.save("Інтегрована_таблиця_захисту.pdf");
