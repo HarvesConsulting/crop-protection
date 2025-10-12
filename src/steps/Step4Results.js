@@ -3,6 +3,7 @@ import ModalWithSummary from "../components/ModalWithSummary"; // адаптуй
 import React, { useState } from "react";
 import "./Step4Results.css";
 import jsPDF from "jspdf";
+import "./path-to/RobotoCyrillic"; // (без .js)
 import autoTable from "jspdf-autotable";
 import HourTimeline from "../components/HourTimeline";
 import Layout from "../components/Layout";
@@ -627,23 +628,25 @@ const integratedSystem = integratedMap
 const exportToPDF = () => {
   const doc = new jsPDF();
 
-  // Заголовок
-  doc.setFontSize(16);
+  // ✅ Встановлюємо підтримку кирилиці (Arial вже вбудований)
+  doc.setFont("Arial");
+  doc.setFontSize(14);
   doc.text("Інтегрована система захисту", 105, 20, { align: "center" });
 
-  // Підготовка даних для таблиці
+  // 📋 Готуємо дані
   const exportData = integratedSystem.map((entry) => [
-    entry.Дата,
-    entry.Препарат,
-    entry.Хвороби,
+    entry.Дата || "",
+    entry.Препарат || "",
+    entry.Хвороби || "",
   ]);
 
-  // Створення таблиці (замість doc.autoTable => autoTable(doc, {...}))
+  // 🧾 Малюємо таблицю
   autoTable(doc, {
     startY: 30,
     head: [["Дата", "Препарати", "Хвороби"]],
     body: exportData,
     styles: {
+      font: "Arial",         // 🔥 Шрифт з підтримкою кирилиці
       fontSize: 10,
       cellPadding: 4,
       valign: "top",
@@ -654,16 +657,16 @@ const exportToPDF = () => {
       2: { cellWidth: 80 },
     },
     headStyles: {
-      fillColor: [24, 78, 47], // темно-зелений
+      fillColor: [24, 78, 47],
       textColor: 255,
       fontStyle: "bold",
     },
     alternateRowStyles: {
-      fillColor: [240, 240, 240], // світло-сірий фон для чіткості
+      fillColor: [240, 240, 240],
     },
   });
 
-  // Збереження PDF
+  // 💾 Зберігаємо файл
   doc.save("Інтегрована_таблиця_захисту.pdf");
 };
 
