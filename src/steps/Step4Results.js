@@ -3,7 +3,6 @@ import ModalWithSummary from "../components/ModalWithSummary"; // адаптуй
 import React, { useState } from "react";
 import "./Step4Results.css";
 import jsPDF from "jspdf";
-import "./path-to/RobotoCyrillic"; // (без .js)
 import autoTable from "jspdf-autotable";
 import HourTimeline from "../components/HourTimeline";
 import Layout from "../components/Layout";
@@ -624,29 +623,31 @@ const integratedSystem = integratedMap
     const dB = parseISO(b.Дата.split(".").reverse().join("-"));
     return dA - dB;
   });
-  
+
 const exportToPDF = () => {
   const doc = new jsPDF();
 
-  // ✅ Встановлюємо підтримку кирилиці (Arial вже вбудований)
+  // ✅ Установлюємо вбудований шрифт з підтримкою кирилиці
   doc.setFont("Arial");
   doc.setFontSize(14);
+
+  // Заголовок
   doc.text("Інтегрована система захисту", 105, 20, { align: "center" });
 
-  // 📋 Готуємо дані
+  // Готуємо дані
   const exportData = integratedSystem.map((entry) => [
     entry.Дата || "",
     entry.Препарат || "",
     entry.Хвороби || "",
   ]);
 
-  // 🧾 Малюємо таблицю
+  // Побудова таблиці
   autoTable(doc, {
     startY: 30,
     head: [["Дата", "Препарати", "Хвороби"]],
     body: exportData,
     styles: {
-      font: "Arial",         // 🔥 Шрифт з підтримкою кирилиці
+      font: "Arial", // ✅ Шрифт з підтримкою кирилиці
       fontSize: 10,
       cellPadding: 4,
       valign: "top",
@@ -666,7 +667,7 @@ const exportToPDF = () => {
     },
   });
 
-  // 💾 Зберігаємо файл
+  // Збереження
   doc.save("Інтегрована_таблиця_захисту.pdf");
 };
 
