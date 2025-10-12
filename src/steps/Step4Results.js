@@ -629,30 +629,32 @@ const integratedSystem = integratedMap
 const exportToPDF = () => {
   const doc = new jsPDF();
 
-  // ✅ Використовуємо шрифт з підтримкою кирилиці
-  doc.setFont("Roboto-Regular");
+  // 🔤 Установлюємо шрифт Roboto-Regular (доданий через .js файл)
+  doc.setFont("Roboto-Regular", "normal");
   doc.setFontSize(16);
 
-  // Заголовок
+  // 🧾 Заголовок
   doc.text("Інтегрована система захисту", 105, 20, { align: "center" });
 
-  // Дані таблиці
+  // 🧩 Підготовка даних таблиці
   const exportData = integratedSystem.map((entry) => [
     entry.Дата || "",
     entry.Препарат || "",
     entry.Хвороби || "",
   ]);
 
-  // Побудова таблиці
+  // 🧱 Побудова таблиці
   autoTable(doc, {
     startY: 30,
     head: [["Дата", "Препарати", "Хвороби"]],
     body: exportData,
     styles: {
-      font: "Roboto-Regular", // ⚡ важливо для кирилиці
+      font: "Roboto-Regular", // 👈 важливо для кирилиці
+      fontStyle: "normal", // 👈 або "bold", якщо хочеш зробити весь текст жирним
       fontSize: 10,
       cellPadding: 4,
       valign: "top",
+      textColor: 20,
     },
     columnStyles: {
       0: { cellWidth: 30 },
@@ -660,18 +662,19 @@ const exportToPDF = () => {
       2: { cellWidth: 80 },
     },
     headStyles: {
-      fillColor: [24, 78, 47], // зелений заголовок
-      textColor: 255,
+      fillColor: [24, 78, 47], // 🟩 темно-зелений
+      textColor: 255, // 🔲 білий текст
       fontStyle: "bold",
     },
     alternateRowStyles: {
-      fillColor: [240, 240, 240], // чергування рядків
+      fillColor: [245, 245, 245], // 🔁 чергування сірих рядків
     },
   });
 
-  // Збереження PDF
+  // 💾 Збереження файлу
   doc.save("Інтегрована_таблиця_захисту.pdf");
 };
+
 
   return (
   <main ref={topRef} className="flex justify-center items-start min-h-[70vh] px-4">
