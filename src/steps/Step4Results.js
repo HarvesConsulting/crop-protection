@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import "./Step4Results.css";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import "../fonts/RobotoCyrillic";
+import "../fonts/Roboto-Regular-normal";
 import HourTimeline from "../components/HourTimeline";
 import Layout from "../components/Layout";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
@@ -628,27 +628,27 @@ const integratedSystem = integratedMap
 const exportToPDF = () => {
   const doc = new jsPDF();
 
-  // ✅ Встановлюємо шрифт з підтримкою кирилиці
+  // ✅ Використовуємо шрифт з підтримкою кирилиці
   doc.setFont("RobotoCyrillic");
-  doc.setFontSize(14);
+  doc.setFontSize(16);
 
   // Заголовок
   doc.text("Інтегрована система захисту", 105, 20, { align: "center" });
 
-  // Дані для таблиці
+  // Дані таблиці
   const exportData = integratedSystem.map((entry) => [
     entry.Дата || "",
     entry.Препарат || "",
     entry.Хвороби || "",
   ]);
 
-  // Таблиця
+  // Побудова таблиці
   autoTable(doc, {
     startY: 30,
     head: [["Дата", "Препарати", "Хвороби"]],
     body: exportData,
     styles: {
-      font: "RobotoCyrillic", // 🔥 шрифт тут також
+      font: "RobotoCyrillic", // ⚡ важливо для кирилиці
       fontSize: 10,
       cellPadding: 4,
       valign: "top",
@@ -659,12 +659,12 @@ const exportToPDF = () => {
       2: { cellWidth: 80 },
     },
     headStyles: {
-      fillColor: [24, 78, 47],
+      fillColor: [24, 78, 47], // зелений заголовок
       textColor: 255,
       fontStyle: "bold",
     },
     alternateRowStyles: {
-      fillColor: [240, 240, 240],
+      fillColor: [240, 240, 240], // чергування рядків
     },
   });
 
