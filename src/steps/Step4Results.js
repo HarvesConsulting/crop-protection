@@ -2,7 +2,8 @@ import { format, parseISO, differenceInDays, isValid } from "date-fns";
 import ModalWithSummary from "../components/ModalWithSummary"; // адаптуй шлях, якщо потрібно
 import React, { useState } from "react";
 import "./Step4Results.css";
-import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 import HourTimeline from "../components/HourTimeline";
 import Layout from "../components/Layout";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
@@ -623,47 +624,48 @@ const integratedSystem = integratedMap
     return dA - dB;
   });
   
-  const exportToExcel = () => {
-  const exportData = integratedSystem.map((entry) => ({
-    Дата: entry.Дата,
-    Препарати: entry.Препарат,
-    Хвороби: entry.Хвороби,
-  }));
+const exportToPDF = () => {
+  const doc = new jsPDF();
 
-  const ws = XLSX.utils.aoa_to_sheet([["Інтегрована система захисту"]]);
+  // 🟢 Заголовок
+  doc.setFontSize(16);
+  doc.text("Інтегрована система захисту", 105, 20, { align: "center" });
 
-  // Об'єднання заголовку
-  ws["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 2 } }];
+  // 📊 Дані для таблиці
+  const exportData = integratedSystem.map((entry) => [
+    entry.Дата,
+    entry.Препарат,
+    entry.Хвороби,
+  ]);
 
-  // Додаємо основну таблицю
-  XLSX.utils.sheet_add_json(ws, exportData, { origin: "A2", skipHeader: false });
-
-  // Автоширина колонок
-  ws["!cols"] = Object.keys(exportData[0]).map((key) => {
-    const maxContentLength = Math.max(
-      key.length,
-      ...exportData.map((row) =>
-        String(row[key] || "").split("\n").reduce((max, line) => Math.max(max, line.length), 0)
-      )
-    );
-    return { wch: Math.min(Math.max(maxContentLength + 4, 12), 60) };
+  // 📋 Створення таблиці
+  doc.autoTable({
+    startY: 30,
+    head: [["Дата", "Препарати", "Хвороби"]],
+    body: exportData,
+    styles: {
+      fontSize: 10,
+      cellPadding: 4,
+      valign: "top",
+    },
+    columnStyles: {
+      0: { cellWidth: 30 },
+      1: { cellWidth: 80 },
+      2: { cellWidth: 80 },
+    },
+    headStyles: {
+      fillColor: [24, 78, 47], // темно-зелений
+      textColor: 255,
+      fontStyle: "bold",
+    },
+    alternateRowStyles: {
+      fillColor: [240, 240, 240], // сірий для чіткості
+    },
   });
 
-  // 🔹 НЕ встановлюємо висоту рядків (Excel сам адаптує)
-
-  // Увімкнення переносу тексту
-  Object.keys(ws).forEach((cell) => {
-    if (cell[0] === "!") return;
-    if (!ws[cell].s) ws[cell].s = {};
-    ws[cell].s.alignment = { wrapText: true, vertical: "top" };
-  });
-
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Інтегрована таблиця");
-  XLSX.writeFile(wb, "Інтегрована_таблиця_захисту.xlsx");
+  // 💾 Збереження PDF
+  doc.save("Інтегрована_таблиця_захисту.pdf");
 };
-
-
   return (
   <main ref={topRef} className="flex justify-center items-start min-h-[70vh] px-4">
   <div className="w-full max-w-xl mx-auto bg-white rounded-xl shadow-md px-6 sm:px-10 py-6 space-y-6 text-base sm:text-lg">
@@ -719,7 +721,7 @@ const integratedSystem = integratedMap
     <IntegratedTableView data={integratedSystem} />
 
     <button onClick={exportToExcel} className="toggle-button">
-      Експорт в Excel
+      Експорт в PDF
     </button>
   </>
 ) : (
