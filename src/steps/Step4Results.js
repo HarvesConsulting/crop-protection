@@ -630,13 +630,13 @@ const integratedSystem = integratedMap
     Хвороби: entry.Хвороби,
   }));
 
-  // Створюємо аркуш з заголовком у A1
+  // Створюємо аркуш із заголовком
   const ws = XLSX.utils.aoa_to_sheet([["Інтегрована система захисту"]]);
 
-  // Об'єднуємо комірки A1:C1
+  // Об'єднання клітинок заголовка
   ws["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 2 } }];
 
-  // Додаємо таблицю з A2 (під заголовком)
+  // Додаємо основну таблицю з A2
   XLSX.utils.sheet_add_json(ws, exportData, { origin: "A2", skipHeader: false });
 
   // Автоширина колонок
@@ -649,21 +649,23 @@ const integratedSystem = integratedMap
     );
     return { wch: Math.min(Math.max(maxContentLength + 4, 12), 60) };
   });
-
   ws["!cols"] = columnWidths;
 
-  // Увімкнення перенесення тексту та вертикальне вирівнювання
+  // Висота рядків: заголовок + заголовки + всі рядки даних
+  ws["!rows"] = Array(exportData.length + 2).fill({ hpt: 60 });
+
+  // Увімкнення перенесення тексту в усіх клітинках
   Object.keys(ws).forEach((cell) => {
     if (cell[0] === "!") return;
     if (!ws[cell].s) ws[cell].s = {};
     ws[cell].s.alignment = { wrapText: true, vertical: "top" };
   });
 
-  // Створення книги та додавання аркуша
+  // Створюємо книгу і додаємо аркуш
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Інтегрована таблиця");
 
-  // Збереження Excel-файлу
+  // Збереження файлу
   XLSX.writeFile(wb, "Інтегрована_таблиця_захисту.xlsx");
 };
 
