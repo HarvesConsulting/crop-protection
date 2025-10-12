@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import "./Step4Results.css";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import "../fonts/Roboto-Regular-normal";
+import "../fonts/Roboto-Regular-normal.js";
 import HourTimeline from "../components/HourTimeline";
 import Layout from "../components/Layout";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
