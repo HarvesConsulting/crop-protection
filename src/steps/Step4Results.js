@@ -720,9 +720,10 @@ const exportToPDF = () => {
   <>
     <IntegratedTableView data={integratedSystem} />
 
-    <button onClick={exportToExcel} className="toggle-button">
-      Експорт в PDF
-    </button>
+    <button onClick={exportToPDF} className="toggle-button">
+  Експорт в PDF
+</button>
+
   </>
 ) : (
   <>
