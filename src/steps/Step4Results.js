@@ -630,33 +630,42 @@ const integratedSystem = integratedMap
     Хвороби: entry.Хвороби,
   }));
 
-  const ws = XLSX.utils.json_to_sheet(exportData);
+  // Створюємо аркуш з заголовком у A1
+  const ws = XLSX.utils.aoa_to_sheet([["Інтегрована система захисту"]]);
 
-  // 🟢 Додаємо заголовок в A1
-  XLSX.utils.sheet_add_aoa(ws, [["Інтегрована система захисту"]], { origin: "A1" });
+  // Об'єднуємо комірки A1:C1
+  ws["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 2 } }];
 
-  // 🟢 Автоширина колонок
+  // Додаємо таблицю з A2 (під заголовком)
+  XLSX.utils.sheet_add_json(ws, exportData, { origin: "A2", skipHeader: false });
+
+  // Автоширина колонок
   const columnWidths = Object.keys(exportData[0]).map((key) => {
-  const maxContentLength = Math.max(
-    key.length,
-    ...exportData.map((row) =>
-      String(row[key] || "").split("\n").reduce((max, line) => Math.max(max, line.length), 0)
-    )
-  );
+    const maxContentLength = Math.max(
+      key.length,
+      ...exportData.map((row) =>
+        String(row[key] || "").split("\n").reduce((max, line) => Math.max(max, line.length), 0)
+      )
+    );
+    return { wch: Math.min(Math.max(maxContentLength + 4, 12), 60) };
+  });
 
-  return { wch: Math.min(Math.max(maxContentLength + 4, 12), 60) }; // трохи більший запас
-});
+  ws["!cols"] = columnWidths;
 
-ws["!cols"] = columnWidths;
+  // Увімкнення перенесення тексту та вертикальне вирівнювання
+  Object.keys(ws).forEach((cell) => {
+    if (cell[0] === "!") return;
+    if (!ws[cell].s) ws[cell].s = {};
+    ws[cell].s.alignment = { wrapText: true, vertical: "top" };
+  });
 
-  // 🟢 Створюємо книгу та додаємо лист
+  // Створення книги та додавання аркуша
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Інтегрована таблиця");
 
-  // 🟢 Зберігаємо файл
+  // Збереження Excel-файлу
   XLSX.writeFile(wb, "Інтегрована_таблиця_захисту.xlsx");
 };
-
 
   return (
   <main ref={topRef} className="flex justify-center items-start min-h-[70vh] px-4">
