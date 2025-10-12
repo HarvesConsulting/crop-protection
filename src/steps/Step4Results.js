@@ -629,28 +629,28 @@ const integratedSystem = integratedMap
 const exportToPDF = () => {
   const doc = new jsPDF();
 
-  // 🔤 Установлюємо шрифт Roboto-Regular (доданий через .js файл)
-  doc.setFont("Roboto-Regular", "normal");
+  // ✅ Встановлюємо шрифт Roboto, зареєстрований як "Roboto"
+  doc.setFont("Roboto", "normal");
   doc.setFontSize(16);
 
-  // 🧾 Заголовок
+  // 📌 Заголовок
   doc.text("Інтегрована система захисту", 105, 20, { align: "center" });
 
-  // 🧩 Підготовка даних таблиці
+  // 📋 Підготовка даних таблиці
   const exportData = integratedSystem.map((entry) => [
     entry.Дата || "",
     entry.Препарат || "",
     entry.Хвороби || "",
   ]);
 
-  // 🧱 Побудова таблиці
+  // 📊 Побудова таблиці
   autoTable(doc, {
     startY: 30,
     head: [["Дата", "Препарати", "Хвороби"]],
     body: exportData,
     styles: {
-      font: "Roboto-Regular", // 👈 важливо для кирилиці
-      fontStyle: "normal", // 👈 або "bold", якщо хочеш зробити весь текст жирним
+      font: "Roboto",         // 🟢 Головне — правильна назва шрифту!
+      fontStyle: "normal",    // або "bold"
       fontSize: 10,
       cellPadding: 4,
       valign: "top",
@@ -662,19 +662,18 @@ const exportToPDF = () => {
       2: { cellWidth: 80 },
     },
     headStyles: {
-      fillColor: [24, 78, 47], // 🟩 темно-зелений
-      textColor: 255, // 🔲 білий текст
+      fillColor: [24, 78, 47], // 🟢 темно-зелений фон
+      textColor: 255,          // ⚪ білий текст
       fontStyle: "bold",
     },
     alternateRowStyles: {
-      fillColor: [245, 245, 245], // 🔁 чергування сірих рядків
+      fillColor: [245, 245, 245], // 🔁 світло-сірі рядки
     },
   });
 
-  // 💾 Збереження файлу
+  // 💾 Зберігаємо
   doc.save("Інтегрована_таблиця_захисту.pdf");
 };
-
 
   return (
   <main ref={topRef} className="flex justify-center items-start min-h-[70vh] px-4">
