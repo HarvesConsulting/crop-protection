@@ -14,34 +14,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-    <!-- 🔹 SPLASH SCREEN СТИЛІ -->
+    <!-- ✅ Мінімальний стиль для моментального splash -->
     <style>
-      /* Контейнер сплешу */
-      #initial-splash {
-        position: fixed;
-        inset: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: #184e2f;
-        z-index: 99999;
-        overflow: hidden;
-      }
-
-      /* Фонове зображення */
-      #initial-splash::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: url("./images/bg.jpg") center/cover no-repeat;
-        opacity: 0.8;
-        filter: brightness(0.85);
-      }
-
-      /* Текст/логотип зверху */
       .splash-logo-box {
-        position: relative;
-        z-index: 1;
         text-align: center;
         color: #fff;
         font-family: system-ui, Arial, sans-serif;
@@ -59,7 +34,7 @@
         margin-top: 6px;
       }
 
-      /* Плавне зникнення після завантаження React */
+      /* Плавне зникнення splash */
       .fade-out {
         opacity: 0;
         transition: opacity 0.6s ease;
@@ -69,18 +44,30 @@
   </head>
 
   <body>
-    <!-- 🔹 SPLASH SCREEN (з’являється миттєво) -->
-    <div id="initial-splash">
-    <div class="splash-logo-box">
-    <h1 class="splash-title"><em>by</em> HarvestConsulting</h1>
-    <p class="splash-subtitle">Завантаження...</p>
-    </div>
+    <!-- ✅ ШВИДКИЙ SPLASH SCREEN — inline стилі забезпечують миттєвий показ -->
+    <div
+      id="initial-splash"
+      style="
+        position: fixed;
+        inset: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #184e2f;
+        z-index: 99999;
+        color: white;
+        font-family: system-ui, sans-serif;"
+    >
+      <div class="splash-logo-box">
+        <h1 class="splash-title"><em>by</em> HarvestConsulting</h1>
+        <p class="splash-subtitle">Завантаження...</p>
+      </div>
     </div>
 
     <!-- Основний React root -->
     <div id="root"></div>
 
-    <!-- 🔹 Скрипт: прибирає splash, коли React готовий -->
+    <!-- ✅ Скрипт: видаляє splash, коли React завантажиться -->
     <script>
       window.addEventListener("load", () => {
         const splash = document.getElementById("initial-splash");
@@ -92,4 +79,5 @@
     </script>
   </body>
 </html>
+
 
