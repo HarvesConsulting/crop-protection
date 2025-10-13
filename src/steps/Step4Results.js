@@ -374,7 +374,6 @@ function aggregateDailyRain(hourlyData = []) {
   }));
 }
 
-
 export default function Step4Results({ result, onRestart }) {
   const [showIntegrated, setShowIntegrated] = useState(false);
   const data = result?.data || []; // або адаптуй під структуру твого result
@@ -631,12 +630,11 @@ const integratedSystem = integratedMap
 const exportToPDF = () => {
   const doc = new jsPDF();
 
-  const integratedSystem = getIntegratedSystem(data); // <-- сюди передай свої дані
-
-  const exportData = integratedSystem.map((entry) => [
-    entry.Дата,
-    entry.Препарати.join(", "),
-  ]);
+  // ⛳️ використовуємо вже готову інтегровану систему
+const exportData = integratedSystem.map((entry) => [
+  entry.Дата,
+  entry.Препарат,
+]);
 
   doc.setFont("Roboto", "normal");
   doc.setFontSize(16);
