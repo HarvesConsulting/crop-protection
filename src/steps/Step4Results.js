@@ -650,30 +650,30 @@ const exportData = integratedSystem.map((entry) => [
   doc.text("Інтегрована система захисту", 105, 20, { align: "center" });
 
   autoTable(doc, {
-    startY: 30,
-    head: [["Дата", "Препарати"]],
-    body: exportData,
-    styles: {
-      font: "Roboto",
-      fontStyle: "normal",
-      fontSize: 10,
-      cellPadding: 4,
-      valign: "top",
-      textColor: 20,
-    },
-    columnStyles: {
-      0: { cellWidth: 30 },
-      1: { cellWidth: 150 },
-    },
-    headStyles: {
-      fillColor: [24, 78, 47],
-      textColor: 255,
-      fontStyle: "bold",
-    },
-    alternateRowStyles: {
-      fillColor: [245, 245, 245],
-    },
-  });
+  startY: 30,
+  head: [["Дата", "Препарати"]],
+  body: exportData,
+  styles: {
+    font: "Roboto",
+    fontStyle: "normal",
+    fontSize: 10,
+    cellPadding: 4,
+    valign: "top",
+    textColor: 20,
+  },
+  columnStyles: {
+    0: { cellWidth: 30 },
+    1: { cellWidth: 'wrap' }, // ✅ Дозволяємо перенос рядків
+  },
+  headStyles: {
+    fillColor: [24, 78, 47],
+    textColor: 255,
+    fontStyle: "bold",
+  },
+  alternateRowStyles: {
+    fillColor: [245, 245, 245],
+  },
+});
 
   doc.save("Інтегрована_таблиця_захисту.pdf");
 };
