@@ -645,7 +645,7 @@ const exportData = integratedSystem.map((entry) => [
   entry.Препарат,
 ]);
 
-  doc.setFont("helvetica", "normal");
+  doc.setFont("Roboto", "normal");
   doc.setFontSize(16);
   doc.text("Інтегрована система захисту", 105, 20, { align: "center" });
 
