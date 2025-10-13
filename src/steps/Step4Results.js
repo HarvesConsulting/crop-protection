@@ -616,10 +616,14 @@ for (const group of diseaseCardsGrouped) {
 const integratedSystem = integratedMap
   .map((entry) => ({
     Дата: entry.Дата,
-    Препарат: entry.Препарати.join(", "),
-    Рекомендація: entry.Рекомендації,
-    backData: entry.backData,
-    Хвороби: Array.from(entry.diseases).join(", "),
+    Препарат: entry.Препарати
+  .map((raw) => {
+    const name = raw.split(" (")[0]; // вирізаємо назву
+    const dose = productInfo[name] || "—";
+    return `${name} (${dose})`;
+  })
+  .join(", "),
+
   }))
   .sort((a, b) => {
     const dA = parseISO(a.Дата.split(".").reverse().join("-"));
