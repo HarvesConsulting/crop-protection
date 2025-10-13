@@ -635,7 +635,21 @@ const integratedSystem = integratedMap
     const dB = parseISO(b.Дата.split(".").reverse().join("-"));
     return dA - dB;
   });
+// Додайте цей код для дебагінгу
+console.log("🔍 ДЕБАГ: Перевірка integratedSystem перед експортом");
+integratedSystem.forEach((entry, index) => {
+  console.log(`Запис ${index + 1}:`, {
+    Дата: entry.Дата,
+    Препарат: entry.Препарат,
+    Тип_Препарату: typeof entry.Препарат
+  });
+});
 
+// Перевірка productInfo
+console.log("🔍 ДЕБАГ: Перевірка productInfo");
+Object.entries(productInfo).forEach(([key, value]) => {
+  console.log(`${key}: ${value}`);
+});
 const exportToPDF = () => {
   const doc = new jsPDF();
 
