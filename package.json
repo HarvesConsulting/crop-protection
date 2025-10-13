@@ -19,6 +19,7 @@
     "jspdf": "^3.0.3",
     "jspdf-autotable": "^5.0.2",
     "lucide-react": "^0.544.0",
+    "minimist": "^1.2.8",
     "react": "^19.1.1",
     "react-calendar": "^6.0.0",
     "react-datepicker": "^8.7.0",
@@ -54,6 +55,7 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.15",
+    "jspdf-customfonts": "^0.0.4-rc.4",
     "postcss": "^8.4.31",
     "tailwindcss": "^3.4.3"
   }
