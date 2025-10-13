@@ -574,7 +574,7 @@ const integratedMap = sprayData.map((spray) => {
   return {
     Дата: spray.Дата,
     timestamp: dateObj.getTime(),
-    Препарати: [spray.Препарат],
+    Препарати: [product], // Тільки назву!
     Рекомендації: [spray.Рекомендація],
     diseases: new Set(["Фітофтороз"]),
     backData: spray.backData,
@@ -604,7 +604,7 @@ for (const group of diseaseCardsGrouped) {
       integratedMap.push({
         Дата: entry.Дата,
         timestamp: diseaseTime,
-        Препарати: [entry.Препарат],
+        Препарати: [product], // ✅ назва без дози
         Рекомендації: [entry.Рекомендація],
         diseases: new Set([group.name]),
         backData: entry.backData,
