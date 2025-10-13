@@ -646,85 +646,51 @@ integratedSystem.forEach((entry, index) => {
 });
 
 const exportToPDF = () => {
-  // Створюємо просту HTML сторінку для друку
-  const htmlContent = `
+  // Створюємо версію для друку
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(`
     <!DOCTYPE html>
-    <html lang="uk">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Інтегрована система захисту</title>
+    <html>
+      <head>
+        <title>HarvestConsulting</title>
         <style>
-            body {
-                font-family: Arial, sans-serif;
-                margin: 20px;
-                line-height: 1.4;
-            }
-            .header {
-                text-align: center;
-                color: #184e2f;
-                margin-bottom: 30px;
-            }
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 20px;
-            }
-            th, td {
-                padding: 12px 8px;
-                border: 1px solid #ddd;
-                text-align: left;
-            }
-            th {
-                background-color: #184e2f;
-                color: white;
-                font-weight: bold;
-            }
-            tr:nth-child(even) {
-                background-color: #f8f9fa;
-            }
-            @media print {
-                body { margin: 10px; }
-            }
+          body { font-family: Arial, sans-serif; margin: 20px; }
+          h1 { text-align: center; color: #184e2f; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th { background: #184e2f; color: white; padding: 10px; text-align: left; }
+          td { padding: 8px; border: 1px solid #ddd; }
+          tr:nth-child(even) { background: #f9f9f9; }
+          @media print { body { margin: 0; } }
         </style>
-    </head>
-    <body>
-        <div class="header">
-            <h1>Інтегрована система захисту</h1>
-        </div>
+      </head>
+      <body>
+        <h1>Інтегрована система захисту</h1>
         <table>
-            <thead>
-                <tr>
-                    <th>Дата</th>
-                    <th>Препарати</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${integratedSystem.map(item => 
-                    `<tr>
-                        <td><strong>${item.Дата}</strong></td>
-                        <td>${item.Препарат}</td>
-                    </tr>`
-                ).join('')}
-            </tbody>
+          <thead>
+            <tr>
+              <th>Дата</th>
+              <th>Препарати</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${integratedSystem.map(item => `
+              <tr>
+                <td>${item.Дата}</td>
+                <td>${item.Препарат}</td>
+              </tr>
+            `).join('')}
+          </tbody>
         </table>
         <script>
-            window.onload = function() {
-                window.print();
-            }
+          window.onload = function() {
+            window.print();
+            setTimeout(() => window.close(), 500);
+          }
         </script>
-    </body>
+      </body>
     </html>
-  `;
-
-  // Відкриваємо нове вікно для друку
-  const printWindow = window.open('', '_blank');
-  if (printWindow) {
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
-  } else {
-    alert('Будь ласка, дозвольте спливаючі вікна для цього сайту');
-  }
+  `);
+  printWindow.document.close();
 };
 
   return (
