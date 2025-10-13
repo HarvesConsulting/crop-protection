@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import "./Step4Results.css";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-//import "../fonts/Roboto-Regular-normal.js";
-//import "../fonts/Roboto-bold.js"; // 👈 додай одразу після normal
+import "../fonts/Roboto-Regular-normal.js";
+import "../fonts/Roboto-bold.js"; // 👈 додай одразу після normal
 import HourTimeline from "../components/HourTimeline";
 import Layout from "../components/Layout";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
@@ -652,49 +652,34 @@ Object.entries(productInfo).forEach(([key, value]) => {
 });
 
 const exportToPDF = () => {
-  const doc = new jsPDF();
-
-  // ✅ Використовуємо тестові дані з кирилицею
-  const testData = [
-    { Дата: "10.08.2025", Препарат: "Медян Екстра (2л/га)" },
-    { Дата: "21.08.2025", Препарат: "Зорвек Інкантія (0,5л/га), Луна Експірієнс (0,75л/га)" },
-    { Дата: "03.09.2025", Препарат: "Казумін (1,5-3л/га)" },
-  ];
-
-  const exportData = testData.map(entry => [entry.Дата, entry.Препарат]);
-
-  // ✅ Додаємо кириличний текст без використання спеціальних шрифтів
-  doc.setFontSize(16);
-  doc.text("Інтегрована система захисту", 105, 20, { align: "center" });
-
-  // ✅ Використовуємо autoTable з правильними налаштуваннями
-  autoTable(doc, {
-    startY: 30,
-    head: [["Дата", "Препарати"]],
-    body: exportData,
-    styles: {
-      font: "helvetica",
-      fontStyle: "normal",
-      fontSize: 10,
-      cellPadding: 4,
-      valign: "top",
-      textColor: 20,
-    },
-    columnStyles: {
-      0: { cellWidth: 25 },
-      1: { cellWidth: 160 }, // Збільшена ширина для препаратів
-    },
-    headStyles: {
-      fillColor: [24, 78, 47],
-      textColor: 255,
-      fontStyle: "bold",
-    },
-    alternateRowStyles: {
-      fillColor: [245, 245, 245],
-    },
+  import('html2canvas').then(html2canvas => {
+    import('jspdf').then(jsPDF => {
+      const tableElement = document.querySelector('.integrated-table-container');
+      
+      html2canvas.default(tableElement).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF.default('p', 'mm', 'a4');
+        const imgWidth = 210; // A4 width in mm
+        const pageHeight = 295; // A4 height in mm
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        let heightLeft = imgHeight;
+        
+        let position = 0;
+        
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+        
+        while (heightLeft >= 0) {
+          position = heightLeft - imgHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
+        
+        pdf.save('Інтегрована_система_захисту.pdf');
+      });
+    });
   });
-
-  doc.save("Інтегрована_таблиця_захисту.pdf");
 };
 
   return (
