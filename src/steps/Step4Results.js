@@ -706,7 +706,7 @@ const exportToPDF = () => {
           </style>
         </head>
         <body>
-          <h1>Інтегрована система захисту</h1>
+          <h1>HarvestConsulting</h1>
           
           ${isMobile ? `
             <div class="help">
