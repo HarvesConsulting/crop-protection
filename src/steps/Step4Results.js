@@ -646,20 +646,18 @@ integratedSystem.forEach((entry, index) => {
 });
 
 const exportToPDF = () => {
-  const [showExportDialog, setShowExportDialog] = useState(false);
-
   // Перевіряємо тип пристрою
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   
-  const handleExport = () => {
-    if (isMobile) {
-      openPrintableVersion();
-    } else {
-      createDirectPDF();
-    }
-  };
+  // Для мобільних завжди використовуємо версію для друку
+  // Для десктопів намагаємося створити PDF напряму
+  if (isMobile) {
+    openPrintableVersion();
+  } else {
+    createDirectPDF().catch(() => openPrintableVersion());
+  }
 
-  const openPrintableVersion = () => {
+  function openPrintableVersion() {
     const printContent = `
       <html>
         <head>
@@ -668,48 +666,57 @@ const exportToPDF = () => {
           <style>
             body { 
               font-family: Arial, sans-serif; 
-              margin: 15px; 
+              margin: 20px; 
               line-height: 1.4;
-              font-size: 14px;
             }
             h1 { 
               text-align: center; 
               color: #184e2f; 
-              margin-bottom: 20px;
-              font-size: 18px;
+              margin-bottom: 30px;
             }
-            .instruction {
-              background: #f0f8f0;
-              padding: 15px;
+            .help { 
+              background: #f0f8f0; 
+              padding: 15px; 
+              margin: 20px 0; 
               border-radius: 8px;
-              margin: 20px 0;
               border-left: 4px solid #184e2f;
             }
             table {
               width: 100%;
               border-collapse: collapse;
+              margin-top: 20px;
             }
             th, td {
-              padding: 10px 8px;
+              padding: 12px 8px;
               border: 1px solid #ddd;
               text-align: left;
             }
             th {
               background-color: #184e2f;
               color: white;
+              font-weight: bold;
+            }
+            tr:nth-child(even) {
+              background-color: #f8f9fa;
+            }
+            @media print {
+              body { margin: 0; }
+              .help { display: none; }
             }
           </style>
         </head>
         <body>
           <h1>Інтегрована система захисту</h1>
           
-          <div class="instruction">
-            <p><strong>📱 Як зберегти на телефоні:</strong></p>
-            <p>1. Натисніть кнопку "Поділитися"</p>
-            <p>2. Виберіть "Друк" або "Print"</p>
-            <p>3. Оберіть "Зберегти як PDF"</p>
-            <p>4. Натисніть "Зберегти"</p>
-          </div>
+          ${isMobile ? `
+            <div class="help">
+              <strong>📱 Як зберегти на телефоні:</strong><br>
+              1. Натисніть кнопку "Поділитися"<br>
+              2. Виберіть "Друк" або "Print"<br>
+              3. Оберіть "Зберегти як PDF"<br>
+              4. Натисніть "Зберегти"
+            </div>
+          ` : ''}
 
           <table>
             <thead>
@@ -731,7 +738,7 @@ const exportToPDF = () => {
           <script>
             setTimeout(() => {
               window.print();
-            }, 1000);
+            }, 500);
           </script>
         </body>
       </html>
@@ -740,17 +747,16 @@ const exportToPDF = () => {
     const printWindow = window.open('', '_blank');
     printWindow.document.write(printContent);
     printWindow.document.close();
-  };
+  }
 
-  const createDirectPDF = async () => {
+  async function createDirectPDF() {
     try {
       const html2canvas = (await import('html2canvas')).default;
       const { jsPDF } = await import('jspdf');
 
       const tableElement = document.querySelector('.integrated-table-container');
       if (!tableElement) {
-        alert('Таблицю не знайдено');
-        return;
+        throw new Error('Таблицю не знайдено');
       }
 
       const canvas = await html2canvas(tableElement, {
@@ -770,13 +776,9 @@ const exportToPDF = () => {
       
     } catch (error) {
       console.error('PDF creation failed:', error);
-      // Якщо пряме створення не вийшло - відкриваємо версію для друку
-      openPrintableVersion();
+      throw error; // Перекидаємо помилку далі
     }
-  };
-
-  // Викликаємо експорт
-  handleExport();
+  }
 };
 
   return (
