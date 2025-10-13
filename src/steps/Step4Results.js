@@ -377,6 +377,7 @@ function aggregateDailyRain(hourlyData = []) {
 
 export default function Step4Results({ result, onRestart }) {
   const [showIntegrated, setShowIntegrated] = useState(false);
+  const data = result?.data || []; // або адаптуй під структуру твого result
   const topRef = React.useRef(null);
   const [showMenu, setShowMenu] = useState(false);
   const [showWeather, setShowWeather] = useState(false);
