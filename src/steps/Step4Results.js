@@ -621,9 +621,9 @@ for (const group of diseaseCardsGrouped) {
 const integratedSystem = integratedMap
   .map((entry) => {
     const formattedProducts = entry.Препарати.map((назва) => {
-  const dose = productInfo[назва] || "—";
-  return `${назва} (${dose})`; // ✅ тепер буде і назва, і доза
-});
+      const dose = productInfo[назва] || "—";
+      return `${назва} (${dose})`;
+    });
 
     return {
       Дата: entry.Дата,
@@ -639,42 +639,41 @@ const integratedSystem = integratedMap
 const exportToPDF = () => {
   const doc = new jsPDF();
 
-  // ⛳️ використовуємо вже готову інтегровану систему
-const exportData = integratedSystem.map((entry) => [
-  entry.Дата,
-  entry.Препарат,
-]);
+  // ✅ Використовуємо правильні дані з integratedSystem
+  const exportData = integratedSystem.map((entry) => [
+    entry.Дата,
+    entry.Препарат, // ✅ Це вже містить і назву, і дозу
+  ]);
 
   doc.setFont("Roboto", "normal");
   doc.setFontSize(16);
   doc.text("Інтегрована система захисту", 105, 20, { align: "center" });
 
   autoTable(doc, {
-  startY: 30,
-  head: [["Дата", "Препарати"]],
-  body: exportData,
-  styles: {
-    font: "Roboto",
-    fontStyle: "normal",
-    fontSize: 10,
-    cellPadding: 4,
-    valign: "top",
-    textColor: 20,
-  },
-  columnStyles: {
-    0: { cellWidth: 30 },
-    1: { cellWidth: 'wrap' }, // ✅ Дозволяємо перенос рядків
-  },
-  headStyles: {
-    fillColor: [24, 78, 47],
-    textColor: 255,
-    fontStyle: "bold",
-  },
-  alternateRowStyles: {
-    fillColor: [245, 245, 245],
-  },
-});
-
+    startY: 30,
+    head: [["Дата", "Препарати"]],
+    body: exportData,
+    styles: {
+      font: "Roboto",
+      fontStyle: "normal",
+      fontSize: 10,
+      cellPadding: 4,
+      valign: "top",
+      textColor: 20,
+    },
+    columnStyles: {
+      0: { cellWidth: 30 },
+      1: { cellWidth: 'wrap' },
+    },
+    headStyles: {
+      fillColor: [24, 78, 47],
+      textColor: 255,
+      fontStyle: "bold",
+    },
+    alternateRowStyles: {
+      fillColor: [245, 245, 245],
+    },
+  });
 
   doc.save("Інтегрована_таблиця_захисту.pdf");
 };
