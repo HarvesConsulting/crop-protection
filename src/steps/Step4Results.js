@@ -588,8 +588,11 @@ for (const group of diseaseCardsGrouped) {
     const diseaseDate = parseISO(entry.Дата.split(".").reverse().join("-"));
     const diseaseTime = diseaseDate.getTime();
 
-    // 🧠 Вирізаємо лише назву без дози
-    const rawName = (entry.Препарат || "").split(" (")[0];
+    // ❌ було так:
+    // const rawName = (entry.Препарат || "").split(" (")[0];
+
+    // ✅ тепер так:
+    const rawName = entry.Назва?.trim() || "—";
 
     let merged = false;
 
