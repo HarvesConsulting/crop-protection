@@ -675,6 +675,7 @@ const exportData = integratedSystem.map((entry) => [
   },
 });
 
+
   doc.save("Інтегрована_таблиця_захисту.pdf");
 };
 
