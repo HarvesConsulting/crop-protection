@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import "./Step4Results.css";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import "../fonts/Roboto-Regular-normal.js";
-import "../fonts/Roboto-bold.js"; // 👈 додай одразу після normal
+//import "../fonts/Roboto-Regular-normal.js";
+//import "../fonts/Roboto-bold.js"; // 👈 додай одразу після normal
 import HourTimeline from "../components/HourTimeline";
 import Layout from "../components/Layout";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
@@ -654,14 +654,7 @@ Object.entries(productInfo).forEach(([key, value]) => {
 const exportToPDF = () => {
   const doc = new jsPDF();
 
-  // ✅ Реєструємо шрифт для кирилиці (якщо ще не зроблено)
-  // Додайте ці рядки, якщо у вас є окремий файл з кириличним шрифтом
-  // doc.addFont('path/to/cyrillic-font.ttf', 'CyrillicFont', 'normal');
-
-  // ✅ Використовуємо стандартний шрифт, який підтримує кирилицю
-  doc.setFont("helvetica", "normal");
-
-  // ✅ ТЕСТОВІ ДАНІ з кирилицею
+  // ✅ Використовуємо тестові дані з кирилицею
   const testData = [
     { Дата: "10.08.2025", Препарат: "Медян Екстра (2л/га)" },
     { Дата: "21.08.2025", Препарат: "Зорвек Інкантія (0,5л/га), Луна Експірієнс (0,75л/га)" },
@@ -670,15 +663,17 @@ const exportToPDF = () => {
 
   const exportData = testData.map(entry => [entry.Дата, entry.Препарат]);
 
+  // ✅ Додаємо кириличний текст без використання спеціальних шрифтів
   doc.setFontSize(16);
   doc.text("Інтегрована система захисту", 105, 20, { align: "center" });
 
+  // ✅ Використовуємо autoTable з правильними налаштуваннями
   autoTable(doc, {
     startY: 30,
     head: [["Дата", "Препарати"]],
     body: exportData,
     styles: {
-      font: "helvetica", // ✅ Використовуємо стандартний шрифт
+      font: "helvetica",
       fontStyle: "normal",
       fontSize: 10,
       cellPadding: 4,
@@ -687,7 +682,7 @@ const exportToPDF = () => {
     },
     columnStyles: {
       0: { cellWidth: 25 },
-      1: { cellWidth: 160 },
+      1: { cellWidth: 160 }, // Збільшена ширина для препаратів
     },
     headStyles: {
       fillColor: [24, 78, 47],
@@ -697,13 +692,9 @@ const exportToPDF = () => {
     alternateRowStyles: {
       fillColor: [245, 245, 245],
     },
-    // ✅ Додаткові налаштування для кирилиці
-    didDrawPage: function (data) {
-      // Додаткові налаштування, якщо потрібно
-    }
   });
 
-  doc.save("Тестова_таблиця_захисту.pdf");
+  doc.save("Інтегрована_таблиця_захисту.pdf");
 };
 
   return (
