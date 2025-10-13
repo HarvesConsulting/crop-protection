@@ -588,13 +588,16 @@ for (const group of diseaseCardsGrouped) {
     const diseaseDate = parseISO(entry.Дата.split(".").reverse().join("-"));
     const diseaseTime = diseaseDate.getTime();
 
+    // 🧠 Вирізаємо лише назву без дози
+    const rawName = (entry.Препарат || "").split(" (")[0];
+
     let merged = false;
 
     for (const record of integratedMap) {
       const diff = Math.abs(record.timestamp - diseaseTime);
 
       if (diff <= mergeThreshold) {
-        record.Препарати.push(entry.Назва); // ✅ беремо назву з entry
+        record.Препарати.push(rawName);
         record.Рекомендації.push(entry.Рекомендація);
         record.diseases.add(group.name);
         merged = true;
@@ -606,7 +609,7 @@ for (const group of diseaseCardsGrouped) {
       integratedMap.push({
         Дата: entry.Дата,
         timestamp: diseaseTime,
-        Препарати: [entry.Назва], // ✅ без product
+        Препарати: [rawName],
         Рекомендації: [entry.Рекомендація],
         diseases: new Set([group.name]),
         backData: entry.backData,
