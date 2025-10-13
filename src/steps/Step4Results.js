@@ -646,51 +646,130 @@ integratedSystem.forEach((entry, index) => {
 });
 
 const exportToPDF = () => {
-  // Створюємо версію для друку
-  const printWindow = window.open('', '_blank');
-  printWindow.document.write(`
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <title>Інтегрована система захисту</title>
-        <style>
-          body { font-family: Arial, sans-serif; margin: 20px; }
-          h1 { text-align: center; color: #184e2f; }
-          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-          th { background: #184e2f; color: white; padding: 10px; text-align: left; }
-          td { padding: 8px; border: 1px solid #ddd; }
-          tr:nth-child(even) { background: #f9f9f9; }
-          @media print { body { margin: 0; } }
-        </style>
-      </head>
-      <body>
-        <h1>Інтегрована система захисту</h1>
-        <table>
-          <thead>
-            <tr>
-              <th>Дата</th>
-              <th>Препарати</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${integratedSystem.map(item => `
+  // Перевіряємо тип пристрою
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  
+  if (isMobile) {
+    // Для мобільних - відкриваємо версію для друку
+    openPrintableVersion();
+  } else {
+    // Для десктопів - створюємо PDF напряму
+    createDirectPDF();
+  }
+
+  function openPrintableVersion() {
+    const printContent = `
+      <html>
+        <head>
+          <title>Інтегрована система захисту</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body { 
+              font-family: Arial, sans-serif; 
+              margin: 15px; 
+              line-height: 1.4;
+              font-size: 14px;
+            }
+            h1 { 
+              text-align: center; 
+              color: #184e2f; 
+              margin-bottom: 20px;
+              font-size: 18px;
+            }
+            .instruction {
+              background: #f0f8f0;
+              padding: 15px;
+              border-radius: 8px;
+              margin: 20px 0;
+              border-left: 4px solid #184e2f;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+            }
+            th, td {
+              padding: 10px 8px;
+              border: 1px solid #ddd;
+              text-align: left;
+            }
+            th {
+              background-color: #184e2f;
+              color: white;
+            }
+          </style>
+        </head>
+        <body>
+          <h1>Інтегрована система захисту</h1>
+          
+          <div class="instruction">
+            <p><strong>📱 Як зберегти на телефоні:</strong></p>
+            <p>1. Натисніть кнопку "Поділитися"</p>
+            <p>2. Виберіть "Друк" або "Print"</p>
+            <p>3. Оберіть "Зберегти як PDF"</p>
+            <p>4. Натисніть "Зберегти"</p>
+          </div>
+
+          <table>
+            <thead>
               <tr>
-                <td>${item.Дата}</td>
-                <td>${item.Препарат}</td>
+                <th>Дата</th>
+                <th>Препарати</th>
               </tr>
-            `).join('')}
-          </tbody>
-        </table>
-        <script>
-          window.onload = function() {
-            window.print();
-            setTimeout(() => window.close(), 500);
-          }
-        </script>
-      </body>
-    </html>
-  `);
-  printWindow.document.close();
+            </thead>
+            <tbody>
+              ${integratedSystem.map(item => `
+                <tr>
+                  <td><strong>${item.Дата}</strong></td>
+                  <td>${item.Препарат}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </body>
+      </html>
+    `;
+
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    
+    // На мобільних показуємо інструкцію перед друком
+    setTimeout(() => {
+      if (confirm('Натисніть "OK" щоб відкрити діалог друку. Потім виберіть "Зберегти як PDF".')) {
+        printWindow.print();
+      }
+    }, 1000);
+  }
+
+  async function createDirectPDF() {
+    try {
+      const html2canvas = (await import('html2canvas')).default;
+      const { jsPDF } = await import('jspdf');
+
+      const tableElement = document.querySelector('.integrated-table-container');
+      if (!tableElement) return;
+
+      const canvas = await html2canvas(tableElement, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff'
+      });
+
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgWidth = 190;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      pdf.setFontSize(16);
+      pdf.text('Інтегрована система захисту', 105, 15, { align: 'center' });
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, 25, imgWidth, imgHeight);
+      pdf.save('Інтегрована_система_захисту.pdf');
+      
+    } catch (error) {
+      // Якщо пряме створення не вийшло - відкриваємо версію для друку
+      console.error('PDF creation failed:', error);
+      openPrintableVersion();
+    }
+  }
 };
 
   return (
