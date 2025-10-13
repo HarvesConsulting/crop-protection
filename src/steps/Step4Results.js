@@ -646,138 +646,78 @@ integratedSystem.forEach((entry, index) => {
 });
 
 const exportToPDF = () => {
-  // Перевіряємо тип пристрою
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-  // Для мобільних використовуємо версію для друку
-  // Для десктопів намагаємося створити PDF напряму
-  if (isMobile) {
-    openPrintableVersion();
-  } else {
-    createDirectPDF().catch(() => openPrintableVersion());
-  }
-
-  function openPrintableVersion() {
-    const printContent = `
-      <html>
-        <head>
-          <title>HarvestConsulting</title>
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <style>
+  // Проста версія - відкриваємо сторінку для друку
+  const printContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Інтегрована система захисту</title>
+        <style>
             body { 
-              font-family: Arial, sans-serif; 
-              margin: 20px; 
-              line-height: 1.4;
+                font-family: Arial, sans-serif; 
+                margin: 20px; 
+                line-height: 1.4;
             }
             h1 { 
-              text-align: center; 
-              color: #184e2f; 
-              margin-bottom: 30px;
-            }
-            .help { 
-              background: #f0f8f0; 
-              padding: 15px; 
-              margin: 20px 0; 
-              border-radius: 8px;
-              border-left: 4px solid #184e2f;
+                text-align: center; 
+                color: #184e2f; 
+                margin-bottom: 30px;
             }
             table {
-              width: 100%;
-              border-collapse: collapse;
-              margin-top: 20px;
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
             }
             th, td {
-              padding: 12px 8px;
-              border: 1px solid #ddd;
-              text-align: left;
+                padding: 12px 8px;
+                border: 1px solid #ddd;
+                text-align: left;
             }
             th {
-              background-color: #184e2f;
-              color: white;
-              font-weight: bold;
+                background-color: #184e2f;
+                color: white;
+                font-weight: bold;
             }
             tr:nth-child(even) {
-              background-color: #f8f9fa;
+                background-color: #f8f9fa;
             }
-            @media print {
-              body { margin: 0; }
-              .help { display: none; }
-            }
-          </style>
-        </head>
-        <body>
-          <h1>HarvestConsulting</h1>
-          
-          ${isMobile ? `
-            <div class="help">
-              <strong>📱 Як зберегти на телефоні:</strong><br>
-              1. Натисніть кнопку "Поділитися"<br>
-              2. Виберіть "Друк" або "Print"<br>
-              3. Оберіть "Зберегти як PDF"<br>
-              4. Натисніть "Зберегти"
-            </div>
-          ` : ''}
-
-          <table>
+        </style>
+    </head>
+    <body>
+        <h1>Інтегрована система захисту</h1>
+        <table>
             <thead>
-              <tr>
-                <th>Дата</th>
-                <th>Препарати</th>
-              </tr>
+                <tr>
+                    <th>Дата</th>
+                    <th>Препарати</th>
+                </tr>
             </thead>
             <tbody>
-              ${integratedSystem.map(item => `
-                <tr>
-                  <td><strong>${item.Дата}</strong></td>
-                  <td>${item.Препарат}</td>
-                </tr>
-              `).join('')}
+                ${integratedSystem.map(item => 
+                    `<tr>
+                        <td><strong>${item.Дата}</strong></td>
+                        <td>${item.Препарат}</td>
+                    </tr>`
+                ).join('')}
             </tbody>
-          </table>
-          
-          <script>
-            setTimeout(() => {
-              window.print();
-            }, 500);
-          </script>
-        </body>
-      </html>
-    `;
+        </table>
+        <script>
+            window.onload = function() {
+                window.print();
+            }
+        </script>
+    </body>
+    </html>
+  `;
 
-    const printWindow = window.open('', '_blank');
+  // Відкриваємо нове вікно
+  const printWindow = window.open('', '_blank');
+  if (printWindow) {
     printWindow.document.write(printContent);
     printWindow.document.close();
-  }
-
-  async function createDirectPDF() {
-    try {
-      const html2canvas = (await import('html2canvas')).default;
-      const { jsPDF } = await import('jspdf');
-
-      const tableElement = document.querySelector('.integrated-table-container');
-      if (!tableElement) {
-        throw new Error('Таблицю не знайдено');
-      }
-
-      const canvas = await html2canvas(tableElement, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: '#ffffff'
-      });
-
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgWidth = 190;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-      pdf.setFontSize(16);
-      pdf.text('Інтегрована система захисту', 105, 15, { align: 'center' });
-      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, 25, imgWidth, imgHeight);
-      pdf.save('Інтегрована_система_захисту.pdf');
-      
-    } catch (error) {
-      console.error('PDF creation failed:', error);
-      throw error;
-    }
+  } else {
+    alert('Будь ласка, дозвольте спливаючі вікна для цього сайту');
   }
 };
 
