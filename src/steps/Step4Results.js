@@ -623,13 +623,10 @@ for (const group of diseaseCardsGrouped) {
 
 const integratedSystem = integratedMap
   .map((entry) => {
-    const formattedProducts = entry.Препарати
-      .map((назва) => {
-        if (!назва || typeof назва !== "string") return null;
-        const dose = productInfo[назва] || "—";
-        return `${назва} (${dose})`;
-      })
-      .filter(Boolean); // видаляє null / undefined
+    const formattedProducts = entry.Препарати.map((назва) => {
+      const dose = productInfo[назва] || "";
+      return dose ? `${назва} (${dose})` : назва;
+    });
 
     return {
       Дата: entry.Дата,
