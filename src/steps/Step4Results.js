@@ -650,20 +650,18 @@ console.log("🔍 ДЕБАГ: Перевірка productInfo");
 Object.entries(productInfo).forEach(([key, value]) => {
   console.log(`${key}: ${value}`);
 });
+
 const exportToPDF = () => {
   const doc = new jsPDF();
 
-  // ✅ Налаштування ширини стовпців
-  const columnStyles = {
-    0: { cellWidth: 25 }, // Дата
-    1: { cellWidth: 165 }, // Препарати - більша ширина
-  };
+  // ✅ ТЕСТОВІ ДАНІ для перевірки
+  const testData = [
+    { Дата: "10.08.2025", Препарат: "Медян Екстра (2л/га)" },
+    { Дата: "21.08.2025", Препарат: "Зорвек Інкантія (0,5л/га), Луна Експірієнс (0,75л/га)" },
+    { Дата: "03.09.2025", Препарат: "Казумін (1,5-3л/га)" },
+  ];
 
-  // ✅ Дані для експорту
-  const exportData = integratedSystem.map((entry) => [
-    entry.Дата,
-    entry.Препарат || "—",
-  ]);
+  const exportData = testData.map(entry => [entry.Дата, entry.Препарат]);
 
   doc.setFont("Roboto", "normal");
   doc.setFontSize(16);
@@ -676,31 +674,26 @@ const exportToPDF = () => {
     styles: {
       font: "Roboto",
       fontStyle: "normal",
-      fontSize: 9, // ✅ Трохи менший шрифт для кращого вміщення
+      fontSize: 9,
       cellPadding: 3,
       valign: "top",
       textColor: 20,
-      lineWidth: 0.5,
     },
-    columnStyles: columnStyles,
+    columnStyles: {
+      0: { cellWidth: 25 },
+      1: { cellWidth: 165 },
+    },
     headStyles: {
       fillColor: [24, 78, 47],
       textColor: 255,
       fontStyle: "bold",
-      fontSize: 10,
-    },
-    bodyStyles: {
-      fontSize: 9,
     },
     alternateRowStyles: {
       fillColor: [245, 245, 245],
     },
-    // ✅ Дозволяємо перенос слів
-    tableWidth: 'wrap',
-    margin: { left: 10, right: 10 },
   });
 
-  doc.save("Інтегрована_таблиця_захисту.pdf");
+  doc.save("Тестова_таблиця_захисту.pdf");
 };
 
   return (
