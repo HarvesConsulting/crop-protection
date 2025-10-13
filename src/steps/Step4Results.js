@@ -645,32 +645,41 @@ integratedSystem.forEach((entry, index) => {
   });
 });
 
-const exportToPDF = () => {
-  const doc = new jsPDF();
-  
-  // Використовуємо courier шрифт
-  doc.setFont("courier");
-  doc.setFontSize(16);
-  doc.text("Інтегрована система захисту", 105, 15, { align: "center" });
-  
-  // Створюємо дані для таблиці
-  const tableData = integratedSystem.map(item => [item.Дата, item.Препарат]);
-  
-  autoTable(doc, {
-    startY: 25,
-    head: [['Дата', 'Препарати']],
-    body: tableData,
-    styles: { 
-      font: 'courier',
-      fontSize: 9 
-    },
-    headStyles: { 
-      fillColor: [24, 78, 47],
-      font: 'courier'
-    }
-  });
+const exportToPDF = async () => {
+  try {
+    // Динамічно імпортуємо бібліотеки
+    const html2canvas = (await import('html2canvas')).default;
+    const { jsPDF } = await import('jspdf');
 
-  doc.save("Інтегрована_система_захисту.pdf");
+    // Знаходимо таблицю
+    const tableElement = document.querySelector('.integrated-table-container');
+    if (!tableElement) {
+      alert('Таблицю не знайдено');
+      return;
+    }
+
+    // Створюємо canvas з таблиці
+    const canvas = await html2canvas(tableElement, {
+      scale: 2, // Збільшуємо якість
+      useCORS: true,
+      backgroundColor: '#ffffff'
+    });
+
+    // Створюємо PDF
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const imgWidth = 190;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    // Додаємо зображення в PDF
+    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, 10, imgWidth, imgHeight);
+    
+    // Зберігаємо PDF
+    pdf.save('Інтегрована_система_захисту.pdf');
+    
+  } catch (error) {
+    console.error('Помилка при створенні PDF:', error);
+    alert('Помилка при створенні PDF: ' + error.message);
+  }
 };
 
   return (
