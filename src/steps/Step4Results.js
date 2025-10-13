@@ -469,21 +469,20 @@ const toggleAllCards = () => {
 const aggregatedRain = rainDaily;
   const sprayData = sprayDates.map((d, i) => {
   const cur = parseISO(d.split(".").reverse().join("-"));
+
   const prev =
     i > 0
       ? parseISO(sprayDates[i - 1].split(".").reverse().join("-"))
       : plantingDate;
 
-  const gap = prev
-    ? `${differenceInDays(cur, prev)} діб після попередньої`
-    : "—";
-
   const product = rotationProducts[i % rotationProducts.length];
+
   const recommendedHours = suitableHours[d] || [];
 
   const backData = getAccumulatedStats(diagnostics, prev, cur, aggregatedRain);
 
   return {
+    Назва: product, // ✅ нове поле — оголошене й додане правильно
     Дата: d,
     Препарат: `${product} (${productInfo[product] || "—"})`,
     Рекомендація: productLinks[product] ? (
@@ -493,11 +492,13 @@ const aggregatedRain = rainDaily;
     ) : (
       "—"
     ),
-    Інтервал: gap,
+    Інтервал: prev
+      ? `${differenceInDays(cur, prev)} діб після попередньої`
+      : "—",
     "Рекомендовані години": recommendedHours.length
       ? recommendedHours.join(", ")
       : "—",
-    backData, // 🔥 Ось що ми додаємо
+    backData,
   };
 });
 
@@ -525,6 +526,7 @@ const aggregatedRain = rainDaily;
   );
 
   return {
+    Назва: product, // ✅ нове поле
     Дата: dateStr,
     Препарат: `${product} (${productInfo[product] || "—"})`,
     Рекомендація: productLinks[product] ? (
@@ -574,7 +576,7 @@ const integratedMap = sprayData.map((spray) => {
   return {
     Дата: spray.Дата,
     timestamp: dateObj.getTime(),
-    Препарати: [product], // Тільки назву!
+    Препарати: [spray.Назва], // ✅ беремо назву без дози
     Рекомендації: [spray.Рекомендація],
     diseases: new Set(["Фітофтороз"]),
     backData: spray.backData,
@@ -592,7 +594,7 @@ for (const group of diseaseCardsGrouped) {
       const diff = Math.abs(record.timestamp - diseaseTime);
 
       if (diff <= mergeThreshold) {
-        record.Препарати.push(entry.Препарат);
+        record.Препарати.push(entry.Назва); // ✅ беремо назву з entry
         record.Рекомендації.push(entry.Рекомендація);
         record.diseases.add(group.name);
         merged = true;
@@ -604,7 +606,7 @@ for (const group of diseaseCardsGrouped) {
       integratedMap.push({
         Дата: entry.Дата,
         timestamp: diseaseTime,
-        Препарати: [product], // ✅ назва без дози
+        Препарати: [entry.Назва], // ✅ без product
         Рекомендації: [entry.Рекомендація],
         diseases: new Set([group.name]),
         backData: entry.backData,
@@ -614,17 +616,17 @@ for (const group of diseaseCardsGrouped) {
 }
 
 const integratedSystem = integratedMap
-  .map((entry) => ({
-    Дата: entry.Дата,
-    Препарат: entry.Препарати
-  .map((raw) => {
-    const name = raw.split(" (")[0]; // вирізаємо назву
-    const dose = productInfo[name] || "—";
-    return `${name} (${dose})`;
-  })
-  .join(", "),
+  .map((entry) => {
+    const formattedProducts = entry.Препарати.map((назва) => {
+      const dose = productInfo[назва] || "—";
+      return `${назва} (${dose})`;
+    });
 
-  }))
+    return {
+      Дата: entry.Дата,
+      Препарат: formattedProducts.join(", "),
+    };
+  })
   .sort((a, b) => {
     const dA = parseISO(a.Дата.split(".").reverse().join("-"));
     const dB = parseISO(b.Дата.split(".").reverse().join("-"));
