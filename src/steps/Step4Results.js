@@ -646,18 +646,20 @@ integratedSystem.forEach((entry, index) => {
 });
 
 const exportToPDF = () => {
+  const [showExportDialog, setShowExportDialog] = useState(false);
+
   // Перевіряємо тип пристрою
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   
-  if (isMobile) {
-    // Для мобільних - відкриваємо версію для друку
-    openPrintableVersion();
-  } else {
-    // Для десктопів - створюємо PDF напряму
-    createDirectPDF();
-  }
+  const handleExport = () => {
+    if (isMobile) {
+      openPrintableVersion();
+    } else {
+      createDirectPDF();
+    }
+  };
 
-  function openPrintableVersion() {
+  const openPrintableVersion = () => {
     const printContent = `
       <html>
         <head>
@@ -725,6 +727,12 @@ const exportToPDF = () => {
               `).join('')}
             </tbody>
           </table>
+          
+          <script>
+            setTimeout(() => {
+              window.print();
+            }, 1000);
+          </script>
         </body>
       </html>
     `;
@@ -732,22 +740,18 @@ const exportToPDF = () => {
     const printWindow = window.open('', '_blank');
     printWindow.document.write(printContent);
     printWindow.document.close();
-    
-    // На мобільних показуємо інструкцію перед друком
-    setTimeout(() => {
-      if (confirm('Натисніть "OK" щоб відкрити діалог друку. Потім виберіть "Зберегти як PDF".')) {
-        printWindow.print();
-      }
-    }, 1000);
-  }
+  };
 
-  async function createDirectPDF() {
+  const createDirectPDF = async () => {
     try {
       const html2canvas = (await import('html2canvas')).default;
       const { jsPDF } = await import('jspdf');
 
       const tableElement = document.querySelector('.integrated-table-container');
-      if (!tableElement) return;
+      if (!tableElement) {
+        alert('Таблицю не знайдено');
+        return;
+      }
 
       const canvas = await html2canvas(tableElement, {
         scale: 2,
@@ -765,11 +769,14 @@ const exportToPDF = () => {
       pdf.save('Інтегрована_система_захисту.pdf');
       
     } catch (error) {
-      // Якщо пряме створення не вийшло - відкриваємо версію для друку
       console.error('PDF creation failed:', error);
+      // Якщо пряме створення не вийшло - відкриваємо версію для друку
       openPrintableVersion();
     }
-  }
+  };
+
+  // Викликаємо експорт
+  handleExport();
 };
 
   return (
