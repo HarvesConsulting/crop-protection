@@ -648,8 +648,8 @@ integratedSystem.forEach((entry, index) => {
 const exportToPDF = () => {
   // Перевіряємо тип пристрою
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  
-  // Для мобільних завжди використовуємо версію для друку
+
+  // Для мобільних використовуємо версію для друку
   // Для десктопів намагаємося створити PDF напряму
   if (isMobile) {
     openPrintableVersion();
@@ -776,7 +776,7 @@ const exportToPDF = () => {
       
     } catch (error) {
       console.error('PDF creation failed:', error);
-      throw error; // Перекидаємо помилку далі
+      throw error;
     }
   }
 };
