@@ -646,79 +646,26 @@ integratedSystem.forEach((entry, index) => {
 });
 
 const exportToPDF = () => {
-  // Проста версія - відкриваємо сторінку для друку
-  const printContent = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Інтегрована система захисту</title>
-        <style>
-            body { 
-                font-family: Arial, sans-serif; 
-                margin: 20px; 
-                line-height: 1.4;
-            }
-            h1 { 
-                text-align: center; 
-                color: #184e2f; 
-                margin-bottom: 30px;
-            }
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 20px;
-            }
-            th, td {
-                padding: 12px 8px;
-                border: 1px solid #ddd;
-                text-align: left;
-            }
-            th {
-                background-color: #184e2f;
-                color: white;
-                font-weight: bold;
-            }
-            tr:nth-child(even) {
-                background-color: #f8f9fa;
-            }
-        </style>
-    </head>
-    <body>
-        <h1>Інтегрована система захисту</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>Дата</th>
-                    <th>Препарати</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${integratedSystem.map(item => 
-                    `<tr>
-                        <td><strong>${item.Дата}</strong></td>
-                        <td>${item.Препарат}</td>
-                    </tr>`
-                ).join('')}
-            </tbody>
-        </table>
-        <script>
-            window.onload = function() {
-                window.print();
-            }
-        </script>
-    </body>
-    </html>
-  `;
+  const doc = new jsPDF();
+  
+  // Додаємо заголовок
+  doc.setFontSize(16);
+  doc.text("Інтегрована система захисту", 105, 15, { align: "center" });
+  
+  // Створюємо дані для таблиці
+  const tableData = integratedSystem.map(item => [item.Дата, item.Препарат]);
+  
+  // Додаємо таблицю
+  autoTable(doc, {
+    startY: 25,
+    head: [['Дата', 'Препарати']],
+    body: tableData,
+    styles: { fontSize: 10 },
+    headStyles: { fillColor: [24, 78, 47] }
+  });
 
-  // Відкриваємо нове вікно
-  const printWindow = window.open('', '_blank');
-  if (printWindow) {
-    printWindow.document.write(printContent);
-    printWindow.document.close();
-  } else {
-    alert('Будь ласка, дозвольте спливаючі вікна для цього сайту');
-  }
+  // Зберігаємо PDF
+  doc.save("Інтегрована_система_захисту.pdf");
 };
 
   return (
