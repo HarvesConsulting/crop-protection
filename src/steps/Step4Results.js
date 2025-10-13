@@ -648,37 +648,28 @@ integratedSystem.forEach((entry, index) => {
 const exportToPDF = () => {
   const doc = new jsPDF();
   
-  // Додаємо кириличні шрифти
-  doc.addFileToVFS('Roboto-Regular.ttf', RobotoRegular);
-  doc.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
-  doc.setFont('Roboto');
-  
-  // Додаємо заголовок
+  // Використовуємо courier шрифт
+  doc.setFont("courier");
   doc.setFontSize(16);
   doc.text("Інтегрована система захисту", 105, 15, { align: "center" });
   
   // Створюємо дані для таблиці
   const tableData = integratedSystem.map(item => [item.Дата, item.Препарат]);
   
-  // Додаємо таблицю з кириличними шрифтами
   autoTable(doc, {
     startY: 25,
     head: [['Дата', 'Препарати']],
     body: tableData,
     styles: { 
-      font: 'Roboto',
-      fontSize: 10 
+      font: 'courier',
+      fontSize: 9 
     },
     headStyles: { 
       fillColor: [24, 78, 47],
-      font: 'Roboto'
-    },
-    bodyStyles: {
-      font: 'Roboto'
+      font: 'courier'
     }
   });
 
-  // Зберігаємо PDF
   doc.save("Інтегрована_система_захисту.pdf");
 };
 
