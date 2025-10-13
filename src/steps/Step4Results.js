@@ -621,9 +621,9 @@ for (const group of diseaseCardsGrouped) {
 const integratedSystem = integratedMap
   .map((entry) => {
     const formattedProducts = entry.Препарати.map((назва) => {
-      const dose = productInfo[назва] || "—";
-      return `${назва} (${dose})`;
-    });
+  const dose = productInfo[назва] || "—";
+  return `${назва} (${dose})`; // ✅ тепер буде і назва, і доза
+});
 
     return {
       Дата: entry.Дата,
