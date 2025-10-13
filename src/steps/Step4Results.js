@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import "./Step4Results.css";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import "../fonts/Roboto-Regular-normal.js";
-import "../fonts/Roboto-bold.js"; // 👈 додай одразу після normal
+// import "../fonts/Roboto-Regular-normal.js";
+// import "../fonts/Roboto-bold.js"; // 👈 додай одразу після normal
 import HourTimeline from "../components/HourTimeline";
 import Layout from "../components/Layout";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
@@ -645,7 +645,7 @@ const exportData = integratedSystem.map((entry) => [
   entry.Препарат,
 ]);
 
-  doc.setFont("Roboto", "normal");
+  doc.setFont("helvetica", "normal");
   doc.setFontSize(16);
   doc.text("Інтегрована система захисту", 105, 20, { align: "center" });
 
