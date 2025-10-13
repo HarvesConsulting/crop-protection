@@ -645,40 +645,62 @@ integratedSystem.forEach((entry, index) => {
   });
 });
 
-// Перевірка productInfo
-console.log("🔍 ДЕБАГ: Перевірка productInfo");
-Object.entries(productInfo).forEach(([key, value]) => {
-  console.log(`${key}: ${value}`);
-});
-
 const exportToPDF = () => {
-  import('html2canvas').then(html2canvas => {
-    import('jspdf').then(jsPDF => {
-      const tableElement = document.querySelector('.integrated-table-container');
-      
-      html2canvas.default(tableElement).then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF.default('p', 'mm', 'a4');
-        const imgWidth = 210; // A4 width in mm
-        const pageHeight = 295; // A4 height in mm
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        let heightLeft = imgHeight;
-        
-        let position = 0;
-        
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-        
-        while (heightLeft >= 0) {
-          position = heightLeft - imgHeight;
-          pdf.addPage();
-          pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-          heightLeft -= pageHeight;
+  // Використовуємо pdfmake для кращої підтримки кирилиці
+  import('pdfmake/build/pdfmake').then(pdfmakeModule => {
+    const pdfMake = pdfmakeModule.default;
+    
+    const fonts = {
+      Roboto: {
+        normal: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf',
+        bold: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Medium.ttf',
+        italics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Italic.ttf',
+        bolditalics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-MediumItalic.ttf'
+      }
+    };
+
+    pdfMake.fonts = fonts;
+
+    const testData = [
+      { Дата: "10.08.2025", Препарат: "Медян Екстра (2л/га)" },
+      { Дата: "21.08.2025", Препарат: "Зорвек Інкантія (0,5л/га), Луна Експірієнс (0,75л/га)" },
+      { Дата: "03.09.2025", Препарат: "Казумін (1,5-3л/га)" },
+    ];
+
+    const documentDefinition = {
+      content: [
+        { text: 'Інтегрована система захисту', style: 'header' },
+        {
+          table: {
+            headerRows: 1,
+            widths: ['auto', '*'],
+            body: [
+              [{ text: 'Дата', style: 'tableHeader' }, { text: 'Препарати', style: 'tableHeader' }],
+              ...testData.map(item => [item.Дата, item.Препарат])
+            ]
+          }
         }
-        
-        pdf.save('Інтегрована_система_захисту.pdf');
-      });
-    });
+      ],
+      styles: {
+        header: {
+          fontSize: 18,
+          bold: true,
+          margin: [0, 0, 0, 10],
+          alignment: 'center'
+        },
+        tableHeader: {
+          bold: true,
+          fontSize: 12,
+          color: 'white',
+          fillColor: '#184e2f'
+        }
+      },
+      defaultStyle: {
+        font: 'Roboto'
+      }
+    };
+
+    pdfMake.createPdf(documentDefinition).download('Інтегрована_система_захисту.pdf');
   });
 };
 
