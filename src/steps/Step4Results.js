@@ -2,10 +2,7 @@ import { format, parseISO, differenceInDays, isValid } from "date-fns";
 import ModalWithSummary from "../components/ModalWithSummary"; // адаптуй шлях, якщо потрібно
 import React, { useState } from "react";
 import "./Step4Results.css";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import "../fonts/Roboto-Regular-normal.js";
-import "../fonts/Roboto-bold.js"; // 👈 додай одразу після normal
+import * as XLSX from "xlsx";
 import HourTimeline from "../components/HourTimeline";
 import Layout from "../components/Layout";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
@@ -14,7 +11,6 @@ import ModalWithWeather from "../components/ModalWithWeather";
 import { extractSuitableSprayHours } from "../engine";
 import IntegratedTableView from "../components/IntegratedTableView";
 import ActionMenu from "../components/ActionMenu";
-import { getIntegratedSystem } from "./utils";
 
 const productInfo = {
   "Зорвек Інкантія": "0,5л/га",
@@ -374,9 +370,9 @@ function aggregateDailyRain(hourlyData = []) {
   }));
 }
 
+
 export default function Step4Results({ result, onRestart }) {
   const [showIntegrated, setShowIntegrated] = useState(false);
-  const data = result?.data || []; // або адаптуй під структуру твого result
   const topRef = React.useRef(null);
   const [showMenu, setShowMenu] = useState(false);
   const [showWeather, setShowWeather] = useState(false);
@@ -469,20 +465,21 @@ const toggleAllCards = () => {
 const aggregatedRain = rainDaily;
   const sprayData = sprayDates.map((d, i) => {
   const cur = parseISO(d.split(".").reverse().join("-"));
-
   const prev =
     i > 0
       ? parseISO(sprayDates[i - 1].split(".").reverse().join("-"))
       : plantingDate;
 
-  const product = rotationProducts[i % rotationProducts.length];
+  const gap = prev
+    ? `${differenceInDays(cur, prev)} діб після попередньої`
+    : "—";
 
+  const product = rotationProducts[i % rotationProducts.length];
   const recommendedHours = suitableHours[d] || [];
 
   const backData = getAccumulatedStats(diagnostics, prev, cur, aggregatedRain);
 
   return {
-    Назва: product, // ✅ нове поле — оголошене й додане правильно
     Дата: d,
     Препарат: `${product} (${productInfo[product] || "—"})`,
     Рекомендація: productLinks[product] ? (
@@ -492,13 +489,11 @@ const aggregatedRain = rainDaily;
     ) : (
       "—"
     ),
-    Інтервал: prev
-      ? `${differenceInDays(cur, prev)} діб після попередньої`
-      : "—",
+    Інтервал: gap,
     "Рекомендовані години": recommendedHours.length
       ? recommendedHours.join(", ")
       : "—",
-    backData,
+    backData, // 🔥 Ось що ми додаємо
   };
 });
 
@@ -526,7 +521,6 @@ const aggregatedRain = rainDaily;
   );
 
   return {
-    Назва: product, // ✅ нове поле
     Дата: dateStr,
     Препарат: `${product} (${productInfo[product] || "—"})`,
     Рекомендація: productLinks[product] ? (
@@ -576,7 +570,7 @@ const integratedMap = sprayData.map((spray) => {
   return {
     Дата: spray.Дата,
     timestamp: dateObj.getTime(),
-    Препарати: [spray.Назва], // ✅ беремо назву без дози
+    Препарати: [spray.Препарат],
     Рекомендації: [spray.Рекомендація],
     diseases: new Set(["Фітофтороз"]),
     backData: spray.backData,
@@ -588,19 +582,13 @@ for (const group of diseaseCardsGrouped) {
     const diseaseDate = parseISO(entry.Дата.split(".").reverse().join("-"));
     const diseaseTime = diseaseDate.getTime();
 
-    // ❌ було так:
-    // const rawName = (entry.Препарат || "").split(" (")[0];
-
-    // ✅ тепер так:
-    const rawName = entry.Назва?.trim() || "—";
-
     let merged = false;
 
     for (const record of integratedMap) {
       const diff = Math.abs(record.timestamp - diseaseTime);
 
       if (diff <= mergeThreshold) {
-        record.Препарати.push(rawName);
+        record.Препарати.push(entry.Препарат);
         record.Рекомендації.push(entry.Рекомендація);
         record.diseases.add(group.name);
         merged = true;
@@ -612,7 +600,7 @@ for (const group of diseaseCardsGrouped) {
       integratedMap.push({
         Дата: entry.Дата,
         timestamp: diseaseTime,
-        Препарати: [rawName],
+        Препарати: [entry.Препарат],
         Рекомендації: [entry.Рекомендація],
         diseases: new Set([group.name]),
         backData: entry.backData,
@@ -622,42 +610,57 @@ for (const group of diseaseCardsGrouped) {
 }
 
 const integratedSystem = integratedMap
-  .map((entry) => {
-    const formattedProducts = entry.Препарати.map((назва) => {
-      const dose = productInfo[назва] || "";
-      return dose ? `${назва} (${dose})` : назва;
-    });
-
-    return {
-      Дата: entry.Дата,
-      Препарат: formattedProducts.join(", "),
-    };
-  })
+  .map((entry) => ({
+    Дата: entry.Дата,
+    Препарат: entry.Препарати.join(", "),
+    Рекомендація: entry.Рекомендації,
+    backData: entry.backData,
+    Хвороби: Array.from(entry.diseases).join(", "),
+  }))
   .sort((a, b) => {
     const dA = parseISO(a.Дата.split(".").reverse().join("-"));
     const dB = parseISO(b.Дата.split(".").reverse().join("-"));
     return dA - dB;
   });
+  
+  const exportToExcel = () => {
+  const exportData = integratedSystem.map((entry) => ({
+    Дата: entry.Дата,
+    Препарати: entry.Препарат,
+    Хвороби: entry.Хвороби,
+  }));
 
+  const ws = XLSX.utils.aoa_to_sheet([["Інтегрована система захисту"]]);
 
-const exportToPDF = () => {
-  const pdf = new jsPDF('l', 'mm', 'a4'); // landscape
+  // Об'єднання заголовку
+  ws["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 2 } }];
 
-  const headers = [["Дата", "Препарат"]]; // Залежно від структури
-  const dataRows = integratedSystem.map(row => [
-    row.Дата,
-    row.Препарат,
-  ]);
+  // Додаємо основну таблицю
+  XLSX.utils.sheet_add_json(ws, exportData, { origin: "A2", skipHeader: false });
 
-  autoTable(pdf, {
-    head: headers,
-    body: dataRows,
-    styles: { font: "Roboto", fontSize: 10 },
-    headStyles: { fillColor: [30, 136, 229] }, // синій колір заголовків
-    margin: { top: 20 },
+  // Автоширина колонок
+  ws["!cols"] = Object.keys(exportData[0]).map((key) => {
+    const maxContentLength = Math.max(
+      key.length,
+      ...exportData.map((row) =>
+        String(row[key] || "").split("\n").reduce((max, line) => Math.max(max, line.length), 0)
+      )
+    );
+    return { wch: Math.min(Math.max(maxContentLength + 4, 12), 60) };
   });
 
-  pdf.save("Інтегрована_система_захисту.pdf");
+  // 🔹 НЕ встановлюємо висоту рядків (Excel сам адаптує)
+
+  // Увімкнення переносу тексту
+  Object.keys(ws).forEach((cell) => {
+    if (cell[0] === "!") return;
+    if (!ws[cell].s) ws[cell].s = {};
+    ws[cell].s.alignment = { wrapText: true, vertical: "top" };
+  });
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Інтегрована таблиця");
+  XLSX.writeFile(wb, "Інтегрована_таблиця_захисту.xlsx");
 };
 
   return (
@@ -714,10 +717,9 @@ const exportToPDF = () => {
   <>
     <IntegratedTableView data={integratedSystem} />
 
-    <button onClick={exportToPDF} className="toggle-button">
-  Експорт в PDF
-</button>
-
+    <button onClick={exportToExcel} className="toggle-button">
+      Експорт в Excel
+    </button>
   </>
 ) : (
   <>
@@ -836,4 +838,4 @@ const exportToPDF = () => {
 
 </main>
 );
-}
+}  
