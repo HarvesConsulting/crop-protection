@@ -645,42 +645,24 @@ integratedSystem.forEach((entry, index) => {
   });
 });
 
-const exportToPDF = async () => {
-  let tableElement;
-  
-  try {
-    const html2canvas = (await import('html2canvas')).default;
-    const { jsPDF } = await import('jspdf');
+const exportToPDF = () => {
+  const pdf = new jsPDF('l', 'mm', 'a4'); // landscape
 
-    tableElement = document.querySelector('.integrated-table-container');
-    if (!tableElement) {
-      alert('Таблицю не знайдено');
-      return;
-    }
+  const headers = [["Дата", "Препарат"]]; // Залежно від структури
+  const dataRows = integratedSystem.map(row => [
+    row.Дата,
+    row.Препарат,
+  ]);
 
-    // Альбомна орієнтація - більше місца по ширині
-    const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' - landscape
+  autoTable(pdf, {
+    head: headers,
+    body: dataRows,
+    styles: { font: "Roboto", fontSize: 10 },
+    headStyles: { fillColor: [30, 136, 229] }, // синій колір заголовків
+    margin: { top: 20 },
+  });
 
-    const canvas = await html2canvas(tableElement, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: '#ffffff'
-    });
-
-    const imgWidth = 270; // Більша ширина в альбомній орієнтації
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, 10, imgWidth, imgHeight);
-    pdf.save('Інтегрована_система_захисту.pdf');
-    
-  } catch (error) {
-    console.error('Помилка:', error);
-    // Відновлюємо стилі якщо tableElement був змінений
-    if (tableElement) {
-      tableElement.style.fontSize = '';
-      tableElement.style.lineHeight = '';
-    }
-  }
+  pdf.save("Інтегрована_система_захисту.pdf");
 };
 
   return (
