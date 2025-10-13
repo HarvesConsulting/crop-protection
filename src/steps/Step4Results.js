@@ -14,6 +14,7 @@ import ModalWithWeather from "../components/ModalWithWeather";
 import { extractSuitableSprayHours } from "../engine";
 import IntegratedTableView from "../components/IntegratedTableView";
 import ActionMenu from "../components/ActionMenu";
+import { getIntegratedSystem } from "./utils";
 
 const productInfo = {
   "Зорвек Інкантія": "0,5л/га",
@@ -629,33 +630,24 @@ const integratedSystem = integratedMap
 const exportToPDF = () => {
   const doc = new jsPDF();
 
-  // ✅ Встановлюємо шрифт Roboto, зареєстрований як "Roboto"
+  const integratedSystem = getIntegratedSystem(data); // <-- сюди передай свої дані
+
+  const exportData = integratedSystem.map((entry) => [
+    entry.Дата,
+    entry.Препарати.join(", "),
+  ]);
+
   doc.setFont("Roboto", "normal");
   doc.setFontSize(16);
-
-  // 📌 Заголовок
   doc.text("Інтегрована система захисту", 105, 20, { align: "center" });
 
-  // 📋 Підготовка даних таблиці
-  const exportData = integratedSystem.map((entry) => [
-  entry.Дата || "",
-  Array.isArray(entry.Препарат)
-    ? entry.Препарат.join(", ")
-    : (entry.Препарат || ""),
-  Array.isArray(entry.Хвороби)
-    ? entry.Хвороби.join(", ")
-    : (entry.Хвороби || ""),
-]);
-
-
-  // 📊 Побудова таблиці
   autoTable(doc, {
     startY: 30,
-    head: [["Дата", "Препарати", "Хвороби"]],
+    head: [["Дата", "Препарати"]],
     body: exportData,
     styles: {
-      font: "Roboto",         // 🟢 Головне — правильна назва шрифту!
-      fontStyle: "normal",    // або "bold"
+      font: "Roboto",
+      fontStyle: "normal",
       fontSize: 10,
       cellPadding: 4,
       valign: "top",
@@ -663,20 +655,18 @@ const exportToPDF = () => {
     },
     columnStyles: {
       0: { cellWidth: 30 },
-      1: { cellWidth: 80 },
-      2: { cellWidth: 80 },
+      1: { cellWidth: 150 },
     },
     headStyles: {
-      fillColor: [24, 78, 47], // 🟢 темно-зелений фон
-      textColor: 255,          // ⚪ білий текст
+      fillColor: [24, 78, 47],
+      textColor: 255,
       fontStyle: "bold",
     },
     alternateRowStyles: {
-      fillColor: [245, 245, 245], // 🔁 світло-сірі рядки
+      fillColor: [245, 245, 245],
     },
   });
 
-  // 💾 Зберігаємо
   doc.save("Інтегрована_таблиця_захисту.pdf");
 };
 
