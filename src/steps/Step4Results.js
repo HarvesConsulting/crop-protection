@@ -654,7 +654,7 @@ const exportData = integratedSystem.map((entry) => [
   head: [["Дата", "Препарати"]],
   body: exportData,
   styles: {
-    font: "Roboto",
+    // font: "Roboto",
     fontStyle: "normal",
     fontSize: 10,
     cellPadding: 4,
