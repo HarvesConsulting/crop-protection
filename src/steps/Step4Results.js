@@ -654,7 +654,14 @@ Object.entries(productInfo).forEach(([key, value]) => {
 const exportToPDF = () => {
   const doc = new jsPDF();
 
-  // ✅ ТЕСТОВІ ДАНІ для перевірки
+  // ✅ Реєструємо шрифт для кирилиці (якщо ще не зроблено)
+  // Додайте ці рядки, якщо у вас є окремий файл з кириличним шрифтом
+  // doc.addFont('path/to/cyrillic-font.ttf', 'CyrillicFont', 'normal');
+
+  // ✅ Використовуємо стандартний шрифт, який підтримує кирилицю
+  doc.setFont("helvetica", "normal");
+
+  // ✅ ТЕСТОВІ ДАНІ з кирилицею
   const testData = [
     { Дата: "10.08.2025", Препарат: "Медян Екстра (2л/га)" },
     { Дата: "21.08.2025", Препарат: "Зорвек Інкантія (0,5л/га), Луна Експірієнс (0,75л/га)" },
@@ -663,7 +670,6 @@ const exportToPDF = () => {
 
   const exportData = testData.map(entry => [entry.Дата, entry.Препарат]);
 
-  doc.setFont("Roboto", "normal");
   doc.setFontSize(16);
   doc.text("Інтегрована система захисту", 105, 20, { align: "center" });
 
@@ -672,16 +678,16 @@ const exportToPDF = () => {
     head: [["Дата", "Препарати"]],
     body: exportData,
     styles: {
-      font: "Roboto",
+      font: "helvetica", // ✅ Використовуємо стандартний шрифт
       fontStyle: "normal",
-      fontSize: 9,
-      cellPadding: 3,
+      fontSize: 10,
+      cellPadding: 4,
       valign: "top",
       textColor: 20,
     },
     columnStyles: {
       0: { cellWidth: 25 },
-      1: { cellWidth: 165 },
+      1: { cellWidth: 160 },
     },
     headStyles: {
       fillColor: [24, 78, 47],
@@ -691,6 +697,10 @@ const exportToPDF = () => {
     alternateRowStyles: {
       fillColor: [245, 245, 245],
     },
+    // ✅ Додаткові налаштування для кирилиці
+    didDrawPage: function (data) {
+      // Додаткові налаштування, якщо потрібно
+    }
   });
 
   doc.save("Тестова_таблиця_захисту.pdf");
