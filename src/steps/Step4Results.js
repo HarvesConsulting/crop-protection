@@ -646,62 +646,51 @@ integratedSystem.forEach((entry, index) => {
 });
 
 const exportToPDF = () => {
-  // Використовуємо pdfmake для кращої підтримки кирилиці
-  import('pdfmake/build/pdfmake').then(pdfmakeModule => {
-    const pdfMake = pdfmakeModule.default;
-    
-    const fonts = {
-      Roboto: {
-        normal: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf',
-        bold: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Medium.ttf',
-        italics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Italic.ttf',
-        bolditalics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-MediumItalic.ttf'
-      }
-    };
-
-    pdfMake.fonts = fonts;
-
-    const testData = [
-      { Дата: "10.08.2025", Препарат: "Медян Екстра (2л/га)" },
-      { Дата: "21.08.2025", Препарат: "Зорвек Інкантія (0,5л/га), Луна Експірієнс (0,75л/га)" },
-      { Дата: "03.09.2025", Препарат: "Казумін (1,5-3л/га)" },
-    ];
-
-    const documentDefinition = {
-      content: [
-        { text: 'Інтегрована система захисту', style: 'header' },
-        {
-          table: {
-            headerRows: 1,
-            widths: ['auto', '*'],
-            body: [
-              [{ text: 'Дата', style: 'tableHeader' }, { text: 'Препарати', style: 'tableHeader' }],
-              ...testData.map(item => [item.Дата, item.Препарат])
-            ]
+  // Створюємо версію для друку
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Інтегрована система захисту</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; }
+          h1 { text-align: center; color: #184e2f; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th { background: #184e2f; color: white; padding: 10px; text-align: left; }
+          td { padding: 8px; border: 1px solid #ddd; }
+          tr:nth-child(even) { background: #f9f9f9; }
+          @media print { body { margin: 0; } }
+        </style>
+      </head>
+      <body>
+        <h1>Інтегрована система захисту</h1>
+        <table>
+          <thead>
+            <tr>
+              <th>Дата</th>
+              <th>Препарати</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${integratedSystem.map(item => `
+              <tr>
+                <td>${item.Дата}</td>
+                <td>${item.Препарат}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        <script>
+          window.onload = function() {
+            window.print();
+            setTimeout(() => window.close(), 500);
           }
-        }
-      ],
-      styles: {
-        header: {
-          fontSize: 18,
-          bold: true,
-          margin: [0, 0, 0, 10],
-          alignment: 'center'
-        },
-        tableHeader: {
-          bold: true,
-          fontSize: 12,
-          color: 'white',
-          fillColor: '#184e2f'
-        }
-      },
-      defaultStyle: {
-        font: 'Roboto'
-      }
-    };
-
-    pdfMake.createPdf(documentDefinition).download('Інтегрована_система_захисту.pdf');
-  });
+        </script>
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
 };
 
   return (
