@@ -653,10 +653,16 @@ Object.entries(productInfo).forEach(([key, value]) => {
 const exportToPDF = () => {
   const doc = new jsPDF();
 
-  // ✅ Використовуємо правильні дані з integratedSystem
+  // ✅ Налаштування ширини стовпців
+  const columnStyles = {
+    0: { cellWidth: 25 }, // Дата
+    1: { cellWidth: 165 }, // Препарати - більша ширина
+  };
+
+  // ✅ Дані для експорту
   const exportData = integratedSystem.map((entry) => [
     entry.Дата,
-    entry.Препарат, // ✅ Це вже містить і назву, і дозу
+    entry.Препарат || "—",
   ]);
 
   doc.setFont("Roboto", "normal");
@@ -670,23 +676,28 @@ const exportToPDF = () => {
     styles: {
       font: "Roboto",
       fontStyle: "normal",
-      fontSize: 10,
-      cellPadding: 4,
+      fontSize: 9, // ✅ Трохи менший шрифт для кращого вміщення
+      cellPadding: 3,
       valign: "top",
       textColor: 20,
+      lineWidth: 0.5,
     },
-    columnStyles: {
-      0: { cellWidth: 30 },
-      1: { cellWidth: 'wrap' },
-    },
+    columnStyles: columnStyles,
     headStyles: {
       fillColor: [24, 78, 47],
       textColor: 255,
       fontStyle: "bold",
+      fontSize: 10,
+    },
+    bodyStyles: {
+      fontSize: 9,
     },
     alternateRowStyles: {
       fillColor: [245, 245, 245],
     },
+    // ✅ Дозволяємо перенос слів
+    tableWidth: 'wrap',
+    margin: { left: 10, right: 10 },
   });
 
   doc.save("Інтегрована_таблиця_захисту.pdf");
