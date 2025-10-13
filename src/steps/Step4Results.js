@@ -620,10 +620,13 @@ for (const group of diseaseCardsGrouped) {
 
 const integratedSystem = integratedMap
   .map((entry) => {
-    const formattedProducts = entry.Препарати.map((назва) => {
-      const dose = productInfo[назва] || "—";
-      return `${назва} (${dose})`;
-    });
+    const formattedProducts = entry.Препарати
+      .map((назва) => {
+        if (!назва || typeof назва !== "string") return null;
+        const dose = productInfo[назва] || "—";
+        return `${назва} (${dose})`;
+      })
+      .filter(Boolean); // видаляє null / undefined
 
     return {
       Дата: entry.Дата,
@@ -635,15 +638,7 @@ const integratedSystem = integratedMap
     const dB = parseISO(b.Дата.split(".").reverse().join("-"));
     return dA - dB;
   });
-// Додайте цей код для дебагінгу
-console.log("🔍 ДЕБАГ: Перевірка integratedSystem перед експортом");
-integratedSystem.forEach((entry, index) => {
-  console.log(`Запис ${index + 1}:`, {
-    Дата: entry.Дата,
-    Препарат: entry.Препарат,
-    Тип_Препарату: typeof entry.Препарат
-  });
-});
+
 
 const exportToPDF = () => {
   const pdf = new jsPDF('l', 'mm', 'a4'); // landscape
