@@ -362,6 +362,7 @@ function aggregateDailyRain(hourlyData = []) {
 
 export default function Step4Results({ result, onRestart }) {
   const [showIntegrated, setShowIntegrated] = useState(false);
+  const [showIntegratedModal, setShowIntegratedModal] = useState(false);
   const topRef = React.useRef(null);
   const [showMenu, setShowMenu] = useState(false);
   const [showWeather, setShowWeather] = useState(false);
@@ -641,7 +642,7 @@ export default function Step4Results({ result, onRestart }) {
           isMobile={isMobile}
           onRestart={onRestart}
           onShowWeather={() => setWeatherModalOpen(true)}
-          onToggleIntegrated={() => setShowIntegrated((prev) => !prev)}
+          onToggleIntegrated={() => setShowIntegratedModal(true)} // 🆕 Змінити тут
           showIntegrated={showIntegrated}
           onGoToCards={handleGoToCards}
           onShowSummary={() => setSummaryModalOpen(true)}
@@ -804,6 +805,12 @@ export default function Step4Results({ result, onRestart }) {
         rainDaily={rainDaily}
         integratedTreatments={integratedSystem}
       />
+      {/* 🆕 Додаємо модальне вікно інтегрованої системи */}
+      <IntegratedTableView 
+        data={integratedSystem} 
+        isOpen={showIntegratedModal} 
+        onClose={() => setShowIntegratedModal(false)} 
+/>
     </main>
   );
 }
