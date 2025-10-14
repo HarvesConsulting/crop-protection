@@ -3,132 +3,93 @@ import React from "react";
 
 export default function PDFExporter({ data }) {
   const exportToPDF = () => {
-    // Створюємо тимчасовий контейнер для PDF
+    if (!data || data.length === 0) {
+      alert("Немає даних для експорту");
+      return;
+    }
+
+    // Створюємо контейнер для PDF
     const pdfContainer = document.createElement("div");
-    pdfContainer.style.position = "fixed";
-    pdfContainer.style.left = "0";
-    pdfContainer.style.top = "0";
     pdfContainer.style.width = "800px";
     pdfContainer.style.padding = "40px";
     pdfContainer.style.backgroundColor = "white";
     pdfContainer.style.color = "black";
     pdfContainer.style.fontFamily = "Arial, sans-serif";
-    pdfContainer.style.zIndex = "9999";
     pdfContainer.style.boxSizing = "border-box";
 
-    // Додаємо логотип з обробкою помилок
-    const logoHtml = `
+    // Створюємо HTML вміст
+    pdfContainer.innerHTML = `
       <div style="display: flex; align-items: center; margin-bottom: 20px;">
-        <img 
-          src="/images/logo.png" 
-          alt="Логотип" 
-          style="height: 60px; margin-right: 20px;" 
-          onerror="this.style.display='none'"
-        />
-        <div>
-          <h2 style="margin: 0;">Інтегрована система захисту рослин</h2>
-          <p style="margin: 0; font-size: 14px; color: #555;">
+        <div style="flex: 1;">
+          <h2 style="margin: 0; color: #333;">Інтегрована система захисту рослин</h2>
+          <p style="margin: 5px 0 0 0; color: #666; font-size: 14px;">
             Сформовано ${new Date().toLocaleDateString("uk-UA")}
           </p>
         </div>
       </div>
-    `;
 
-    // Формуємо таблицю з даними
-    const tableHtml = `
-      <table 
-        border="1" 
-        cellpadding="8" 
-        cellspacing="0" 
-        width="100%" 
-        style="border-collapse: collapse; font-size: 14px; text-align: left;"
-      >
+      <table border="1" cellpadding="8" cellspacing="0" width="100%" style="border-collapse: collapse; font-size: 14px; margin-bottom: 30px;">
         <thead>
-          <tr style="background-color: #e0e0e0;">
-            <th>Дата</th>
-            <th>Препарати</th>
-            <th>Хвороби</th>
+          <tr style="background-color: #f5f5f5;">
+            <th style="border: 1px solid #ddd; padding: 12px; text-align: left; font-weight: bold;">Дата</th>
+            <th style="border: 1px solid #ddd; padding: 12px; text-align: left; font-weight: bold;">Препарати</th>
+            <th style="border: 1px solid #ddd; padding: 12px; text-align: left; font-weight: bold;">Хвороби</th>
           </tr>
         </thead>
         <tbody>
-          ${
-            data && data.length > 0 
-              ? data.map((entry, index) => `
-                  <tr>
-                    <td>${entry.Дата || ''}</td>
-                    <td>${entry.Препарат || ''}</td>
-                    <td>${entry.Хвороби || ''}</td>
-                  </tr>
-                `).join('')
-              : `
-                <tr>
-                  <td colspan="3" style="text-align: center; padding: 20px;">
-                    Дані відсутні
-                  </td>
-                </tr>
-              `
-          }
+          ${data.map((entry, index) => `
+            <tr>
+              <td style="border: 1px solid #ddd; padding: 10px; vertical-align: top;">${entry.Дата || ''}</td>
+              <td style="border: 1px solid #ddd; padding: 10px; vertical-align: top;">${entry.Препарат || ''}</td>
+              <td style="border: 1px solid #ddd; padding: 10px; vertical-align: top;">${entry.Хвороби || ''}</td>
+            </tr>
+          `).join('')}
         </tbody>
       </table>
+
+      <div style="padding: 15px; background-color: #f9f9f9; border-left: 4px solid #ff9800;">
+        <p style="margin: 0; font-size: 12px; color: #666;">
+          ⚠️ Документ сформовано автоматично на базі агрономічної моделі. 
+          Для прийняття остаточних рішень проконсультуйтесь з агрономом.
+        </p>
+      </div>
     `;
 
-    const footerHtml = `
-      <p style="margin-top: 40px; font-size: 13px; color: #666;">
-        ⚠️ Документ сформовано автоматично на базі агрономічної моделі. 
-        Для прийняття остаточних рішень проконсультуйтесь з агрономом.
-      </p>
-    `;
-
-    // Додаємо весь контент до контейнера
-    pdfContainer.innerHTML = logoHtml + tableHtml + footerHtml;
-    document.body.appendChild(pdfContainer);
-
-    // Налаштування для PDF
+    // Налаштування для html2pdf
     const opt = {
-      margin: 0.5,
-      filename: "Інтегрована_система_захисту.pdf",
-      image: { type: "jpeg", quality: 0.98 },
+      margin: 10,
+      filename: `Інтегрована_система_захисту_${new Date().toISOString().split('T')[0]}.pdf`,
+      image: { 
+        type: 'jpeg', 
+        quality: 0.98 
+      },
       html2canvas: { 
-        scale: 2, 
+        scale: 2,
         useCORS: true,
         logging: true,
-        allowTaint: true,
-        onclone: (clonedDoc) => {
-          // Ця функція викликається після клонування DOM для html2canvas
-          console.log("✅ DOM клоновано для html2canvas");
-        }
+        width: 800,
+        windowWidth: 800
       },
       jsPDF: { 
-        unit: "mm", 
-        format: "a4", 
-        orientation: "portrait" 
-      },
+        unit: 'mm', 
+        format: 'a4', 
+        orientation: 'portrait' 
+      }
     };
 
-    console.log("📊 Дані для PDF:", data);
-    console.log("🖨️ Початок генерації PDF...");
+    console.log("🔄 Початок генерації PDF...");
 
-    // Генеруємо PDF
+    // Використовуємо Promise для кращого контролю
     html2pdf()
       .set(opt)
       .from(pdfContainer)
       .save()
       .then(() => {
-        console.log("✅ PDF успішно згенеровано");
-        // Видаляємо тимчасовий контейнер після успішного створення PDF
-        setTimeout(() => {
-          if (document.body.contains(pdfContainer)) {
-            document.body.removeChild(pdfContainer);
-            console.log("🗑️ Тимчасовий контейнер видалено");
-          }
-        }, 1000);
+        console.log("✅ PDF успішно збережено");
       })
       .catch((error) => {
         console.error("❌ Помилка при створенні PDF:", error);
-        // Все одно видаляємо контейнер при помилці
-        if (document.body.contains(pdfContainer)) {
-          document.body.removeChild(pdfContainer);
-        }
+        alert("Помилка при створенні PDF файлу");
       });
   };
 
