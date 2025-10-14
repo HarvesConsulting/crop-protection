@@ -723,45 +723,66 @@ const integratedSystem = integratedMap
     </button>
     <PDFExporter data={integratedSystem} />
 
+{/* ⚡ ТЕПЕР ВІДКРИТИЙ ЕЛЕМЕНТ (НЕ ХОВАЙ display:none!) */}
 <div
   id="pdf-content"
   style={{
-    position: "absolute",
-    left: "-9999px",
-    top: "0",
-    visibility: "hidden",
-    zIndex: -1,
+    background: "white",
+    color: "black",
+    padding: "40px",
+    width: "800px",
+    margin: "0 auto",
   }}
 >
-  <div style={{ padding: "40px", fontSize: "14px", fontFamily: "Arial" }}>
-    <div style={{ display: "flex", alignItems: "center", marginBottom: "20px" }}>
-      <img src="/images/logo.png" alt="Логотип" style={{ height: "60px", marginRight: "20px" }} />
-      <h2>Інтегрована система захисту рослин</h2>
-    </div>
+  <div style={{ display: "flex", alignItems: "center", marginBottom: "20px" }}>
+    <img
+      src="/images/logo.png"
+      alt="Логотип"
+      style={{ height: "60px", marginRight: "20px" }}
+      onError={(e) => {
+        e.target.style.display = "none";
+        console.warn("⚠️ Логотип не знайдено /images/logo.png");
+      }}
+    />
+    <h2>Інтегрована система захисту рослин</h2>
+  </div>
 
-    <table border="1" cellPadding="8" cellSpacing="0" width="100%">
-      <thead>
-        <tr style={{ backgroundColor: "#e0e0e0" }}>
-          <th>Дата</th>
-          <th>Препарати</th>
-          <th>Хвороби</th>
-        </tr>
-      </thead>
-      <tbody>
-        {integratedSystem.map((entry, index) => (
+  <table
+    border="1"
+    cellPadding="8"
+    cellSpacing="0"
+    width="100%"
+    style={{ borderCollapse: "collapse" }}
+  >
+    <thead>
+      <tr style={{ backgroundColor: "#e0e0e0" }}>
+        <th>Дата</th>
+        <th>Препарати</th>
+        <th>Хвороби</th>
+      </tr>
+    </thead>
+    <tbody>
+      {data && data.length > 0 ? (
+        data.map((entry, index) => (
           <tr key={index}>
             <td>{entry.Дата}</td>
             <td>{entry.Препарат}</td>
             <td>{entry.Хвороби}</td>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        ))
+      ) : (
+        <tr>
+          <td colSpan="3" style={{ textAlign: "center", padding: "20px" }}>
+            Дані відсутні
+          </td>
+        </tr>
+      )}
+    </tbody>
+  </table>
 
-    <p style={{ marginTop: "40px", fontStyle: "italic" }}>
-      ⚠️ Цей документ згенеровано автоматично. Для уточнення схем звертайтеся до агронома або консультанта.
-    </p>
-  </div>
+  <p style={{ marginTop: "40px", fontStyle: "italic" }}>
+    ⚠️ Автоматично сформовано на основі даних моделі “Crop Protection”.
+  </p>
 </div>
 
   </>
