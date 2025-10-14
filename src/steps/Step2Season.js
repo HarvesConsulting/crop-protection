@@ -153,48 +153,65 @@ export default function Step2Season({
             </div>
           )}
 
-          {/* Вибір хвороб */}
-          <div className="bg-white border border-gray-200 rounded-lg p-4">
-            <label className="block font-medium text-gray-800 mb-3">
-              Оберіть хвороби для моделювання:
-            </label>
+{/* Вибір хвороб */}
+<div className="bg-white border border-gray-200 rounded-lg p-6">
+  <label className="block font-semibold text-gray-800 text-lg mb-4">
+    Оберіть хвороби для моделювання:
+  </label>
 
-            {/* Кнопка "Вибрати всі" */}
-            <button
-              onClick={toggleSelectAll}
-              className={`mb-4 px-4 py-2 rounded-full text-sm font-medium transition 
-                ${diseases.length === allDiseases.length 
-                  ? "bg-green-600 text-white hover:bg-green-700" 
-                  : "bg-gray-100 text-gray-800 hover:bg-gray-200"
-                }`}
-            >
-              {diseases.length === allDiseases.length ? "Скасувати вибір" : "Вибрати всі"}
-            </button>
+  {/* Кнопка "Вибрати всі" */}
+  <button
+    onClick={toggleSelectAll}
+    className={`mb-6 px-4 py-2 rounded-lg border text-sm font-medium transition-all 
+      ${diseases.length === allDiseases.length 
+        ? "bg-green-50 border-green-500 text-green-700 hover:bg-green-100" 
+        : "bg-white border-gray-300 text-gray-700 hover:border-gray-400"
+      }`}
+  >
+    {diseases.length === allDiseases.length ? "Скасувати вибір усіх" : "Вибрати всі хвороби"}
+  </button>
 
-            {/* Список хвороб у форматі тегів */}
-            <div className="flex flex-wrap gap-3">
-              {[
-                { id: "lateBlight", name: "Фітофтороз", emoji: "🥔" },
-                { id: "grayMold", name: "Сіра гниль", emoji: "💀" },
-                { id: "alternaria", name: "Альтернаріоз", emoji: "🌫️" },
-                { id: "bacteriosis", name: "Бактеріоз", emoji: "🧬" },
-              ].map((d) => (
-                <button
-                  key={d.id}
-                  type="button"
-                  onClick={() => toggleDisease(d.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full border font-medium transition 
-                    ${diseases.includes(d.id)
-                      ? "bg-green-600 border-green-600 text-white shadow-md hover:bg-green-700"
-                      : "bg-gray-100 border-gray-300 text-gray-800 hover:bg-gray-200"
-                    }`}
-                >
-                  <span>{d.emoji}</span>
-                  {d.name}
-                </button>
-              ))}
-            </div>
+  {/* Список хвороб у вигляді карток */}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+    {[
+      { id: "lateBlight", name: "Фітофтороз", description: "Грибкова хвороба пасльонових" },
+      { id: "grayMold", name: "Сіра гниль", description: "Botrytis cinerea" },
+      { id: "alternaria", name: "Альтернаріоз", description: "Плямистість листя" },
+      { id: "bacteriosis", name: "Бактеріоз", description: "Бактеріальне ураження" },
+    ].map((d) => (
+      <button
+        key={d.id}
+        type="button"
+        onClick={() => toggleDisease(d.id)}
+        className={`text-left p-4 rounded-lg border transition-all 
+          ${diseases.includes(d.id)
+            ? "border-green-500 bg-green-50 shadow-sm"
+            : "border-gray-200 bg-white hover:border-gray-300"
+          }`}
+      >
+        <div className="flex items-center justify-between mb-2">
+          <span className={`font-medium ${
+            diseases.includes(d.id) ? "text-green-700" : "text-gray-800"
+          }`}>
+            {d.name}
+          </span>
+          <div className={`w-5 h-5 rounded border flex items-center justify-center ${
+            diseases.includes(d.id) 
+              ? "bg-green-500 border-green-500" 
+              : "bg-white border-gray-300"
+          }`}>
+            {diseases.includes(d.id) && (
+              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
           </div>
+        </div>
+        <div className="text-sm text-gray-600">{d.description}</div>
+      </button>
+    ))}
+  </div>
+</div>
 
           {/* Кнопки */}
           <div className="flex justify-between pt-4">
