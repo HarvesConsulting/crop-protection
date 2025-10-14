@@ -721,17 +721,21 @@ const integratedSystem = integratedMap
     <button onClick={exportToExcel} className="toggle-button">
       Експорт в Excel
     </button>
-    <PDFExporter data={integratedSystem} />
+<PDFExporter data={integratedSystem} />
 
-{/* ⚡ ТЕПЕР ВІДКРИТИЙ ЕЛЕМЕНТ (НЕ ХОВАЙ display:none!) */}
 <div
   id="pdf-content"
   style={{
-    background: "white",
+    position: "absolute",
+    left: "-9999px",
+    top: "0",
+    visibility: "hidden",
+    zIndex: -1,
+    backgroundColor: "white",
     color: "black",
     padding: "40px",
     width: "800px",
-    margin: "0 auto",
+    fontFamily: "Arial, sans-serif",
   }}
 >
   <div style={{ display: "flex", alignItems: "center", marginBottom: "20px" }}>
@@ -741,10 +745,15 @@ const integratedSystem = integratedMap
       style={{ height: "60px", marginRight: "20px" }}
       onError={(e) => {
         e.target.style.display = "none";
-        console.warn("⚠️ Логотип не знайдено /images/logo.png");
+        console.warn("⚠️ Логотип не знайдено");
       }}
     />
-    <h2>Інтегрована система захисту рослин</h2>
+    <div>
+      <h2 style={{ margin: 0 }}>Інтегрована система захисту рослин</h2>
+      <p style={{ margin: 0, fontSize: "14px", color: "#555" }}>
+        Сформовано {new Date().toLocaleDateString("uk-UA")}
+      </p>
+    </div>
   </div>
 
   <table
@@ -752,7 +761,11 @@ const integratedSystem = integratedMap
     cellPadding="8"
     cellSpacing="0"
     width="100%"
-    style={{ borderCollapse: "collapse" }}
+    style={{
+      borderCollapse: "collapse",
+      fontSize: "14px",
+      textAlign: "left",
+    }}
   >
     <thead>
       <tr style={{ backgroundColor: "#e0e0e0" }}>
@@ -762,8 +775,8 @@ const integratedSystem = integratedMap
       </tr>
     </thead>
     <tbody>
-      {data && data.length > 0 ? (
-        data.map((entry, index) => (
+      {integratedSystem.length > 0 ? (
+        integratedSystem.map((entry, index) => (
           <tr key={index}>
             <td>{entry.Дата}</td>
             <td>{entry.Препарат}</td>
@@ -780,8 +793,8 @@ const integratedSystem = integratedMap
     </tbody>
   </table>
 
-  <p style={{ marginTop: "40px", fontStyle: "italic" }}>
-    ⚠️ Автоматично сформовано на основі даних моделі “Crop Protection”.
+  <p style={{ marginTop: "40px", fontSize: "13px", color: "#666" }}>
+    ⚠️ Документ сформовано автоматично на базі агрономічної моделі. Для прийняття остаточних рішень проконсультуйтесь з агрономом.
   </p>
 </div>
 

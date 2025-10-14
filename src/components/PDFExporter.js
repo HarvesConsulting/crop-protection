@@ -1,16 +1,14 @@
-import React from "react";
 import html2pdf from "html2pdf.js";
+import React from "react";
 
 export default function PDFExporter({ data }) {
-  const handleExportPDF = () => {
+  const exportToPDF = () => {
     const element = document.getElementById("pdf-content");
 
     if (!element) {
-      console.error("❌ Елемент #pdf-content не знайдено!");
+      console.error("❌ PDF контент не знайдено");
       return;
     }
-
-    console.log("✅ Елемент знайдено, вміст:", element.innerHTML);
 
     const opt = {
       margin: 0.5,
@@ -20,14 +18,13 @@ export default function PDFExporter({ data }) {
       jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
     };
 
-    // Трохи затримки — щоб DOM точно оновився
     setTimeout(() => {
       html2pdf().set(opt).from(element).save();
     }, 300);
   };
 
   return (
-    <button onClick={handleExportPDF} className="toggle-button">
+    <button onClick={exportToPDF} className="toggle-button">
       📄 Експорт у PDF
     </button>
   );
