@@ -153,39 +153,45 @@ export default function Step2Season({
             </div>
           )}
 
-          {/* Чекбокси хвороб */}
+          {/* Вибір хвороб */}
           <div className="bg-white border border-gray-200 rounded-lg p-4">
             <label className="block font-medium text-gray-800 mb-3">
               Оберіть хвороби для моделювання:
             </label>
-            <div className="space-y-2 pl-2">
-              {/* Вибрати всі */}
-              <label className="flex items-center gap-2 font-medium text-gray-900">
-                <input
-                  type="checkbox"
-                  checked={diseases.length === allDiseases.length}
-                  onChange={toggleSelectAll}
-                  className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
-                />
-                Вибрати всі
-              </label>
 
-              {/* Список хвороб */}
+            {/* Кнопка "Вибрати всі" */}
+            <button
+              onClick={toggleSelectAll}
+              className={`mb-4 px-4 py-2 rounded-full text-sm font-medium transition 
+                ${diseases.length === allDiseases.length 
+                  ? "bg-green-600 text-white hover:bg-green-700" 
+                  : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                }`}
+            >
+              {diseases.length === allDiseases.length ? "Скасувати вибір" : "Вибрати всі"}
+            </button>
+
+            {/* Список хвороб у форматі тегів */}
+            <div className="flex flex-wrap gap-3">
               {[
-                { id: "lateBlight", name: "Фітофтороз" },
-                { id: "grayMold", name: "Сіра гниль" },
-                { id: "alternaria", name: "Альтернаріоз" },
-                { id: "bacteriosis", name: "Бактеріоз" },
+                { id: "lateBlight", name: "Фітофтороз", emoji: "🥔" },
+                { id: "grayMold", name: "Сіра гниль", emoji: "💀" },
+                { id: "alternaria", name: "Альтернаріоз", emoji: "🌫️" },
+                { id: "bacteriosis", name: "Бактеріоз", emoji: "🧬" },
               ].map((d) => (
-                <label key={d.id} className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={diseases.includes(d.id)}
-                    onChange={() => toggleDisease(d.id)}
-                    className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
-                  />
+                <button
+                  key={d.id}
+                  type="button"
+                  onClick={() => toggleDisease(d.id)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full border font-medium transition 
+                    ${diseases.includes(d.id)
+                      ? "bg-green-600 border-green-600 text-white shadow-md hover:bg-green-700"
+                      : "bg-gray-100 border-gray-300 text-gray-800 hover:bg-gray-200"
+                    }`}
+                >
+                  <span>{d.emoji}</span>
                   {d.name}
-                </label>
+                </button>
               ))}
             </div>
           </div>
