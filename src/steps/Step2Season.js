@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Info, Calendar, ArrowRight } from "lucide-react";
+import { Info, ArrowRight, Calendar } from "lucide-react";
+import DatePicker from "react-datepicker";
+import { registerLocale } from "react-datepicker";
+import { uk } from "date-fns/locale";
+import "react-datepicker/dist/react-datepicker.css";
+
+// Реєструємо українську локаль
+registerLocale('uk', uk);
 
 export default function Step2Season({
   plantingDate,
@@ -29,29 +36,26 @@ export default function Step2Season({
     }
   };
 
-  // Розрахунок тривалості сезону
-  const getSeasonDuration = () => {
-    if (!plantingDate || !harvestDate) return 0;
-    const start = new Date(plantingDate);
-    const end = new Date(harvestDate);
-    return Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+  // Обробник зміни дат у календарі
+  const handleDateChange = (dates) => {
+    const [start, end] = dates;
+    setPlantingDate(start);
+    setHarvestDate(end);
   };
 
   // Форматування дати для відображення
-  const formatDisplayDate = (dateString) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
+  const formatDisplayDate = (date) => {
+    if (!date) return "Не обрано";
     return date.toLocaleDateString("uk-UA", {
       day: "numeric",
-      month: "long"
+      month: "long",
+      year: "numeric"
     });
   };
 
-  const seasonDuration = getSeasonDuration();
-
   return (
     <main className="flex justify-center items-start min-h-[70vh] px-4">
-      <div className="w-full max-w-xl mx-auto bg-white rounded-xl shadow-lg">
+      <div className="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-lg">
         <div className="px-6 sm:px-10 py-6 space-y-6">
           {/* Заголовок + Інфо */}
           <div className="flex items-center justify-between">
@@ -69,92 +73,61 @@ export default function Step2Season({
 
           {showInfo && (
             <div className="bg-blue-50 border border-blue-200 text-sm text-gray-700 p-4 rounded-md shadow-sm">
-              Вкажіть початок і кінець сезону, а також оберіть хвороби для прогнозування.
+              Оберіть період сезону: перший клік - дата висадки, другий клік - дата збирання. Весь період між датами буде автоматично виділено.
             </div>
           )}
 
-          {/* ТАЙМЛАЙН */}
-          {(plantingDate || harvestDate) && (
-            <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <Calendar size={18} />
-                Тривалість сезону
-              </h3>
-              
-              <div className="flex items-center justify-between mb-2">
-                <div className="text-sm font-medium text-gray-700">
-                  {plantingDate ? formatDisplayDate(plantingDate) : "Оберіть дату"}
-                </div>
-                <div className="text-sm font-medium text-gray-700">
-                  {harvestDate ? formatDisplayDate(harvestDate) : "Оберіть дату"}
-                </div>
-              </div>
-
-              {/* Шкала часу */}
-              <div className="relative h-4 bg-gray-200 rounded-full overflow-hidden">
-                <div 
-                  className="absolute top-0 left-0 h-full bg-gradient-to-r from-green-500 to-blue-500 transition-all duration-500"
-                  style={{ 
-                    width: plantingDate && harvestDate ? '100%' : '0%' 
-                  }}
-                />
-                
-                {/* Маркери */}
-                {plantingDate && (
-                  <div className="absolute top-1/2 left-0 w-3 h-3 bg-white border-2 border-green-600 rounded-full transform -translate-y-1/2 -translate-x-1/2 shadow-sm" />
-                )}
-                {harvestDate && (
-                  <div className="absolute top-1/2 right-0 w-3 h-3 bg-white border-2 border-blue-600 rounded-full transform -translate-y-1/2 translate-x-1/2 shadow-sm" />
-                )}
-              </div>
-
-              {/* Інформація про тривалість */}
-              {seasonDuration > 0 && (
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-xs text-gray-600">
-                    Початок: <strong>{formatDisplayDate(plantingDate)}</strong>
-                  </span>
-                  <span className="text-xs font-medium bg-white px-2 py-1 rounded border">
-                    {seasonDuration} днів
-                  </span>
-                  <span className="text-xs text-gray-600">
-                    Кінець: <strong>{formatDisplayDate(harvestDate)}</strong>
-                  </span>
-                </div>
-              )}
+          {/* Календар з виділенням періоду */}
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Calendar size={20} className="text-green-600" />
+              <h3 className="font-semibold text-gray-800">Оберіть період сезону</h3>
             </div>
-          )}
+            
+            {/* Інформація про обраний період */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div className="bg-white p-3 rounded border">
+                <div className="text-sm text-gray-600">Дата висадки:</div>
+                <div className="font-medium text-green-700">
+                  {formatDisplayDate(plantingDate)}
+                </div>
+              </div>
+              <div className="bg-white p-3 rounded border">
+                <div className="text-sm text-gray-600">Дата збирання:</div>
+                <div className="font-medium text-blue-700">
+                  {formatDisplayDate(harvestDate)}
+                </div>
+              </div>
+            </div>
 
-          {/* Поля дат */}
-          <div className="flex flex-col sm:flex-row items-end gap-4 sm:gap-6">
-            <div className="flex flex-col w-full">
-              <label className="text-sm font-medium text-gray-700 mb-1 block">
-                Дата висадки (або останнє внесення фунгіциду):
-              </label>
-              <input
-                type="date"
-                value={plantingDate}
-                onChange={(e) => setPlantingDate(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-[16px] focus:outline-none focus:ring-2 focus:ring-green-500 transition"
+            {/* Календар */}
+            <div className="flex justify-center">
+              <DatePicker
+                selected={plantingDate}
+                onChange={handleDateChange}
+                startDate={plantingDate}
+                endDate={harvestDate}
+                selectsRange
+                inline
+                monthsShown={2}
+                locale={uk}
+                minDate={new Date()}
+                dateFormat="dd.MM.yyyy"
+                shouldCloseOnSelect={false}
+                isClearable={false}
+                className="react-datepicker-custom"
               />
             </div>
 
-            <div className="flex flex-col w-full">
-              <label className="text-sm font-medium text-gray-700 mb-1 block">
-                Дата збирання:
-              </label>
-              <input
-                type="date"
-                value={harvestDate}
-                onChange={(e) => setHarvestDate(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-[16px] focus:outline-none focus:ring-2 focus:ring-green-500 transition"
-              />
+            {/* Інструкція */}
+            <div className="text-xs text-gray-500 text-center mt-3">
+              💡 Натисніть на дату висадки, потім на дату збирання. Період буде автоматично виділено.
             </div>
           </div>
 
-          {/* Чекбокси */}
-          <div>
-            <label className="block font-medium text-gray-800 mb-2">
+          {/* Чекбокси хвороб */}
+          <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <label className="block font-medium text-gray-800 mb-3">
               Оберіть хвороби для моделювання:
             </label>
             <div className="space-y-2 pl-2">
@@ -164,6 +137,7 @@ export default function Step2Season({
                   type="checkbox"
                   checked={diseases.length === allDiseases.length}
                   onChange={toggleSelectAll}
+                  className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
                 />
                 Вибрати всі
               </label>
@@ -180,6 +154,7 @@ export default function Step2Season({
                     type="checkbox"
                     checked={diseases.includes(d.id)}
                     onChange={() => toggleDisease(d.id)}
+                    className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
                   />
                   {d.name}
                 </label>
@@ -191,16 +166,16 @@ export default function Step2Season({
           <div className="flex justify-between pt-4">
             <button
               onClick={onBack}
-              className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition flex items-center gap-2"
+              className="px-6 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition flex items-center gap-2 font-medium"
             >
               Назад
             </button>
             <button
               onClick={() => onNext({ diseases })}
               disabled={!plantingDate || !harvestDate}
-              className={`px-4 py-2 rounded text-white font-medium transition flex items-center gap-2 ${
+              className={`px-6 py-2 rounded-lg text-white font-medium transition flex items-center gap-2 ${
                 plantingDate && harvestDate
-                  ? "bg-green-600 hover:bg-green-700"
+                  ? "bg-green-600 hover:bg-green-700 shadow-md"
                   : "bg-gray-400 cursor-not-allowed"
               }`}
             >
