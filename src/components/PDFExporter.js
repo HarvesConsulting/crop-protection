@@ -45,9 +45,7 @@ export default function PDFExporter({ data }) {
                 <h1 style="margin: 0; color: #000; font-size: 22px; font-weight: bold;">
                   ІНТЕГРОВАНА СИСТЕМА ЗАХИСТУ РОСЛИН
                 </h1>
-                <p style="margin: 5px 0 0 0; color: #666; font-size: 14px;">
-                  Рекомендації для захисту картоплі
-                </p>
+                 </p>
               </td>
               <td width="20%" style="vertical-align: top; text-align: right; font-size: 11px; color: #666;">
                 <div style="margin-bottom: 3px;">Дата: ${new Date().toLocaleDateString("uk-UA")}</div>
@@ -68,7 +66,7 @@ export default function PDFExporter({ data }) {
             </tr>
             <tr>
               <td style="padding: 5px;"><strong>Культура:</strong></td>
-              <td style="padding: 5px;">Картопля</td>
+              <td style="padding: 5px;">Томати</td>
               <td style="padding: 5px;"><strong>Статус:</strong></td>
               <td style="padding: 5px;"><strong style="color: #006600;">Рекомендовано</strong></td>
             </tr>
@@ -116,9 +114,9 @@ export default function PDFExporter({ data }) {
         <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; background: #fffde7;">
           <h3 style="margin: 0 0 10px 0; color: #000; font-size: 14px; font-weight: bold;">Примітки:</h3>
           <ul style="margin: 0; padding-left: 20px; font-size: 12px; color: #666;">
-            <li>Обробки проводять в сприятливі погодні умови</li>
+            <li>Обробки проводять в сприятливі погодні умови (дивитись в картках обробок - рекомендовані години</li>
             <li>Дотримуйтесь регламенту чергування препаратів</li>
-            <li>Враховуйте період чекання до збору врожаю</li>
+            <li>Враховуйте період очікування до збору врожаю згідно рекомендацій виробника</li>
             <li>Використовуйте засоби індивідуального захисту</li>
           </ul>
         </div>
@@ -133,7 +131,7 @@ export default function PDFExporter({ data }) {
               </td>
               <td width="30%" style="vertical-align: top; text-align: center;">
                 <div style="margin-bottom: 8px;"><strong>Агроном-консультант:</strong></div>
-                <div style="border-bottom: 1px solid #999; padding-bottom: 8px; margin-bottom: 8px;">_________________________</div>
+                <div style="border-bottom: 1px solid #999; padding-bottom: 8px; margin-bottom: 8px;">Лашин Олександр</div>
                 <div>підпис та ПІБ</div>
               </td>
             </tr>
