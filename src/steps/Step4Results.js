@@ -11,8 +11,7 @@ import ModalWithWeather from "../components/ModalWithWeather";
 import { extractSuitableSprayHours } from "../engine";
 import IntegratedTableView from "../components/IntegratedTableView";
 import ActionMenu from "../components/ActionMenu";
-import { exportToPDF } from "../utils/exportToPDF";
-import logo from "../assets/images/logo.png"; // адаптуй шлях, якщо потрібно
+import PDFExporter from "../components/PDFExporter";
 
 const productInfo = {
   "Зорвек Інкантія": "0,5л/га",
@@ -718,17 +717,42 @@ const integratedSystem = integratedMap
    {showIntegrated ? (
   <>
     <IntegratedTableView data={integratedSystem} />
-<div style={{ display: "flex", gap: "12px", marginTop: "1rem" }}>
-  <button onClick={exportToExcel} className="toggle-button">
-    Експорт в Excel
-  </button>
 
-  <button
-    onClick={() => exportToPDF(integratedSystem, logo)}
-    className="toggle-button"
-  >
-    Експорт в PDF
-  </button>
+    <button onClick={exportToExcel} className="toggle-button">
+      Експорт в Excel
+    </button>
+    <PDFExporter data={integratedSystem} />
+
+<div id="pdf-content" style={{ display: "none" }}>
+  <div style={{ padding: "40px", fontSize: "14px", fontFamily: "Arial" }}>
+    <div style={{ display: "flex", alignItems: "center", marginBottom: "20px" }}>
+      <img src="/images/logo.png" alt="Логотип" style={{ height: "60px", marginRight: "20px" }} />
+      <h2>Інтегрована система захисту рослин</h2>
+    </div>
+
+    <table border="1" cellPadding="8" cellSpacing="0" width="100%">
+      <thead>
+        <tr style={{ backgroundColor: "#e0e0e0" }}>
+          <th>Дата</th>
+          <th>Препарати</th>
+          <th>Хвороби</th>
+        </tr>
+      </thead>
+      <tbody>
+        {integratedSystem.map((entry, index) => (
+          <tr key={index}>
+            <td>{entry.Дата}</td>
+            <td>{entry.Препарат}</td>
+            <td>{entry.Хвороби}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+
+    <p style={{ marginTop: "40px", fontStyle: "italic" }}>
+      ⚠️ Цей документ згенеровано автоматично. Для уточнення схем звертайтеся до агронома або консультанта.
+    </p>
+  </div>
 </div>
 
   </>
@@ -849,4 +873,4 @@ const integratedSystem = integratedMap
 
 </main>
 );
-}  
+} 
