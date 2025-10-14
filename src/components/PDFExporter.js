@@ -114,7 +114,7 @@ export default function PDFExporter({ data }) {
         <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; background: #fffde7;">
           <h3 style="margin: 0 0 10px 0; color: #000; font-size: 14px; font-weight: bold;">Примітки:</h3>
           <ul style="margin: 0; padding-left: 20px; font-size: 12px; color: #666;">
-            <li>Обробки проводять в сприятливі погодні умови (дивитись в картках обробок - рекомендовані години</li>
+            <li>Обробки проводять в сприятливі погодні умови (дивитись в картках обробок - рекомендовані години)</li>
             <li>Дотримуйтесь регламенту чергування препаратів</li>
             <li>Враховуйте період очікування до збору врожаю згідно рекомендацій виробника</li>
             <li>Використовуйте засоби індивідуального захисту</li>

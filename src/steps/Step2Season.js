@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Info } from "lucide-react";
+import { Info, Calendar, ArrowRight } from "lucide-react";
 
 export default function Step2Season({
   plantingDate,
@@ -29,6 +29,26 @@ export default function Step2Season({
     }
   };
 
+  // Розрахунок тривалості сезону
+  const getSeasonDuration = () => {
+    if (!plantingDate || !harvestDate) return 0;
+    const start = new Date(plantingDate);
+    const end = new Date(harvestDate);
+    return Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+  };
+
+  // Форматування дати для відображення
+  const formatDisplayDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("uk-UA", {
+      day: "numeric",
+      month: "long"
+    });
+  };
+
+  const seasonDuration = getSeasonDuration();
+
   return (
     <main className="flex justify-center items-start min-h-[70vh] px-4">
       <div className="w-full max-w-xl mx-auto bg-white rounded-xl shadow-lg">
@@ -50,6 +70,58 @@ export default function Step2Season({
           {showInfo && (
             <div className="bg-blue-50 border border-blue-200 text-sm text-gray-700 p-4 rounded-md shadow-sm">
               Вкажіть початок і кінець сезону, а також оберіть хвороби для прогнозування.
+            </div>
+          )}
+
+          {/* ТАЙМЛАЙН */}
+          {(plantingDate || harvestDate) && (
+            <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg p-4">
+              <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                <Calendar size={18} />
+                Тривалість сезону
+              </h3>
+              
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-sm font-medium text-gray-700">
+                  {plantingDate ? formatDisplayDate(plantingDate) : "Оберіть дату"}
+                </div>
+                <div className="text-sm font-medium text-gray-700">
+                  {harvestDate ? formatDisplayDate(harvestDate) : "Оберіть дату"}
+                </div>
+              </div>
+
+              {/* Шкала часу */}
+              <div className="relative h-4 bg-gray-200 rounded-full overflow-hidden">
+                <div 
+                  className="absolute top-0 left-0 h-full bg-gradient-to-r from-green-500 to-blue-500 transition-all duration-500"
+                  style={{ 
+                    width: plantingDate && harvestDate ? '100%' : '0%' 
+                  }}
+                />
+                
+                {/* Маркери */}
+                {plantingDate && (
+                  <div className="absolute top-1/2 left-0 w-3 h-3 bg-white border-2 border-green-600 rounded-full transform -translate-y-1/2 -translate-x-1/2 shadow-sm" />
+                )}
+                {harvestDate && (
+                  <div className="absolute top-1/2 right-0 w-3 h-3 bg-white border-2 border-blue-600 rounded-full transform -translate-y-1/2 translate-x-1/2 shadow-sm" />
+                )}
+              </div>
+
+              {/* Інформація про тривалість */}
+              {seasonDuration > 0 && (
+                <div className="flex justify-between items-center mt-2">
+                  <span className="text-xs text-gray-600">
+                    Початок: <strong>{formatDisplayDate(plantingDate)}</strong>
+                  </span>
+                  <span className="text-xs font-medium bg-white px-2 py-1 rounded border">
+                    {seasonDuration} днів
+                  </span>
+                  <span className="text-xs text-gray-600">
+                    Кінець: <strong>{formatDisplayDate(harvestDate)}</strong>
+                  </span>
+                </div>
+              )}
             </div>
           )}
 
@@ -119,20 +191,21 @@ export default function Step2Season({
           <div className="flex justify-between pt-4">
             <button
               onClick={onBack}
-              className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition"
+              className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition flex items-center gap-2"
             >
               Назад
             </button>
             <button
               onClick={() => onNext({ diseases })}
               disabled={!plantingDate || !harvestDate}
-              className={`px-4 py-2 rounded text-white font-medium transition ${
+              className={`px-4 py-2 rounded text-white font-medium transition flex items-center gap-2 ${
                 plantingDate && harvestDate
                   ? "bg-green-600 hover:bg-green-700"
                   : "bg-gray-400 cursor-not-allowed"
               }`}
             >
               Продовжити
+              <ArrowRight size={16} />
             </button>
           </div>
         </div>
