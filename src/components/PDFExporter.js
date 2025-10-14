@@ -6,9 +6,13 @@ export default function PDFExporter({ data }) {
     const element = document.getElementById("pdf-content");
 
     if (!element) {
-      console.error("❌ PDF контент не знайдено");
+      console.error("❌ Елемент #pdf-content не знайдено");
       return;
     }
+
+    console.log("📦 PDFExporter data:", data);
+    console.log("🧾 Знайдено елемент:", element);
+    console.log("🔍 Його HTML:", element.innerHTML);
 
     const opt = {
       margin: 0.5,
@@ -20,12 +24,13 @@ export default function PDFExporter({ data }) {
 
     setTimeout(() => {
       html2pdf().set(opt).from(element).save();
-    }, 300);
+    }, 500); // 👈 Додана затримка, щоб DOM точно встиг згенеруватись
   };
 
   return (
     <button onClick={exportToPDF} className="toggle-button">
-      📄 Експорт у PDF
+      📄 Зберегти як PDF
     </button>
   );
 }
+
