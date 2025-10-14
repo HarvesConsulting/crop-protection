@@ -14,6 +14,7 @@ import ActionMenu from "../components/ActionMenu";
 import logoImage from "../assets/images/logo.png";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import autoTable from 'jspdf-autotable';
 
 const productInfo = {
   "Зорвек Інкантія": "0,5л/га",
@@ -645,34 +646,61 @@ const integratedSystem = integratedMap
   pdf.setDrawColor(160, 160, 160);
   pdf.line(10, 42, pageWidth - 10, 42);
 };
-const exportToPDF = async () => {
-  const element = document.getElementById("pdf-content"); // обгорни таблицю у цей div
-
-  if (!element) {
-    console.warn("❗ Елемент для PDF не знайдено");
-    return;
-  }
-
-  const canvas = await html2canvas(element, { scale: 2 });
-  const imgData = canvas.toDataURL("image/png");
-
+const exportToPDF = () => {
   const pdf = new jsPDF("p", "mm", "a4");
+  const pageWidth = pdf.internal.pageSize.getWidth();
 
-  // 🟦 Шапка
+  // 🟢 Шапка
+  const addCompanyHeader = (doc) => {
+    doc.addImage(logoImage, "PNG", 10, 10, 30, 30);
+    doc.setFontSize(14);
+    doc.setTextColor(40, 40, 40);
+    doc.text("ТОВ «Harvest Consulting»", 50, 18);
+    doc.setFontSize(10);
+    doc.setTextColor(80, 80, 80);
+    doc.text("www.harvestconsulting.com | +38 (067) 000-00-00", 50, 25);
+    doc.setDrawColor(160, 160, 160);
+    doc.line(10, 42, pageWidth - 10, 42);
+  };
+
   addCompanyHeader(pdf);
 
-  // 📄 Розміри
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const contentWidth = pageWidth - 20;
-  const imgProps = pdf.getImageProperties(imgData);
-  const contentHeight = (imgProps.height * contentWidth) / imgProps.width;
+  // 🔽 Дані
+  const tableData = integratedSystem.map((entry) => [
+    entry.Дата,
+    entry.Препарат,
+    entry.Хвороби,
+  ]);
 
-  // 🖼️ Вставляємо таблицю
-  pdf.addImage(imgData, "PNG", 10, 50, contentWidth, contentHeight);
+  // 🧾 Генерація таблиці з авто-розбиттям на сторінки
+  autoTable(pdf, {
+    head: [["Дата", "Препарати", "Хвороби"]],
+    body: tableData,
+    startY: 50,
+    margin: { top: 50 },
+    styles: {
+      fontSize: 10,
+      cellPadding: 4,
+    },
+    headStyles: {
+      fillColor: [205, 235, 204],
+      halign: "center",
+    },
+    bodyStyles: {
+      valign: "top",
+    },
+    didDrawPage: (data) => {
+      if (data.pageNumber > 1) {
+        addCompanyHeader(pdf);
+      }
+    },
+  });
 
-  // 💾 Зберегти файл
-  pdf.save("Інтегрована_таблиця_захисту.pdf");
+  // 💾 Збереження
+  const today = format(new Date(), "dd.MM.yyyy");
+  pdf.save(`Інтегрована_таблиця_захисту_${today}.pdf`);
 };
+
 
   const exportToExcel = () => {
   const exportData = integratedSystem.map((entry) => ({
