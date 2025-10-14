@@ -723,7 +723,16 @@ const integratedSystem = integratedMap
     </button>
     <PDFExporter data={integratedSystem} />
 
-<div id="pdf-content" style={{ display: "none" }}>
+<div
+  id="pdf-content"
+  style={{
+    position: "absolute",
+    left: "-9999px",
+    top: "0",
+    visibility: "hidden",
+    zIndex: -1,
+  }}
+>
   <div style={{ padding: "40px", fontSize: "14px", fontFamily: "Arial" }}>
     <div style={{ display: "flex", alignItems: "center", marginBottom: "20px" }}>
       <img src="/images/logo.png" alt="Логотип" style={{ height: "60px", marginRight: "20px" }} />
