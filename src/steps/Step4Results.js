@@ -645,8 +645,8 @@ const exportToPDF = () => {
   const pdf = new jsPDF("p", "mm", "a4");
   const pageWidth = pdf.internal.pageSize.getWidth();
 
-  // 🟢 Шапка
   const addCompanyHeader = (doc) => {
+    doc.setFont("helvetica"); // Важливо!
     doc.addImage(logoImage, "PNG", 10, 10, 30, 30);
     doc.setFontSize(14);
     doc.setTextColor(40, 40, 40);
@@ -660,14 +660,15 @@ const exportToPDF = () => {
 
   addCompanyHeader(pdf);
 
-  // 🔽 Дані
+  // 📌 Перетворення в текст
   const tableData = integratedSystem.map((entry) => [
     entry.Дата,
-    entry.Препарат,
-    entry.Хвороби,
+    String(entry.Препарат ?? ""),
+    String(entry.Хвороби ?? ""),
   ]);
 
-  // 🧾 Генерація таблиці з авто-розбиттям на сторінки
+  console.table(tableData); // Перевірка
+
   autoTable(pdf, {
     head: [["Дата", "Препарати", "Хвороби"]],
     body: tableData,
@@ -691,10 +692,10 @@ const exportToPDF = () => {
     },
   });
 
-  // 💾 Збереження
   const today = format(new Date(), "dd.MM.yyyy");
   pdf.save(`Інтегрована_таблиця_захисту_${today}.pdf`);
 };
+
 
 
   const exportToExcel = () => {
