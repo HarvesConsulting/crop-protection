@@ -54,7 +54,7 @@ export default function PDFExporter({ data }) {
           ${
             data && data.length > 0 
               ? data.map((entry, index) => `
-                  <tr key="${index}">
+                  <tr>
                     <td>${entry.Дата || ''}</td>
                     <td>${entry.Препарат || ''}</td>
                     <td>${entry.Хвороби || ''}</td>
@@ -92,7 +92,11 @@ export default function PDFExporter({ data }) {
         scale: 2, 
         useCORS: true,
         logging: true,
-        allowTaint: true
+        allowTaint: true,
+        onclone: (clonedDoc) => {
+          // Ця функція викликається після клонування DOM для html2canvas
+          console.log("✅ DOM клоновано для html2canvas");
+        }
       },
       jsPDF: { 
         unit: "mm", 
@@ -101,18 +105,30 @@ export default function PDFExporter({ data }) {
       },
     };
 
+    console.log("📊 Дані для PDF:", data);
+    console.log("🖨️ Початок генерації PDF...");
+
     // Генеруємо PDF
     html2pdf()
       .set(opt)
       .from(pdfContainer)
       .save()
       .then(() => {
-        // Видаляємо тимчасовий контейнер після створення PDF
-        document.body.removeChild(pdfContainer);
+        console.log("✅ PDF успішно згенеровано");
+        // Видаляємо тимчасовий контейнер після успішного створення PDF
+        setTimeout(() => {
+          if (document.body.contains(pdfContainer)) {
+            document.body.removeChild(pdfContainer);
+            console.log("🗑️ Тимчасовий контейнер видалено");
+          }
+        }, 1000);
       })
       .catch((error) => {
-        console.error("Помилка при створенні PDF:", error);
-        document.body.removeChild(pdfContainer);
+        console.error("❌ Помилка при створенні PDF:", error);
+        // Все одно видаляємо контейнер при помилці
+        if (document.body.contains(pdfContainer)) {
+          document.body.removeChild(pdfContainer);
+        }
       });
   };
 
