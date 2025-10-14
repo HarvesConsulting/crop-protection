@@ -11,10 +11,6 @@ import ModalWithWeather from "../components/ModalWithWeather";
 import { extractSuitableSprayHours } from "../engine";
 import IntegratedTableView from "../components/IntegratedTableView";
 import ActionMenu from "../components/ActionMenu";
-import logoImage from "../assets/images/logo.png";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
-import autoTable from 'jspdf-autotable';
 
 const productInfo = {
   "Зорвек Інкантія": "0,5л/га",
@@ -486,8 +482,13 @@ const aggregatedRain = rainDaily;
   return {
     Дата: d,
     Препарат: `${product} (${productInfo[product] || "—"})`,
-   Рекомендація: productLinks[product] ?? "—",
-
+    Рекомендація: productLinks[product] ? (
+      <a href={productLinks[product]} target="_blank" rel="noreferrer">
+        Перейти
+      </a>
+    ) : (
+      "—"
+    ),
     Інтервал: gap,
     "Рекомендовані години": recommendedHours.length
       ? recommendedHours.join(", ")
@@ -599,9 +600,9 @@ for (const group of diseaseCardsGrouped) {
       integratedMap.push({
         Дата: entry.Дата,
         timestamp: diseaseTime,
-        Препарат: entry.Препарати.join(", "),
-        Рекомендація: entry.Рекомендації.join(", "),
-        Хвороби: Array.from(entry.diseases).join(", "),
+        Препарати: [entry.Препарат],
+        Рекомендації: [entry.Рекомендація],
+        diseases: new Set([group.name]),
         backData: entry.backData,
       });
     }
@@ -621,85 +622,7 @@ const integratedSystem = integratedMap
     const dB = parseISO(b.Дата.split(".").reverse().join("-"));
     return dA - dB;
   });
-  const addCompanyHeader = (pdf) => {
-  const pageWidth = pdf.internal.pageSize.getWidth();
-
-  // 🔹 Логотип
-  pdf.addImage(logoImage, "PNG", 10, 10, 30, 30);
-
-  // 🔹 Назва компанії
-  pdf.setFontSize(14);
-  pdf.setTextColor(40, 40, 40);
-  pdf.text("ТОВ «Harvest Consulting»", 50, 18);
-
-  // 🔹 Контакти
-  pdf.setFontSize(10);
-  pdf.setTextColor(80, 80, 80);
-  pdf.text("www.harvestconsulting.com | +38 (067) 000-00-00", 50, 25);
-
-  // 🔹 Лінія
-  pdf.setDrawColor(160, 160, 160);
-  pdf.line(10, 42, pageWidth - 10, 42);
-};
-const exportToPDF = () => {
-  const pdf = new jsPDF("p", "mm", "a4");
-  const pageWidth = pdf.internal.pageSize.getWidth();
-
-  const addCompanyHeader = (doc) => {
-    doc.setFont("helvetica"); // Важливо!
-    doc.addImage(logoImage, "PNG", 10, 10, 30, 30);
-    doc.setFontSize(14);
-    doc.setTextColor(40, 40, 40);
-    doc.text("ТОВ «Harvest Consulting»", 50, 18);
-    doc.setFontSize(10);
-    doc.setTextColor(80, 80, 80);
-    doc.text("www.harvestconsulting.com | +38 (067) 000-00-00", 50, 25);
-    doc.setDrawColor(160, 160, 160);
-    doc.line(10, 42, pageWidth - 10, 42);
-  };
-
-  addCompanyHeader(pdf);
-
-  // 📌 Перетворення в текст
-  const tableData = integratedSystem.map((entry) => [
-  entry.Дата,
-  Array.isArray(entry.Препарати)
-    ? entry.Препарати.join(", ")
-    : String(entry.Препарати ?? ""),
-  String(entry.Хвороби ?? ""),
-]);
-
-  console.table(tableData); // Перевірка
-
-  autoTable(pdf, {
-    head: [["Дата", "Препарати", "Хвороби"]],
-    body: tableData,
-    startY: 50,
-    margin: { top: 50 },
-    styles: {
-      fontSize: 10,
-      cellPadding: 4,
-    },
-    headStyles: {
-      fillColor: [205, 235, 204],
-      halign: "center",
-    },
-    bodyStyles: {
-      valign: "top",
-    },
-    didDrawPage: (data) => {
-      if (data.pageNumber > 1) {
-        addCompanyHeader(pdf);
-      }
-    },
-  });
-
-  const today = format(new Date(), "dd.MM.yyyy");
-  pdf.save(`Інтегрована_таблиця_захисту_${today}.pdf`);
-};
-
-
-
+  
   const exportToExcel = () => {
   const exportData = integratedSystem.map((entry) => ({
     Дата: entry.Дата,
@@ -792,19 +715,11 @@ const exportToPDF = () => {
 
    {showIntegrated ? (
   <>
-    <div id="pdf-content">
-  <IntegratedTableView data={integratedSystem} />
-</div>
+    <IntegratedTableView data={integratedSystem} />
 
-<div style={{ display: "flex", gap: "12px", marginTop: "1rem" }}>
-  <button onClick={exportToExcel} className="toggle-button">
-    Експорт в Excel
-  </button>
-  <button onClick={exportToPDF} className="toggle-button">
-    Експорт в PDF
-  </button>
-</div>
-
+    <button onClick={exportToExcel} className="toggle-button">
+      Експорт в Excel
+    </button>
   </>
 ) : (
   <>
