@@ -36,12 +36,30 @@ export default function Step2Season({
     }
   };
 
-  // Обробник зміни дат у календарі - конвертуємо в рядки
+  // Функція для форматування дати у зрозумілий вигляд
+  const formatDateForDisplay = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("uk-UA", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric"
+    });
+  };
+
+  // Функція для форматування дати для передачі в наступний крок
+  const formatDateForStorage = (date) => {
+    if (!date) return "";
+    // Повертаємо дату у форматі YYYY-MM-DD (без часу)
+    return date.toISOString().split('T')[0];
+  };
+
+  // Обробник зміни дат у календарі
   const handleDateChange = (dates) => {
     const [start, end] = dates;
-    // Конвертуємо Date об'єкти в рядки ISO для зберігання
-    setPlantingDate(start ? start.toISOString() : "");
-    setHarvestDate(end ? end.toISOString() : "");
+    // Конвертуємо Date об'єкти в рядки у форматі YYYY-MM-DD
+    setPlantingDate(start ? formatDateForStorage(start) : "");
+    setHarvestDate(end ? formatDateForStorage(end) : "");
   };
 
   // Перевірка готовності до переходу
@@ -55,7 +73,18 @@ export default function Step2Season({
       alert("Будь ласка, оберіть період сезону та хоча б одну хворобу");
       return;
     }
-    onNext({ diseases });
+    
+    // Форматуємо дати для передачі в наступний крок
+    const formattedData = {
+      diseases,
+      plantingDate: formatDateForDisplay(plantingDate),
+      harvestDate: formatDateForDisplay(harvestDate),
+      // Також передаємо оригінальні дати для обчислень, якщо потрібно
+      rawPlantingDate: plantingDate,
+      rawHarvestDate: harvestDate
+    };
+    
+    onNext(formattedData);
   };
 
   // Конвертуємо рядки назад в Date об'єкти для календаря
@@ -111,13 +140,13 @@ export default function Step2Season({
                 <div>
                   <div className="text-sm text-gray-600">Дата висадки:</div>
                   <div className="font-medium text-green-700">
-                    {plantingDateObj ? plantingDateObj.toLocaleDateString("uk-UA") : "Не обрано"}
+                    {formatDateForDisplay(plantingDate)}
                   </div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-600">Дата збирання:</div>
                   <div className="font-medium text-green-700">
-                    {harvestDateObj ? harvestDateObj.toLocaleDateString("uk-UA") : "Не обрано"}
+                    {formatDateForDisplay(harvestDate)}
                   </div>
                 </div>
               </div>
