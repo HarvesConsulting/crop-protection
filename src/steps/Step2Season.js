@@ -81,7 +81,7 @@ export default function Step2Season({
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
             <div className="flex items-center gap-2 mb-4">
               <Calendar size={20} className="text-green-600" />
-              <h3 className="font-semibold text-gray-800">Оберіть період сезону</h3>
+              <h3 className="font-semibold text-gray-800">Період сезону</h3>
             </div>
             
             {/* Інформація про обраний період */}
@@ -111,7 +111,7 @@ export default function Step2Season({
                 inline
                 monthsShown={2}
                 locale={uk}
-                minDate={new Date()}
+                // ВИДАЛЕНО minDate - тепер можна вибирати дати в минулому
                 dateFormat="dd.MM.yyyy"
                 shouldCloseOnSelect={false}
                 isClearable={false}
@@ -121,7 +121,7 @@ export default function Step2Season({
 
             {/* Інструкція */}
             <div className="text-xs text-gray-500 text-center mt-3">
-              💡 Натисніть на дату висадки, потім на дату збирання. Період буде автоматично виділено.
+              💡 Натисніть на дату висадки, потім на дату збирання
             </div>
           </div>
 
