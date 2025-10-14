@@ -11,6 +11,8 @@ import ModalWithWeather from "../components/ModalWithWeather";
 import { extractSuitableSprayHours } from "../engine";
 import IntegratedTableView from "../components/IntegratedTableView";
 import ActionMenu from "../components/ActionMenu";
+import { exportToPDF } from "../utils/exportToPDF";
+import logo from "../assets/images/logo.png"; // адаптуй шлях, якщо потрібно
 
 const productInfo = {
   "Зорвек Інкантія": "0,5л/га",
@@ -716,10 +718,19 @@ const integratedSystem = integratedMap
    {showIntegrated ? (
   <>
     <IntegratedTableView data={integratedSystem} />
+<div style={{ display: "flex", gap: "12px", marginTop: "1rem" }}>
+  <button onClick={exportToExcel} className="toggle-button">
+    Експорт в Excel
+  </button>
 
-    <button onClick={exportToExcel} className="toggle-button">
-      Експорт в Excel
-    </button>
+  <button
+    onClick={() => exportToPDF(integratedSystem, logo)}
+    className="toggle-button"
+  >
+    Експорт в PDF
+  </button>
+</div>
+
   </>
 ) : (
   <>
