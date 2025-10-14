@@ -3,7 +3,7 @@ import autoTable from "jspdf-autotable";
 
 // Підключення шрифтів (шляхи вказані правильно!)
 import "../fonts/Roboto-Bold-bold";
-import "../fonts/Roboto-Regular-normal";
+import "../fonts/Roboto-Regular";
 
 export const exportToPDF = (data, logoUrl) => {
   const doc = new jsPDF();
