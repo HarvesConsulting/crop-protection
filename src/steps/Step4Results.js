@@ -810,6 +810,12 @@ export default function Step4Results({ result, onRestart }) {
         data={integratedSystem} 
         isOpen={showIntegratedModal} 
         onClose={() => setShowIntegratedModal(false)} 
+        onExportToExcel={exportToExcel}
+  onExportToPDF={() => {
+    // Тимчасово для тесту
+    alert("PDF експорт буде тут!");
+    console.log("Дані для PDF:", integratedSystem);
+  }}
 />
     </main>
   );
