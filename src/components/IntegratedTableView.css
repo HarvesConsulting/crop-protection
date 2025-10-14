@@ -1,97 +1,244 @@
-/* Контейнер таблиці */
-.integrated-table-container {
-  max-width: 760px; /* 🔧 обмеження ширини */
-  margin: 1.5rem auto;
-  background-color: #f9fffa;
+/* Стилі для модального вікна */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.modal-content {
+  background: white;
   border-radius: 12px;
-  padding: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalAppear 0.3s ease-out;
 }
 
-/* Заголовок */
-.integrated-table-title {
-  text-align: left;
-  color: #155724;
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  padding-left: 0;
-  margin-left: 0;
+@keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
-/* Основна таблиця */
+/* Шапка модального вікна */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 2px solid #2E7D32;
+  background: linear-gradient(135deg, #f8fff8 0%, #f0f8f0 100%);
+}
+
+.modal-title {
+  margin: 0;
+  color: #2E7D32;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #666;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.modal-close-btn:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+/* Тіло модального вікна */
+.modal-body {
+  flex: 1;
+  padding: 0;
+  overflow: auto;
+}
+
+.table-container {
+  padding: 0;
+}
+
 .integrated-table {
   width: 100%;
   border-collapse: collapse;
-  background-color: #ffffff;
-  border-radius: 12px;
-  font-family: "Inter", "Segoe UI", sans-serif;
-  table-layout: auto; /* ✅ Автоматична ширина по вмісту */
-  /*min-width: 600px; /* 🟢 Щоб на мобільних не зливалося */
+  font-size: 14px;
 }
 
-/* Заголовки */
-.integrated-table th {
-  background-color: #bde5b8;
-  color: #0b3d17;
+/* Заголовки таблиці */
+.integrated-table thead {
+  background: linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%);
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.date-header {
+  width: 20%;
+  padding: 16px 20px;
+  text-align: left;
   font-weight: 600;
-  padding: 12px 10px;
-  font-size: 16px;
-  border: 1px solid #9ed89a;
-  text-align: center;
-  white-space: nowrap;
-}
-
-/* Комірки */
-.integrated-table td {
-  border: 1px solid #c3e6cb;
-  padding: 12px 8px;
   font-size: 15px;
-  color: #1a1a1a;
-  background-color: #f3fff4;
-  text-align: center;
-  vertical-align: top;
-  line-height: 1.5;
-  font-style: normal;
-  white-space: normal;
-  word-break: break-word;
-  overflow-wrap: anywhere;
 }
 
-/* Зебра */
-.integrated-table tr:nth-child(even) td {
-  background-color: #e6fae7;
-}
-
-/* Комірка з датою */
-.date-cell {
+.preparations-header {
+  width: 80%;
+  padding: 16px 20px;
+  text-align: left;
   font-weight: 600;
-  color: #155724;
-  background-color: #d9f5db;
-  white-space: nowrap;
-  text-align: center;
-  width: 120px;
+  font-size: 15px;
 }
 
-/* При наведенні */
-.integrated-table tr:hover td {
-  background-color: #d5f0d8;
+/* Рядки таблиці */
+.table-row {
+  border-bottom: 1px solid #e0e0e0;
   transition: background-color 0.2s ease;
 }
 
-/* 🟢 Адаптація під мобільні: прокрутка та зменшений текст */
+.table-row:hover {
+  background-color: #f8f9fa;
+}
+
+.table-row:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.table-row:nth-child(even):hover {
+  background-color: #f0f0f0;
+}
+
+/* Комірки таблиці */
+.date-cell {
+  padding: 14px 20px;
+  font-weight: 600;
+  color: #2E7D32;
+  border-right: 1px solid #e0e0e0;
+  vertical-align: top;
+}
+
+.preparations-cell {
+  padding: 14px 20px;
+  vertical-align: top;
+}
+
+.preparation-item {
+  padding: 6px 0;
+  border-bottom: 1px solid #f0f0f0;
+  line-height: 1.4;
+}
+
+.preparation-item:last-child {
+  border-bottom: none;
+}
+
+.preparation-item:not(:last-child) {
+  margin-bottom: 4px;
+}
+
+/* Футер модального вікна */
+.modal-footer {
+  padding: 20px 24px;
+  border-top: 1px solid #e0e0e0;
+  background: #f8f9fa;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.close-button {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.close-button:hover {
+  background: #5a6268;
+  transform: translateY(-1px);
+}
+
+/* Адаптивність */
 @media (max-width: 768px) {
-  .integrated-table-container {
-    overflow-x: auto;
+  .modal-content {
+    width: 95%;
+    max-height: 85vh;
   }
-
-  .integrated-table {
-    min-width: 700px; /* дозволяє горизонтальний скрол */
+  
+  .modal-header {
+    padding: 16px 20px;
   }
-
-  .integrated-table td,
-  .integrated-table th {
+  
+  .modal-title {
+    font-size: 20px;
+  }
+  
+  .date-header,
+  .preparations-header {
+    padding: 12px 16px;
     font-size: 14px;
-    padding: 10px 6px;
+  }
+  
+  .date-cell,
+  .preparations-cell {
+    padding: 12px 16px;
+    font-size: 13px;
+  }
+  
+  .preparation-item {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-backdrop {
+    padding: 10px;
+  }
+  
+  .modal-content {
+    width: 100%;
+    border-radius: 8px;
+  }
+  
+  .modal-header {
+    padding: 12px 16px;
+  }
+  
+  .modal-title {
+    font-size: 18px;
+  }
+  
+  .date-header {
+    width: 25%;
+  }
+  
+  .preparations-header {
+    width: 75%;
   }
 }
