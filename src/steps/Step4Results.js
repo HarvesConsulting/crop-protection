@@ -11,7 +11,7 @@ import ModalWithWeather from "../components/ModalWithWeather";
 import { extractSuitableSprayHours } from "../engine";
 import IntegratedTableView from "../components/IntegratedTableView";
 import ActionMenu from "../components/ActionMenu";
-import logoImage from "../../assets/images/logo.png"; // змінюй шлях, якщо компонент глибше\
+import logoImage from "../assets/images/logo.png";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
