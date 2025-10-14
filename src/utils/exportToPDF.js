@@ -1,11 +1,12 @@
-// src/utils/exportToPDF.js
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import "../fonts/roboto-normal"; // 🔗 шлях до згенерованого шрифта
+import "../fonts/Roboto-Regular-normal";
+import "../fonts/Roboto-bold";
 
 export const exportToPDF = (data, logoUrl) => {
   const doc = new jsPDF();
-  doc.setFont("roboto");
+  doc.setFont("Roboto-Regular", "normal");
+
   const img = new Image();
   img.src = logoUrl;
 
@@ -13,12 +14,12 @@ export const exportToPDF = (data, logoUrl) => {
     doc.addImage(img, "PNG", 10, 10, 40, 15);
 
     doc.setFontSize(16);
-    doc.setFont("roboto", "bold");
+    doc.setFont("Roboto", "bold"); // <- заголовок
     doc.text("Інтегрована система захисту рослин", 105, 30, { align: "center" });
 
     const today = new Date().toLocaleDateString("uk-UA");
     doc.setFontSize(10);
-    doc.setFont("roboto", "normal");
+    doc.setFont("Roboto-Regular", "normal"); // <- звичайний текст
     doc.text(`Дата формування: ${today}`, 200, 10, { align: "right" });
 
     const tableData = data.map((row) => [
@@ -32,7 +33,7 @@ export const exportToPDF = (data, logoUrl) => {
       head: [["Дата", "Препарат(и)", "Хвороби"]],
       body: tableData,
       styles: {
-        font: "roboto",
+        font: "Roboto-Regular", // тут також
         fontSize: 10,
         cellPadding: 3,
         valign: "top",
@@ -41,6 +42,7 @@ export const exportToPDF = (data, logoUrl) => {
         fillColor: [41, 128, 185],
         textColor: 255,
         fontStyle: "bold",
+        font: "Roboto", // для заголовків таблиці
       },
     });
 
