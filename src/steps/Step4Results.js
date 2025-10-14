@@ -11,6 +11,9 @@ import ModalWithWeather from "../components/ModalWithWeather";
 import { extractSuitableSprayHours } from "../engine";
 import IntegratedTableView from "../components/IntegratedTableView";
 import ActionMenu from "../components/ActionMenu";
+import logoImage from "../../assets/images/logo.png"; // змінюй шлях, якщо компонент глибше\
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 const productInfo = {
   "Зорвек Інкантія": "0,5л/га",
@@ -622,7 +625,55 @@ const integratedSystem = integratedMap
     const dB = parseISO(b.Дата.split(".").reverse().join("-"));
     return dA - dB;
   });
-  
+  const addCompanyHeader = (pdf) => {
+  const pageWidth = pdf.internal.pageSize.getWidth();
+
+  // 🔹 Логотип
+  pdf.addImage(logoImage, "PNG", 10, 10, 30, 30);
+
+  // 🔹 Назва компанії
+  pdf.setFontSize(14);
+  pdf.setTextColor(40, 40, 40);
+  pdf.text("ТОВ «Harvest Consulting»", 50, 18);
+
+  // 🔹 Контакти
+  pdf.setFontSize(10);
+  pdf.setTextColor(80, 80, 80);
+  pdf.text("www.harvestconsulting.com | +38 (067) 000-00-00", 50, 25);
+
+  // 🔹 Лінія
+  pdf.setDrawColor(160, 160, 160);
+  pdf.line(10, 42, pageWidth - 10, 42);
+};
+const exportToPDF = async () => {
+  const element = document.getElementById("pdf-content"); // обгорни таблицю у цей div
+
+  if (!element) {
+    console.warn("❗ Елемент для PDF не знайдено");
+    return;
+  }
+
+  const canvas = await html2canvas(element, { scale: 2 });
+  const imgData = canvas.toDataURL("image/png");
+
+  const pdf = new jsPDF("p", "mm", "a4");
+
+  // 🟦 Шапка
+  addCompanyHeader(pdf);
+
+  // 📄 Розміри
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const contentWidth = pageWidth - 20;
+  const imgProps = pdf.getImageProperties(imgData);
+  const contentHeight = (imgProps.height * contentWidth) / imgProps.width;
+
+  // 🖼️ Вставляємо таблицю
+  pdf.addImage(imgData, "PNG", 10, 50, contentWidth, contentHeight);
+
+  // 💾 Зберегти файл
+  pdf.save("Інтегрована_таблиця_захисту.pdf");
+};
+
   const exportToExcel = () => {
   const exportData = integratedSystem.map((entry) => ({
     Дата: entry.Дата,
@@ -715,11 +766,19 @@ const integratedSystem = integratedMap
 
    {showIntegrated ? (
   <>
-    <IntegratedTableView data={integratedSystem} />
+    <div id="pdf-content">
+  <IntegratedTableView data={integratedSystem} />
+</div>
 
-    <button onClick={exportToExcel} className="toggle-button">
-      Експорт в Excel
-    </button>
+<div style={{ display: "flex", gap: "12px", marginTop: "1rem" }}>
+  <button onClick={exportToExcel} className="toggle-button">
+    Експорт в Excel
+  </button>
+  <button onClick={exportToPDF} className="toggle-button">
+    Експорт в PDF
+  </button>
+</div>
+
   </>
 ) : (
   <>
