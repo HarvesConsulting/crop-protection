@@ -5,9 +5,16 @@ import "./IntegratedTableView.css";
  * 📊 Модальне вікно з інтегрованою системою захисту
  * Формат: Дата | Препарати
  */
-export default function IntegratedTableView({ data = [], isOpen, onClose }) {
+export default function IntegratedTableView({ 
+  data = [], 
+  isOpen, 
+  onClose,
+  onExportToExcel, // ✅ Обробник експорту в Excel
+  onExportToPDF    // ✅ Обробник експорту в PDF
+}) {
   const mergedByDate = {};
 
+  // Групуємо препарати за датою
   data.forEach((entry) => {
     const date = entry.Дата;
     if (!mergedByDate[date]) {
@@ -16,20 +23,21 @@ export default function IntegratedTableView({ data = [], isOpen, onClose }) {
     mergedByDate[date].push(entry.Препарат);
   });
 
+  // Сортуємо дати
   const sortedDates = Object.keys(mergedByDate).sort((a, b) => {
     const [dA, mA, yA] = a.split(".");
     const [dB, mB, yB] = b.split(".");
     return new Date(yA, mA - 1, dA) - new Date(yB, mB - 1, dB);
   });
 
-  // Закриваємо модальне вікно при кліку на фон
+  // Закриття по кліку на фон
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
       onClose();
     }
   };
 
-  // Закриваємо модальне вікно при натисканні Escape
+  // Закриття по Escape
   React.useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape') {
@@ -39,7 +47,7 @@ export default function IntegratedTableView({ data = [], isOpen, onClose }) {
 
     if (isOpen) {
       document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden'; // Блокуємо скрол сторінки
+      document.body.style.overflow = 'hidden';
     }
 
     return () => {
@@ -53,7 +61,7 @@ export default function IntegratedTableView({ data = [], isOpen, onClose }) {
   return (
     <div className="modal-backdrop" onClick={handleBackdropClick}>
       <div className="modal-content">
-        {/* Шапка модального вікна */}
+        {/* 🔹 Заголовок */}
         <div className="modal-header">
           <h2 className="modal-title">Інтегрована система захисту</h2>
           <button className="modal-close-btn" onClick={onClose} aria-label="Закрити">
@@ -61,7 +69,7 @@ export default function IntegratedTableView({ data = [], isOpen, onClose }) {
           </button>
         </div>
 
-        {/* Контент модального вікна */}
+        {/* 🔸 Основний контент */}
         <div className="modal-body">
           <div className="table-container">
             <table className="integrated-table">
@@ -89,8 +97,22 @@ export default function IntegratedTableView({ data = [], isOpen, onClose }) {
           </div>
         </div>
 
-        {/* Футер модального вікна */}
+        {/* 🔻 Футер з кнопками */}
         <div className="modal-footer">
+          <div className="export-buttons">
+            <button 
+              className="export-btn excel-btn" 
+              onClick={onExportToExcel}
+            >
+              📊 Експорт в Excel
+            </button>
+            <button 
+              className="export-btn pdf-btn" 
+              onClick={onExportToPDF}
+            >
+              📄 Зберегти як PDF
+            </button>
+          </div>
           <button className="close-button" onClick={onClose}>
             Закрити
           </button>
