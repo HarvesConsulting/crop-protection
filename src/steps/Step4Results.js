@@ -662,10 +662,12 @@ const exportToPDF = () => {
 
   // 📌 Перетворення в текст
   const tableData = integratedSystem.map((entry) => [
-    entry.Дата,
-    String(entry.Препарат ?? ""),
-    String(entry.Хвороби ?? ""),
-  ]);
+  entry.Дата,
+  Array.isArray(entry.Препарати)
+    ? entry.Препарати.join(", ")
+    : String(entry.Препарати ?? ""),
+  String(entry.Хвороби ?? ""),
+]);
 
   console.table(tableData); // Перевірка
 
