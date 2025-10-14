@@ -71,12 +71,6 @@ export default function Step2Season({
             </button>
           </div>
 
-          {showInfo && (
-            <div className="bg-blue-50 border border-blue-200 text-sm text-gray-700 p-4 rounded-md shadow-sm">
-              Оберіть період сезону: перший клік - дата висадки, другий клік - дата збирання. Весь період між датами буде автоматично виділено.
-            </div>
-          )}
-
           {/* Календар з виділенням періоду */}
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
             <div className="flex items-center gap-2 mb-4">
