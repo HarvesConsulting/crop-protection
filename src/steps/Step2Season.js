@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import { Info, ArrowRight, Calendar } from "lucide-react";
-import DatePicker from "react-datepicker";
-import { registerLocale } from "react-datepicker";
-import { uk } from "date-fns/locale";
-import "react-datepicker/dist/react-datepicker.css";
-
-registerLocale('uk', uk);
+import { Info, ArrowRight } from "lucide-react";
 
 export default function Step2Season({
   plantingDate,
@@ -18,7 +12,6 @@ export default function Step2Season({
   const allDiseases = ["lateBlight", "grayMold", "alternaria", "bacteriosis"];
   const [diseases, setDiseases] = useState(["lateBlight"]);
   const [showInfo, setShowInfo] = useState(false);
-  const [showCalendar, setShowCalendar] = useState(false);
 
   const toggleDisease = (disease) => {
     setDiseases((prev) =>
@@ -30,15 +23,6 @@ export default function Step2Season({
 
   const toggleSelectAll = () => {
     setDiseases(diseases.length === allDiseases.length ? [] : allDiseases);
-  };
-
-  const plantingDateObj = plantingDate ? new Date(plantingDate) : null;
-  const harvestDateObj = harvestDate ? new Date(harvestDate) : null;
-
-  const handleDateChange = (dates) => {
-    const [start, end] = dates;
-    setPlantingDate(start ? start.toISOString() : "");
-    setHarvestDate(end ? end.toISOString() : "");
   };
 
   const handleNext = () => {
@@ -54,6 +38,17 @@ export default function Step2Season({
   };
 
   const isDateValid = plantingDate && harvestDate && new Date(harvestDate) <= new Date(plantingDate);
+
+  // Форматування дати для відображення
+  const formatDateForDisplay = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("uk-UA", {
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    });
+  };
 
   return (
     <main className="flex justify-center items-start min-h-[70vh] px-4">
@@ -79,77 +74,48 @@ export default function Step2Season({
             </div>
           )}
 
-          {/* Кнопка для відкриття календаря на десктопі */}
-          <div className="hidden md:block">
-            <button
-              onClick={() => setShowCalendar(!showCalendar)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base text-gray-700 hover:bg-gray-50 transition flex items-center justify-center gap-2"
-            >
-              <Calendar size={18} />
-              {plantingDate && harvestDate ? "Змінити період" : "Обрати період у календарі"}
-            </button>
-          </div>
-
-          {/* Календар для десктопу */}
-          {showCalendar && (
-            <div className="hidden md:block border border-gray-200 rounded-lg p-4">
-              <DatePicker
-                selected={plantingDateObj}
-                onChange={handleDateChange}
-                startDate={plantingDateObj}
-                endDate={harvestDateObj}
-                selectsRange
-                inline
-                monthsShown={2}
-                locale={uk}
-                dateFormat="dd.MM.yyyy"
-                shouldCloseOnSelect={false}
-                className="react-datepicker-custom"
-              />
-              <div className="text-sm text-gray-500 text-center mt-3">
-                Натисніть на дату висадки, потім на дату збирання
-              </div>
-            </div>
-          )}
-
-          {/* Поля дат для мобільних та альтернатива на десктопі */}
+          {/* Поля дат */}
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Дата висадки або останньої обробки:
               </label>
-              <div className="relative">
-                <input
-                  type="date"
-                  value={plantingDate}
-                  onChange={(e) => setPlantingDate(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                />
-                <Calendar size={18} className="absolute right-4 top-3.5 text-gray-400" />
-              </div>
+              <input
+                type="date"
+                value={plantingDate}
+                onChange={(e) => setPlantingDate(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Дата збирання врожаю:
               </label>
-              <div className="relative">
-                <input
-                  type="date"
-                  value={harvestDate}
-                  onChange={(e) => setHarvestDate(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                />
-                <Calendar size={18} className="absolute right-4 top-3.5 text-gray-400" />
-              </div>
+              <input
+                type="date"
+                value={harvestDate}
+                onChange={(e) => setHarvestDate(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              />
             </div>
 
             {/* Інформація про обраний період */}
             {(plantingDate || harvestDate) && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                <div className="text-sm text-green-700">
-                  <div><strong>Висадка:</strong> {plantingDate ? new Date(plantingDate).toLocaleDateString('uk-UA') : '—'}</div>
-                  <div><strong>Збирання:</strong> {harvestDate ? new Date(harvestDate).toLocaleDateString('uk-UA') : '—'}</div>
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <div className="text-sm text-gray-600">Дата висадки:</div>
+                    <div className="font-medium text-green-700">
+                      {plantingDate ? formatDateForDisplay(plantingDate) : "Не обрано"}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-600">Дата збирання:</div>
+                    <div className="font-medium text-blue-700">
+                      {harvestDate ? formatDateForDisplay(harvestDate) : "Не обрано"}
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -169,16 +135,17 @@ export default function Step2Season({
               Оберіть хвороби для моделювання:
             </label>
             
-            <button
-              onClick={toggleSelectAll}
-              className={`w-full mb-4 px-4 py-3 rounded-lg border transition-colors text-sm font-medium ${
-                diseases.length === allDiseases.length
-                  ? "bg-green-100 border-green-500 text-green-700"
-                  : "bg-gray-100 border-gray-300 text-gray-700"
-              }`}
-            >
-              {diseases.length === allDiseases.length ? "Скасувати вибір усіх" : "Вибрати всі хвороби"}
-            </button>
+            <div className="mb-4">
+              <label className="flex items-center gap-3 font-medium text-gray-900">
+                <input
+                  type="checkbox"
+                  checked={diseases.length === allDiseases.length}
+                  onChange={toggleSelectAll}
+                  className="w-5 h-5 text-green-600 rounded border-gray-300 focus:ring-green-500"
+                />
+                Вибрати всі хвороби
+              </label>
+            </div>
 
             <div className="space-y-3">
               {[
