@@ -486,13 +486,8 @@ const aggregatedRain = rainDaily;
   return {
     Дата: d,
     Препарат: `${product} (${productInfo[product] || "—"})`,
-    Рекомендація: productLinks[product] ? (
-      <a href={productLinks[product]} target="_blank" rel="noreferrer">
-        Перейти
-      </a>
-    ) : (
-      "—"
-    ),
+   Рекомендація: productLinks[product] ?? "—",
+
     Інтервал: gap,
     "Рекомендовані години": recommendedHours.length
       ? recommendedHours.join(", ")
@@ -604,9 +599,9 @@ for (const group of diseaseCardsGrouped) {
       integratedMap.push({
         Дата: entry.Дата,
         timestamp: diseaseTime,
-        Препарати: [entry.Препарат],
-        Рекомендації: [entry.Рекомендація],
-        diseases: new Set([group.name]),
+        Препарат: entry.Препарати.join(", "),
+        Рекомендація: entry.Рекомендації.join(", "),
+        Хвороби: Array.from(entry.diseases).join(", "),
         backData: entry.backData,
       });
     }
