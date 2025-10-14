@@ -242,3 +242,84 @@
     width: 75%;
   }
 }
+/* Стилі для кнопок експорту */
+.export-buttons {
+  display: flex;
+  gap: 12px;
+  margin-right: auto;
+}
+
+.export-btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.excel-btn {
+  background: #217346;
+  color: white;
+}
+
+.excel-btn:hover {
+  background: #1a5f38;
+  transform: translateY(-1px);
+}
+
+.pdf-btn {
+  background: #d32f2f;
+  color: white;
+}
+
+.pdf-btn:hover {
+  background: #b71c1c;
+  transform: translateY(-1px);
+}
+
+/* Оновлений футер */
+.modal-footer {
+  padding: 20px 24px;
+  border-top: 1px solid #e0e0e0;
+  background: #f8f9fa;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Адаптивність для кнопок */
+@media (max-width: 768px) {
+  .export-buttons {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 15px;
+  }
+  
+  .export-btn {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .modal-footer {
+    flex-direction: column;
+  }
+  
+  .close-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .export-buttons {
+    gap: 6px;
+  }
+  
+  .export-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+}
