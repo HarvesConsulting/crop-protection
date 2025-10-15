@@ -275,13 +275,7 @@ export default function Step3Run({
           {/* Анімація або кнопки */}
           {loading ? (
             <div className="text-center py-8">
-              <LoadingTractor />
-              <div className="mt-4 text-sm text-gray-600 font-medium">
-                Триває розрахунок...
-              </div>
-              <div className="text-xs text-gray-500 mt-2">
-                Це може зайняти кілька хвилин
-              </div>
+              <LoadingTractor />                          
             </div>
           ) : (
             <div className="flex flex-col sm:flex-row justify-between gap-3 pt-4">
