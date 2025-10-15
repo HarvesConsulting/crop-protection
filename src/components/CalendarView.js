@@ -73,7 +73,7 @@ export default function CalendarView({ events = [], startDate, endDate }) {
           </div>
         )}
         
-        {/* Розгорнутий список подій */}
+        {/* Розгорнутий список препаратів */}
         {isExpanded && (
           <div className="events-list">
             {dayEvents.map((event, index) => (
@@ -106,7 +106,7 @@ export default function CalendarView({ events = [], startDate, endDate }) {
       <p className="calendar-subtitle">
         {startDate && endDate 
           ? `Період: ${new Date(startDate).toLocaleDateString('uk-UA')} - ${new Date(endDate).toLocaleDateString('uk-UA')}`
-          : 'Натисніть на дату з крапками, щоб побачити події'
+          : 'Натисніть на дату з крапками, щоб побачити препарати'
         }
       </p>
 
@@ -129,18 +129,6 @@ export default function CalendarView({ events = [], startDate, endDate }) {
             return false;
           }}
         />
-      </div>
-
-      {/* Інструкція */}
-      <div className="instructions">
-        <p>💡 <strong>Як користуватися:</strong></p>
-        <ul>
-          <li>🔵 Крапки позначають дні з подіями</li>
-          <li>📅 Натисніть на день з крапками, щоб побачити список подій</li>
-          <li>🟢 Зелена крапка - обробка</li>
-          <li>🔴 Червона крапка - ризик</li>
-          <li>🔵 Синя крапка - інформація</li>
-        </ul>
       </div>
 
       <div className="instagram-container">
