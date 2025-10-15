@@ -1,6 +1,6 @@
 import { format, parseISO, differenceInDays, isValid } from "date-fns";
 import ModalWithSummary from "../components/ModalWithSummary";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Step4Results.css";
 import * as XLSX from "xlsx";
 import HourTimeline from "../components/HourTimeline";
@@ -11,7 +11,7 @@ import ModalWithWeather from "../components/ModalWithWeather";
 import { extractSuitableSprayHours } from "../engine";
 import IntegratedTableView from "../components/IntegratedTableView";
 import ActionMenu from "../components/ActionMenu";
-import PDFExporter from "../components/PDFExporter"; // ✅ Один раз імпортовано
+import PDFExporter from "../components/PDFExporter";
 
 const productInfo = {
   "Зорвек Інкантія": "0,5л/га",
@@ -368,9 +368,8 @@ export default function Step4Results({ result, onRestart }) {
   const [showWeather, setShowWeather] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
 
-  const [expandedDiseases, setExpandedDiseases] = useState({
-    "Фітофтороз": true,
-  });
+  // Змінено: порожній початковий стан
+  const [expandedDiseases, setExpandedDiseases] = useState({});
 
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
@@ -402,46 +401,7 @@ export default function Step4Results({ result, onRestart }) {
 
   const hasPhytophthora = true;
 
-  const isAllExpanded =
-    ["Фітофтороз", ...((diseaseSummary?.map((d) => d.name)) || [])].every(
-      (name) => expandedDiseases[name]
-    );
-
-  const suitableMap = extractSuitableSprayHours(hourlyData);
-
-  const enrichedHourlyData = hourlyData.map((entry) => {
-    const dateStr = entry.date.toISOString().split("T")[0];
-    const hourStr = String(entry.hour).padStart(2, "0") + ":00";
-    const suitableEntry = suitableMap[dateStr]?.find((h) => h.hour === hourStr);
-    return {
-      ...entry,
-      suitable: suitableEntry?.suitable === true,
-    };
-  });
-
-  const toggleDisease = (name) => {
-    setExpandedDiseases((prev) => ({
-      ...prev,
-      [name]: !prev[name],
-    }));
-  };
-
-  const toggleAllCards = () => {
-    const allDiseaseNames = ["Фітофтороз", ...(diseaseCardsGrouped?.map((d) => d.name) || [])];
-    const allExpanded = allDiseaseNames.every((name) => expandedDiseases[name]);
-    const newState = {};
-    for (const name of allDiseaseNames) {
-      newState[name] = !allExpanded;
-    }
-    setExpandedDiseases(newState);
-  };
-
-  console.log("🔬 Перевірка diagnostics:");
-  console.table(diagnostics.slice(0, 10));
-
-  console.log("🔬 Перевірка rainDaily:");
-  console.table(rainDaily.slice(0, 10));
-
+  // Обчислення sprayData та diseaseCardsGrouped
   const aggregatedRain = rainDaily;
   const sprayData = sprayDates.map((d, i) => {
     const cur = parseISO(d.split(".").reverse().join("-"));
@@ -524,6 +484,60 @@ export default function Step4Results({ result, onRestart }) {
     return { name, entries };
   });
 
+  // Додано: автоматичне управління станом розгортання
+  useEffect(() => {
+    const newExpandedState = {};
+    
+    // Фітофтороз - розгортаємо тільки якщо є sprayData
+    if (sprayData && sprayData.length > 0) {
+      newExpandedState["Фітофтороз"] = true;
+    } else {
+      newExpandedState["Фітофтороз"] = false;
+    }
+    
+    // Інші хвороби - розгортаємо тільки якщо є entries
+    diseaseCardsGrouped?.forEach(({ name, entries }) => {
+      newExpandedState[name] = entries && entries.length > 0;
+    });
+    
+    setExpandedDiseases(newExpandedState);
+  }, [sprayData, diseaseCardsGrouped]);
+
+  const isAllExpanded =
+    ["Фітофтороз", ...((diseaseSummary?.map((d) => d.name)) || [])].every(
+      (name) => expandedDiseases[name]
+    );
+
+  const suitableMap = extractSuitableSprayHours(hourlyData);
+
+  const enrichedHourlyData = hourlyData.map((entry) => {
+    const dateStr = entry.date.toISOString().split('T')[0];
+    const hourStr = String(entry.hour).padStart(2, "0") + ":00";
+    const suitableEntry = suitableMap[dateStr]?.find((h) => h.hour === hourStr);
+    return {
+      ...entry,
+      suitable: suitableEntry?.suitable === true,
+    };
+  });
+
+  const toggleDisease = (name) => {
+    setExpandedDiseases((prev) => ({
+      ...prev,
+      [name]: !prev[name],
+    }));
+  };
+
+  const toggleAllCards = () => {
+    const allDiseaseNames = ["Фітофтороз", ...(diseaseCardsGrouped?.map((d) => d.name) || [])];
+    const allExpanded = allDiseaseNames.every((name) => expandedDiseases[name]);
+    const newState = {};
+    for (const name of allDiseaseNames) {
+      newState[name] = !allExpanded;
+    }
+    setExpandedDiseases(newState);
+  };
+
+  // Решта коду для integratedSystem, exportToExcel тощо залишається без змін
   const rawEntries = [
     ...sprayData,
     ...diseaseCardsGrouped.flatMap(({ entries }) => entries),
@@ -642,7 +656,7 @@ export default function Step4Results({ result, onRestart }) {
           isMobile={isMobile}
           onRestart={onRestart}
           onShowWeather={() => setWeatherModalOpen(true)}
-          onToggleIntegrated={() => setShowIntegratedModal(true)} // 🆕 Змінити тут
+          onToggleIntegrated={() => setShowIntegratedModal(true)}
           showIntegrated={showIntegrated}
           onGoToCards={handleGoToCards}
           onShowSummary={() => setSummaryModalOpen(true)}
@@ -715,19 +729,21 @@ export default function Step4Results({ result, onRestart }) {
                   </span>
                 </h3>
 
-                {expandedDiseases["Фітофтороз"] && sprayData.length > 0 ? (
-                  <CardView
-                    entries={sprayData}
-                    title=""
-                    diagnostics={diagnostics}
-                    plantingDate={plantingDate}
-                    rainDaily={aggregatedRain}
-                    hourlyData={enrichedHourlyData}
-                  />
-                ) : !expandedDiseases["Фітофтороз"] ? null : (
-                  <p style={{ color: "#666", fontStyle: "italic", marginLeft: "10px" }}>
-                    Ризиків за обраний період не визначено
-                  </p>
+                {expandedDiseases["Фітофтороз"] && (
+                  sprayData.length > 0 ? (
+                    <CardView
+                      entries={sprayData}
+                      title=""
+                      diagnostics={diagnostics}
+                      plantingDate={plantingDate}
+                      rainDaily={aggregatedRain}
+                      hourlyData={enrichedHourlyData}
+                    />
+                  ) : (
+                    <p style={{ color: "#666", fontStyle: "italic", marginLeft: "10px" }}>
+                      Ризиків за обраний період не визначено
+                    </p>
+                  )
                 )}
               </div>
             )}
@@ -750,19 +766,21 @@ export default function Step4Results({ result, onRestart }) {
                   </span>
                 </h3>
 
-                {expandedDiseases[name] && entries.length > 0 ? (
-                  <CardView
-                    entries={entries}
-                    title=""
-                    diagnostics={diagnostics}
-                    plantingDate={plantingDate}
-                    rainDaily={aggregatedRain}
-                    hourlyData={enrichedHourlyData}
-                  />
-                ) : !expandedDiseases[name] ? null : (
-                  <p style={{ color: "#666", fontStyle: "italic", marginLeft: "10px" }}>
-                    Ризиків за обраний період не визначено
-                  </p>
+                {expandedDiseases[name] && (
+                  entries.length > 0 ? (
+                    <CardView
+                      entries={entries}
+                      title=""
+                      diagnostics={diagnostics}
+                      plantingDate={plantingDate}
+                      rainDaily={aggregatedRain}
+                      hourlyData={enrichedHourlyData}
+                    />
+                  ) : (
+                    <p style={{ color: "#666", fontStyle: "italic", marginLeft: "10px" }}>
+                      Ризиків за обраний період не визначено
+                    </p>
+                  )
                 )}
               </div>
             ))}
@@ -808,7 +826,6 @@ export default function Step4Results({ result, onRestart }) {
         rainDaily={rainDaily}
         integratedTreatments={integratedSystem}
       />
-      {/* 🆕 Додаємо модальне вікно інтегрованої системи */}
       <IntegratedTableView 
         data={integratedSystem} 
         isOpen={showIntegratedModal} 
