@@ -6,22 +6,16 @@ import "./CalendarView.css";
 export default function CalendarView({ events = [], startDate, endDate }) {
   const [selectedDate, setSelectedDate] = useState(null);
   const [activeStartDate, setActiveStartDate] = useState(null);
-  const [tooltip, setTooltip] = useState({ 
-    visible: false, 
-    content: "", 
-    x: 0, 
-    y: 0 
-  });
+  const [expandedDate, setExpandedDate] = useState(null);
 
   useEffect(() => {
-    console.log('Calendar events:', events);
     if (startDate) {
       const start = new Date(startDate);
       setActiveStartDate(start);
     } else {
       setActiveStartDate(new Date());
     }
-  }, [startDate, events]);
+  }, [startDate]);
 
   const normalizeDate = (input) => {
     if (input instanceof Date) return input;
@@ -42,45 +36,53 @@ export default function CalendarView({ events = [], startDate, endDate }) {
     );
   };
 
-  const handleDayMouseEnter = (event, date) => {
-    console.log('Mouse enter on date:', date);
+  const handleDateClick = (date) => {
+    setSelectedDate(date);
     const dayEvents = getEventsForDate(date);
-    console.log('Day events:', dayEvents);
-
+    
     if (dayEvents.length > 0) {
-      const rect = event.currentTarget.getBoundingClientRect();
-      console.log('Rectangle position:', rect);
-      
-      const content = dayEvents.map(ev => `• ${ev.title}`).join('\n');
-      
-      setTooltip({
-        visible: true,
-        content,
-        x: rect.left + window.scrollX + rect.width / 2,
-        y: rect.top + window.scrollY
-      });
+      // Якщо клікнули на ту саму дату - закриваємо, якщо на іншу - відкриваємо
+      if (expandedDate && expandedDate.toDateString() === date.toDateString()) {
+        setExpandedDate(null);
+      } else {
+        setExpandedDate(date);
+      }
+    } else {
+      setExpandedDate(null);
     }
-  };
-
-  const handleDayMouseLeave = () => {
-    console.log('Mouse leave');
-    setTooltip({ visible: false, content: "", x: 0, y: 0 });
   };
 
   const tileContent = ({ date, view }) => {
     if (view !== "month") return null;
 
     const dayEvents = getEventsForDate(date);
-    if (dayEvents.length === 0) return null;
+    const isExpanded = expandedDate && expandedDate.toDateString() === date.toDateString();
 
     return (
-      <div className="event-dots">
-        {dayEvents.map((event, index) => (
-          <div 
-            key={index}
-            className={`event-dot ${event.type || 'info'}`}
-          />
-        ))}
+      <div className="tile-content">
+        {/* Індикатори подій */}
+        {dayEvents.length > 0 && !isExpanded && (
+          <div className="event-dots">
+            {dayEvents.map((event, index) => (
+              <div 
+                key={index}
+                className={`event-dot ${event.type || 'info'}`}
+                title={event.title}
+              />
+            ))}
+          </div>
+        )}
+        
+        {/* Розгорнутий список подій */}
+        {isExpanded && (
+          <div className="events-list">
+            {dayEvents.map((event, index) => (
+              <div key={index} className={`event-item ${event.type || 'info'}`}>
+                <span className="event-title">{event.title}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     );
   };
@@ -89,22 +91,13 @@ export default function CalendarView({ events = [], startDate, endDate }) {
     const classes = [];
     if (view === "month") {
       const hasEvent = getEventsForDate(date).length > 0;
+      const isExpanded = expandedDate && expandedDate.toDateString() === date.toDateString();
+      
       if (hasEvent) classes.push("has-event");
+      if (isExpanded) classes.push("expanded");
       if (date.toDateString() === new Date().toDateString()) classes.push("today");
     }
     return classes.join(" ");
-  };
-
-  const tileProps = ({ date, view }) => {
-    if (view === "month") {
-      return {
-        onMouseEnter: (e) => handleDayMouseEnter(e, date),
-        onMouseLeave: handleDayMouseLeave,
-        onTouchStart: (e) => handleDayMouseEnter(e, date),
-        onTouchEnd: handleDayMouseLeave,
-      };
-    }
-    return {};
   };
 
   return (
@@ -113,17 +106,16 @@ export default function CalendarView({ events = [], startDate, endDate }) {
       <p className="calendar-subtitle">
         {startDate && endDate 
           ? `Період: ${new Date(startDate).toLocaleDateString('uk-UA')} - ${new Date(endDate).toLocaleDateString('uk-UA')}`
-          : 'Наведіть курсор на дату з крапками, щоб побачити події'
+          : 'Натисніть на дату з крапками, щоб побачити події'
         }
       </p>
 
       <div className="calendar-container">
         <Calendar
-          onChange={setSelectedDate}
+          onChange={handleDateClick}
           value={selectedDate}
           tileContent={tileContent}
           tileClassName={tileClassName}
-          tileProps={tileProps}
           activeStartDate={activeStartDate}
           onActiveStartDateChange={({ activeStartDate }) => setActiveStartDate(activeStartDate)}
           locale="uk-UA"
@@ -139,23 +131,17 @@ export default function CalendarView({ events = [], startDate, endDate }) {
         />
       </div>
 
-      {/* Унікальний тултіп для календаря */}
-      {tooltip.visible && (
-        <div 
-          className="calendar-tooltip-unique"
-          style={{
-            left: tooltip.x,
-            top: tooltip.y - 10,
-          }}
-        >
-          <div className="calendar-tooltip-content">
-            {tooltip.content.split('\n').map((line, index) => (
-              <div key={index} className="calendar-tooltip-line">{line}</div>
-            ))}
-          </div>
-          <div className="calendar-tooltip-arrow"></div>
-        </div>
-      )}
+      {/* Інструкція */}
+      <div className="instructions">
+        <p>💡 <strong>Як користуватися:</strong></p>
+        <ul>
+          <li>🔵 Крапки позначають дні з подіями</li>
+          <li>📅 Натисніть на день з крапками, щоб побачити список подій</li>
+          <li>🟢 Зелена крапка - обробка</li>
+          <li>🔴 Червона крапка - ризик</li>
+          <li>🔵 Синя крапка - інформація</li>
+        </ul>
+      </div>
 
       <div className="instagram-container">
         <a
