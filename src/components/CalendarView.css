@@ -95,7 +95,7 @@
   background: #e3f2fd;
   border-color: #2196f3;
   transform: scale(1.05);
-  z-index: 10;
+  z-index: 100;
 }
 
 .react-calendar__tile--active {
@@ -118,20 +118,7 @@
 
 .react-calendar__tile.has-event:hover {
   background-color: #e9ecef;
-  z-index: 20;
-}
-
-/* Специфічні стилі для різних типів подій */
-.react-calendar__tile.has-spray {
-  border-left: 3px solid #28a745;
-}
-
-.react-calendar__tile.has-risk {
-  border-left: 3px solid #dc3545;
-}
-
-.react-calendar__tile.has-info {
-  border-left: 3px solid #17a2b8;
+  z-index: 200;
 }
 
 /* Індикатор подій */
@@ -177,39 +164,56 @@
   margin-left: 2px;
 }
 
-/* Легенда */
-.calendar-legend {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin: 16px 0;
-  flex-wrap: wrap;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* Стилі для тултіпу - ВИПРАВЛЕНА ВЕРСІЯ */
+.calendar-tooltip {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.95);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 8px;
   font-size: 14px;
-  color: #6c757d;
+  line-height: 1.4;
+  white-space: pre;
+  max-width: 280px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  animation: tooltipFadeIn 0.15s ease-out;
 }
 
-.legend-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -120%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -100%);
+  }
 }
 
-.legend-dot.spray {
-  background-color: #28a745;
+.tooltip-content {
+  position: relative;
+  z-index: 2;
 }
 
-.legend-dot.risk {
-  background-color: #dc3545;
+.tooltip-line {
+  margin: 3px 0;
+  display: block;
 }
 
-.legend-dot.info {
-  background-color: #17a2b8;
+.tooltip-arrow {
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid rgba(0, 0, 0, 0.95);
 }
 
 /* Список подій */
@@ -351,60 +355,6 @@
   color: white;
 }
 
-/* Стилі для тултіпу */
-.calendar-tooltip {
-  position: fixed;
-  z-index: 9999;
-  pointer-events: none;
-  background: rgba(0, 0, 0, 0.95);
-  color: white;
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  line-height: 1.5;
-  white-space: pre-line;
-  max-width: 300px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  animation: tooltipFadeIn 0.2s ease-out;
-}
-
-@keyframes tooltipFadeIn {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-100%) scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(-100%) scale(1);
-  }
-}
-
-.tooltip-content {
-  position: relative;
-  z-index: 2;
-}
-
-.tooltip-line {
-  margin: 4px 0;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.tooltip-arrow {
-  position: absolute;
-  bottom: -6px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-top: 6px solid rgba(0, 0, 0, 0.95);
-}
-
 /* Покращені стилі для календаря */
 .calendar-container .react-calendar {
   width: 100%;
@@ -423,7 +373,7 @@
 .calendar-container .react-calendar__tile:enabled:hover,
 .calendar-container .react-calendar__tile:enabled:focus {
   background-color: #e9ecef;
-  z-index: 10;
+  z-index: 100;
 }
 
 .calendar-container .react-calendar__tile--active {
@@ -468,26 +418,8 @@
   .calendar-tooltip {
     font-size: 12px;
     padding: 8px 12px;
-    max-width: 250px;
+    max-width: 220px;
   }
-  
-  .calendar-legend {
-    gap: 12px;
-  }
-  
-  .legend-item {
-    font-size: 12px;
-  }
-}
-
-/* Додаткові покращення для тултіпу */
-.react-calendar__month-view__days__day {
-  position: relative;
-  overflow: visible;
-}
-
-.react-calendar__tile--hasEvents {
-  position: relative;
 }
 
 /* Забезпечення правильного z-index */
@@ -496,9 +428,27 @@
 }
 
 .react-calendar__tile:hover {
-  z-index: 100;
+  z-index: 1000;
 }
 
 .calendar-tooltip {
   z-index: 10000;
+}
+
+/* Додаткові покращення для тултіпу */
+.react-calendar__month-view__days__day {
+  position: relative;
+}
+
+/* Специфічні стилі для різних типів подій */
+.react-calendar__tile.has-spray {
+  border-left: 3px solid #28a745;
+}
+
+.react-calendar__tile.has-risk {
+  border-left: 3px solid #dc3545;
+}
+
+.react-calendar__tile.has-info {
+  border-left: 3px solid #17a2b8;
 }
