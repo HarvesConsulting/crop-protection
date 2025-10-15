@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Info, ArrowRight } from "lucide-react";
 
 export default function Step2Season({
@@ -12,6 +12,37 @@ export default function Step2Season({
   const allDiseases = ["lateBlight", "grayMold", "alternaria", "bacteriosis"];
   const [diseases, setDiseases] = useState(["lateBlight"]);
   const [showInfo, setShowInfo] = useState(false);
+  const [calculationPeriod, setCalculationPeriod] = useState(30);
+  const [maxPeriod, setMaxPeriod] = useState(45);
+
+  // Розрахунок максимального періоду (поточна дата + 15 днів)
+  useEffect(() => {
+    const today = new Date();
+    const maxDate = new Date(today);
+    maxDate.setDate(maxDate.getDate() + 15);
+    
+    if (plantingDate) {
+      const startDate = new Date(plantingDate);
+      const diffTime = maxDate - startDate;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      setMaxPeriod(Math.max(1, diffDays)); // Мінімум 1 день
+    } else {
+      setMaxPeriod(45); // Значення за замовчуванням
+    }
+  }, [plantingDate]);
+
+  // Оновлення дати завершення при зміні точки відліку або періоду
+  useEffect(() => {
+    if (plantingDate && calculationPeriod > 0) {
+      const startDate = new Date(plantingDate);
+      const endDate = new Date(startDate);
+      endDate.setDate(endDate.getDate() + calculationPeriod);
+      
+      // Форматуємо дату у формат YYYY-MM-DD
+      const formattedDate = endDate.toISOString().split('T')[0];
+      setHarvestDate(formattedDate);
+    }
+  }, [plantingDate, calculationPeriod, setHarvestDate]);
 
   const toggleDisease = (disease) => {
     setDiseases((prev) =>
@@ -29,9 +60,16 @@ export default function Step2Season({
     }
   };
 
+  const handleCalculationPeriodChange = (e) => {
+    const value = parseInt(e.target.value) || 0;
+    if (value >= 1 && value <= maxPeriod) {
+      setCalculationPeriod(value);
+    }
+  };
+
   const handleNext = () => {
-    if (!plantingDate || !harvestDate) {
-      alert("Будь ласка, оберіть дати сезону");
+    if (!plantingDate || !calculationPeriod) {
+      alert("Будь ласка, оберіть точку відліку та період розрахунку");
       return;
     }
     if (diseases.length === 0) {
@@ -39,6 +77,17 @@ export default function Step2Season({
       return;
     }
     onNext({ diseases });
+  };
+
+  // Розрахунок дати завершення для відображення
+  const getEndDateDisplay = () => {
+    if (!plantingDate || !calculationPeriod) return "";
+    
+    const startDate = new Date(plantingDate);
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + calculationPeriod);
+    
+    return endDate.toLocaleDateString('uk-UA');
   };
 
   return (
@@ -61,15 +110,16 @@ export default function Step2Season({
 
           {showInfo && (
             <div className="bg-blue-50 border border-blue-200 text-sm text-gray-700 p-4 rounded-md">
-              Вкажіть початок і кінець сезону, а також оберіть хвороби для прогнозування.
+              Вкажіть точку відліку (дату початку розрахунків) та період розрахунку. 
+              Період не може перевищувати 15 днів від поточної дати.
             </div>
           )}
 
-          {/* Поля дат */}
+          {/* Поля вводу */}
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Дата висадки (або останнє внесення фунгіциду):
+                Точка відліку (дата початку розрахунків):
               </label>
               <input
                 type="date"
@@ -77,18 +127,36 @@ export default function Step2Season({
                 onChange={(e) => setPlantingDate(e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
+              <p className="text-xs text-gray-500 mt-1">
+                Дата висадки або останнього внесення фунгіциду
+              </p>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Дата збирання:
+                Період розрахунку (в днях):
               </label>
-              <input
-                type="date"
-                value={harvestDate}
-                onChange={(e) => setHarvestDate(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              />
+              <div className="flex items-center gap-3">
+                <input
+                  type="number"
+                  min="1"
+                  max={maxPeriod}
+                  value={calculationPeriod}
+                  onChange={handleCalculationPeriodChange}
+                  className="w-24 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                />
+                <span className="text-sm text-gray-600">
+                  днів (макс.: {maxPeriod})
+                </span>
+              </div>
+              
+              {plantingDate && calculationPeriod > 0 && (
+                <div className="mt-2 p-2 bg-gray-50 rounded-md">
+                  <p className="text-sm text-gray-700">
+                    <strong>Дата завершення:</strong> {getEndDateDisplay()}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -140,9 +208,9 @@ export default function Step2Season({
             </button>
             <button
               onClick={handleNext}
-              disabled={!plantingDate || !harvestDate || diseases.length === 0}
+              disabled={!plantingDate || !calculationPeriod || diseases.length === 0}
               className={`px-6 py-2 rounded-lg text-white font-medium transition flex items-center gap-2 ${
-                plantingDate && harvestDate && diseases.length > 0
+                plantingDate && calculationPeriod && diseases.length > 0
                   ? "bg-green-600 hover:bg-green-700"
                   : "bg-gray-400 cursor-not-allowed"
               }`}
