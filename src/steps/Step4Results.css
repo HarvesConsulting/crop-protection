@@ -576,3 +576,42 @@
 .card-modal-content::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
 }
+.step-title-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.step-title {
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.info-button {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.info-button:hover {
+  color: #0056b3;
+}
+
+.results-header {
+  margin-bottom: 20px;
+}
+
+.info-panel {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  padding: 15px;
+  margin-top: 15px;
+}
