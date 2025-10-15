@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Info, ArrowRight } from "lucide-react";
+import { Info, ArrowRight, CheckSquare, Square } from "lucide-react";
 
 export default function Step2Season({
   plantingDate,
@@ -116,6 +116,8 @@ export default function Step2Season({
     return endDate.toLocaleDateString('uk-UA');
   };
 
+  const isAllSelected = diseases.length === allDiseases.length;
+
   return (
     <main className="flex justify-center items-start min-h-[70vh] px-4">
       <div className="w-full max-w-xl mx-auto bg-white rounded-xl shadow-lg">
@@ -193,16 +195,23 @@ export default function Step2Season({
               Оберіть хвороби для моделювання:
             </label>
             
-            <div className="mb-3">
-              <label className="flex items-center gap-2 font-medium text-gray-900">
-                <input
-                  type="checkbox"
-                  checked={diseases.length === allDiseases.length}
-                  onChange={toggleSelectAll}
-                  className="w-4 h-4 text-green-600 rounded"
-                />
-                Вибрати всі
-              </label>
+            {/* Кнопка "Вибрати всі" */}
+            <div className="mb-4">
+              <button
+                onClick={toggleSelectAll}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all font-medium ${
+                  isAllSelected
+                    ? "bg-green-50 border-green-300 text-green-700 hover:bg-green-100"
+                    : "bg-gray-50 border-gray-300 text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                {isAllSelected ? (
+                  <CheckSquare size={18} className="text-green-600" />
+                ) : (
+                  <Square size={18} className="text-gray-500" />
+                )}
+                {isAllSelected ? "Всі обрані" : "Вибрати всі"}
+              </button>
             </div>
 
             <div className="space-y-2">
