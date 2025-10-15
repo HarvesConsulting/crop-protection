@@ -161,7 +161,7 @@ export default function Step2Season({
           <div className="space-y-4 sm:space-y-5">
             <div>
               <label className="block text-sm font-semibold text-gray-800 mb-2 sm:mb-3">
-                📅 Точка відліку
+                Точка відліку
               </label>
               <input
                 type="date"
@@ -176,7 +176,7 @@ export default function Step2Season({
 
             <div>
               <label className="block text-sm font-semibold text-gray-800 mb-2 sm:mb-3">
-                ⏱️ Період розрахунку
+                Період розрахунку
               </label>
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                 <div className="flex items-center gap-3">
@@ -198,7 +198,7 @@ export default function Step2Season({
               {plantingDate && calculationPeriod && parseInt(calculationPeriod) > 0 && (
                 <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-xl">
                   <p className="text-sm text-green-800 font-medium">
-                    <span className="block mb-1">📌 Дата завершення:</span>
+                    <span className="block mb-1">Дата завершення:</span>
                     <span className="text-base">{getEndDateDisplay()}</span>
                   </p>
                 </div>
