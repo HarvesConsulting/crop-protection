@@ -568,48 +568,58 @@ export default function Step4Results({ result, onRestart }) {
         />
 
         {showIntegrated ? (
-          <>
-            <IntegratedTableView data={integratedSystem} />
-            <div className="action-buttons">
-              <button onClick={exportToExcel} className="action-button">
-                Експорт в Excel
-              </button>
-              <PDFExporter data={integratedSystem} />
-            </div>
-          </>
-        ) : (
-          <>
-            {/* ТАБЛИЦЯ ДЛЯ ФІТОФТОРОЗУ */}
-            {sprayData.length > 0 && (
-              <TreatmentTable
-                data={sprayData}
-                title="Захисні заходи проти Фітофторозу"
-                onCardClick={handleCardClick}
-              />
-            )}
-
-            {/* ТАБЛИЦІ ДЛЯ ІНШИХ ХВОРОБ */}
-            {diseaseCardsGrouped?.map(({ name, entries }) => (
-              entries.length > 0 && (
-                <TreatmentTable
-                  key={name}
-                  data={entries}
-                  title={`Захисні заходи проти ${name}`}
-                  onCardClick={handleCardClick}
-                />
-              )
-            ))}
-
-            <div className="action-buttons">
-              <button
-                className="scroll-top-button"
-                onClick={() => topRef.current?.scrollIntoView({ behavior: "smooth" })}
-              >
-                ↑ Вгору
-              </button>
-            </div>
-          </>
+  <>
+    <IntegratedTableView data={integratedSystem} />
+    <div className="action-buttons">
+      <button onClick={exportToExcel} className="action-button">
+        Експорт в Excel
+      </button>
+      <PDFExporter data={integratedSystem} />
+    </div>
+  </>
+) : (
+  <>
+    {sprayData.length === 0 && 
+     (!diseaseCardsGrouped || diseaseCardsGrouped.every(g => g.entries.length === 0)) ? (
+      <div className="no-treatments-message">
+        <p>💡 Внесення фунгіцидів не рекомендовано.</p>
+      </div>
+    ) : (
+      <>
+        {/* ТАБЛИЦЯ ДЛЯ ФІТОФТОРОЗУ */}
+        {sprayData.length > 0 && (
+          <TreatmentTable
+            data={sprayData}
+            title="Захисні заходи проти Фітофторозу"
+            onCardClick={handleCardClick}
+          />
         )}
+
+        {/* ТАБЛИЦІ ДЛЯ ІНШИХ ХВОРОБ */}
+        {diseaseCardsGrouped?.map(({ name, entries }) => (
+          entries.length > 0 && (
+            <TreatmentTable
+              key={name}
+              data={entries}
+              title={`Захисні заходи проти ${name}`}
+              onCardClick={handleCardClick}
+            />
+          )
+        ))}
+      </>
+    )}
+
+    <div className="action-buttons">
+      <button
+        className="scroll-top-button"
+        onClick={() => topRef.current?.scrollIntoView({ behavior: "smooth" })}
+      >
+        ↑ Вгору
+      </button>
+    </div>
+  </>
+)}
+
 
         {/* МОДАЛЬНЕ ВІКНО ДЛЯ КАРТКИ */}
         <CardModal
