@@ -27,14 +27,14 @@
   padding: 24px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   margin: 20px 0;
+  position: relative;
 }
 
-/* Стилі календаря */
+/* Календар */
 .react-calendar {
   width: 100%;
   border: none;
   background: transparent;
-  font-family: inherit;
 }
 
 .react-calendar__navigation {
@@ -44,7 +44,6 @@
   background: #f8f9fa;
   border-radius: 12px;
   padding: 0 16px;
-  align-items: center;
 }
 
 .react-calendar__navigation button {
@@ -61,16 +60,6 @@
 
 .react-calendar__navigation button:hover {
   background: #e9ecef;
-}
-
-.react-calendar__navigation button:disabled {
-  color: #6c757d;
-  background: transparent;
-}
-
-.react-calendar__navigation__label {
-  font-weight: 700;
-  font-size: 16px;
 }
 
 .react-calendar__month-view__weekdays {
@@ -91,7 +80,6 @@
 
 .react-calendar__month-view__weekdays__weekday abbr {
   text-decoration: none;
-  border-bottom: none;
 }
 
 .react-calendar__tile {
@@ -113,27 +101,21 @@
 }
 
 .react-calendar__tile:hover {
-  background: #e3f2fd;
-  border-color: #2196f3;
+  background: #e3f2fd !important;
+  border-color: #2196f3 !important;
   transform: scale(1.05);
-  z-index: 10;
+  z-index: 100;
 }
 
 .react-calendar__tile--active {
   background: #2196f3 !important;
   color: white !important;
-  border-color: #1976d2;
 }
 
 .react-calendar__tile--now {
-  background: #fff3cd;
-  border: 2px solid #ffc107;
-  color: #856404;
-}
-
-.react-calendar__tile.today {
-  background: #fff3cd;
-  border-color: #ffc107;
+  background: #fff3cd !important;
+  border: 2px solid #ffc107 !important;
+  color: #856404 !important;
 }
 
 /* Індикатори подій */
@@ -146,11 +128,10 @@
 }
 
 .event-dot {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  border: 2px solid white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border: 1px solid white;
 }
 
 .event-dot.spray {
@@ -165,36 +146,35 @@
   background: #17a2b8;
 }
 
-/* Підсвічування днів з подіями */
-.react-calendar__tile.has-event {
-  background-color: #f8f9fa;
-  font-weight: 600;
-}
-
-.react-calendar__tile.has-event:hover {
-  background-color: #e9ecef;
-  z-index: 20;
-}
-
-/* Простий тултіп */
-.simple-tooltip {
+/* ТУЛТІП - Головне виправлення */
+.calendar-tooltip {
   position: fixed;
-  z-index: 10000;
+  z-index: 9999;
   pointer-events: none;
   background: rgba(0, 0, 0, 0.95);
   color: white;
   padding: 12px 16px;
   border-radius: 8px;
   font-size: 14px;
-  line-height: 1.5;
-  white-space: pre-line;
+  line-height: 1.4;
+  white-space: pre;
   max-width: 280px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.1);
   transform: translateX(-50%) translateY(-100%);
 }
 
-.simple-tooltip .tooltip-arrow {
+.tooltip-content {
+  position: relative;
+  z-index: 2;
+}
+
+.tooltip-line {
+  margin: 3px 0;
+  display: block;
+}
+
+.tooltip-arrow {
   position: absolute;
   bottom: -6px;
   left: 50%;
@@ -206,7 +186,7 @@
   border-top: 6px solid rgba(0, 0, 0, 0.95);
 }
 
-/* Instagram посилання */
+/* Instagram */
 .instagram-container {
   text-align: center;
   margin-top: 32px;
@@ -246,35 +226,23 @@
     font-size: 12px;
   }
   
-  .event-dot {
-    width: 8px;
-    height: 8px;
-  }
-  
-  .simple-tooltip {
+  .calendar-tooltip {
     font-size: 12px;
     padding: 10px 12px;
     max-width: 240px;
   }
 }
 
-/* Додаткові поліпшення */
-.react-calendar__month-view__days__day--weekend {
-  color: #dc3545;
+/* Забезпечуємо правильний z-index */
+.react-calendar__tile {
+  position: relative;
+  z-index: 1;
 }
 
-.react-calendar__month-view__days__day--neighboringMonth {
-  color: #adb5bd;
+.react-calendar__tile:hover {
+  z-index: 100;
 }
 
-.react-calendar__tile:disabled {
-  background-color: #f8f9fa;
-  color: #adb5bd;
-  cursor: not-allowed;
-}
-
-.react-calendar__tile:disabled:hover {
-  background-color: #f8f9fa;
-  transform: none;
-  border-color: transparent;
+.calendar-tooltip {
+  z-index: 10000;
 }
