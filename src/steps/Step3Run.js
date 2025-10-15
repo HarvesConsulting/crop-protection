@@ -188,13 +188,13 @@ export default function Step3Run({
           
           {/* Заголовок */}
           <h2 className="text-xl sm:text-2xl font-bold text-gray-800 leading-tight">
-            Крок 3: Розрахунок <span role="img" aria-label="lab">🧪</span>
+            Крок 3: Розрахунок <span role="img" aria-label="lab"></span>
           </h2>
           
           {/* Обране користувачем */}  
           <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-3">
             <div className="flex items-center gap-2">
-              <span className="text-lg">🏙️</span>
+              <span className="text-lg"></span>
               <div>
                 <div className="text-xs text-gray-600 font-medium">Обране місто</div>
                 <div className="text-sm font-semibold text-gray-800">
@@ -204,7 +204,7 @@ export default function Step3Run({
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-lg">📅</span>
+              <span className="text-lg"></span>
               <div>
                 <div className="text-xs text-gray-600 font-medium">Період розрахунку</div>
                 <div className="text-sm font-semibold text-gray-800">
@@ -214,7 +214,7 @@ export default function Step3Run({
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-lg">🦠</span>
+              <span className="text-lg"></span>
               <div>
                 <div className="text-xs text-gray-600 font-medium">Обрані хвороби</div>
                 <div className="text-sm font-semibold text-gray-800">
