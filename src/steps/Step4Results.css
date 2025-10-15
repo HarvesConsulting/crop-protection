@@ -7,23 +7,289 @@
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* === МЕДІА-ЗАПИТИ ДЛЯ МОБІЛЬНИХ === */
+h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  color: #2c3e50;
+}
+
+.description {
+  font-size: 15px;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+.period-box {
+  background: #eef5ff;
+  border-left: 4px solid #2d6cdf;
+  padding: 10px 16px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 15px;
+  color: #333;
+}
+
+/* === КНОПКИ === */
+.toggle-button,
+.restart-button {
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  margin: 12px 0;
+  border: 1px solid #2d6cdf;
+  background-color: #fff;
+  color: #2d6cdf;
+  transition: all 0.3s ease;
+}
+
+.toggle-button:hover,
+.restart-button:hover {
+  background-color: #2d6cdf;
+  color: #fff;
+  transform: scale(1.02);
+}
+
+/* === СЕКЦІЯ КАРТОК === */
+.card-section {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.card-section h3 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  color: #2c3e50;
+}
+
+.card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 14px;
+  width: 100%;
+  max-width: 100%;
+  background-color: #fdfdfd;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+}
+
+.card-index {
+  font-size: 13px;
+  font-weight: bold;
+  color: #2d6cdf;
+  margin-bottom: 6px;
+}
+
+.card-row {
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.card-row strong {
+  color: #333;
+}
+
+/* === FLIP-КАРТКИ === */
+.flip-card {
+  perspective: 1000px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 12px 0;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+  min-height: 240px; /* встанови мінімальну однакову висоту */
+}
+
+.flip-card.flipped .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  box-sizing: border-box;
+}
+
+.flip-card-front {
+  background-color: #eafaf1;
+  border: 2px solid #28a745;
+  z-index: 2;
+  transform: rotateY(0deg);
+}
+
+.flip-card-back {
+  background-color: #28a745;
+  color: white;
+  transform: rotateY(180deg);
+  z-index: 1;
+}
+
+/* КОЛЬОРИ КАРТОК */
+.card-green .flip-card-front {
+  background-color: #eafaf1;
+  border: 2px solid #28a745;
+}
+
+.card-green .flip-card-back {
+  background-color: #28a745;
+}
+
+.card-yellow .flip-card-front {
+  background-color: #fff9e6;
+  border: 2px solid #ffc107;
+}
+
+.card-yellow .flip-card-back {
+  background-color: #ffc107;
+}
+
+.card-red .flip-card-front {
+  background-color: #fdecea;
+  border: 2px solid #dc3545;
+}
+
+.card-red .flip-card-back {
+  background-color: #dc3545;
+}
+
+/* СХОВАНИЙ КОНТЕНТ НА ЗАДНІЙ СТОРІНЦІ */
+.flip-card-back .timeline-wrapper,
+.flip-card-back .hour-segment,
+.flip-card-back .hour-details-tooltip {
+  display: none !important;
+}
+
+/* === ДІЇ === */
+.top-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.btn-action {
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-action.restart {
+  background-color: #e0f4ff;
+  color: #005ea3;
+  border: 1px solid #007acc;
+}
+
+.btn-action.info {
+  background-color: #f1f1f1;
+  color: #333;
+  border: 1px solid #aaa;
+}
+
+.btn-action.system {
+  background-color: #ffe8e1;
+  color: #b13a00;
+  border: 1px solid #f07800;
+}
+
+.btn-action:hover {
+  transform: scale(1.03);
+  opacity: 0.9;
+}
+
+/* === МЕНЮ === */
+.menu-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.menu-toggle {
+  background-color: #007acc;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.menu-toggle:hover {
+  background-color: #005fa3;
+}
+
+.menu-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #ffffff;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border-radius: 6px;
+  margin-top: 6px;
+  z-index: 10;
+  min-width: 260px;
+}
+
+.menu-item {
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  border-bottom: 1px solid #eee;
+  transition: background 0.2s;
+}
+
+.menu-item:hover {
+  background-color: #f0f0f0;
+}
+
+/* === МЕДІА === */
 @media (max-width: 768px) {
   html, body {
     overflow-x: hidden;
-    width: 100%;
-    height: 100%;
   }
 
-  .container {
-    padding: 12px 8px !important;
-    margin: 0 !important;
-    width: 100vw !important;
-    max-width: 100vw !important;
-    min-height: 100vh;
-    box-sizing: border-box;
-  }
-
+  .container,
   .card-section,
   .main-container,
   .glass-container {
@@ -32,7 +298,6 @@
     margin-left: 0 !important;
     margin-right: 0 !important;
     overflow-x: hidden !important;
-    width: 100% !important;
   }
 
   .card,
@@ -41,8 +306,7 @@
     max-width: 100% !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
-    margin: 8px 0 !important;
-    box-sizing: border-box;
+    margin: 12px 0 !important;
   }
 
   .flip-card-inner {
@@ -52,55 +316,18 @@
   .flip-card-front,
   .flip-card-back {
     padding: 12px !important;
-    width: 100% !important;
-  }
-
-  /* Додаткові покращення для мобільних */
-  h2 {
-    font-size: 20px;
-    margin-bottom: 12px;
-  }
-
-  .description {
-    font-size: 14px;
-    margin-bottom: 16px;
-  }
-
-  .period-box {
-    padding: 8px 12px;
-    font-size: 14px;
-  }
-
-  .top-actions {
-    gap: 8px;
-    margin-bottom: 16px;
-  }
-
-  .btn-action {
-    padding: 8px 12px;
-    font-size: 13px;
   }
 }
-
-/* Ще більш компактний варіант для дуже малих екранів */
-@media (max-width: 480px) {
-  .container {
-    padding: 8px 4px !important;
-  }
-
-  .card {
-    padding: 10px 12px;
-    margin: 6px 0 !important;
-  }
-
-  .flip-card-inner {
-    min-height: 200px; /* зменшуємо висоту для малих екранів */
-  }
-
-  .toggle-button,
-  .restart-button {
-    padding: 8px 14px;
-    font-size: 13px;
-    margin: 8px 0;
-  }
+.scroll-top-button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.scroll-top-button:hover {
+  background-color: #0056b3;
 }
