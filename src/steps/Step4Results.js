@@ -583,7 +583,7 @@ export default function Step4Results({ result, onRestart }) {
             {sprayData.length > 0 && (
               <TreatmentTable
                 data={sprayData}
-                title="🛡️ Захисні заходи проти Фітофторозу"
+                title="Захисні заходи проти Фітофторозу"
                 onCardClick={handleCardClick}
               />
             )}
@@ -594,7 +594,7 @@ export default function Step4Results({ result, onRestart }) {
                 <TreatmentTable
                   key={name}
                   data={entries}
-                  title={`🦠 Захисні заходи проти ${name}`}
+                  title={`Захисні заходи проти ${name}`}
                   onCardClick={handleCardClick}
                 />
               )
