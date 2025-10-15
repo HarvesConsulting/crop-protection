@@ -11,6 +11,7 @@ import ActionMenu from "../components/ActionMenu";
 import PDFExporter from "../components/PDFExporter";
 import { Modal, Box, IconButton, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { parseISO, format, differenceInDays, isValid } from 'date-fns';
 
 const productInfo = {
   "Зорвек Інкантія": "0,5л/га",
@@ -230,10 +231,8 @@ function TreatmentTable({ data, title, onCardClick }) {
   );
 }
 
-// ДОПОМІЖНІ ФУНКЦІЇ (залишаються незмінними)
+// ДОПОМІЖНІ ФУНКЦІЇ
 function getAdvancedTreatments(riskDates, minGap = 7, shortGap = 5) {
-  const { parseISO, isValid, differenceInDays } = require('date-fns');
-  
   const parsedDates = riskDates
     .map((d) =>
       typeof d === "string"
@@ -274,8 +273,6 @@ function getAdvancedTreatments(riskDates, minGap = 7, shortGap = 5) {
 }
 
 function getAccumulatedStats(diagnostics = [], prevDate, currentDate, rainDaily = []) {
-  const { format, parseISO } = require('date-fns');
-  
   const start = typeof prevDate === "string" ? new Date(prevDate) : prevDate;
   const end = typeof currentDate === "string" ? new Date(currentDate) : currentDate;
 
@@ -287,12 +284,14 @@ function getAccumulatedStats(diagnostics = [], prevDate, currentDate, rainDaily 
   const endStr = format(end, "yyyy-MM-dd");
 
   const rainEntries = rainDaily.filter((entry) => {
-    const entryStr = format(new Date(entry.date), "yyyy-MM-dd");
+    const entryDate = new Date(entry.date);
+    const entryStr = format(entryDate, "yyyy-MM-dd");
     return entryStr >= startStr && entryStr <= endStr;
   });
 
   const condEntries = diagnostics.filter((entry) => {
-    const entryStr = format(new Date(entry.date), "yyyy-MM-dd");
+    const entryDate = new Date(entry.date);
+    const entryStr = format(entryDate, "yyyy-MM-dd");
     return entryStr >= startStr && entryStr <= endStr;
   });
 
@@ -362,8 +361,6 @@ export default function Step4Results({ result, onRestart }) {
       plantingDate,
     } = result;
 
-    const { parseISO, format, differenceInDays } = require('date-fns');
-
     // Обчислення sprayData для фітофторозу
     const calculatedSprayData = sprayDates.map((d, i) => {
       const cur = parseISO(d.split(".").reverse().join("-"));
@@ -421,7 +418,7 @@ export default function Step4Results({ result, onRestart }) {
       return { name, entries };
     });
 
-    // Інтегрована система (залишається для функціоналу)
+    // Інтегрована система
     const integratedMap = calculatedSprayData.map((spray) => {
       const dateObj = parseISO(spray.Дата.split(".").reverse().join("-"));
       return {
@@ -513,8 +510,6 @@ export default function Step4Results({ result, onRestart }) {
   };
 
   if (!result) return <p>Дані відсутні</p>;
-
-  const { format } = require('date-fns');
 
   return (
     <main ref={topRef} className="step4-results-container">
