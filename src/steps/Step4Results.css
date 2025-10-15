@@ -1,441 +1,327 @@
-/* === ОСНОВНЕ ОФОРМЛЕННЯ === */
-.container {
+/* СТИЛІ ДЛЯ ТАБЛИЧНОГО ВІДОБРАЖЕННЯ */
+.step4-results-container {
   width: 100%;
-  max-width: 100%;
-  margin: 0;
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 20px;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-h2 {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 16px;
-  color: #2c3e50;
+.results-content {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-.description {
-  font-size: 15px;
-  color: #555;
-  margin-bottom: 20px;
+.results-header {
+  margin-bottom: 24px;
 }
 
-.period-box {
-  background: #eef5ff;
-  border-left: 4px solid #2d6cdf;
-  padding: 10px 16px;
-  border-radius: 6px;
-  margin-bottom: 20px;
-  font-size: 15px;
-  color: #333;
-}
-
-/* === УНІФІКОВАНІ КНОПКИ === */
-.toggle-button,
-.restart-button,
-.btn-action,
-.menu-toggle,
-.scroll-top-button {
-  background-color: #198754;
-  color: white;
-  padding: 10px 18px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  user-select: none;
-  border: none;
-  text-align: center;
-  transition: background 0.25s ease, transform 0.2s ease;
-  font-size: 14px;
-}
-
-.toggle-button:hover,
-.restart-button:hover,
-.btn-action:hover,
-.menu-toggle:hover,
-.scroll-top-button:hover {
-  background-color: #157347;
-  transform: translateY(-1px);
-}
-
-/* Специфічні стилі для різних типів кнопок */
-.btn-action.restart {
-  background-color: #198754;
-}
-
-.btn-action.info {
-  background-color: #6c757d;
-}
-
-.btn-action.info:hover {
-  background-color: #5a6268;
-}
-
-.btn-action.system {
-  background-color: #dc3545;
-}
-
-.btn-action.system:hover {
-  background-color: #c82333;
-}
-
-/* === СЕКЦІЯ КАРТОК === */
-.card-section {
+.results-header h2 {
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 16px;
-  margin-bottom: 32px;
-}
-
-.card-section h3 {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 12px;
-  color: #2c3e50;
-}
-
-.card {
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 14px 18px;
-  margin-bottom: 14px;
-  width: 100%;
-  max-width: 100%;
-  background-color: #fdfdfd;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
-}
-
-.card-index {
-  font-size: 13px;
-  font-weight: bold;
-  color: #2d6cdf;
-  margin-bottom: 6px;
-}
-
-.card-row {
-  font-size: 14px;
-  margin-bottom: 6px;
-}
-
-.card-row strong {
-  color: #333;
-}
-
-/* === FLIP-КАРТКИ === */
-.flip-card {
-  perspective: 1000px;
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  margin: 12px 0;
-}
-
-.flip-card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transform-style: preserve-3d;
-  transition: transform 0.6s;
-  min-height: 240px;
-}
-
-.flip-card.flipped .flip-card-inner {
-  transform: rotateY(180deg);
-}
-
-.flip-card-front,
-.flip-card-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  padding: 8px 10px;
-  border-radius: 8px;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  box-sizing: border-box;
-}
-
-.flip-card-front {
-  background-color: #eafaf1;
-  border: 2px solid #28a745;
-  z-index: 2;
-  transform: rotateY(0deg);
-}
-
-.flip-card-back {
-  background-color: #28a745;
-  color: white;
-  transform: rotateY(180deg);
-  z-index: 1;
-}
-
-/* КОЛЬОРИ КАРТОК */
-.card-green .flip-card-front {
-  background-color: #eafaf1;
-  border: 2px solid #28a745;
-}
-
-.card-green .flip-card-back {
-  background-color: #28a745;
-}
-
-.card-yellow .flip-card-front {
-  background-color: #fff9e6;
-  border: 2px solid #ffc107;
-}
-
-.card-yellow .flip-card-back {
-  background-color: #ffc107;
-}
-
-.card-red .flip-card-front {
-  background-color: #fdecea;
-  border: 2px solid #dc3545;
-}
-
-.card-red .flip-card-back {
-  background-color: #dc3545;
-}
-
-/* СХОВАНИЙ КОНТЕНТ НА ЗАДНІЙ СТОРІНЦІ */
-.flip-card-back .timeline-wrapper,
-.flip-card-back .hour-segment,
-.flip-card-back .hour-details-tooltip {
-  display: none !important;
-}
-
-/* === ДІЇ === */
-.top-actions {
-  display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   gap: 12px;
-  margin-bottom: 20px;
-  align-items: center;
-  justify-content: flex-start;
+  color: #2c3e50;
+  margin-bottom: 16px;
 }
 
-.btn-action {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  text-decoration: none;
-}
-
-/* === МЕНЮ === */
-.menu-wrapper {
-  position: relative;
-  display: inline-block;
-  width: 100%;
-  margin-bottom: 1rem;
-  z-index: 3;
-}
-
-.menu-dropdown {
-  position: absolute;
-  top: 110%;
-  left: 0;
-  min-width: 240px;
-  background-color: #ffffff;
-  border: 1px solid #c3e6cb;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 4;
-  opacity: 0;
-  transform: translateY(-10px);
-  visibility: hidden;
-  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
-  pointer-events: none;
-}
-
-.menu-dropdown.visible {
-  opacity: 1;
-  transform: translateY(0);
-  visibility: visible;
-  pointer-events: auto;
-}
-
-/* ПУНКТИ МЕНЮ */
-.menu-item {
-  width: 100%;
+.info-button {
   background: none;
   border: none;
-  padding: 10px 14px;
-  text-align: left;
-  font-size: 15px;
   cursor: pointer;
-  color: #155724;
-  border-bottom: 1px solid #e2f0e5;
-  transition: background 0.2s ease, color 0.2s ease;
-}
-
-.menu-item:last-child {
-  border-bottom: none;
-}
-
-.menu-item:hover {
-  background-color: #e8f5e9;
-  color: #0b3d16;
-}
-
-/* BACKDROP */
-.menu-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 2;
-  background: transparent;
-}
-
-/* === МЕДІА === */
-@media (max-width: 768px) {
-  html, body {
-    overflow-x: hidden;
-  }
-
-  .container,
-  .card-section,
-  .main-container,
-  .glass-container {
-    padding-left: 4px !important;
-    padding-right: 4px !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    overflow-x: hidden !important;
-  }
-
-  .card,
-  .flip-card {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    margin: 12px 0 !important;
-  }
-
-  .flip-card-inner {
-    width: 100% !important;
-  }
-
-  .flip-card-front,
-  .flip-card-back {
-    padding: 12px !important;
-  }
-
-  .menu-dropdown {
-    width: 100%;
-    border-radius: 8px;
-    margin-top: 8px;
-  }
-
-  .menu-item {
-    text-align: center;
-  }
-
-  .top-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .btn-action {
-    justify-content: center;
-  }
-}
-/* НОВІ СТИЛІ ДЛЯ ЗАГОЛОВКІВ КАРТОК */
-.disease-section-header {
-  background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
-  border: 2px solid #28a745;
-  border-radius: 12px;
-  padding: 16px 20px;
-  margin-bottom: 16px;
-  cursor: pointer;
-  user-select: none;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.15);
-}
-
-.disease-section-header:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.25);
-  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-}
-
-.disease-header-content {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.disease-icon {
-  font-size: 24px;
-  width: 50px;
-  height: 50px;
-  background: white;
-  border-radius: 50%;
+  color: #1976d2;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-.disease-info {
-  flex: 1;
+.info-panel {
+  background: #e3f2fd;
+  border-left: 4px solid #1976d2;
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
-.disease-name {
+/* СТИЛІ ТАБЛИЦІ */
+.treatment-table-section {
+  margin-bottom: 32px;
+}
+
+.table-section-title {
   font-size: 18px;
-  font-weight: 700;
-  color: #155724;
-  margin: 0 0 6px 0;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e9ecef;
 }
 
-.disease-stats {
+.table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.treatment-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  min-width: 800px;
+}
+
+.treatment-table th {
+  background: #f8f9fa;
+  padding: 12px 8px;
+  text-align: left;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 2px solid #dee2e6;
+  white-space: nowrap;
+}
+
+.treatment-table td {
+  padding: 12px 8px;
+  border-bottom: 1px solid #e9ecef;
+  vertical-align: top;
+}
+
+.treatment-table .even-row {
+  background: #f8f9fa;
+}
+
+.treatment-table .odd-row {
+  background: white;
+}
+
+.treatment-table .even-row:hover,
+.treatment-table .odd-row:hover {
+  background: #e3f2fd;
+}
+
+/* СТИЛІ КОМІРОК ТАБЛИЦІ */
+.number-cell {
+  font-weight: 600;
+  color: #495057;
+  text-align: center;
+  width: 60px;
+}
+
+.date-cell {
+  font-weight: 500;
+  color: #1565c0;
+  white-space: nowrap;
+  width: 100px;
+}
+
+.product-cell {
+  font-weight: 500;
+  color: #2e7d32;
+  min-width: 150px;
+}
+
+.norm-cell,
+.unit-cell {
+  text-align: center;
+  white-space: nowrap;
+  width: 80px;
+}
+
+.recommendation-cell {
+  min-width: 120px;
+}
+
+.recommendation-cell a {
+  color: #1976d2;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.recommendation-cell a:hover {
+  text-decoration: underline;
+}
+
+.card-cell {
+  text-align: center;
+  width: 100px;
+}
+
+.card-button {
+  background: #1976d2;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.card-button:hover {
+  background: #1565c0;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.no-data-message {
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+/* СТИЛІ МОДАЛЬНОГО ВІКНА КАРТКИ */
+.card-modal-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  overflow: auto;
+  outline: none;
+}
+
+.card-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 14px;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e9ecef;
+  background: #f8f9fa;
+  border-radius: 12px 12px 0 0;
 }
 
-.treatment-count {
-  background: #28a745;
-  color: white;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-weight: 600;
+.card-modal-content {
+  padding: 24px;
 }
 
-.expand-indicator {
-  color: #155724;
+.card-modal-section {
+  margin-bottom: 24px;
+}
+
+.card-modal-section:last-child {
+  margin-bottom: 0;
+}
+
+.card-modal-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.card-modal-item {
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.weather-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.weather-stat {
+  background: #f8f9fa;
+  padding: 16px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.stat-label {
+  display: block;
+  font-size: 12px;
+  color: #6c757d;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  display: block;
+  font-size: 18px;
   font-weight: 600;
+  color: #1976d2;
+}
+
+/* КОЛЬОРИ ДЛЯ КАРТОК */
+.card-modal-content.card-green {
+  border-left: 4px solid #28a745;
+}
+
+.card-modal-content.card-yellow {
+  border-left: 4px solid #ffc107;
+}
+
+.card-modal-content.card-red {
+  border-left: 4px solid #dc3545;
+}
+
+.action-buttons {
   display: flex;
-  align-items: center;
-  gap: 6px;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.action-button,
+.scroll-top-button {
+  background: #198754;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.action-button:hover,
+.scroll-top-button:hover {
+  background: #157347;
 }
 
 /* АДАПТИВНІСТЬ */
 @media (max-width: 768px) {
-  .disease-header-content {
-    flex-direction: column;
-    text-align: center;
-    gap: 12px;
+  .step4-results-container {
+    padding: 10px;
   }
   
-  .disease-stats {
-    flex-direction: column;
-    gap: 8px;
+  .results-content {
+    padding: 16px;
   }
   
-  .disease-name {
+  .treatment-table {
+    font-size: 12px;
+  }
+  
+  .treatment-table th,
+  .treatment-table td {
+    padding: 8px 4px;
+  }
+  
+  .card-button {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  
+  .weather-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .card-modal-container {
+    width: 95%;
+    max-height: 85vh;
+  }
+  
+  .table-section-title {
     font-size: 16px;
   }
 }
