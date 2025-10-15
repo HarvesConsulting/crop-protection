@@ -1,4 +1,4 @@
-/* СТИЛІ ДЛЯ ТАБЛИЧНОГО ВІДОБРАЖЕННЯ */
+/* ОНОВЛЕНІ СТИЛІ ДЛЯ ЗАГОЛОВКІВ */
 .step4-results-container {
   width: 100%;
   max-width: 1200px;
@@ -14,54 +14,76 @@
 }
 
 .results-header {
-  margin-bottom: 24px;
+  margin-bottom: 2rem;
+  text-align: center;
 }
 
-.results-header h2 {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: #2c3e50;
-  margin-bottom: 16px;
+.step-title {
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+  color: #2c3e50 !important;
+  margin-bottom: 1rem !important;
+  text-align: center !important;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  padding-bottom: 0.5rem !important;
+  border-bottom: 2px solid #e9ecef !important;
 }
 
 .info-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #1976d2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  color: #1976d2 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 4px !important;
+  border-radius: 50% !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.info-button:hover {
+  background-color: #f0f8ff !important;
 }
 
 .info-panel {
-  background: #e3f2fd;
-  border-left: 4px solid #1976d2;
-  padding: 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  line-height: 1.5;
+  background: #e3f2fd !important;
+  border-left: 4px solid #1976d2 !important;
+  padding: 1rem 1.5rem !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  margin-top: 1rem !important;
+  color: #2c3e50 !important;
+  text-align: left !important;
 }
 
 /* СТИЛІ ТАБЛИЦІ */
 .treatment-table-section {
-  margin-bottom: 32px;
+  margin-bottom: 2.5rem;
 }
 
 .table-section-title {
-  font-size: 18px;
+  font-size: 1.25rem;
   font-weight: 600;
   color: #2c3e50;
-  margin-bottom: 16px;
-  padding-bottom: 8px;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
   border-bottom: 2px solid #e9ecef;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .table-container {
   overflow-x: auto;
   border-radius: 8px;
   border: 1px solid #e9ecef;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .treatment-table {
@@ -69,26 +91,31 @@
   border-collapse: collapse;
   font-size: 14px;
   min-width: 800px;
+  background: white;
 }
 
 .treatment-table th {
-  background: #f8f9fa;
-  padding: 12px 8px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 14px 12px;
   text-align: left;
   font-weight: 600;
   color: #495057;
   border-bottom: 2px solid #dee2e6;
   white-space: nowrap;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .treatment-table td {
-  padding: 12px 8px;
+  padding: 14px 12px;
   border-bottom: 1px solid #e9ecef;
   vertical-align: top;
+  transition: background-color 0.2s ease;
 }
 
 .treatment-table .even-row {
-  background: #f8f9fa;
+  background: #fafbfc;
 }
 
 .treatment-table .odd-row {
@@ -98,80 +125,105 @@
 .treatment-table .even-row:hover,
 .treatment-table .odd-row:hover {
   background: #e3f2fd;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 /* СТИЛІ КОМІРОК ТАБЛИЦІ */
 .number-cell {
-  font-weight: 600;
+  font-weight: 700;
   color: #495057;
   text-align: center;
   width: 60px;
+  font-size: 13px;
 }
 
 .date-cell {
-  font-weight: 500;
+  font-weight: 600;
   color: #1565c0;
   white-space: nowrap;
-  width: 100px;
+  width: 110px;
+  font-size: 13px;
 }
 
 .product-cell {
-  font-weight: 500;
+  font-weight: 600;
   color: #2e7d32;
-  min-width: 150px;
+  min-width: 160px;
+  font-size: 13px;
 }
 
 .norm-cell,
 .unit-cell {
   text-align: center;
   white-space: nowrap;
-  width: 80px;
+  width: 90px;
+  font-weight: 500;
+  font-size: 13px;
 }
 
 .recommendation-cell {
-  min-width: 120px;
+  min-width: 130px;
 }
 
 .recommendation-cell a {
   color: #1976d2;
   text-decoration: none;
   font-size: 13px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #f0f8ff;
+  transition: all 0.2s ease;
+  display: inline-block;
 }
 
 .recommendation-cell a:hover {
-  text-decoration: underline;
+  text-decoration: none;
+  background: #1976d2;
+  color: white;
+  transform: translateY(-1px);
 }
 
 .card-cell {
   text-align: center;
-  width: 100px;
+  width: 110px;
 }
 
 .card-button {
-  background: #1976d2;
+  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
   color: white;
   border: none;
-  padding: 6px 12px;
+  padding: 8px 16px;
   border-radius: 6px;
   cursor: pointer;
   font-size: 12px;
-  font-weight: 500;
-  transition: all 0.2s ease;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(25, 118, 210, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .card-button:hover {
-  background: #1565c0;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(25, 118, 210, 0.4);
+}
+
+.card-button:active {
+  transform: translateY(0);
 }
 
 .no-data-message {
   text-align: center;
   color: #6c757d;
   font-style: italic;
-  padding: 20px;
+  padding: 2rem;
   background: #f8f9fa;
   border-radius: 8px;
+  font-size: 14px;
 }
 
 /* ОНОВЛЕНІ СТИЛІ ДЛЯ МОДАЛЬНОГО ВІКНА КАРТКИ */
@@ -184,26 +236,37 @@
   max-width: 500px;
   max-height: 85vh;
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
   overflow: hidden;
   outline: none;
   display: flex;
   flex-direction: column;
+  border: 1px solid #e9ecef;
 }
 
 .card-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid #e9ecef;
-  background: #f8f9fa;
+  padding: 20px 24px;
+  border-bottom: 2px solid #e9ecef;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   flex-shrink: 0;
 }
 
+.card-modal-header h2 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.25rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .card-modal-content {
-  padding: 20px;
+  padding: 24px;
   overflow-y: auto;
   flex: 1;
   overscroll-behavior-x: none;
@@ -227,63 +290,97 @@
 }
 
 .card-modal-section {
-  margin-bottom: 20px;
-  padding: 16px;
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: 1px solid #f0f0f0;
+  transition: all 0.3s ease;
+}
+
+.card-modal-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
 
 .card-modal-section:last-child {
   margin-bottom: 0;
 }
 
+.card-modal-section h4 {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .card-modal-grid {
   display: grid;
-  gap: 12px;
+  gap: 1rem;
 }
 
 .card-modal-item {
-  padding: 8px 0;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f8f9fa;
   font-size: 14px;
-  line-height: 1.4;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .card-modal-item:last-child {
   border-bottom: none;
 }
 
+.card-modal-item strong {
+  color: #495057;
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .weather-stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 8px;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
 .weather-stat {
-  background: #f8f9fa;
-  padding: 12px;
-  border-radius: 8px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 1.25rem;
+  border-radius: 12px;
   text-align: center;
   border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.weather-stat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .stat-label {
   display: block;
   font-size: 12px;
   color: #6c757d;
-  margin-bottom: 4px;
-  font-weight: 500;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .stat-value {
   display: block;
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 1.5rem;
+  font-weight: 800;
 }
 
-/* КОЛЬОРИ ДЛЯ СТАТИСТИКИ В ЗАЛЕЖНОСТІ ВІД КАРТКИ */
+/* КОЛЬОРИ ДЛЯ СТАТИСТИКИ */
 .card-green .stat-value {
   color: #28a745;
 }
@@ -300,12 +397,14 @@
 .risk-status {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
   color: white !important;
-  margin-bottom: 16px !important;
+  margin-bottom: 1.5rem !important;
+  border: none !important;
 }
 
 .risk-status .MuiTypography-subtitle1 {
   color: white !important;
-  font-size: 16px !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
 }
 
 .card-green .risk-status {
@@ -320,101 +419,74 @@
   background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
 }
 
-/* ЗБІЛЬШЕНІ СТИЛІ ДЛЯ ТАЙМЛАЙНУ В МОДАЛЦІ */
-.card-modal-section .timeline-wrapper {
-  font-size: 14px !important;
-}
-
-.card-modal-section .hour-segment {
-  height: 32px !important;
-  font-size: 12px !important;
-  font-weight: 600 !important;
-}
-
-.card-modal-section .hour-label {
-  font-size: 11px !important;
-  font-weight: 600 !important;
-}
-
-.card-modal-section .hour-details-tooltip {
-  font-size: 12px !important;
-  padding: 8px 12px !important;
-}
-
-/* ЗАБОРОНА ПРОКРУТКИ ПО ГОРИЗОНТАЛІ ДЛЯ ТАЙМЛАЙНУ */
-.card-modal-section .timeline-container {
-  overflow-x: auto;
-  overscroll-behavior-x: none;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-x;
-}
-
-/* ДОДАТКОВІ СТИЛІ ДЛЯ КРАЩОГО ВІДОБРАЖЕННЯ */
-.card-modal-header h2 {
-  margin: 0;
-  color: #2c3e50;
-  font-size: 18px;
-}
-
-.card-modal-section h4 {
-  margin: 0 0 12px 0;
-  color: #495057;
-  font-size: 16px;
-  font-weight: 600;
-}
-
+/* КНОПКИ ДІЙ */
 .action-buttons {
   display: flex;
-  gap: 12px;
+  gap: 1rem;
   justify-content: center;
-  margin-top: 24px;
+  margin-top: 2rem;
   flex-wrap: wrap;
 }
 
 .action-button,
 .scroll-top-button {
-  background: #198754;
+  background: linear-gradient(135deg, #198754 0%, #157347 100%);
   color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
+  padding: 12px 24px;
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: 500;
-  transition: background 0.2s ease;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(25, 135, 84, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .action-button:hover,
 .scroll-top-button:hover {
-  background: #157347;
+  background: linear-gradient(135deg, #157347 0%, #0f5132 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(25, 135, 84, 0.4);
 }
 
 /* АДАПТИВНІСТЬ */
 @media (max-width: 768px) {
   .step4-results-container {
-    padding: 10px;
+    padding: 1rem;
   }
   
   .results-content {
-    padding: 16px;
+    padding: 1.25rem;
+    border-radius: 8px;
+  }
+  
+  .step-title {
+    font-size: 1.5rem !important;
+    flex-direction: column;
+    gap: 0.5rem;
   }
   
   .treatment-table {
     font-size: 12px;
+    min-width: 700px;
   }
   
   .treatment-table th,
   .treatment-table td {
-    padding: 8px 4px;
+    padding: 10px 8px;
   }
   
   .card-button {
-    padding: 4px 8px;
+    padding: 6px 12px;
     font-size: 11px;
   }
   
   .weather-stats {
     grid-template-columns: 1fr;
-    gap: 8px;
+    gap: 0.75rem;
   }
   
   .card-modal-container {
@@ -422,72 +494,53 @@
     max-width: 95%;
     max-height: 90vh;
     margin: 0;
+    border-radius: 12px;
   }
   
   .table-section-title {
-    font-size: 16px;
+    font-size: 1.125rem;
   }
   
   .card-modal-content {
-    padding: 16px;
+    padding: 1.25rem;
   }
   
   .card-modal-section {
-    padding: 12px;
-    margin-bottom: 16px;
+    padding: 1rem;
+    margin-bottom: 1.25rem;
   }
   
   .weather-stat {
-    padding: 10px;
+    padding: 1rem;
   }
   
   .stat-value {
-    font-size: 16px;
+    font-size: 1.25rem;
   }
   
-  /* ЩЕ БІЛЬШЕ ЗБІЛЬШУЄМО ТАЙМЛАЙН НА МОБІЛЬНИХ */
-  .card-modal-section .timeline-wrapper {
-    font-size: 16px !important;
+  .action-buttons {
+    gap: 0.75rem;
   }
   
-  .card-modal-section .hour-segment {
-    height: 36px !important;
-    font-size: 13px !important;
+  .action-button,
+  .scroll-top-button {
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .step-title {
+    font-size: 1.25rem !important;
   }
   
-  .card-modal-section .hour-label {
-    font-size: 12px !important;
+  .results-content {
+    padding: 1rem;
   }
   
-  .card-modal-section .hour-details-tooltip {
-    font-size: 14px !important;
-    padding: 10px 14px !important;
-    max-width: 200px;
-    white-space: normal;
-    word-wrap: break-word;
+  .treatment-table-section {
+    margin-bottom: 2rem;
   }
-}
-
-/* ДОДАТКОВІ ПОЛІПШЕННЯ ДЛЯ UI */
-.card-modal-header {
-  border-bottom: 2px solid #e9ecef;
-}
-
-.card-modal-section {
-  transition: transform 0.2s ease;
-}
-
-.card-modal-section:hover {
-  transform: translateY(-1px);
-}
-
-.weather-stat {
-  transition: all 0.2s ease;
-}
-
-.weather-stat:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 /* ПОЛІПШЕННЯ ДЛЯ SCROLLBAR */
@@ -496,7 +549,7 @@
 }
 
 .card-modal-content::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #f8f9fa;
   border-radius: 3px;
 }
 

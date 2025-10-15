@@ -528,18 +528,9 @@ export default function Step4Results({ result, onRestart }) {
   return (
     <main ref={topRef} className="step4-results-container">
       <div className="results-content">
-        <ActionMenu
-          isMobile={isMobile}
-          onRestart={onRestart}
-          onShowWeather={() => setWeatherModalOpen(true)}
-          onToggleIntegrated={() => setShowIntegratedModal(true)}
-          showIntegrated={showIntegrated}
-          onGoToCards={() => setShowIntegrated(false)}
-          onShowSummary={() => setSummaryModalOpen(true)}
-        />
-
+        {/* Заголовок тепер вище меню дій */}
         <div className="results-header">
-          <h2>
+          <h2 className="step-title">
             Крок 4: Результати
             <button
               className="info-button"
@@ -564,6 +555,17 @@ export default function Step4Results({ result, onRestart }) {
             </div>
           )}
         </div>
+
+        {/* Меню дій тепер під заголовком */}
+        <ActionMenu
+          isMobile={isMobile}
+          onRestart={onRestart}
+          onShowWeather={() => setWeatherModalOpen(true)}
+          onToggleIntegrated={() => setShowIntegratedModal(true)}
+          showIntegrated={showIntegrated}
+          onGoToCards={() => setShowIntegrated(false)}
+          onShowSummary={() => setSummaryModalOpen(true)}
+        />
 
         {showIntegrated ? (
           <>
