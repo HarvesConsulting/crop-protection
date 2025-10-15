@@ -240,25 +240,7 @@ export default function Step3Run({
               </div>
             </div>
           </div>
-
-          {/* Інформація про процес */}
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-            <div className="flex items-start gap-3">
-              <span className="text-lg mt-0.5">💡</span>
-              <div>
-                <div className="font-semibold text-blue-800 text-sm mb-1">
-                  Що буде зроблено:
-                </div>
-                <ul className="text-xs text-blue-700 space-y-1 list-disc list-inside">
-                  <li>Аналіз погодних даних за обраний період</li>
-                  <li>Розрахунок ризиків для обраних хвороб</li>
-                  <li>Формування графіку обробок</li>
-                  <li>Визначення оптимального часу для обприскування</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
+         
           {/* Повідомлення про помилку */}
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-xl p-4">

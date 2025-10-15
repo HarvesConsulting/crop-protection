@@ -205,13 +205,8 @@ export default function Step2Season({
                     </button>
                   </div>
                 </div>
-              </div>
+              </div>             
               
-              {plantingDate && calculationPeriod && parseInt(calculationPeriod) > 0 && (
-                <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-xl">
-                  
-                </div>
-              )}
             </div>
           </div>
 
