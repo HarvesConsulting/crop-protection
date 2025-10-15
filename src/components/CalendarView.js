@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import "./CalendarView.css"; // Додай стилі нижче
+import "./CalendarView.css";
 
 export default function CalendarView({ events = [] }) {
   const [selectedDate, setSelectedDate] = useState(null);
@@ -22,54 +22,142 @@ export default function CalendarView({ events = [] }) {
     );
   };
 
+  const getEventTypeCount = (type) => {
+    return events.filter(event => event.type === type).length;
+  };
+
+  const tileContent = ({ date, view }) => {
+    if (view === "month") {
+      const dayEvents = getEventsForDate(date);
+      
+      if (dayEvents.length > 0) {
+        const eventTypes = [...new Set(dayEvents.map(event => event.type))];
+        
+        return (
+          <div className="event-indicator">
+            {eventTypes.map(type => (
+              <div 
+                key={type} 
+                className={`event-dot ${type}`}
+                title={`${type}: ${dayEvents.filter(e => e.type === type).length} подій`}
+              />
+            ))}
+            {dayEvents.length > 1 && (
+              <div className="event-count" title={`${dayEvents.length} подій`}>
+                {dayEvents.length}
+              </div>
+            )}
+          </div>
+        );
+      }
+    }
+    return null;
+  };
+
+  const tileClassName = ({ date, view }) => {
+    if (view === "month") {
+      const classes = [];
+      const hasEvent = events.some(
+        (event) =>
+          normalizeDate(event.date)?.toDateString() === date.toDateString()
+      );
+      
+      if (hasEvent) classes.push("highlight");
+      if (date.toDateString() === new Date().toDateString()) classes.push("react-calendar__tile--now");
+      
+      return classes.join(" ");
+    }
+    return null;
+  };
+
+  const formatEvents = (events) => {
+    return events.map(event => ({
+      ...event,
+      type: event.type || 'info'
+    }));
+  };
+
+  const formattedEvents = formatEvents(events);
+
   return (
-    <div style={{ marginTop: 40 }}>
-      <h2>📅 Календар обробок</h2>
-      <p className="text-sm text-gray-600">
-        Натисніть на дату, щоб побачити призначені обробки.
+    <div className="calendar-wrapper">
+      <h2 style={{ textAlign: 'center', marginBottom: '8px', color: '#2c3e50' }}>
+        📅 Календар обробок
+      </h2>
+      <p className="text-sm text-gray-600" style={{ textAlign: 'center', marginBottom: '24px' }}>
+        Натисніть на дату, щоб побачити призначені обробки та ризики
       </p>
 
+      {/* Статистика */}
+      <div className="calendar-stats">
+        <div className="stat-card">
+          <div className="stat-number">{formattedEvents.length}</div>
+          <div className="stat-label">Всього подій</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-number">{getEventTypeCount('spray')}</div>
+          <div className="stat-label">Обробки</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-number">{getEventTypeCount('risk')}</div>
+          <div className="stat-label">Ризики</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-number">{getEventTypeCount('info')}</div>
+          <div className="stat-label">Інфо</div>
+        </div>
+      </div>
+
+      {/* Календар */}
       <div className="calendar-container">
         <Calendar
           onClickDay={setSelectedDate}
-          tileClassName={({ date, view }) => {
-            if (view === "month") {
-              const hasEvent = events.some(
-                (event) =>
-                  normalizeDate(event.date)?.toDateString() ===
-                  date.toDateString()
-              );
-              return hasEvent ? "highlight" : null;
-            }
-          }}
+          tileContent={tileContent}
+          tileClassName={tileClassName}
+          locale="uk-UA"
+          showNeighboringMonth={false}
         />
       </div>
 
+      {/* Деталі вибраної дати */}
       {selectedDate && (
         <div className="event-list">
-          <h3>Обробки на {selectedDate.toLocaleDateString("uk-UA")}:</h3>
+          <h3>Події на {selectedDate.toLocaleDateString("uk-UA")}:</h3>
           {getEventsForDate(selectedDate).length > 0 ? (
             getEventsForDate(selectedDate).map((event, index) => (
               <div key={index} className="event-card">
-                <strong>{event.title}</strong>
-                <p>{event.description}</p>
+                <div className="event-header">
+                  <div className="event-title">{event.title}</div>
+                  <div className={`event-type ${event.type || 'info'}`}>
+                    {event.type === 'spray' ? 'Обробка' : 
+                     event.type === 'risk' ? 'Ризик' : 'Інфо'}
+                  </div>
+                </div>
+                <p className="event-description">{event.description}</p>
+                {event.time && (
+                  <div style={{ fontSize: '12px', color: '#6c757d', marginTop: '4px' }}>
+                    ⏰ {event.time}
+                  </div>
+                )}
               </div>
             ))
           ) : (
-            <p>Немає запланованих обробок</p>
+            <div className="no-events">
+              Немає запланованих подій на цей день
+            </div>
           )}
         </div>
       )}
 
-      {/* ✨ Патріотичне повідомлення + Instagram */}
-      <div style={{ marginTop: 40, textAlign: "center" }}>
-                <a
+      {/* Instagram посилання */}
+      <div style={{ textAlign: 'center', marginTop: '32px' }}>
+        <a
           href="https://www.instagram.com/harvest.consulting/"
           target="_blank"
-          rel="noreferrer"
-          style={{ color: "#007bff", textDecoration: "underline" }}
+          rel="noopener noreferrer"
+          className="instagram-link"
         >
-          Harvest Consulting в Instagram
+          <span>📱 Harvest Consulting в Instagram</span>
         </a>
       </div>
     </div>
