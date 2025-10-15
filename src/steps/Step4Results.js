@@ -1,17 +1,15 @@
 import { format, parseISO, differenceInDays, isValid } from "date-fns";
 import ModalWithSummary from "../components/ModalWithSummary";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Step4Results.css";
 import * as XLSX from "xlsx";
 import HourTimeline from "../components/HourTimeline";
-import Layout from "../components/Layout";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import WeatherPeriodView from "../components/WeatherPeriodView";
 import ModalWithWeather from "../components/ModalWithWeather";
 import { extractSuitableSprayHours } from "../engine";
 import IntegratedTableView from "../components/IntegratedTableView";
 import ActionMenu from "../components/ActionMenu";
-import PDFExporter from "../components/PDFExporter"; // ✅ Один раз імпортовано
+import PDFExporter from "../components/PDFExporter";
 
 const productInfo = {
   "Зорвек Інкантія": "0,5л/га",
@@ -164,15 +162,6 @@ function getAdvancedTreatments(riskDates, minGap = 7, shortGap = 5) {
   return selected;
 }
 
-const parseDotDate = (str) => {
-  if (!str || typeof str !== "string") return null;
-  const [day, month, year] = str.split(".");
-  if (!day || !month || !year) return null;
-  const isoStr = `${year}-${month}-${day}`;
-  const date = parseISO(isoStr);
-  return isValid(date) ? date : null;
-};
-
 export function getAccumulatedStats(
   diagnostics = [],
   prevDate,
@@ -182,12 +171,7 @@ export function getAccumulatedStats(
   const start = typeof prevDate === "string" ? new Date(prevDate) : prevDate;
   const end = typeof currentDate === "string" ? new Date(currentDate) : currentDate;
 
-  console.log("🔍 getAccumulatedStats()");
-  console.log("⏱️ prevDate:", prevDate, "→", start);
-  console.log("⏱️ currentDate:", currentDate, "→", end);
-
   if (!start || !end || isNaN(start) || isNaN(end)) {
-    console.warn("❗ Невалідна дата:", { start, end });
     return { rain: 0, condHours: 0 };
   }
 
@@ -204,9 +188,6 @@ export function getAccumulatedStats(
     return entryStr >= startStr && entryStr <= endStr;
   });
 
-  console.log("🌧️ Враховано опадів:", rainEntries.length);
-  console.log("⏳ Враховано годин:", condEntries.length);
-
   const rainSum = rainEntries.reduce((sum, entry) => {
     let value = Number(entry.rain ?? entry.precip ?? entry.opad);
     if (!isFinite(value) || value < 0) value = 0;
@@ -217,10 +198,6 @@ export function getAccumulatedStats(
     const h = Number(entry.condHours ?? entry.cond_hours ?? entry.hours);
     return sum + (isNaN(h) ? 0 : h);
   }, 0);
-
-  console.log("✅ Підсумок за період:");
-  console.log("☔ Опади:", rainSum.toFixed(1), "мм");
-  console.log("🕒 Години:", hoursSum);
 
   return {
     rain: rainSum,
@@ -338,86 +315,231 @@ function CardView({ title, entries, diagnostics = [], plantingDate, rainDaily = 
   );
 }
 
-function aggregateDailyRain(hourlyData = []) {
-  const dailyMap = {};
-
-  hourlyData.forEach((entry) => {
-    const date = entry.date;
-    const rainValue = Number(entry.rain ?? entry.precip ?? entry.opad);
-
-    if (!date || isNaN(rainValue)) return;
-
-    if (!dailyMap[date]) {
-      dailyMap[date] = 0;
-    }
-
-    dailyMap[date] += rainValue;
-  });
-
-  return Object.entries(dailyMap).map(([date, totalRain]) => ({
-    date,
-    rain: totalRain,
-  }));
-}
-
 export default function Step4Results({ result, onRestart }) {
+  // Всі хуки на початку
   const [showIntegrated, setShowIntegrated] = useState(false);
   const [showIntegratedModal, setShowIntegratedModal] = useState(false);
   const topRef = React.useRef(null);
-  const [showMenu, setShowMenu] = useState(false);
-  const [showWeather, setShowWeather] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
-
-  const [expandedDiseases, setExpandedDiseases] = useState({
-    "Фітофтороз": true,
-  });
-
+  const [expandedDiseases, setExpandedDiseases] = useState({});
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [summaryModalOpen, setSummaryModalOpen] = useState(false);
+  const [weatherModalOpen, setWeatherModalOpen] = useState(false);
 
-  React.useEffect(() => {
+  // Стани для обчислених даних
+  const [sprayData, setSprayData] = useState([]);
+  const [diseaseCardsGrouped, setDiseaseCardsGrouped] = useState([]);
+  const [integratedSystem, setIntegratedSystem] = useState([]);
+  const [enrichedHourlyData, setEnrichedHourlyData] = useState([]);
+
+  // useEffect для resize
+  useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const [summaryModalOpen, setSummaryModalOpen] = useState(false);
-  const [weatherModalOpen, setWeatherModalOpen] = useState(false);
+  // Основний useEffect для обчислення всіх даних
+  useEffect(() => {
+    if (!result) return;
+
+    const {
+      sprayDates,
+      diseaseSummary,
+      suitableHours = {},
+      diagnostics = [],
+      rainDaily = [],
+      hourlyData = [],
+      plantingDate,
+    } = result;
+
+    const aggregatedRain = rainDaily;
+    
+    // Обчислення sprayData
+    const calculatedSprayData = sprayDates.map((d, i) => {
+      const cur = parseISO(d.split(".").reverse().join("-"));
+      const prev =
+        i > 0
+          ? parseISO(sprayDates[i - 1].split(".").reverse().join("-"))
+          : plantingDate;
+
+      const gap = prev
+        ? `${differenceInDays(cur, prev)} діб після попередньої`
+        : "—";
+
+      const product = rotationProducts[i % rotationProducts.length];
+      const recommendedHours = suitableHours[d] || [];
+
+      const backData = getAccumulatedStats(diagnostics, prev, cur, aggregatedRain);
+
+      return {
+        Дата: d,
+        Препарат: `${product} (${productInfo[product] || "—"})`,
+        Рекомендація: productLinks[product] ? (
+          <a href={productLinks[product]} target="_blank" rel="noreferrer">
+            Перейти
+          </a>
+        ) : (
+          "—"
+        ),
+        Інтервал: gap,
+        "Рекомендовані години": recommendedHours.length
+          ? recommendedHours.join(", ")
+          : "—",
+        backData,
+      };
+    });
+
+    // Обчислення diseaseCardsGrouped
+    const calculatedDiseaseCardsGrouped = diseaseSummary?.map(({ name, riskDates }) => {
+      const rotation = {
+        "Сіра гниль": rotationGrayMold,
+        "Альтернаріоз": rotationAlternaria,
+        "Бактеріоз": rotationBacteriosis,
+      }[name] || [];
+
+      const treatments = getAdvancedTreatments(riskDates);
+      const entries = treatments.map((item, i) => {
+        const product = rotation[i % rotation.length];
+        const dateStr = format(item.date, "dd.MM.yyyy");
+        const recommendedHours = suitableHours[dateStr] || [];
+
+        const prevDate =
+          i === 0 ? plantingDate : treatments[i - 1].date;
+
+        const backData = getAccumulatedStats(
+          diagnostics,
+          prevDate,
+          item.date,
+          aggregatedRain
+        );
+
+        return {
+          Дата: dateStr,
+          Препарат: `${product} (${productInfo[product] || "—"})`,
+          Рекомендація: productLinks[product] ? (
+            <a href={productLinks[product]} target="_blank" rel="noreferrer">
+              Перейти
+            </a>
+          ) : (
+            "—"
+          ),
+          Інтервал:
+            i === 0
+              ? "—"
+              : `${differenceInDays(item.date, treatments[i - 1].date)} діб після попередньої`,
+          "Рекомендовані години": recommendedHours.length
+            ? recommendedHours.join(", ")
+            : "—",
+          backData,
+        };
+      });
+
+      return { name, entries };
+    });
+
+    // Обчислення integratedSystem
+    const rawEntries = [
+      ...calculatedSprayData,
+      ...(calculatedDiseaseCardsGrouped?.flatMap(({ entries }) => entries) || []),
+    ];
+
+    const mergeThreshold = 3 * 24 * 60 * 60 * 1000;
+
+    const integratedMap = calculatedSprayData.map((spray) => {
+      const dateObj = parseISO(spray.Дата.split(".").reverse().join("-"));
+      return {
+        Дата: spray.Дата,
+        timestamp: dateObj.getTime(),
+        Препарати: [spray.Препарат],
+        Рекомендації: [spray.Рекомендація],
+        diseases: new Set(["Фітофтороз"]),
+        backData: spray.backData,
+      };
+    });
+
+    calculatedDiseaseCardsGrouped?.forEach((group) => {
+      group.entries?.forEach((entry) => {
+        const diseaseDate = parseISO(entry.Дата.split(".").reverse().join("-"));
+        const diseaseTime = diseaseDate.getTime();
+
+        let merged = false;
+
+        for (const record of integratedMap) {
+          const diff = Math.abs(record.timestamp - diseaseTime);
+
+          if (diff <= mergeThreshold) {
+            record.Препарати.push(entry.Препарат);
+            record.Рекомендації.push(entry.Рекомендація);
+            record.diseases.add(group.name);
+            merged = true;
+            break;
+          }
+        }
+
+        if (!merged) {
+          integratedMap.push({
+            Дата: entry.Дата,
+            timestamp: diseaseTime,
+            Препарати: [entry.Препарат],
+            Рекомендації: [entry.Рекомендація],
+            diseases: new Set([group.name]),
+            backData: entry.backData,
+          });
+        }
+      });
+    });
+
+    const calculatedIntegratedSystem = integratedMap
+      .map((entry) => ({
+        Дата: entry.Дата,
+        Препарат: entry.Препарати.join(", "),
+        Рекомендація: entry.Рекомендації,
+        backData: entry.backData,
+        Хвороби: Array.from(entry.diseases).join(", "),
+      }))
+      .sort((a, b) => {
+        const dA = parseISO(a.Дата.split(".").reverse().join("-"));
+        const dB = parseISO(b.Дата.split(".").reverse().join("-"));
+        return dA - dB;
+      });
+
+    // Обчислення enrichedHourlyData
+    const suitableMap = extractSuitableSprayHours(hourlyData);
+    const calculatedEnrichedHourlyData = hourlyData.map((entry) => {
+      const dateStr = entry.date.toISOString().split('T')[0];
+      const hourStr = String(entry.hour).padStart(2, "0") + ":00";
+      const suitableEntry = suitableMap[dateStr]?.find((h) => h.hour === hourStr);
+      return {
+        ...entry,
+        suitable: suitableEntry?.suitable === true,
+      };
+    });
+
+    setSprayData(calculatedSprayData);
+    setDiseaseCardsGrouped(calculatedDiseaseCardsGrouped || []);
+    setIntegratedSystem(calculatedIntegratedSystem);
+    setEnrichedHourlyData(calculatedEnrichedHourlyData);
+
+    // Автоматичне управління станом розгортання
+    const newExpandedState = {};
+    
+    if (calculatedSprayData && calculatedSprayData.length > 0) {
+      newExpandedState["Фітофтороз"] = true;
+    } else {
+      newExpandedState["Фітофтороз"] = false;
+    }
+    
+    calculatedDiseaseCardsGrouped?.forEach(({ name, entries }) => {
+      newExpandedState[name] = entries && entries.length > 0;
+    });
+    
+    setExpandedDiseases(newExpandedState);
+  }, [result]);
 
   const handleGoToCards = () => {
     setShowIntegrated(false);
   };
-
-  if (!result) return <p>Дані відсутні</p>;
-
-  const {
-    sprayDates,
-    diseaseSummary,
-    suitableHours = {},
-    diagnostics = [],
-    rainDaily = [],
-    hourlyData = [],
-    plantingDate,
-    harvestDate,
-  } = result;
-
-  const hasPhytophthora = true;
-
-  const isAllExpanded =
-    ["Фітофтороз", ...((diseaseSummary?.map((d) => d.name)) || [])].every(
-      (name) => expandedDiseases[name]
-    );
-
-  const suitableMap = extractSuitableSprayHours(hourlyData);
-
-  const enrichedHourlyData = hourlyData.map((entry) => {
-    const dateStr = entry.date.toISOString().split("T")[0];
-    const hourStr = String(entry.hour).padStart(2, "0") + ":00";
-    const suitableEntry = suitableMap[dateStr]?.find((h) => h.hour === hourStr);
-    return {
-      ...entry,
-      suitable: suitableEntry?.suitable === true,
-    };
-  });
 
   const toggleDisease = (name) => {
     setExpandedDiseases((prev) => ({
@@ -435,173 +557,6 @@ export default function Step4Results({ result, onRestart }) {
     }
     setExpandedDiseases(newState);
   };
-
-  console.log("🔬 Перевірка diagnostics:");
-  console.table(diagnostics.slice(0, 10));
-
-  console.log("🔬 Перевірка rainDaily:");
-  console.table(rainDaily.slice(0, 10));
-
-  const aggregatedRain = rainDaily;
-  const sprayData = sprayDates.map((d, i) => {
-    const cur = parseISO(d.split(".").reverse().join("-"));
-    const prev =
-      i > 0
-        ? parseISO(sprayDates[i - 1].split(".").reverse().join("-"))
-        : plantingDate;
-
-    const gap = prev
-      ? `${differenceInDays(cur, prev)} діб після попередньої`
-      : "—";
-
-    const product = rotationProducts[i % rotationProducts.length];
-    const recommendedHours = suitableHours[d] || [];
-
-    const backData = getAccumulatedStats(diagnostics, prev, cur, aggregatedRain);
-
-    return {
-      Дата: d,
-      Препарат: `${product} (${productInfo[product] || "—"})`,
-      Рекомендація: productLinks[product] ? (
-        <a href={productLinks[product]} target="_blank" rel="noreferrer">
-          Перейти
-        </a>
-      ) : (
-        "—"
-      ),
-      Інтервал: gap,
-      "Рекомендовані години": recommendedHours.length
-        ? recommendedHours.join(", ")
-        : "—",
-      backData,
-    };
-  });
-
-  const diseaseCardsGrouped = diseaseSummary?.map(({ name, riskDates }) => {
-    const rotation = {
-      "Сіра гниль": rotationGrayMold,
-      "Альтернаріоз": rotationAlternaria,
-      "Бактеріоз": rotationBacteriosis,
-    }[name] || [];
-
-    const treatments = getAdvancedTreatments(riskDates);
-    const entries = treatments.map((item, i) => {
-      const product = rotation[i % rotation.length];
-      const dateStr = format(item.date, "dd.MM.yyyy");
-      const recommendedHours = suitableHours[dateStr] || [];
-
-      const prevDate =
-        i === 0 ? plantingDate : treatments[i - 1].date;
-
-      const backData = getAccumulatedStats(
-        diagnostics,
-        prevDate,
-        item.date,
-        aggregatedRain
-      );
-
-      return {
-        Дата: dateStr,
-        Препарат: `${product} (${productInfo[product] || "—"})`,
-        Рекомендація: productLinks[product] ? (
-          <a href={productLinks[product]} target="_blank" rel="noreferrer">
-            Перейти
-          </a>
-        ) : (
-          "—"
-        ),
-        Інтервал:
-          i === 0
-            ? "—"
-            : `${differenceInDays(item.date, treatments[i - 1].date)} діб після попередньої`,
-        "Рекомендовані години": recommendedHours.length
-          ? recommendedHours.join(", ")
-          : "—",
-        backData,
-      };
-    });
-
-    return { name, entries };
-  });
-
-  const rawEntries = [
-    ...sprayData,
-    ...diseaseCardsGrouped.flatMap(({ entries }) => entries),
-  ];
-
-  const groupedByDate = rawEntries.reduce((acc, entry) => {
-    const key = entry.Дата;
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(entry);
-    return acc;
-  }, {});
-
-  let lastDatesByDisease = {
-    "Фітофтороз": plantingDate,
-    "Альтернаріоз": plantingDate,
-    "Сіра гниль": plantingDate,
-    "Бактеріоз": plantingDate,
-  };
-
-  const mergeThreshold = 3 * 24 * 60 * 60 * 1000;
-
-  const integratedMap = sprayData.map((spray) => {
-    const dateObj = parseISO(spray.Дата.split(".").reverse().join("-"));
-    return {
-      Дата: spray.Дата,
-      timestamp: dateObj.getTime(),
-      Препарати: [spray.Препарат],
-      Рекомендації: [spray.Рекомендація],
-      diseases: new Set(["Фітофтороз"]),
-      backData: spray.backData,
-    };
-  });
-
-  for (const group of diseaseCardsGrouped) {
-    for (const entry of group.entries) {
-      const diseaseDate = parseISO(entry.Дата.split(".").reverse().join("-"));
-      const diseaseTime = diseaseDate.getTime();
-
-      let merged = false;
-
-      for (const record of integratedMap) {
-        const diff = Math.abs(record.timestamp - diseaseTime);
-
-        if (diff <= mergeThreshold) {
-          record.Препарати.push(entry.Препарат);
-          record.Рекомендації.push(entry.Рекомендація);
-          record.diseases.add(group.name);
-          merged = true;
-          break;
-        }
-      }
-
-      if (!merged) {
-        integratedMap.push({
-          Дата: entry.Дата,
-          timestamp: diseaseTime,
-          Препарати: [entry.Препарат],
-          Рекомендації: [entry.Рекомендація],
-          diseases: new Set([group.name]),
-          backData: entry.backData,
-        });
-      }
-    }
-  }
-
-  const integratedSystem = integratedMap
-    .map((entry) => ({
-      Дата: entry.Дата,
-      Препарат: entry.Препарати.join(", "),
-      Рекомендація: entry.Рекомендації,
-      backData: entry.backData,
-      Хвороби: Array.from(entry.diseases).join(", "),
-    }))
-    .sort((a, b) => {
-      const dA = parseISO(a.Дата.split(".").reverse().join("-"));
-      const dB = parseISO(b.Дата.split(".").reverse().join("-"));
-      return dA - dB;
-    });
 
   const exportToExcel = () => {
     const exportData = integratedSystem.map((entry) => ({
@@ -635,6 +590,21 @@ export default function Step4Results({ result, onRestart }) {
     XLSX.writeFile(wb, "Інтегрована_таблиця_захисту.xlsx");
   };
 
+  // Умовний рендеринг в кінці
+  if (!result) return <p>Дані відсутні</p>;
+
+  const {
+    diagnostics = [],
+    rainDaily = [],
+    plantingDate,
+    harvestDate,
+  } = result;
+
+  const hasPhytophthora = true;
+  const isAllExpanded = ["Фітофтороз", ...(diseaseCardsGrouped?.map((d) => d.name) || [])].every(
+    (name) => expandedDiseases[name]
+  );
+
   return (
     <main ref={topRef} className="flex justify-center items-start min-h-[70vh] px-4">
       <div className="w-full max-w-xl mx-auto bg-white rounded-xl shadow-md px-6 sm:px-10 py-6 space-y-6 text-base sm:text-lg">
@@ -642,7 +612,7 @@ export default function Step4Results({ result, onRestart }) {
           isMobile={isMobile}
           onRestart={onRestart}
           onShowWeather={() => setWeatherModalOpen(true)}
-          onToggleIntegrated={() => setShowIntegratedModal(true)} // 🆕 Змінити тут
+          onToggleIntegrated={() => setShowIntegratedModal(true)}
           showIntegrated={showIntegrated}
           onGoToCards={handleGoToCards}
           onShowSummary={() => setSummaryModalOpen(true)}
@@ -675,7 +645,8 @@ export default function Step4Results({ result, onRestart }) {
               <strong>{format(new Date(result.harvestDate), "dd.MM.yyyy")}</strong>
             </p>
             <p>
-              Нижче показано рекомендовані дати обробки. Ви можете сформувати інтегровану систему
+              Нижче показано рекомендовані дати обробки. 
+              Ви можете сформувати інтегровану систему
               захисту. Зверніть увагу на колір картки - зелений - низький рівень загрози захворювання (додаткових заходів не потребує), 
               жовтий - середній рівень загрози (потребує включення до бакової суміші додатковоо контактного препарату опційно), 
               червоний - високий рівень загрози (потребує включення до бакової суміші додатково системного препарату опційно).
@@ -692,7 +663,6 @@ export default function Step4Results({ result, onRestart }) {
             </button>
             
             <PDFExporter data={integratedSystem} />
-
           </>
         ) : (
           <>
@@ -714,19 +684,21 @@ export default function Step4Results({ result, onRestart }) {
                   </span>
                 </h3>
 
-                {expandedDiseases["Фітофтороз"] && sprayData.length > 0 ? (
-                  <CardView
-                    entries={sprayData}
-                    title=""
-                    diagnostics={diagnostics}
-                    plantingDate={plantingDate}
-                    rainDaily={aggregatedRain}
-                    hourlyData={enrichedHourlyData}
-                  />
-                ) : !expandedDiseases["Фітофтороз"] ? null : (
-                  <p style={{ color: "#666", fontStyle: "italic", marginLeft: "10px" }}>
-                    Ризиків за обраний період не визначено
-                  </p>
+                {expandedDiseases["Фітофтороз"] && (
+                  sprayData.length > 0 ? (
+                    <CardView
+                      entries={sprayData}
+                      title=""
+                      diagnostics={diagnostics}
+                      plantingDate={plantingDate}
+                      rainDaily={rainDaily}
+                      hourlyData={enrichedHourlyData}
+                    />
+                  ) : (
+                    <p style={{ color: "#666", fontStyle: "italic", marginLeft: "10px" }}>
+                      Ризиків за обраний період не визначено
+                    </p>
+                  )
                 )}
               </div>
             )}
@@ -749,22 +721,25 @@ export default function Step4Results({ result, onRestart }) {
                   </span>
                 </h3>
 
-                {expandedDiseases[name] && entries.length > 0 ? (
-                  <CardView
-                    entries={entries}
-                    title=""
-                    diagnostics={diagnostics}
-                    plantingDate={plantingDate}
-                    rainDaily={aggregatedRain}
-                    hourlyData={enrichedHourlyData}
-                  />
-                ) : !expandedDiseases[name] ? null : (
-                  <p style={{ color: "#666", fontStyle: "italic", marginLeft: "10px" }}>
-                    Ризиків за обраний період не визначено
-                  </p>
+                {expandedDiseases[name] && (
+                  entries.length > 0 ? (
+                    <CardView
+                      entries={entries}
+                      title=""
+                      diagnostics={diagnostics}
+                      plantingDate={plantingDate}
+                      rainDaily={rainDaily}
+                      hourlyData={enrichedHourlyData}
+                    />
+                  ) : (
+                    <p style={{ color: "#666", fontStyle: "italic", marginLeft: "10px" }}>
+                      Ризиків за обраний період не визначено
+                    </p>
+                  )
                 )}
               </div>
             ))}
+            
             <div style={{ display: "flex", gap: "12px", marginTop: "1rem" }}>
               <div style={{ display: "flex", justifyContent: "center", marginTop: "1rem" }}>
                 <button className="toggle-button" onClick={toggleAllCards}>
@@ -778,8 +753,6 @@ export default function Step4Results({ result, onRestart }) {
               onClick={() => {
                 if (topRef.current) {
                   topRef.current.scrollIntoView({ behavior: "smooth" });
-                } else {
-                  console.warn("❗ topRef не знайдено");
                 }
               }}
             >
@@ -796,7 +769,7 @@ export default function Step4Results({ result, onRestart }) {
         endDate={harvestDate}
         lat={result.lat}
         lon={result.lon}
-        hourlyData={hourlyData}
+        hourlyData={result.hourlyData}
       />
       <ModalWithSummary
         open={summaryModalOpen}
@@ -807,12 +780,11 @@ export default function Step4Results({ result, onRestart }) {
         rainDaily={rainDaily}
         integratedTreatments={integratedSystem}
       />
-      {/* 🆕 Додаємо модальне вікно інтегрованої системи */}
       <IntegratedTableView 
         data={integratedSystem} 
         isOpen={showIntegratedModal} 
         onClose={() => setShowIntegratedModal(false)} 
-        />
+      />
     </main>
   );
 }
