@@ -101,6 +101,11 @@ export default function Step2Season({
     }
   };
 
+  // Функція для встановлення максимального періоду
+  const setMaxPeriodToField = () => {
+    setCalculationPeriod(maxPeriod.toString());
+  };
+
   const handleNext = () => {
     if (!plantingDate || !calculationPeriod || parseInt(calculationPeriod) < 1) {
       alert("Будь ласка, оберіть точку відліку та коректний період розрахунку");
@@ -169,9 +174,7 @@ export default function Step2Season({
                 onChange={(e) => setPlantingDate(e.target.value)}
                 className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
-              <p className="text-xs text-gray-600 mt-2 leading-relaxed">
-                Дата висадки або останнього внесення фунгіциду
-              </p>
+              
             </div>
 
             <div>
@@ -189,9 +192,18 @@ export default function Step2Season({
                     onBlur={handleCalculationPeriodBlur}
                     className="w-20 sm:w-24 border border-gray-300 rounded-xl px-4 py-3 text-base text-center focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   />
-                  <span className="text-sm text-gray-700 whitespace-nowrap">
-                    днів (макс.: {maxPeriod})
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-700 whitespace-nowrap">
+                      днів
+                    </span>
+                    <button
+                      onClick={setMaxPeriodToField}
+                      className="bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs font-medium px-2 py-1 rounded-lg border border-blue-300 transition-colors whitespace-nowrap"
+                      title={`Встановити максимальний період (${maxPeriod} днів)`}
+                    >
+                      макс: {maxPeriod}
+                    </button>
+                  </div>
                 </div>
               </div>
               
@@ -222,7 +234,7 @@ export default function Step2Season({
                     : "bg-gray-100 border-gray-300 text-gray-800 hover:bg-gray-200"
                 }`}
               >
-                {isAllSelected ? "✅ Всі хвороби обрані" : "📋 Вибрати всі хвороби"}
+                {isAllSelected ? "✅ Всі хвороби обрані" : "Вибрати всі хвороби"}
               </button>
             </div>
 
@@ -230,7 +242,7 @@ export default function Step2Season({
               {[
                 { id: "lateBlight", name: "Фітофтороз"},
                 { id: "grayMold", name: "Сіра гниль"},
-                { id: "alternaria", name: "Альтернаріоз"},
+                { id: "alternaria", name: "Альтернаріоз" },
                 { id: "bacteriosis", name: "Бактеріоз"},
               ].map((d) => (
                 <label key={d.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
