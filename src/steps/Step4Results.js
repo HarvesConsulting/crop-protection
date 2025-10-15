@@ -666,20 +666,17 @@ export default function Step4Results({ result, onRestart }) {
           </>
         ) : (
           <>
-            // Виправлений код з inline стилями
-{hasPhytophthora && (
+            {hasPhytophthora && (
   <div className="card-section">
     <div 
       style={{
-        background: 'linear-gradient(135deg, #e8f5e8, #c8e6c9)',
+        backgroundColor: '#e8f5e8',
         border: '2px solid #4caf50',
         borderRadius: '12px',
         padding: '16px 20px',
         marginBottom: '16px',
         cursor: 'pointer',
-        userSelect: 'none',
-        transition: 'all 0.3s ease',
-        boxShadow: '0 2px 8px rgba(76, 175, 80, 0.15)'
+        userSelect: 'none'
       }}
       onClick={() => toggleDisease("Фітофтороз")}
     >
@@ -689,7 +686,7 @@ export default function Step4Results({ result, onRestart }) {
           fontWeight: '600',
           color: '#2e7d32'
         }}>
-          🍅 Рекомендовані внесення (проти: Фітофтороз)
+          Рекомендовані внесення (проти: Фітофтороз)
         </div>
         <span style={{
           color: '#2e7d32',
@@ -719,65 +716,55 @@ export default function Step4Results({ result, onRestart }) {
   </div>
 )}
 
-{diseaseCardsGrouped?.map(({ name, entries }) => {
-  const emojiMap = {
-    "Сіра гниль": "🍄",
-    "Альтернаріоз": "🥬", 
-    "Бактеріоз": "🦠"
-  };
-  
-  return (
-    <div key={name} className="card-section">
-      <div 
-        style={{
-          background: 'linear-gradient(135deg, #e8f5e8, #c8e6c9)',
-          border: '2px solid #4caf50',
-          borderRadius: '12px',
-          padding: '16px 20px',
-          marginBottom: '16px',
-          cursor: 'pointer',
-          userSelect: 'none',
-          transition: 'all 0.3s ease',
-          boxShadow: '0 2px 8px rgba(76, 175, 80, 0.15)'
-        }}
-        onClick={() => toggleDisease(name)}
-      >
-        <div className="flex items-center justify-between">
-          <div style={{
-            fontSize: '16px',
-            fontWeight: '600',
-            color: '#2e7d32'
-          }}>
-            {emojiMap[name] || "🦠"} Рекомендовані внесення (проти: {name})
-          </div>
-          <span style={{
-            color: '#2e7d32',
-            fontSize: '18px'
-          }}>
-            {expandedDiseases[name] ? "▲" : "▼"}
-          </span>
+{diseaseCardsGrouped?.map(({ name, entries }) => (
+  <div key={name} className="card-section">
+    <div 
+      style={{
+        backgroundColor: '#e8f5e8',
+        border: '2px solid #4caf50',
+        borderRadius: '12px',
+        padding: '16px 20px',
+        marginBottom: '16px',
+        cursor: 'pointer',
+        userSelect: 'none'
+      }}
+      onClick={() => toggleDisease(name)}
+    >
+      <div className="flex items-center justify-between">
+        <div style={{
+          fontSize: '16px',
+          fontWeight: '600',
+          color: '#2e7d32'
+        }}>
+          Рекомендовані внесення (проти: {name})
         </div>
+        <span style={{
+          color: '#2e7d32',
+          fontSize: '18px'
+        }}>
+          {expandedDiseases[name] ? "▲" : "▼"}
+        </span>
       </div>
-
-      {expandedDiseases[name] && (
-        entries.length > 0 ? (
-          <CardView
-            entries={entries}
-            title=""
-            diagnostics={diagnostics}
-            plantingDate={plantingDate}
-            rainDaily={rainDaily}
-            hourlyData={enrichedHourlyData}
-          />
-        ) : (
-          <p style={{ color: "#666", fontStyle: "italic", marginLeft: "10px" }}>
-            Ризиків за обраний період не визначено
-          </p>
-        )
-      )}
     </div>
-  );
-})}
+
+    {expandedDiseases[name] && (
+      entries.length > 0 ? (
+        <CardView
+          entries={entries}
+          title=""
+          diagnostics={diagnostics}
+          plantingDate={plantingDate}
+          rainDaily={rainDaily}
+          hourlyData={enrichedHourlyData}
+        />
+      ) : (
+        <p style={{ color: "#666", fontStyle: "italic", marginLeft: "10px" }}>
+          Ризиків за обраний період не визначено
+        </p>
+      )
+    )}
+  </div>
+))}
 
             {diseaseCardsGrouped?.map(({ name, entries }) => (
               <div key={name} className="card-section">
