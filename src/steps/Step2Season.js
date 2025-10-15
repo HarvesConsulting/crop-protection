@@ -195,22 +195,24 @@ export default function Step2Season({
               Оберіть хвороби для моделювання:
             </label>
             
-            {/* Кнопка "Вибрати всі" */}
+            {/* Кнопка "Вибрати всі" на всю ширину */}
             <div className="mb-4">
               <button
                 onClick={toggleSelectAll}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all font-medium ${
+                className={`w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg border transition-all font-medium ${
                   isAllSelected
                     ? "bg-green-50 border-green-300 text-green-700 hover:bg-green-100"
                     : "bg-gray-50 border-gray-300 text-gray-700 hover:bg-gray-100"
                 }`}
               >
                 {isAllSelected ? (
-                  <CheckSquare size={18} className="text-green-600" />
+                  <CheckSquare size={20} className="text-green-600" />
                 ) : (
-                  <Square size={18} className="text-gray-500" />
+                  <Square size={20} className="text-gray-500" />
                 )}
-                {isAllSelected ? "Всі обрані" : "Вибрати всі"}
+                <span className="text-base">
+                  {isAllSelected ? "Всі хвороби обрані" : "Вибрати всі хвороби"}
+                </span>
               </button>
             </div>
 
