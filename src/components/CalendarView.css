@@ -3,6 +3,7 @@
   margin: 0 auto;
   padding: 20px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  position: relative;
 }
 
 .calendar-wrapper h2 {
@@ -30,11 +31,12 @@
   position: relative;
 }
 
-/* Календар */
+/* Стилізація основного календаря */
 .react-calendar {
   width: 100%;
   border: none;
   background: transparent;
+  font-family: inherit;
 }
 
 .react-calendar__navigation {
@@ -60,6 +62,17 @@
 
 .react-calendar__navigation button:hover {
   background: #e9ecef;
+  transform: translateY(-1px);
+}
+
+.react-calendar__navigation button:disabled {
+  background: transparent;
+  color: #6c757d;
+}
+
+.react-calendar__navigation__label {
+  font-weight: 700;
+  font-size: 16px;
 }
 
 .react-calendar__month-view__weekdays {
@@ -80,6 +93,7 @@
 
 .react-calendar__month-view__weekdays__weekday abbr {
   text-decoration: none;
+  border-bottom: none;
 }
 
 .react-calendar__tile {
@@ -98,6 +112,7 @@
   align-items: center;
   justify-content: flex-start;
   cursor: pointer;
+  overflow: visible !important;
 }
 
 .react-calendar__tile:hover {
@@ -110,6 +125,7 @@
 .react-calendar__tile--active {
   background: #2196f3 !important;
   color: white !important;
+  border-color: #1976d2;
 }
 
 .react-calendar__tile--now {
@@ -118,10 +134,27 @@
   color: #856404 !important;
 }
 
-/* Індикатори подій */
+.react-calendar__tile.today {
+  background: #fff3cd;
+  border-color: #ffc107;
+}
+
+/* Підсвічування днів з подіями */
+.react-calendar__tile.has-event {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+.react-calendar__tile.has-event:hover {
+  background-color: #e9ecef;
+  z-index: 200;
+}
+
+/* Індикатор подій */
 .event-dots {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 4px;
   margin-top: 6px;
   flex-wrap: wrap;
@@ -132,6 +165,8 @@
   height: 8px;
   border-radius: 50%;
   border: 1px solid white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
 }
 
 .event-dot.spray {
@@ -146,35 +181,48 @@
   background: #17a2b8;
 }
 
-/* ТУЛТІП - Головне виправлення */
-.calendar-tooltip {
-  position: fixed;
-  z-index: 9999;
-  pointer-events: none;
-  background: rgba(0, 0, 0, 0.95);
-  color: white;
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  line-height: 1.4;
-  white-space: pre;
-  max-width: 280px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transform: translateX(-50%) translateY(-100%);
+/* УНІКАЛЬНИЙ ТУЛТІП ДЛЯ КАЛЕНДАРЯ */
+.calendar-tooltip-unique {
+  position: fixed !important;
+  z-index: 10000 !important;
+  pointer-events: none !important;
+  background: rgba(0, 0, 0, 0.95) !important;
+  color: white !important;
+  padding: 12px 16px !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+  white-space: pre !important;
+  max-width: 280px !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(10px) !important;
+  transform: translateX(-50%) translateY(-100%) !important;
+  animation: calendarTooltipFade 0.2s ease-out !important;
 }
 
-.tooltip-content {
+@keyframes calendarTooltipFade {
+  from { 
+    opacity: 0; 
+    transform: translateX(-50%) translateY(-120%) !important; 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(-50%) translateY(-100%) !important; 
+  }
+}
+
+.calendar-tooltip-content {
   position: relative;
-  z-index: 2;
+  z-index: 10001;
 }
 
-.tooltip-line {
-  margin: 3px 0;
+.calendar-tooltip-line {
+  margin: 4px 0;
   display: block;
 }
 
-.tooltip-arrow {
+.calendar-tooltip-arrow {
   position: absolute;
   bottom: -6px;
   left: 50%;
@@ -186,7 +234,7 @@
   border-top: 6px solid rgba(0, 0, 0, 0.95);
 }
 
-/* Instagram */
+/* Instagram посилання */
 .instagram-container {
   text-align: center;
   margin-top: 32px;
@@ -208,6 +256,7 @@
 .instagram-link:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(225, 48, 108, 0.4);
+  color: white;
 }
 
 /* Адаптивність */
@@ -226,23 +275,48 @@
     font-size: 12px;
   }
   
-  .calendar-tooltip {
-    font-size: 12px;
-    padding: 10px 12px;
-    max-width: 240px;
+  .event-dots {
+    gap: 2px;
+  }
+  
+  .event-dot {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .calendar-tooltip-unique {
+    font-size: 12px !important;
+    padding: 10px 12px !important;
+    max-width: 240px !important;
   }
 }
 
-/* Забезпечуємо правильний z-index */
+/* Додаткові покращення */
+.react-calendar__month-view__days__day--weekend {
+  color: #dc3545;
+}
+
+.react-calendar__month-view__days__day--neighboringMonth {
+  color: #adb5bd;
+}
+
+.react-calendar__tile:disabled {
+  background-color: #f8f9fa;
+  color: #adb5bd;
+  cursor: not-allowed;
+}
+
+.react-calendar__tile:disabled:hover {
+  background-color: #f8f9fa;
+  transform: none;
+  border-color: transparent;
+}
+
+/* Забезпечення правильного z-index */
 .react-calendar__tile {
-  position: relative;
   z-index: 1;
 }
 
 .react-calendar__tile:hover {
-  z-index: 100;
-}
-
-.calendar-tooltip {
-  z-index: 10000;
+  z-index: 1000;
 }

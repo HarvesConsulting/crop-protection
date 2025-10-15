@@ -14,23 +14,43 @@ export default function CalendarView({ events = [], startDate, endDate }) {
   });
 
   useEffect(() => {
+    console.log('Calendar events:', events);
     if (startDate) {
       const start = new Date(startDate);
       setActiveStartDate(start);
     } else {
       setActiveStartDate(new Date());
     }
-  }, [startDate]);
+  }, [startDate, events]);
 
-  // Простий тултіп
+  const normalizeDate = (input) => {
+    if (input instanceof Date) return input;
+    if (typeof input === "string") {
+      if (input.includes(".")) {
+        const [day, month, year] = input.split(".");
+        return new Date(`${year}-${month}-${day}`);
+      }
+      return new Date(input);
+    }
+    return null;
+  };
+
+  const getEventsForDate = (date) => {
+    return events.filter(
+      (event) =>
+        normalizeDate(event.date)?.toDateString() === date.toDateString()
+    );
+  };
+
   const handleDayMouseEnter = (event, date) => {
-    const dayEvents = events.filter(ev => {
-      const eventDate = new Date(ev.date);
-      return eventDate.toDateString() === date.toDateString();
-    });
+    console.log('Mouse enter on date:', date);
+    const dayEvents = getEventsForDate(date);
+    console.log('Day events:', dayEvents);
 
     if (dayEvents.length > 0) {
       const rect = event.currentTarget.getBoundingClientRect();
+      console.log('Rectangle position:', rect);
+      
       const content = dayEvents.map(ev => `• ${ev.title}`).join('\n');
       
       setTooltip({
@@ -43,18 +63,14 @@ export default function CalendarView({ events = [], startDate, endDate }) {
   };
 
   const handleDayMouseLeave = () => {
+    console.log('Mouse leave');
     setTooltip({ visible: false, content: "", x: 0, y: 0 });
   };
 
-  // Кастомний рендер дня
-  const renderTileContent = ({ date, view }) => {
+  const tileContent = ({ date, view }) => {
     if (view !== "month") return null;
 
-    const dayEvents = events.filter(ev => {
-      const eventDate = new Date(ev.date);
-      return eventDate.toDateString() === date.toDateString();
-    });
-
+    const dayEvents = getEventsForDate(date);
     if (dayEvents.length === 0) return null;
 
     return (
@@ -69,21 +85,26 @@ export default function CalendarView({ events = [], startDate, endDate }) {
     );
   };
 
-  // Кастомний рендер дня з обробниками подій
-  const renderDay = (props) => {
-    const { date } = props;
-    
-    return (
-      <div 
-        {...props}
-        onMouseEnter={(e) => handleDayMouseEnter(e, date)}
-        onMouseLeave={handleDayMouseLeave}
-        className={`react-calendar__tile ${props.className || ''}`}
-      >
-        {date.getDate()}
-        {renderTileContent({ date, view: "month" })}
-      </div>
-    );
+  const tileClassName = ({ date, view }) => {
+    const classes = [];
+    if (view === "month") {
+      const hasEvent = getEventsForDate(date).length > 0;
+      if (hasEvent) classes.push("has-event");
+      if (date.toDateString() === new Date().toDateString()) classes.push("today");
+    }
+    return classes.join(" ");
+  };
+
+  const tileProps = ({ date, view }) => {
+    if (view === "month") {
+      return {
+        onMouseEnter: (e) => handleDayMouseEnter(e, date),
+        onMouseLeave: handleDayMouseLeave,
+        onTouchStart: (e) => handleDayMouseEnter(e, date),
+        onTouchEnd: handleDayMouseLeave,
+      };
+    }
+    return {};
   };
 
   return (
@@ -100,7 +121,9 @@ export default function CalendarView({ events = [], startDate, endDate }) {
         <Calendar
           onChange={setSelectedDate}
           value={selectedDate}
-          tileContent={renderTileContent}
+          tileContent={tileContent}
+          tileClassName={tileClassName}
+          tileProps={tileProps}
           activeStartDate={activeStartDate}
           onActiveStartDateChange={({ activeStartDate }) => setActiveStartDate(activeStartDate)}
           locale="uk-UA"
@@ -116,21 +139,21 @@ export default function CalendarView({ events = [], startDate, endDate }) {
         />
       </div>
 
-      {/* Тултіп */}
+      {/* Унікальний тултіп для календаря */}
       {tooltip.visible && (
         <div 
-          className="calendar-tooltip"
+          className="calendar-tooltip-unique"
           style={{
             left: tooltip.x,
             top: tooltip.y - 10,
           }}
         >
-          <div className="tooltip-content">
+          <div className="calendar-tooltip-content">
             {tooltip.content.split('\n').map((line, index) => (
-              <div key={index} className="tooltip-line">{line}</div>
+              <div key={index} className="calendar-tooltip-line">{line}</div>
             ))}
           </div>
-          <div className="tooltip-arrow"></div>
+          <div className="calendar-tooltip-arrow"></div>
         </div>
       )}
 
