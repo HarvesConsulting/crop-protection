@@ -182,82 +182,124 @@ export default function Step3Run({
   };
 
   return (
-    <main className="flex justify-center items-start min-h-[70vh] px-4">
-      <div className="w-full max-w-xl mx-auto bg-white rounded-xl shadow-md px-6 sm:px-10 py-6 space-y-6">
-        
-        {/* Заголовок */}
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">
-          Крок 3: Розрахунок <span role="img" aria-label="lab">🧪</span>
-        </h2>
-        
-        {/* Обране користувачем */}  
-        <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg space-y-2 text-sm">
-          <div>
-            <strong>Обране місто:</strong>{" "}
-            <span className="text-gray-800">
-              {region?.name || "—"}
-            </span>
+    <main className="flex justify-center items-start min-h-[70vh] px-3 sm:px-4">
+      <div className="w-full max-w-xl mx-auto bg-white rounded-xl shadow-lg">
+        <div className="px-4 sm:px-8 py-5 sm:py-6 space-y-5 sm:space-y-6">
+          
+          {/* Заголовок */}
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 leading-tight">
+            Крок 3: Розрахунок <span role="img" aria-label="lab">🧪</span>
+          </h2>
+          
+          {/* Обране користувачем */}  
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🏙️</span>
+              <div>
+                <div className="text-xs text-gray-600 font-medium">Обране місто</div>
+                <div className="text-sm font-semibold text-gray-800">
+                  {region?.name || "—"}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-lg">📅</span>
+              <div>
+                <div className="text-xs text-gray-600 font-medium">Період розрахунку</div>
+                <div className="text-sm font-semibold text-gray-800">
+                  {plantingDate} — {harvestDate}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🦠</span>
+              <div>
+                <div className="text-xs text-gray-600 font-medium">Обрані хвороби</div>
+                <div className="text-sm font-semibold text-gray-800">
+                  {diseases.length === 0
+                    ? "Жодної"
+                    : diseases
+                        .map((id) => {
+                          switch (id) {
+                            case "lateBlight":
+                              return "Фітофтороз";
+                            case "grayMold":
+                              return "Сіра гниль";
+                            case "alternaria":
+                              return "Альтернаріоз";
+                            case "bacteriosis":
+                              return "Бактеріоз";
+                            default:
+                              return id;
+                          }
+                        })
+                        .join(", ")}
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <strong>Період:</strong>{" "}
-            <span className="text-gray-800">
-              {plantingDate} — {harvestDate}
-            </span>
+          {/* Інформація про процес */}
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+            <div className="flex items-start gap-3">
+              <span className="text-lg mt-0.5">💡</span>
+              <div>
+                <div className="font-semibold text-blue-800 text-sm mb-1">
+                  Що буде зроблено:
+                </div>
+                <ul className="text-xs text-blue-700 space-y-1 list-disc list-inside">
+                  <li>Аналіз погодних даних за обраний період</li>
+                  <li>Розрахунок ризиків для обраних хвороб</li>
+                  <li>Формування графіку обробок</li>
+                  <li>Визначення оптимального часу для обприскування</li>
+                </ul>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <strong>Обрані хвороби:</strong>{" "}
-            <span className="text-gray-800">
-              {diseases.length === 0
-                ? "Жодної"
-                : diseases
-                    .map((id) => {
-                      switch (id) {
-                        case "lateBlight":
-                          return "Фітофтороз";
-                        case "grayMold":
-                          return "Сіра гниль";
-                        case "alternaria":
-                          return "Альтернаріоз";
-                        case "bacteriosis":
-                          return "Бактеріоз";
-                        default:
-                          return id;
-                      }
-                    })
-                    .join(", ")}
-            </span>
-          </div>
+          {/* Повідомлення про помилку */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+              <div className="flex items-center gap-3">
+                <span className="text-lg">⚠️</span>
+                <div>
+                  <div className="font-semibold text-red-800 text-sm">Помилка</div>
+                  <div className="text-red-700 text-sm mt-1">{error}</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Анімація або кнопки */}
+          {loading ? (
+            <div className="text-center py-8">
+              <LoadingTractor />
+              <div className="mt-4 text-sm text-gray-600 font-medium">
+                Триває розрахунок...
+              </div>
+              <div className="text-xs text-gray-500 mt-2">
+                Це може зайняти кілька хвилин
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col sm:flex-row justify-between gap-3 pt-4">
+              <button
+                onClick={onBack}
+                className="px-6 py-3 bg-gray-100 rounded-xl hover:bg-gray-200 transition font-semibold text-gray-800 text-sm sm:text-base order-2 sm:order-1"
+              >
+                ← Назад
+              </button>
+              <button
+                onClick={runModel}
+                className="px-6 py-3 rounded-xl text-white font-semibold transition flex items-center justify-center gap-2 text-sm sm:text-base order-1 sm:order-2 bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-xl"
+              >
+                Розрахувати
+              </button>
+            </div>
+          )}
         </div>
-
-        {/* Повідомлення про помилку */}
-        {error && (
-          <div className="text-red-600 font-medium mb-4 text-sm">
-            ⚠️ {error}
-          </div>
-        )}
-
-        {/* Анімація або кнопки */}
-        {loading ? (
-          <LoadingTractor />
-        ) : (
-          <div className="flex gap-4 mt-4">
-            <button
-              onClick={onBack}
-              className="px-5 py-2 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium transition text-sm"
-            >
-              Назад
-            </button>
-
-            <button
-              onClick={runModel}
-              className="px-6 py-2 rounded-md text-white font-medium transition bg-green-600 hover:bg-green-700 text-sm"
-            >
-              Розрахувати
-            </button>
-          </div>
-        )}
       </div>
     </main>
   );
