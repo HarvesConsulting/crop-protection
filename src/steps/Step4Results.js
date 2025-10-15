@@ -361,31 +361,30 @@ function aggregateDailyRain(hourlyData = []) {
 }
 
 export default function Step4Results({ result, onRestart }) {
+  // Всі хуки мають бути на початку, перед будь-якими умовними рендерами
   const [showIntegrated, setShowIntegrated] = useState(false);
   const [showIntegratedModal, setShowIntegratedModal] = useState(false);
   const topRef = React.useRef(null);
   const [showMenu, setShowMenu] = useState(false);
   const [showWeather, setShowWeather] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
-
-  // Змінено: порожній початковий стан
   const [expandedDiseases, setExpandedDiseases] = useState({});
-
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [summaryModalOpen, setSummaryModalOpen] = useState(false);
+  const [weatherModalOpen, setWeatherModalOpen] = useState(false);
 
-  React.useEffect(() => {
+  // useEffect також мають бути на початку
+  useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const [summaryModalOpen, setSummaryModalOpen] = useState(false);
-  const [weatherModalOpen, setWeatherModalOpen] = useState(false);
-
   const handleGoToCards = () => {
     setShowIntegrated(false);
   };
 
+  // Умовний рендеринг має бути після всіх хуків
   if (!result) return <p>Дані відсутні</p>;
 
   const {
@@ -484,7 +483,7 @@ export default function Step4Results({ result, onRestart }) {
     return { name, entries };
   });
 
-  // Додано: автоматичне управління станом розгортання
+  // useEffect для автоматичного управління станом розгортання
   useEffect(() => {
     const newExpandedState = {};
     
@@ -549,13 +548,6 @@ export default function Step4Results({ result, onRestart }) {
     acc[key].push(entry);
     return acc;
   }, {});
-
-  let lastDatesByDisease = {
-    "Фітофтороз": plantingDate,
-    "Альтернаріоз": plantingDate,
-    "Сіра гниль": plantingDate,
-    "Бактеріоз": plantingDate,
-  };
 
   const mergeThreshold = 3 * 24 * 60 * 60 * 1000;
 
