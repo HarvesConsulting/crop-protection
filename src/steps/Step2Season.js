@@ -209,7 +209,7 @@ export default function Step2Season({
           {/* Чекбокси хвороб */}
           <div className="border border-gray-200 rounded-xl p-4 sm:p-5">
             <label className="block font-semibold text-gray-800 mb-3 text-sm sm:text-base">
-              🦠 Оберіть хвороби для моделювання:
+              Оберіть хвороби для моделювання:
             </label>
             
             {/* Кнопка "Вибрати всі" */}
