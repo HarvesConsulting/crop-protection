@@ -228,10 +228,10 @@ export default function Step2Season({
 
             <div className="space-y-3">
               {[
-                { id: "lateBlight", name: "Фітофтороз", emoji: "🍅" },
-                { id: "grayMold", name: "Сіра гниль", emoji: "🍄" },
-                { id: "alternaria", name: "Альтернаріоз", emoji: "🥬" },
-                { id: "bacteriosis", name: "Бактеріоз", emoji: "🦠" },
+                { id: "lateBlight", name: "Фітофтороз"},
+                { id: "grayMold", name: "Сіра гниль"},
+                { id: "alternaria", name: "Альтернаріоз"},
+                { id: "bacteriosis", name: "Бактеріоз"},
               ].map((d) => (
                 <label key={d.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
                   <input
