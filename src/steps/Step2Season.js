@@ -12,7 +12,7 @@ export default function Step2Season({
   const allDiseases = ["lateBlight", "grayMold", "alternaria", "bacteriosis"];
   const [diseases, setDiseases] = useState(["lateBlight"]);
   const [showInfo, setShowInfo] = useState(false);
-  const [calculationPeriod, setCalculationPeriod] = useState(30);
+  const [calculationPeriod, setCalculationPeriod] = useState("30");
   const [maxPeriod, setMaxPeriod] = useState(45);
 
   // Розрахунок максимального періоду (поточна дата + 15 днів)
@@ -33,10 +33,11 @@ export default function Step2Season({
 
   // Оновлення дати завершення при зміні точки відліку або періоду
   useEffect(() => {
-    if (plantingDate && calculationPeriod > 0) {
+    if (plantingDate && calculationPeriod && parseInt(calculationPeriod) > 0) {
+      const period = parseInt(calculationPeriod);
       const startDate = new Date(plantingDate);
       const endDate = new Date(startDate);
-      endDate.setDate(endDate.getDate() + calculationPeriod);
+      endDate.setDate(endDate.getDate() + period);
       
       // Форматуємо дату у формат YYYY-MM-DD
       const formattedDate = endDate.toISOString().split('T')[0];
@@ -61,15 +62,39 @@ export default function Step2Season({
   };
 
   const handleCalculationPeriodChange = (e) => {
-    const value = parseInt(e.target.value) || 0;
-    if (value >= 1 && value <= maxPeriod) {
-      setCalculationPeriod(value);
+    const value = e.target.value;
+    
+    // Дозволяємо пустий рядок або числа
+    if (value === "" || /^\d+$/.test(value)) {
+      const numValue = value === "" ? "" : parseInt(value);
+      
+      // Якщо число, перевіряємо межі
+      if (numValue !== "") {
+        if (numValue < 1) {
+          setCalculationPeriod("1");
+        } else if (numValue > maxPeriod) {
+          setCalculationPeriod(maxPeriod.toString());
+        } else {
+          setCalculationPeriod(value);
+        }
+      } else {
+        setCalculationPeriod("");
+      }
+    }
+  };
+
+  const handleCalculationPeriodBlur = (e) => {
+    // При втраті фокусу нормалізуємо значення
+    if (calculationPeriod === "" || parseInt(calculationPeriod) < 1) {
+      setCalculationPeriod("1");
+    } else if (parseInt(calculationPeriod) > maxPeriod) {
+      setCalculationPeriod(maxPeriod.toString());
     }
   };
 
   const handleNext = () => {
-    if (!plantingDate || !calculationPeriod) {
-      alert("Будь ласка, оберіть точку відліку та період розрахунку");
+    if (!plantingDate || !calculationPeriod || parseInt(calculationPeriod) < 1) {
+      alert("Будь ласка, оберіть точку відліку та коректний період розрахунку");
       return;
     }
     if (diseases.length === 0) {
@@ -81,11 +106,12 @@ export default function Step2Season({
 
   // Розрахунок дати завершення для відображення
   const getEndDateDisplay = () => {
-    if (!plantingDate || !calculationPeriod) return "";
+    if (!plantingDate || !calculationPeriod || parseInt(calculationPeriod) < 1) return "";
     
+    const period = parseInt(calculationPeriod);
     const startDate = new Date(plantingDate);
     const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + calculationPeriod);
+    endDate.setDate(endDate.getDate() + period);
     
     return endDate.toLocaleDateString('uk-UA');
   };
@@ -143,6 +169,7 @@ export default function Step2Season({
                   max={maxPeriod}
                   value={calculationPeriod}
                   onChange={handleCalculationPeriodChange}
+                  onBlur={handleCalculationPeriodBlur}
                   className="w-24 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
                 <span className="text-sm text-gray-600">
@@ -150,7 +177,7 @@ export default function Step2Season({
                 </span>
               </div>
               
-              {plantingDate && calculationPeriod > 0 && (
+              {plantingDate && calculationPeriod && parseInt(calculationPeriod) > 0 && (
                 <div className="mt-2 p-2 bg-gray-50 rounded-md">
                   <p className="text-sm text-gray-700">
                     <strong>Дата завершення:</strong> {getEndDateDisplay()}
@@ -208,9 +235,9 @@ export default function Step2Season({
             </button>
             <button
               onClick={handleNext}
-              disabled={!plantingDate || !calculationPeriod || diseases.length === 0}
+              disabled={!plantingDate || !calculationPeriod || parseInt(calculationPeriod) < 1 || diseases.length === 0}
               className={`px-6 py-2 rounded-lg text-white font-medium transition flex items-center gap-2 ${
-                plantingDate && calculationPeriod && diseases.length > 0
+                plantingDate && calculationPeriod && parseInt(calculationPeriod) > 0 && diseases.length > 0
                   ? "bg-green-600 hover:bg-green-700"
                   : "bg-gray-400 cursor-not-allowed"
               }`}
