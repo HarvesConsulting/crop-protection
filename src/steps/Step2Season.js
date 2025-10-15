@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Info, ArrowRight, CheckSquare, Square } from "lucide-react";
+import { Info, ArrowRight } from "lucide-react";
 
 export default function Step2Season({
   plantingDate,
@@ -12,8 +12,17 @@ export default function Step2Season({
   const allDiseases = ["lateBlight", "grayMold", "alternaria", "bacteriosis"];
   const [diseases, setDiseases] = useState(["lateBlight"]);
   const [showInfo, setShowInfo] = useState(false);
-  const [calculationPeriod, setCalculationPeriod] = useState("30");
+  const [calculationPeriod, setCalculationPeriod] = useState("15");
   const [maxPeriod, setMaxPeriod] = useState(45);
+
+  // Встановлення поточної дати за замовчуванням
+  useEffect(() => {
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0];
+    if (!plantingDate) {
+      setPlantingDate(formattedDate);
+    }
+  }, [plantingDate, setPlantingDate]);
 
   // Розрахунок максимального періоду (поточна дата + 15 днів)
   useEffect(() => {
@@ -191,28 +200,22 @@ export default function Step2Season({
 
           {/* Чекбокси хвороб */}
           <div className="border border-gray-200 rounded-lg p-4">
+            {/* Заголовок лишається */}
             <label className="block font-medium text-gray-800 mb-3">
               Оберіть хвороби для моделювання:
             </label>
             
-            {/* Кнопка "Вибрати всі" на всю ширину */}
+            {/* Кнопка "Вибрати всі" на всю ширину БЕЗ іконок */}
             <div className="mb-4">
               <button
                 onClick={toggleSelectAll}
-                className={`w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg border transition-all font-medium ${
+                className={`w-full px-4 py-3 rounded-lg border transition-all font-medium ${
                   isAllSelected
                     ? "bg-green-50 border-green-300 text-green-700 hover:bg-green-100"
                     : "bg-gray-50 border-gray-300 text-gray-700 hover:bg-gray-100"
                 }`}
               >
-                {isAllSelected ? (
-                  <CheckSquare size={20} className="text-green-600" />
-                ) : (
-                  <Square size={20} className="text-gray-500" />
-                )}
-                <span className="text-base">
-                  {isAllSelected ? "Всі хвороби обрані" : "Вибрати всі хвороби"}
-                </span>
+                {isAllSelected ? "Всі хвороби обрані" : "Вибрати всі хвороби"}
               </button>
             </div>
 
