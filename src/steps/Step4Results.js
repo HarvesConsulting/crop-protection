@@ -666,42 +666,81 @@ export default function Step4Results({ result, onRestart }) {
           </>
         ) : (
           <>
-            {hasPhytophthora && (
-              <div className="card-section">
-                <h3
-                  onClick={() => toggleDisease("Фітофтороз")}
-                  style={{
-                    cursor: "pointer",
-                    userSelect: "none",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  Рекомендовані внесення (проти: Фітофтороз)
-                  <span style={{ fontSize: "18px", marginLeft: "10px" }}>
-                    {expandedDiseases["Фітофтороз"] ? "▲" : "▼"}
-                  </span>
-                </h3>
+            // Замініть блоки з заголовками хвороб на ці:
 
-                {expandedDiseases["Фітофтороз"] && (
-                  sprayData.length > 0 ? (
-                    <CardView
-                      entries={sprayData}
-                      title=""
-                      diagnostics={diagnostics}
-                      plantingDate={plantingDate}
-                      rainDaily={rainDaily}
-                      hourlyData={enrichedHourlyData}
-                    />
-                  ) : (
-                    <p style={{ color: "#666", fontStyle: "italic", marginLeft: "10px" }}>
-                      Ризиків за обраний період не визначено
-                    </p>
-                  )
-                )}
-              </div>
-            )}
+{hasPhytophthora && (
+  <div className="card-section">
+    <div 
+      className={`disease-header ${expandedDiseases["Фітофтороз"] ? 'expanded' : ''}`}
+      onClick={() => toggleDisease("Фітофтороз")}
+    >
+      <h3>
+        🍅 Рекомендовані внесення (проти: Фітофтороз)
+        <span className="toggle-icon">
+          {expandedDiseases["Фітофтороз"] ? "▲" : "▼"}
+        </span>
+      </h3>
+    </div>
+
+    {expandedDiseases["Фітофтороз"] && (
+      sprayData.length > 0 ? (
+        <CardView
+          entries={sprayData}
+          title=""
+          diagnostics={diagnostics}
+          plantingDate={plantingDate}
+          rainDaily={rainDaily}
+          hourlyData={enrichedHourlyData}
+        />
+      ) : (
+        <p style={{ color: "#666", fontStyle: "italic", marginLeft: "10px" }}>
+          Ризиків за обраний період не визначено
+        </p>
+      )
+    )}
+  </div>
+)}
+
+{diseaseCardsGrouped?.map(({ name, entries }) => {
+  const emojiMap = {
+    "Сіра гниль": "🍄",
+    "Альтернаріоз": "🥬", 
+    "Бактеріоз": "🦠"
+  };
+  
+  return (
+    <div key={name} className="card-section">
+      <div 
+        className={`disease-header ${expandedDiseases[name] ? 'expanded' : ''}`}
+        onClick={() => toggleDisease(name)}
+      >
+        <h3>
+          {emojiMap[name] || "🦠"} Рекомендовані внесення (проти: {name})
+          <span className="toggle-icon">
+            {expandedDiseases[name] ? "▲" : "▼"}
+          </span>
+        </h3>
+      </div>
+
+      {expandedDiseases[name] && (
+        entries.length > 0 ? (
+          <CardView
+            entries={entries}
+            title=""
+            diagnostics={diagnostics}
+            plantingDate={plantingDate}
+            rainDaily={rainDaily}
+            hourlyData={enrichedHourlyData}
+          />
+        ) : (
+          <p style={{ color: "#666", fontStyle: "italic", marginLeft: "10px" }}>
+            Ризиків за обраний період не визначено
+          </p>
+        )
+      )}
+    </div>
+  );
+})}
 
             {diseaseCardsGrouped?.map(({ name, entries }) => (
               <div key={name} className="card-section">
