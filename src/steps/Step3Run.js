@@ -254,7 +254,7 @@ export default function Step3Run({
               onClick={runModel}
               className="px-6 py-2 rounded-md text-white font-medium transition bg-green-600 hover:bg-green-700 text-sm"
             >
-              Запустити розрахунок
+              Розрахувати
             </button>
           </div>
         )}
