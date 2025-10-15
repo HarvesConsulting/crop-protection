@@ -655,176 +655,138 @@ export default function Step4Results({ result, onRestart }) {
         )}
 
         {showIntegrated ? (
-          <>
-            <IntegratedTableView data={integratedSystem} />
+  <>
+    <IntegratedTableView data={integratedSystem} />
 
-            <button onClick={exportToExcel} className="toggle-button">
-              Експорт в Excel
-            </button>
-            
-            <PDFExporter data={integratedSystem} />
-          </>
-        ) : (
-          <>
-            {hasPhytophthora && (
-  <div className="card-section">
-    <div 
-      style={{
-        backgroundColor: '#e8f5e8',
-        border: '2px solid #4caf50',
-        borderRadius: '12px',
-        padding: '16px 20px',
-        marginBottom: '16px',
-        cursor: 'pointer',
-        userSelect: 'none'
-      }}
-      onClick={() => toggleDisease("Фітофтороз")}
-    >
-      <div className="flex items-center justify-between">
-        <div style={{
-          fontSize: '16px',
-          fontWeight: '600',
-          color: '#2e7d32'
-        }}>
-          Рекомендовані внесення (проти: Фітофтороз)
-        </div>
-        <span style={{
-          color: '#2e7d32',
-          fontSize: '18px'
-        }}>
-          {expandedDiseases["Фітофтороз"] ? "▲" : "▼"}
-        </span>
-      </div>
-    </div>
-
-    {expandedDiseases["Фітофтороз"] && (
-      sprayData.length > 0 ? (
-        <CardView
-          entries={sprayData}
-          title=""
-          diagnostics={diagnostics}
-          plantingDate={plantingDate}
-          rainDaily={rainDaily}
-          hourlyData={enrichedHourlyData}
-        />
-      ) : (
-        <p style={{ color: "#666", fontStyle: "italic", marginLeft: "10px" }}>
-          Ризиків за обраний період не визначено
-        </p>
-      )
-    )}
-  </div>
-)}
-
-{diseaseCardsGrouped?.map(({ name, entries }) => (
-  <div key={name} className="card-section">
-    <div 
-      style={{
-        backgroundColor: '#e8f5e8',
-        border: '2px solid #4caf50',
-        borderRadius: '12px',
-        padding: '16px 20px',
-        marginBottom: '16px',
-        cursor: 'pointer',
-        userSelect: 'none'
-      }}
-      onClick={() => toggleDisease(name)}
-    >
-      <div className="flex items-center justify-between">
-        <div style={{
-          fontSize: '16px',
-          fontWeight: '600',
-          color: '#2e7d32'
-        }}>
-          Рекомендовані внесення (проти: {name})
-        </div>
-        <span style={{
-          color: '#2e7d32',
-          fontSize: '18px'
-        }}>
-          {expandedDiseases[name] ? "▲" : "▼"}
-        </span>
-      </div>
-    </div>
-
-    {expandedDiseases[name] && (
-      entries.length > 0 ? (
-        <CardView
-          entries={entries}
-          title=""
-          diagnostics={diagnostics}
-          plantingDate={plantingDate}
-          rainDaily={rainDaily}
-          hourlyData={enrichedHourlyData}
-        />
-      ) : (
-        <p style={{ color: "#666", fontStyle: "italic", marginLeft: "10px" }}>
-          Ризиків за обраний період не визначено
-        </p>
-      )
-    )}
-  </div>
-))}
-
-            {diseaseCardsGrouped?.map(({ name, entries }) => (
-              <div key={name} className="card-section">
-                <h3
-                  onClick={() => toggleDisease(name)}
-                  style={{
-                    cursor: "pointer",
-                    userSelect: "none",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  Рекомендовані внесення (проти: {name})
-                  <span style={{ fontSize: "18px", marginLeft: "10px" }}>
-                    {expandedDiseases[name] ? "▲" : "▼"}
-                  </span>
-                </h3>
-
-                {expandedDiseases[name] && (
-                  entries.length > 0 ? (
-                    <CardView
-                      entries={entries}
-                      title=""
-                      diagnostics={diagnostics}
-                      plantingDate={plantingDate}
-                      rainDaily={rainDaily}
-                      hourlyData={enrichedHourlyData}
-                    />
-                  ) : (
-                    <p style={{ color: "#666", fontStyle: "italic", marginLeft: "10px" }}>
-                      Ризиків за обраний період не визначено
-                    </p>
-                  )
-                )}
-              </div>
-            ))}
-            
-            <div style={{ display: "flex", gap: "12px", marginTop: "1rem" }}>
-              <div style={{ display: "flex", justifyContent: "center", marginTop: "1rem" }}>
-                <button className="toggle-button" onClick={toggleAllCards}>
-                  {isAllExpanded ? "Згорнути всі картки" : "Розгорнути всі картки"}
-                </button>
-              </div>
+    <button onClick={exportToExcel} className="toggle-button">
+      Експорт в Excel
+    </button>
+    
+    <PDFExporter data={integratedSystem} />
+  </>
+) : (
+  <>
+    {hasPhytophthora && (
+      <div className="card-section">
+        <div 
+          style={{
+            backgroundColor: '#e8f5e8',
+            border: '2px solid #4caf50',
+            borderRadius: '12px',
+            padding: '16px 20px',
+            marginBottom: '16px',
+            cursor: 'pointer',
+            userSelect: 'none'
+          }}
+          onClick={() => toggleDisease("Фітофтороз")}
+        >
+          <div className="flex items-center justify-between">
+            <div style={{
+              fontSize: '16px',
+              fontWeight: '600',
+              color: '#2e7d32'
+            }}>
+              Рекомендовані внесення (проти: Фітофтороз)
             </div>
+            <span style={{
+              color: '#2e7d32',
+              fontSize: '18px'
+            }}>
+              {expandedDiseases["Фітофтороз"] ? "▲" : "▼"}
+            </span>
+          </div>
+        </div>
 
-            <button
-              className="restart-button"
-              onClick={() => {
-                if (topRef.current) {
-                  topRef.current.scrollIntoView({ behavior: "smooth" });
-                }
-              }}
-            >
-              ↑ Вгору
-            </button>
-          </>
+        {expandedDiseases["Фітофтороз"] && (
+          sprayData.length > 0 ? (
+            <CardView
+              entries={sprayData}
+              title=""
+              diagnostics={diagnostics}
+              plantingDate={plantingDate}
+              rainDaily={rainDaily}
+              hourlyData={enrichedHourlyData}
+            />
+          ) : (
+            <p style={{ color: "#666", fontStyle: "italic", marginLeft: "10px" }}>
+              Ризиків за обраний період не визначено
+            </p>
+          )
         )}
       </div>
+    )}
 
+    {diseaseCardsGrouped?.map(({ name, entries }) => (
+      <div key={name} className="card-section">
+        <div 
+          style={{
+            backgroundColor: '#e8f5e8',
+            border: '2px solid #4caf50',
+            borderRadius: '12px',
+            padding: '16px 20px',
+            marginBottom: '16px',
+            cursor: 'pointer',
+            userSelect: 'none'
+          }}
+          onClick={() => toggleDisease(name)}
+        >
+          <div className="flex items-center justify-between">
+            <div style={{
+              fontSize: '16px',
+              fontWeight: '600',
+              color: '#2e7d32'
+            }}>
+              Рекомендовані внесення (проти: {name})
+            </div>
+            <span style={{
+              color: '#2e7d32',
+              fontSize: '18px'
+            }}>
+              {expandedDiseases[name] ? "▲" : "▼"}
+            </span>
+          </div>
+        </div>
+
+        {expandedDiseases[name] && (
+          entries.length > 0 ? (
+            <CardView
+              entries={entries}
+              title=""
+              diagnostics={diagnostics}
+              plantingDate={plantingDate}
+              rainDaily={rainDaily}
+              hourlyData={enrichedHourlyData}
+            />
+          ) : (
+            <p style={{ color: "#666", fontStyle: "italic", marginLeft: "10px" }}>
+              Ризиків за обраний період не визначено
+            </p>
+          )
+        )}
+      </div>
+    ))}
+    
+    <div style={{ display: "flex", gap: "12px", marginTop: "1rem" }}>
+      <div style={{ display: "flex", justifyContent: "center", marginTop: "1rem" }}>
+        <button className="toggle-button" onClick={toggleAllCards}>
+          {isAllExpanded ? "Згорнути всі картки" : "Розгорнути всі картки"}
+        </button>
+      </div>
+    </div>
+
+    <button
+      className="restart-button"
+      onClick={() => {
+        if (topRef.current) {
+          topRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+      }}
+    >
+      ↑ Вгору
+    </button>
+  </>
+)}
+</div>
       <ModalWithWeather
         open={weatherModalOpen}
         onOpenChange={setWeatherModalOpen}
