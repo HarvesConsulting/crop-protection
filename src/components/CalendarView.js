@@ -1,16 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "./CalendarView.css";
 
-export default function CalendarView({ events = [] }) {
+export default function CalendarView({ events = [], startDate, endDate }) {
   const [selectedDate, setSelectedDate] = useState(null);
+  const [activeStartDate, setActiveStartDate] = useState(null);
+
+  // Встановлення початкової дати для календаря
+  useEffect(() => {
+    if (startDate) {
+      const start = new Date(startDate);
+      setActiveStartDate(start);
+    } else {
+      // Якщо startDate не передано, встановлюємо поточний місяць
+      setActiveStartDate(new Date());
+    }
+  }, [startDate]);
 
   const normalizeDate = (input) => {
     if (input instanceof Date) return input;
     if (typeof input === "string") {
-      const [day, month, year] = input.split(".");
-      return new Date(`${year}-${month}-${day}`);
+      // Обробка формату dd.MM.yyyy
+      if (input.includes(".")) {
+        const [day, month, year] = input.split(".");
+        return new Date(`${year}-${month}-${day}`);
+      }
+      // Обробка формату yyyy-MM-dd
+      return new Date(input);
     }
     return null;
   };
@@ -65,9 +82,28 @@ export default function CalendarView({ events = [] }) {
       if (hasEvent) classes.push("highlight");
       if (date.toDateString() === new Date().toDateString()) classes.push("react-calendar__tile--now");
       
+      // Підсвічування днів у вибраному періоді
+      if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        if (date >= start && date <= end) {
+          classes.push("in-period");
+        }
+      }
+      
       return classes.join(" ");
     }
     return null;
+  };
+
+  // Функція для блокування дат поза вибраним періодом
+  const tileDisabled = ({ date, view }) => {
+    if (view === 'month' && startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      return date < start || date > end;
+    }
+    return false;
   };
 
   const formatEvents = (events) => {
@@ -85,7 +121,11 @@ export default function CalendarView({ events = [] }) {
         📅 Календар обробок
       </h2>
       <p className="text-sm text-gray-600" style={{ textAlign: 'center', marginBottom: '24px' }}>
-        Натисніть на дату, щоб побачити призначені обробки та ризики
+        {startDate && endDate ? (
+          `Період: ${new Date(startDate).toLocaleDateString('uk-UA')} - ${new Date(endDate).toLocaleDateString('uk-UA')}`
+        ) : (
+          'Натисніть на дату, щоб побачити призначені обробки та ризики'
+        )}
       </p>
 
       {/* Статистика */}
@@ -114,8 +154,13 @@ export default function CalendarView({ events = [] }) {
           onClickDay={setSelectedDate}
           tileContent={tileContent}
           tileClassName={tileClassName}
+          tileDisabled={tileDisabled}
+          activeStartDate={activeStartDate}
+          onActiveStartDateChange={({ activeStartDate }) => setActiveStartDate(activeStartDate)}
           locale="uk-UA"
           showNeighboringMonth={false}
+          minDetail="month"
+          maxDetail="month"
         />
       </div>
 
