@@ -79,7 +79,7 @@ const rotationGrayMold = [
 const rotationAlternaria = rotationGrayMold;
 const rotationBacteriosis = ["Медян Екстра", "Казумін", "Серенада"];
 
-// МОДАЛЬНЕ ВІКНО ДЛЯ КАРТКИ
+// МОДАЛЬНЕ ВІКНО ДЛЯ КАРТКИ - ПОКРАЩЕНА ВЕРСІЯ
 function CardModal({ open, onClose, cardData }) {
   if (!cardData) return null;
 
@@ -90,12 +90,19 @@ function CardModal({ open, onClose, cardData }) {
     return "card-red";
   };
 
+  const getStatusText = () => {
+    const hours = cardData.backData?.condHours ?? 0;
+    if (hours <= 10) return "🟢 Низький ризик";
+    if (hours <= 20) return "🟡 Середній ризик";
+    return "🔴 Високий ризик";
+  };
+
   return (
     <Modal open={open} onClose={onClose}>
       <Box className="card-modal-container">
         <div className="card-modal-header">
           <Typography variant="h6" component="h2">
-            Детальна інформація про обробку #{cardData.index}
+            📋 Картка обробки #{cardData.index}
           </Typography>
           <IconButton onClick={onClose} size="small">
             <CloseIcon />
@@ -103,9 +110,16 @@ function CardModal({ open, onClose, cardData }) {
         </div>
         
         <div className={`card-modal-content ${getCardClass()}`}>
+          {/* СТАТУС РИЗИКУ */}
+          <div className="card-modal-section risk-status">
+            <Typography variant="subtitle1" gutterBottom style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {getStatusText()}
+            </Typography>
+          </div>
+
           <div className="card-modal-section">
-            <Typography variant="subtitle1" gutterBottom>
-              Основна інформація
+            <Typography variant="subtitle1" gutterBottom style={{ fontWeight: '600' }}>
+              📅 Основна інформація
             </Typography>
             <div className="card-modal-grid">
               <div className="card-modal-item">
@@ -121,8 +135,8 @@ function CardModal({ open, onClose, cardData }) {
           </div>
 
           <div className="card-modal-section">
-            <Typography variant="subtitle1" gutterBottom>
-              Рекомендації
+            <Typography variant="subtitle1" gutterBottom style={{ fontWeight: '600' }}>
+              📖 Рекомендації
             </Typography>
             <div className="card-modal-item">
               {cardData.Рекомендація}
@@ -131,8 +145,8 @@ function CardModal({ open, onClose, cardData }) {
 
           {cardData["Рекомендовані години"] && cardData["Рекомендовані години"] !== "—" && (
             <div className="card-modal-section">
-              <Typography variant="subtitle1" gutterBottom>
-                Сприятливі години для обробки
+              <Typography variant="subtitle1" gutterBottom style={{ fontWeight: '600' }}>
+                🕒 Сприятливі години для обробки
               </Typography>
               <div className="card-modal-item">
                 <HourTimeline
@@ -145,8 +159,8 @@ function CardModal({ open, onClose, cardData }) {
           )}
 
           <div className="card-modal-section">
-            <Typography variant="subtitle1" gutterBottom>
-              Погодні умови періоду
+            <Typography variant="subtitle1" gutterBottom style={{ fontWeight: '600' }}>
+              🌤️ Погодні умови періоду
             </Typography>
             <div className="weather-stats">
               <div className="weather-stat">
