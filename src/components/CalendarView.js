@@ -6,6 +6,12 @@ import "./CalendarView.css";
 export default function CalendarView({ events = [], startDate, endDate }) {
   const [selectedDate, setSelectedDate] = useState(null);
   const [activeStartDate, setActiveStartDate] = useState(null);
+  const [tooltip, setTooltip] = useState({ 
+    visible: false, 
+    content: "", 
+    x: 0, 
+    y: 0 
+  });
 
   // Встановлення початкової дати для календаря
   useEffect(() => {
@@ -43,6 +49,29 @@ export default function CalendarView({ events = [], startDate, endDate }) {
     return events.filter(event => event.type === type).length;
   };
 
+  // Функції для тултіпу
+  const showTooltip = (e, date) => {
+    const eventsForDate = getEventsForDate(date);
+    
+    if (eventsForDate.length > 0) {
+      const rect = e.target.getBoundingClientRect();
+      const tooltipContent = eventsForDate.map(event => 
+        `• ${event.title} (${event.type === 'spray' ? 'Обробка' : event.type === 'risk' ? 'Ризик' : 'Інфо'})`
+      ).join('\n');
+      
+      setTooltip({
+        visible: true,
+        content: tooltipContent,
+        x: rect.left + rect.width / 2,
+        y: rect.top - 10
+      });
+    }
+  };
+
+  const hideTooltip = () => {
+    setTooltip({ visible: false, content: "", x: 0, y: 0 });
+  };
+
   const tileContent = ({ date, view }) => {
     if (view === "month") {
       const dayEvents = getEventsForDate(date);
@@ -56,11 +85,10 @@ export default function CalendarView({ events = [], startDate, endDate }) {
               <div 
                 key={type} 
                 className={`event-dot ${type}`}
-                title={`${type}: ${dayEvents.filter(e => e.type === type).length} подій`}
               />
             ))}
             {dayEvents.length > 1 && (
-              <div className="event-count" title={`${dayEvents.length} подій`}>
+              <div className="event-count">
                 {dayEvents.length}
               </div>
             )}
@@ -79,7 +107,7 @@ export default function CalendarView({ events = [], startDate, endDate }) {
           normalizeDate(event.date)?.toDateString() === date.toDateString()
       );
       
-      if (hasEvent) classes.push("highlight");
+      if (hasEvent) classes.push("has-event");
       if (date.toDateString() === new Date().toDateString()) classes.push("react-calendar__tile--now");
       
       // Підсвічування днів у вибраному періоді
@@ -94,6 +122,23 @@ export default function CalendarView({ events = [], startDate, endDate }) {
       return classes.join(" ");
     }
     return null;
+  };
+
+  // Додаємо обробники подій для тултіпу
+  const tileProps = ({ date, view }) => {
+    if (view === "month") {
+      const eventsForDate = getEventsForDate(date);
+      
+      if (eventsForDate.length > 0) {
+        return {
+          onMouseEnter: (e) => showTooltip(e, date),
+          onMouseLeave: hideTooltip,
+          onFocus: (e) => showTooltip(e, date),
+          onBlur: hideTooltip,
+        };
+      }
+    }
+    return {};
   };
 
   // Функція для блокування дат поза вибраним періодом
@@ -124,7 +169,7 @@ export default function CalendarView({ events = [], startDate, endDate }) {
         {startDate && endDate ? (
           `Період: ${new Date(startDate).toLocaleDateString('uk-UA')} - ${new Date(endDate).toLocaleDateString('uk-UA')}`
         ) : (
-          'Натисніть на дату, щоб побачити призначені обробки та ризики'
+          'Наведіть курсор на дату з крапками, щоб побачити події'
         )}
       </p>
 
@@ -161,36 +206,28 @@ export default function CalendarView({ events = [], startDate, endDate }) {
           showNeighboringMonth={false}
           minDetail="month"
           maxDetail="month"
+          tileProps={tileProps}
         />
       </div>
 
-      {/* Деталі вибраної дати */}
-      {selectedDate && (
-        <div className="event-list">
-          <h3>Події на {selectedDate.toLocaleDateString("uk-UA")}:</h3>
-          {getEventsForDate(selectedDate).length > 0 ? (
-            getEventsForDate(selectedDate).map((event, index) => (
-              <div key={index} className="event-card">
-                <div className="event-header">
-                  <div className="event-title">{event.title}</div>
-                  <div className={`event-type ${event.type || 'info'}`}>
-                    {event.type === 'spray' ? 'Обробка' : 
-                     event.type === 'risk' ? 'Ризик' : 'Інфо'}
-                  </div>
-                </div>
-                <p className="event-description">{event.description}</p>
-                {event.time && (
-                  <div style={{ fontSize: '12px', color: '#6c757d', marginTop: '4px' }}>
-                    ⏰ {event.time}
-                  </div>
-                )}
+      {/* Тултіп */}
+      {tooltip.visible && (
+        <div 
+          className="calendar-tooltip"
+          style={{
+            left: tooltip.x,
+            top: tooltip.y,
+            transform: 'translateX(-50%) translateY(-100%)'
+          }}
+        >
+          <div className="tooltip-content">
+            {tooltip.content.split('\n').map((line, index) => (
+              <div key={index} className="tooltip-line">
+                {line}
               </div>
-            ))
-          ) : (
-            <div className="no-events">
-              Немає запланованих подій на цей день
-            </div>
-          )}
+            ))}
+          </div>
+          <div className="tooltip-arrow"></div>
         </div>
       )}
 

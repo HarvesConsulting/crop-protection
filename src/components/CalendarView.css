@@ -332,3 +332,121 @@
     height: 4px;
   }
 }
+/* Стилі для тултіпу */
+.calendar-tooltip {
+  position: fixed;
+  z-index: 1000;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: pre-line;
+  max-width: 250px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.tooltip-content {
+  position: relative;
+  z-index: 2;
+}
+
+.tooltip-line {
+  margin: 2px 0;
+}
+
+.tooltip-arrow {
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid rgba(0, 0, 0, 0.9);
+}
+
+/* Покращені стилі для індикаторів подій */
+.event-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  margin-top: 2px;
+}
+
+.event-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.event-dot.spray {
+  background-color: #28a745;
+}
+
+.event-dot.risk {
+  background-color: #dc3545;
+}
+
+.event-dot.info {
+  background-color: #17a2b8;
+}
+
+.event-count {
+  font-size: 9px;
+  font-weight: bold;
+  color: #6c757d;
+  margin-left: 2px;
+}
+
+/* Стилі для днів з подіями */
+.react-calendar__tile--hasEvent {
+  background-color: #f8f9fa;
+  font-weight: 500;
+}
+
+.react-calendar__tile--hasEvent:hover {
+  background-color: #e9ecef;
+}
+
+/* Адаптивність для тултіпу */
+@media (max-width: 768px) {
+  .calendar-tooltip {
+    font-size: 11px;
+    padding: 6px 10px;
+    max-width: 200px;
+  }
+}
+
+/* Покращені стилі для календаря */
+.calendar-container .react-calendar {
+  width: 100%;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.calendar-container .react-calendar__tile {
+  position: relative;
+  padding: 8px 4px;
+  height: 60px;
+}
+
+.calendar-container .react-calendar__tile:enabled:hover,
+.calendar-container .react-calendar__tile:enabled:focus {
+  background-color: #e9ecef;
+}
+
+.calendar-container .react-calendar__tile--active {
+  background-color: #007bff;
+  color: white;
+}
+
+.calendar-container .react-calendar__tile--now {
+  background-color: #fff3cd;
+  border: 1px solid #ffeaa7;
+}
