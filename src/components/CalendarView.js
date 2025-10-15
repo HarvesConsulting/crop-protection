@@ -19,7 +19,6 @@ export default function CalendarView({ events = [], startDate, endDate }) {
       const start = new Date(startDate);
       setActiveStartDate(start);
     } else {
-      // Якщо startDate не передано, встановлюємо поточний місяць
       setActiveStartDate(new Date());
     }
   }, [startDate]);
@@ -27,12 +26,10 @@ export default function CalendarView({ events = [], startDate, endDate }) {
   const normalizeDate = (input) => {
     if (input instanceof Date) return input;
     if (typeof input === "string") {
-      // Обробка формату dd.MM.yyyy
       if (input.includes(".")) {
         const [day, month, year] = input.split(".");
         return new Date(`${year}-${month}-${day}`);
       }
-      // Обробка формату yyyy-MM-dd
       return new Date(input);
     }
     return null;
@@ -49,23 +46,32 @@ export default function CalendarView({ events = [], startDate, endDate }) {
     return events.filter(event => event.type === type).length;
   };
 
-  // Функції для тултіпу
+  // Покращені функції для тултіпу
   const showTooltip = (e, date) => {
     const eventsForDate = getEventsForDate(date);
     
     if (eventsForDate.length > 0) {
-      const rect = e.target.getBoundingClientRect();
+      const rect = e.currentTarget.getBoundingClientRect();
       const tooltipContent = eventsForDate.map(event => 
-        `• ${event.title} (${event.type === 'spray' ? 'Обробка' : event.type === 'risk' ? 'Ризик' : 'Інфо'})`
+        `• ${event.title} (${getEventTypeLabel(event.type)})`
       ).join('\n');
       
       setTooltip({
         visible: true,
         content: tooltipContent,
-        x: rect.left + rect.width / 2,
-        y: rect.top - 10
+        x: rect.left + window.scrollX + rect.width / 2,
+        y: rect.top + window.scrollY - 10
       });
     }
+  };
+
+  const getEventTypeLabel = (type) => {
+    const labels = {
+      'spray': 'Обробка',
+      'risk': 'Ризик', 
+      'info': 'Інфо'
+    };
+    return labels[type] || type;
   };
 
   const hideTooltip = () => {
@@ -85,6 +91,7 @@ export default function CalendarView({ events = [], startDate, endDate }) {
               <div 
                 key={type} 
                 className={`event-dot ${type}`}
+                title={`${getEventTypeLabel(type)}: ${dayEvents.filter(e => e.type === type).length} подій`}
               />
             ))}
             {dayEvents.length > 1 && (
@@ -102,14 +109,16 @@ export default function CalendarView({ events = [], startDate, endDate }) {
   const tileClassName = ({ date, view }) => {
     if (view === "month") {
       const classes = [];
-      const hasEvent = events.some(
-        (event) =>
-          normalizeDate(event.date)?.toDateString() === date.toDateString()
-      );
+      const dayEvents = getEventsForDate(date);
       
-      if (hasEvent) classes.push("has-event");
+      if (dayEvents.length > 0) classes.push("has-event");
       if (date.toDateString() === new Date().toDateString()) classes.push("react-calendar__tile--now");
       
+      // Додаткові класи за типом подій
+      dayEvents.forEach(event => {
+        if (event.type) classes.push(`has-${event.type}`);
+      });
+
       // Підсвічування днів у вибраному періоді
       if (startDate && endDate) {
         const start = new Date(startDate);
@@ -124,7 +133,7 @@ export default function CalendarView({ events = [], startDate, endDate }) {
     return null;
   };
 
-  // Додаємо обробники подій для тултіпу
+  // Покращені обробники подій для тултіпу
   const tileProps = ({ date, view }) => {
     if (view === "month") {
       const eventsForDate = getEventsForDate(date);
@@ -135,6 +144,8 @@ export default function CalendarView({ events = [], startDate, endDate }) {
           onMouseLeave: hideTooltip,
           onFocus: (e) => showTooltip(e, date),
           onBlur: hideTooltip,
+          onTouchStart: (e) => showTooltip(e, date),
+          onTouchEnd: hideTooltip,
         };
       }
     }
@@ -193,6 +204,22 @@ export default function CalendarView({ events = [], startDate, endDate }) {
         </div>
       </div>
 
+      {/* Легенда */}
+      <div className="calendar-legend">
+        <div className="legend-item">
+          <div className="legend-dot spray"></div>
+          <span>Обробки</span>
+        </div>
+        <div className="legend-item">
+          <div className="legend-dot risk"></div>
+          <span>Ризики</span>
+        </div>
+        <div className="legend-item">
+          <div className="legend-dot info"></div>
+          <span>Інформація</span>
+        </div>
+      </div>
+
       {/* Календар */}
       <div className="calendar-container">
         <Calendar
@@ -210,13 +237,13 @@ export default function CalendarView({ events = [], startDate, endDate }) {
         />
       </div>
 
-      {/* Тултіп */}
+      {/* Покращений тултіп */}
       {tooltip.visible && (
         <div 
           className="calendar-tooltip"
           style={{
-            left: tooltip.x,
-            top: tooltip.y,
+            left: `${tooltip.x}px`,
+            top: `${tooltip.y}px`,
             transform: 'translateX(-50%) translateY(-100%)'
           }}
         >

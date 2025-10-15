@@ -530,31 +530,31 @@ export default function Step4Results({ result, onRestart }) {
       <div className="results-content">
         {/* Заголовок тепер вище меню дій */}
         <div className="results-header">
-          <h2 className="step-title">
-            Крок 4: Результати
-            <button
-              className="info-button"
-              onClick={() => setShowInfo(!showInfo)}
-              title="Показати інформацію"
-            >
-              <InfoOutlinedIcon />
-            </button>
-          </h2>
+  <div className="step-title-container">
+    <h2 className="step-title">Крок 4: Результати</h2>
+    <button
+      className="info-button"
+      onClick={() => setShowInfo(!showInfo)}
+      title="Показати інформацію"
+    >
+      <InfoOutlinedIcon />
+    </button>
+  </div>
 
-          {showInfo && (
-            <div className="info-panel">
-              <p>
-                Період розрахунку:{" "}
-                <strong>{format(new Date(result.plantingDate), "dd.MM.yyyy")}</strong> —{" "}
-                <strong>{format(new Date(result.harvestDate), "dd.MM.yyyy")}</strong>
-              </p>
-              <p>
-                Нижче показано рекомендовані дати обробки. Натисніть "Картка" для перегляду 
-                детальної інформації про погодні умови та рекомендації.
-              </p>
-            </div>
-          )}
-        </div>
+  {showInfo && (
+    <div className="info-panel">
+      <p>
+        Період розрахунку:{" "}
+        <strong>{format(new Date(result.plantingDate), "dd.MM.yyyy")}</strong> —{" "}
+        <strong>{format(new Date(result.harvestDate), "dd.MM.yyyy")}</strong>
+      </p>
+      <p>
+        Нижче показано рекомендовані дати обробки. Натисніть "Картка" для перегляду 
+        детальної інформації про погодні умови та рекомендації.
+      </p>
+    </div>
+  )}
+</div>
 
         {/* Меню дій тепер під заголовком */}
         <ActionMenu
