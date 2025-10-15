@@ -128,70 +128,78 @@ export default function Step2Season({
   const isAllSelected = diseases.length === allDiseases.length;
 
   return (
-    <main className="flex justify-center items-start min-h-[70vh] px-4">
+    <main className="flex justify-center items-start min-h-[70vh] px-3 sm:px-4">
       <div className="w-full max-w-xl mx-auto bg-white rounded-xl shadow-lg">
-        <div className="px-6 sm:px-10 py-6 space-y-6">
+        <div className="px-4 sm:px-8 py-5 sm:py-6 space-y-5 sm:space-y-6">
           {/* Заголовок + Інфо */}
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-800">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 leading-tight">
               Крок 2: Дані про сезон
             </h2>
             <button
               onClick={() => setShowInfo(!showInfo)}
-              className="text-blue-600 hover:text-blue-800 transition"
+              className="text-blue-600 hover:text-blue-800 transition p-1"
               title="Інформація"
             >
-              <Info size={24} />
+              <Info size={22} />
             </button>
           </div>
 
           {showInfo && (
-            <div className="bg-blue-50 border border-blue-200 text-sm text-gray-700 p-4 rounded-md">
-              Вкажіть точку відліку (дату початку розрахунків) та період розрахунку. Це може бути дата сходів чи висадки культури, або дата останнього внесення фунгіциду.
-              Період не може перевищувати 15 днів від поточної дати.
+            <div className="bg-blue-50 border border-blue-200 text-sm text-gray-700 p-3 sm:p-4 rounded-lg leading-relaxed">
+              <p className="mb-2">
+                <strong>Точка відліку</strong> - це дата початку розрахунків. Це може бути дата сходів чи висадки культури, 
+                або дата останнього внесення фунгіциду.
+              </p>
+              <p>
+                <strong>Період розрахунку</strong> не може перевищувати 15 днів від поточної дати для забезпечення точності прогнозу.
+              </p>
             </div>
           )}
 
           {/* Поля вводу */}
-          <div className="space-y-4">
+          <div className="space-y-4 sm:space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Точка відліку (дата початку розрахунків):
+              <label className="block text-sm font-semibold text-gray-800 mb-2 sm:mb-3">
+                📅 Точка відліку
               </label>
               <input
                 type="date"
                 value={plantingDate}
                 onChange={(e) => setPlantingDate(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-600 mt-2 leading-relaxed">
                 Дата висадки або останнього внесення фунгіциду
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Період розрахунку (в днях):
+              <label className="block text-sm font-semibold text-gray-800 mb-2 sm:mb-3">
+                ⏱️ Період розрахунку
               </label>
-              <div className="flex items-center gap-3">
-                <input
-                  type="number"
-                  min="1"
-                  max={maxPeriod}
-                  value={calculationPeriod}
-                  onChange={handleCalculationPeriodChange}
-                  onBlur={handleCalculationPeriodBlur}
-                  className="w-24 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                />
-                <span className="text-sm text-gray-600">
-                  днів (макс.: {maxPeriod})
-                </span>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="number"
+                    min="1"
+                    max={maxPeriod}
+                    value={calculationPeriod}
+                    onChange={handleCalculationPeriodChange}
+                    onBlur={handleCalculationPeriodBlur}
+                    className="w-20 sm:w-24 border border-gray-300 rounded-xl px-4 py-3 text-base text-center focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  />
+                  <span className="text-sm text-gray-700 whitespace-nowrap">
+                    днів (макс.: {maxPeriod})
+                  </span>
+                </div>
               </div>
               
               {plantingDate && calculationPeriod && parseInt(calculationPeriod) > 0 && (
-                <div className="mt-2 p-2 bg-gray-50 rounded-md">
-                  <p className="text-sm text-gray-700">
-                    <strong>Дата завершення:</strong> {getEndDateDisplay()}
+                <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-xl">
+                  <p className="text-sm text-green-800 font-medium">
+                    <span className="block mb-1">📌 Дата завершення:</span>
+                    <span className="text-base">{getEndDateDisplay()}</span>
                   </p>
                 </div>
               )}
@@ -199,65 +207,67 @@ export default function Step2Season({
           </div>
 
           {/* Чекбокси хвороб */}
-          <div className="border border-gray-200 rounded-lg p-4">
-            {/* Заголовок лишається */}
-            <label className="block font-medium text-gray-800 mb-3">
-              Оберіть хвороби для моделювання:
+          <div className="border border-gray-200 rounded-xl p-4 sm:p-5">
+            <label className="block font-semibold text-gray-800 mb-3 text-sm sm:text-base">
+              🦠 Оберіть хвороби для моделювання:
             </label>
             
-            {/* Кнопка "Вибрати всі" на всю ширину БЕЗ іконок */}
+            {/* Кнопка "Вибрати всі" */}
             <div className="mb-4">
               <button
                 onClick={toggleSelectAll}
-                className={`w-full px-4 py-3 rounded-lg border transition-all font-medium ${
+                className={`w-full px-4 py-3 rounded-xl border-2 transition-all font-semibold text-sm sm:text-base ${
                   isAllSelected
-                    ? "bg-green-50 border-green-300 text-green-700 hover:bg-green-100"
-                    : "bg-gray-50 border-gray-300 text-gray-700 hover:bg-gray-100"
+                    ? "bg-green-100 border-green-400 text-green-800 hover:bg-green-200"
+                    : "bg-gray-100 border-gray-300 text-gray-800 hover:bg-gray-200"
                 }`}
               >
-                {isAllSelected ? "Всі хвороби обрані" : "Вибрати всі хвороби"}
+                {isAllSelected ? "✅ Всі хвороби обрані" : "📋 Вибрати всі хвороби"}
               </button>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-3">
               {[
-                { id: "lateBlight", name: "Фітофтороз" },
-                { id: "grayMold", name: "Сіра гниль" },
-                { id: "alternaria", name: "Альтернаріоз" },
-                { id: "bacteriosis", name: "Бактеріоз" },
+                { id: "lateBlight", name: "Фітофтороз", emoji: "🍅" },
+                { id: "grayMold", name: "Сіра гниль", emoji: "🍄" },
+                { id: "alternaria", name: "Альтернаріоз", emoji: "🥬" },
+                { id: "bacteriosis", name: "Бактеріоз", emoji: "🦠" },
               ].map((d) => (
-                <label key={d.id} className="flex items-center gap-2">
+                <label key={d.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
                   <input
                     type="checkbox"
                     checked={diseases.includes(d.id)}
                     onChange={() => toggleDisease(d.id)}
-                    className="w-4 h-4 text-green-600 rounded"
+                    className="w-5 h-5 text-green-600 rounded border-gray-300 focus:ring-green-500"
                   />
-                  <span className="text-gray-700">{d.name}</span>
+                  <span className="flex items-center gap-2 text-gray-800 text-sm sm:text-base">
+                    <span className="text-base">{d.emoji}</span>
+                    {d.name}
+                  </span>
                 </label>
               ))}
             </div>
           </div>
 
           {/* Кнопки */}
-          <div className="flex justify-between pt-4">
+          <div className="flex flex-col sm:flex-row justify-between gap-3 pt-4">
             <button
               onClick={onBack}
-              className="px-6 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition font-medium"
+              className="px-6 py-3 bg-gray-100 rounded-xl hover:bg-gray-200 transition font-semibold text-gray-800 text-sm sm:text-base order-2 sm:order-1"
             >
-              Назад
+              ← Назад
             </button>
             <button
               onClick={handleNext}
               disabled={!plantingDate || !calculationPeriod || parseInt(calculationPeriod) < 1 || diseases.length === 0}
-              className={`px-6 py-2 rounded-lg text-white font-medium transition flex items-center gap-2 ${
+              className={`px-6 py-3 rounded-xl text-white font-semibold transition flex items-center justify-center gap-2 text-sm sm:text-base order-1 sm:order-2 ${
                 plantingDate && calculationPeriod && parseInt(calculationPeriod) > 0 && diseases.length > 0
-                  ? "bg-green-600 hover:bg-green-700"
+                  ? "bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-xl"
                   : "bg-gray-400 cursor-not-allowed"
               }`}
             >
               Продовжити
-              <ArrowRight size={16} />
+              <ArrowRight size={18} />
             </button>
           </div>
         </div>
