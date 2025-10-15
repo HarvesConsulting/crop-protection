@@ -666,20 +666,38 @@ export default function Step4Results({ result, onRestart }) {
           </>
         ) : (
           <>
-            // Замініть блоки з заголовками хвороб на ці:
-
+            // Виправлений код з inline стилями
 {hasPhytophthora && (
   <div className="card-section">
     <div 
-      className={`disease-header ${expandedDiseases["Фітофтороз"] ? 'expanded' : ''}`}
+      style={{
+        background: 'linear-gradient(135deg, #e8f5e8, #c8e6c9)',
+        border: '2px solid #4caf50',
+        borderRadius: '12px',
+        padding: '16px 20px',
+        marginBottom: '16px',
+        cursor: 'pointer',
+        userSelect: 'none',
+        transition: 'all 0.3s ease',
+        boxShadow: '0 2px 8px rgba(76, 175, 80, 0.15)'
+      }}
       onClick={() => toggleDisease("Фітофтороз")}
     >
-      <h3>
-        🍅 Рекомендовані внесення (проти: Фітофтороз)
-        <span className="toggle-icon">
+      <div className="flex items-center justify-between">
+        <div style={{
+          fontSize: '16px',
+          fontWeight: '600',
+          color: '#2e7d32'
+        }}>
+          🍅 Рекомендовані внесення (проти: Фітофтороз)
+        </div>
+        <span style={{
+          color: '#2e7d32',
+          fontSize: '18px'
+        }}>
           {expandedDiseases["Фітофтороз"] ? "▲" : "▼"}
         </span>
-      </h3>
+      </div>
     </div>
 
     {expandedDiseases["Фітофтороз"] && (
@@ -711,15 +729,34 @@ export default function Step4Results({ result, onRestart }) {
   return (
     <div key={name} className="card-section">
       <div 
-        className={`disease-header ${expandedDiseases[name] ? 'expanded' : ''}`}
+        style={{
+          background: 'linear-gradient(135deg, #e8f5e8, #c8e6c9)',
+          border: '2px solid #4caf50',
+          borderRadius: '12px',
+          padding: '16px 20px',
+          marginBottom: '16px',
+          cursor: 'pointer',
+          userSelect: 'none',
+          transition: 'all 0.3s ease',
+          boxShadow: '0 2px 8px rgba(76, 175, 80, 0.15)'
+        }}
         onClick={() => toggleDisease(name)}
       >
-        <h3>
-          {emojiMap[name] || "🦠"} Рекомендовані внесення (проти: {name})
-          <span className="toggle-icon">
+        <div className="flex items-center justify-between">
+          <div style={{
+            fontSize: '16px',
+            fontWeight: '600',
+            color: '#2e7d32'
+          }}>
+            {emojiMap[name] || "🦠"} Рекомендовані внесення (проти: {name})
+          </div>
+          <span style={{
+            color: '#2e7d32',
+            fontSize: '18px'
+          }}>
             {expandedDiseases[name] ? "▲" : "▼"}
           </span>
-        </h3>
+        </div>
       </div>
 
       {expandedDiseases[name] && (
