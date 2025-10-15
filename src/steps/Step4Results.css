@@ -30,26 +30,53 @@ h2 {
   color: #333;
 }
 
-/* === КНОПКИ === */
+/* === УНІФІКОВАНІ КНОПКИ === */
 .toggle-button,
-.restart-button {
+.restart-button,
+.btn-action,
+.menu-toggle,
+.scroll-top-button {
+  background-color: #198754;
+  color: white;
   padding: 10px 18px;
-  font-size: 14px;
-  font-weight: 600;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  margin: 12px 0;
-  border: 1px solid #2d6cdf;
-  background-color: #fff;
-  color: #2d6cdf;
-  transition: all 0.3s ease;
+  font-weight: 600;
+  user-select: none;
+  border: none;
+  text-align: center;
+  transition: background 0.25s ease, transform 0.2s ease;
+  font-size: 14px;
 }
 
 .toggle-button:hover,
-.restart-button:hover {
-  background-color: #2d6cdf;
-  color: #fff;
-  transform: scale(1.02);
+.restart-button:hover,
+.btn-action:hover,
+.menu-toggle:hover,
+.scroll-top-button:hover {
+  background-color: #157347;
+  transform: translateY(-1px);
+}
+
+/* Специфічні стилі для різних типів кнопок */
+.btn-action.restart {
+  background-color: #198754;
+}
+
+.btn-action.info {
+  background-color: #6c757d;
+}
+
+.btn-action.info:hover {
+  background-color: #5a6268;
+}
+
+.btn-action.system {
+  background-color: #dc3545;
+}
+
+.btn-action.system:hover {
+  background-color: #c82333;
 }
 
 /* === СЕКЦІЯ КАРТОК === */
@@ -116,7 +143,7 @@ h2 {
   height: 100%;
   transform-style: preserve-3d;
   transition: transform 0.6s;
-  min-height: 240px; /* встанови мінімальну однакову висоту */
+  min-height: 240px;
 }
 
 .flip-card.flipped .flip-card-inner {
@@ -197,90 +224,77 @@ h2 {
 }
 
 .btn-action {
-  padding: 10px 16px;
-  font-size: 14px;
-  font-weight: 600;
-  border-radius: 6px;
-  cursor: pointer;
-  border: 1px solid transparent;
-  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   gap: 6px;
-}
-
-.btn-action.restart {
-  background-color: #e0f4ff;
-  color: #005ea3;
-  border: 1px solid #007acc;
-}
-
-.btn-action.info {
-  background-color: #f1f1f1;
-  color: #333;
-  border: 1px solid #aaa;
-}
-
-.btn-action.system {
-  background-color: #ffe8e1;
-  color: #b13a00;
-  border: 1px solid #f07800;
-}
-
-.btn-action:hover {
-  transform: scale(1.03);
-  opacity: 0.9;
+  text-decoration: none;
 }
 
 /* === МЕНЮ === */
 .menu-wrapper {
   position: relative;
   display: inline-block;
-  margin-bottom: 20px;
-}
-
-.menu-toggle {
-  background-color: #007acc;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  font-size: 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s ease;
-}
-
-.menu-toggle:hover {
-  background-color: #005fa3;
+  width: 100%;
+  margin-bottom: 1rem;
+  z-index: 3;
 }
 
 .menu-dropdown {
   position: absolute;
-  top: 100%;
+  top: 110%;
   left: 0;
+  min-width: 240px;
   background-color: #ffffff;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  border-radius: 6px;
-  margin-top: 6px;
-  z-index: 10;
-  min-width: 260px;
+  border: 1px solid #c3e6cb;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 4;
+  opacity: 0;
+  transform: translateY(-10px);
+  visibility: hidden;
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+  pointer-events: none;
 }
 
+.menu-dropdown.visible {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* ПУНКТИ МЕНЮ */
 .menu-item {
   width: 100%;
-  text-align: left;
-  padding: 10px 14px;
+  background: none;
   border: none;
-  background-color: transparent;
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 15px;
   cursor: pointer;
-  font-size: 14px;
-  border-bottom: 1px solid #eee;
-  transition: background 0.2s;
+  color: #155724;
+  border-bottom: 1px solid #e2f0e5;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
 }
 
 .menu-item:hover {
-  background-color: #f0f0f0;
+  background-color: #e8f5e9;
+  color: #0b3d16;
+}
+
+/* BACKDROP */
+.menu-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2;
+  background: transparent;
 }
 
 /* === МЕДІА === */
@@ -317,17 +331,23 @@ h2 {
   .flip-card-back {
     padding: 12px !important;
   }
-}
-.scroll-top-button {
-  background-color: #007bff;
-  color: white;
-  padding: 10px 18px;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-.scroll-top-button:hover {
-  background-color: #0056b3;
+
+  .menu-dropdown {
+    width: 100%;
+    border-radius: 8px;
+    margin-top: 8px;
+  }
+
+  .menu-item {
+    text-align: center;
+  }
+
+  .top-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-action {
+    justify-content: center;
+  }
 }
