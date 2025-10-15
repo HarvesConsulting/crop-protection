@@ -315,6 +315,35 @@ function CardView({ title, entries, diagnostics = [], plantingDate, rainDaily = 
   );
 }
 
+// НОВИЙ КОМПОНЕНТ ДЛЯ ЗАГОЛОВКІВ КАРТОК
+function DiseaseSectionHeader({ 
+  name, 
+  isExpanded, 
+  onToggle, 
+  entryCount,
+  icon = "🛡️"
+}) {
+  return (
+    <div 
+      className="disease-section-header"
+      onClick={onToggle}
+    >
+      <div className="disease-header-content">
+        <div className="disease-icon">{icon}</div>
+        <div className="disease-info">
+          <h3 className="disease-name">Захисні заходи проти {name}</h3>
+          <div className="disease-stats">
+            <span className="treatment-count">{entryCount} обробок</span>
+            <span className="expand-indicator">
+              {isExpanded ? "▲ Згорнути" : "▼ Розгорнути"}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Step4Results({ result, onRestart }) {
   // Всі хуки на початку
   const [showIntegrated, setShowIntegrated] = useState(false);
@@ -668,34 +697,13 @@ export default function Step4Results({ result, onRestart }) {
   <>
     {hasPhytophthora && (
       <div className="card-section">
-        <div 
-          style={{
-            backgroundColor: '#e8f5e8',
-            border: '2px solid #4caf50',
-            borderRadius: '12px',
-            padding: '16px 20px',
-            marginBottom: '16px',
-            cursor: 'pointer',
-            userSelect: 'none'
-          }}
-          onClick={() => toggleDisease("Фітофтороз")}
-        >
-          <div className="flex items-center justify-between">
-            <div style={{
-              fontSize: '16px',
-              fontWeight: '600',
-              color: '#2e7d32'
-            }}>
-              Рекомендовані внесення (проти: Фітофтороз)
-            </div>
-            <span style={{
-              color: '#2e7d32',
-              fontSize: '18px'
-            }}>
-              {expandedDiseases["Фітофтороз"] ? "▲" : "▼"}
-            </span>
-          </div>
-        </div>
+        <DiseaseSectionHeader
+          name="Фітофтороз"
+          isExpanded={expandedDiseases["Фітофтороз"]}
+          onToggle={() => toggleDisease("Фітофтороз")}
+          entryCount={sprayData.length}
+          icon="🛡️"
+        />
 
         {expandedDiseases["Фітофтороз"] && (
           sprayData.length > 0 ? (
@@ -718,34 +726,13 @@ export default function Step4Results({ result, onRestart }) {
 
     {diseaseCardsGrouped?.map(({ name, entries }) => (
       <div key={name} className="card-section">
-        <div 
-          style={{
-            backgroundColor: '#e8f5e8',
-            border: '2px solid #4caf50',
-            borderRadius: '12px',
-            padding: '16px 20px',
-            marginBottom: '16px',
-            cursor: 'pointer',
-            userSelect: 'none'
-          }}
-          onClick={() => toggleDisease(name)}
-        >
-          <div className="flex items-center justify-between">
-            <div style={{
-              fontSize: '16px',
-              fontWeight: '600',
-              color: '#2e7d32'
-            }}>
-              Рекомендовані внесення (проти: {name})
-            </div>
-            <span style={{
-              color: '#2e7d32',
-              fontSize: '18px'
-            }}>
-              {expandedDiseases[name] ? "▲" : "▼"}
-            </span>
-          </div>
-        </div>
+        <DiseaseSectionHeader
+          name={name}
+          isExpanded={expandedDiseases[name]}
+          onToggle={() => toggleDisease(name)}
+          entryCount={entries.length}
+          icon="🦠"
+        />
 
         {expandedDiseases[name] && (
           entries.length > 0 ? (

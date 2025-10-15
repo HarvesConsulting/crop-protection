@@ -351,3 +351,91 @@ h2 {
     justify-content: center;
   }
 }
+/* НОВІ СТИЛІ ДЛЯ ЗАГОЛОВКІВ КАРТОК */
+.disease-section-header {
+  background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+  border: 2px solid #28a745;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.15);
+}
+
+.disease-section-header:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.25);
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+}
+
+.disease-header-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.disease-icon {
+  font-size: 24px;
+  width: 50px;
+  height: 50px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.disease-info {
+  flex: 1;
+}
+
+.disease-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #155724;
+  margin: 0 0 6px 0;
+}
+
+.disease-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.treatment-count {
+  background: #28a745;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.expand-indicator {
+  color: #155724;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* АДАПТИВНІСТЬ */
+@media (max-width: 768px) {
+  .disease-header-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+  
+  .disease-stats {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .disease-name {
+    font-size: 16px;
+  }
+}
