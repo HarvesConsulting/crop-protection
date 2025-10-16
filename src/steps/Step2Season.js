@@ -28,7 +28,7 @@ export default function Step2Season({
   useEffect(() => {
     const today = new Date();
     const maxDate = new Date(today);
-    maxDate.setDate(maxDate.getDate() + 15);
+    maxDate.setDate(maxDate.getDate() + 14);
     
     if (plantingDate) {
       const startDate = new Date(plantingDate);
