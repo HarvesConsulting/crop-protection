@@ -14,8 +14,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-    <!-- ✅ Точна копія стилів з SplashScreen.css -->
     <style>
+      /* Точні стилі з SplashScreen.css */
       .splash-wrapper {
         position: fixed;
         top: 0;
@@ -36,19 +36,22 @@
         padding: 2rem;
         max-width: 90%;
         position: relative;
-        z-index: 2;
+        z-index: 3;
       }
 
       .splash-logo {
         margin-bottom: 1rem;
         text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        position: relative;
+        z-index: 4;
       }
 
       .logo-icon {
         display: block;
         font-size: 4rem;
-        margin-bottom: 0.5rem;
+        margin-bottom: 1rem;
         filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        animation: float 3s ease-in-out infinite;
       }
 
       .logo-text {
@@ -56,6 +59,8 @@
         font-size: 2.5rem;
         font-weight: 700;
         margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 5;
       }
 
       .splash-subtitle {
@@ -64,11 +69,8 @@
         opacity: 0.9;
         font-weight: 300;
         letter-spacing: 0.5px;
-      }
-
-      /* Анімація логотипу */
-      .animate-logo {
-        animation: float 3s ease-in-out infinite;
+        position: relative;
+        z-index: 4;
       }
 
       @keyframes float {
@@ -76,7 +78,6 @@
         50% { transform: translateY(-10px); }
       }
 
-      /* Лоадер */
       .splash-loader {
         width: 200px;
         height: 4px;
@@ -86,6 +87,7 @@
         overflow: hidden;
         position: relative;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        z-index: 4;
       }
 
       .loader-bar {
@@ -119,19 +121,14 @@
         100% { transform: translateX(100%); }
       }
 
-      /* Анімація зникнення */
       .fade-out {
         animation: fadeOut 0.5s ease-in-out forwards;
       }
 
       @keyframes fadeOut {
-        to {
-          opacity: 0;
-          visibility: hidden;
-        }
+        to { opacity: 0; visibility: hidden; }
       }
 
-      /* Декоративні елементи фону */
       .splash-background-elements {
         position: absolute;
         top: 0;
@@ -148,109 +145,37 @@
         background: rgba(233, 245, 219, 0.1);
         animation: float 6s ease-in-out infinite;
         backdrop-filter: blur(2px);
+        z-index: 1;
       }
 
-      .circle-1 {
-        width: 120px;
-        height: 120px;
-        top: 15%;
-        left: 10%;
-        animation-delay: 0s;
-        background: rgba(183, 228, 168, 0.15);
-      }
+      .circle-1 { width: 120px; height: 120px; top: 15%; left: 10%; animation-delay: 0s; }
+      .circle-2 { width: 180px; height: 180px; bottom: 25%; right: 10%; animation-delay: 2s; }
+      .circle-3 { width: 80px; height: 80px; top: 65%; left: 85%; animation-delay: 4s; }
 
-      .circle-2 {
-        width: 180px;
-        height: 180px;
-        bottom: 25%;
-        right: 10%;
-        animation-delay: 2s;
-        background: rgba(233, 245, 219, 0.1);
-      }
-
-      .circle-3 {
-        width: 80px;
-        height: 80px;
-        top: 65%;
-        left: 85%;
-        animation-delay: 4s;
-        background: rgba(183, 228, 168, 0.2);
-      }
-
-      /* Додаткові декоративні елементи */
       .leaf {
         position: absolute;
         font-size: 2rem;
         opacity: 0.3;
         animation: float 4s ease-in-out infinite;
+        z-index: 1;
       }
 
-      .leaf-1 {
-        top: 20%;
-        right: 15%;
-        animation-delay: 1s;
-      }
+      .leaf-1 { top: 20%; right: 15%; animation-delay: 1s; }
+      .leaf-2 { bottom: 30%; left: 15%; animation-delay: 3s; }
 
-      .leaf-2 {
-        bottom: 30%;
-        left: 15%;
-        animation-delay: 3s;
-      }
-
-      /* Адаптивність */
       @media (max-width: 768px) {
-        .splash-content {
-          padding: 1.5rem;
-        }
-        
-        .logo-icon {
-          font-size: 3rem;
-        }
-        
-        .logo-text {
-          font-size: 2rem;
-        }
-        
-        .splash-subtitle {
-          font-size: 1rem;
-        }
-        
-        .splash-loader {
-          width: 180px;
-        }
-        
-        .bg-circle {
-          display: none;
-        }
+        .logo-icon { font-size: 3rem; }
+        .logo-text { font-size: 2rem; }
+        .splash-subtitle { font-size: 1rem; }
+        .splash-loader { width: 180px; }
+        .bg-circle { display: none; }
       }
 
-      @media (max-width: 480px) {
-        .logo-icon {
-          font-size: 2.5rem;
-        }
-        
-        .logo-text {
-          font-size: 1.8rem;
-        }
-        
-        .splash-subtitle {
-          font-size: 0.9rem;
-        }
-        
-        .splash-loader {
-          width: 160px;
-        }
-      }
-
-      /* Блокування прокрутки */
-      body.splash-active {
-        overflow: hidden !important;
-      }
+      body.splash-active { overflow: hidden !important; }
     </style>
   </head>
 
   <body class="splash-active">
-    <!-- ✅ Точна копія розмітки з SplashScreen.jsx -->
     <div
       id="initial-splash"
       class="splash-wrapper"
@@ -259,80 +184,54 @@
       aria-busy="true"
       aria-label="Завантаження додатку"
     >
+      <!-- Декоративні елементи - НИЖЧИЙ пріоритет -->
+      <div class="splash-background-elements">
+        <div class="bg-circle circle-1"></div>
+        <div class="bg-circle circle-2"></div>
+        <div class="bg-circle circle-3"></div>
+        <div class="leaf leaf-1" aria-hidden="true">🍃</div>
+        <div class="leaf leaf-2" aria-hidden="true">🌿</div>
+      </div>
+
+      <!-- Основний контент - ВИЩИЙ пріоритет -->
       <div class="splash-content">
         <div class="splash-logo animate-logo">
-          <span class="logo-icon" aria-hidden="true">🌱</span>
+          <span class="logo-icon" aria-hidden="true">🍅</span>
           <span class="logo-text">Crop Protection</span>
         </div>
         
         <div class="splash-subtitle">завантаження застосунку…</div>
         
         <div class="splash-loader" aria-hidden="true">
-          <div 
-            class="loader-bar" 
-            role="progressbar"
-            aria-valuemin="0"
-            aria-valuemax="100"
-            aria-valuetext="Завантаження"
-          ></div>
-        </div>
-        
-        <!-- Декоративні елементи фону -->
-        <div class="splash-background-elements">
-          <div class="bg-circle circle-1"></div>
-          <div class="bg-circle circle-2"></div>
-          <div class="bg-circle circle-3"></div>
-          <div class="leaf leaf-1" aria-hidden="true">🍃</div>
-          <div class="leaf leaf-2" aria-hidden="true">🌿</div>
+          <div class="loader-bar" role="progressbar"></div>
         </div>
       </div>
     </div>
 
-    <!-- Основний React root -->
     <div id="root"></div>
 
-    <!-- ✅ Скрипт з точною логікою як у React компонента -->
     <script>
       (function() {
         const splash = document.getElementById('initial-splash');
         const minDuration = 1500;
-        let ready = false;
-        let fadeOutTimer;
-        let removeTimer;
+        
+        setTimeout(() => {
+          splash.classList.add('fade-out');
+          setTimeout(() => {
+            if (splash.parentNode) {
+              splash.remove();
+              document.body.classList.remove('splash-active');
+            }
+          }, 500);
+        }, minDuration);
 
-        // Симуляція готовності додатку (React завантажився)
-        function setAppReady() {
-          if (ready) return;
-          ready = true;
-          
-          fadeOutTimer = setTimeout(() => {
+        // Запасний таймер
+        setTimeout(() => {
+          if (splash.parentNode) {
             splash.classList.add('fade-out');
-            
-            removeTimer = setTimeout(() => {
-              if (splash.parentNode) {
-                splash.remove();
-                document.body.classList.remove('splash-active');
-              }
-            }, 500);
-          }, minDuration);
-        }
-
-        // Слухаємо подію завантаження сторінки
-        window.addEventListener('load', setAppReady);
-
-        // Запасний варіант - якщо React вже завантажився
-        if (document.readyState === 'complete') {
-          setAppReady();
-        }
-
-        // Максимальний час показу (5 секунд)
-        setTimeout(setAppReady, 5000);
-
-        // Очищення таймерів при виході (на всяк випадок)
-        window.addEventListener('beforeunload', () => {
-          if (fadeOutTimer) clearTimeout(fadeOutTimer);
-          if (removeTimer) clearTimeout(removeTimer);
-        });
+            setTimeout(() => splash.remove(), 500);
+          }
+        }, 5000);
       })();
     </script>
   </body>

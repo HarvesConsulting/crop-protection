@@ -48,15 +48,6 @@ function SplashScreen({
     };
   }, [ready, minDuration, onFinish]);
 
-  // Додаємо клас для плавного переходу при завантаженні
-  useEffect(() => {
-    document.body.classList.add('splash-active');
-    
-    return () => {
-      document.body.classList.remove('splash-active');
-    };
-  }, []);
-
   if (!visible) return null;
 
   return (
@@ -67,6 +58,16 @@ function SplashScreen({
       aria-busy={!ready}
       aria-label="Завантаження додатку"
     >
+      {/* Декоративні елементи фону - НИЖЧИЙ z-index */}
+      <div className="splash-background-elements">
+        <div className="bg-circle circle-1"></div>
+        <div className="bg-circle circle-2"></div>
+        <div className="bg-circle circle-3"></div>
+        <div className="leaf leaf-1" aria-hidden="true">🍃</div>
+        <div className="leaf leaf-2" aria-hidden="true">🌿</div>
+      </div>
+
+      {/* Основний контент - ВИЩИЙ z-index */}
       <div className="splash-content">
         <div className="splash-logo animate-logo">
           <span className="logo-icon" aria-hidden="true">{logo}</span>
@@ -83,15 +84,6 @@ function SplashScreen({
             aria-valuemax="100"
             aria-valuetext="Завантаження"
           ></div>
-        </div>
-        
-        {/* Декоративні елементи фону */}
-        <div className="splash-background-elements">
-          <div className="bg-circle circle-1"></div>
-          <div className="bg-circle circle-2"></div>
-          <div className="bg-circle circle-3"></div>
-          <div className="leaf leaf-1" aria-hidden="true">🍃</div>
-          <div className="leaf leaf-2" aria-hidden="true">🌿</div>
         </div>
       </div>
     </div>
