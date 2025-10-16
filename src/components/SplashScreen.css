@@ -1,97 +1,160 @@
 .splash-wrapper {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #184e2f; /* Зелений фон */
-  color: white;
-  font-family: "Segoe UI", Roboto, sans-serif;
   z-index: 9999;
-  transition: opacity 0.8s ease;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .splash-content {
   text-align: center;
-  padding: 40px 56px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  backdrop-filter: blur(14px) saturate(140%);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
-  animation: splashIn 0.6s ease both;
+  color: white;
+  padding: 2rem;
+  max-width: 90%;
 }
 
 .splash-logo {
-  font-weight: 800;
-  font-size: 22px;
-  color: #ffffff;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-
-.animate-logo {
-  animation: logoMove 2.4s ease-in-out infinite;
-}
-
-@keyframes logoMove {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-6px);
-  }
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.3);
 }
 
 .splash-subtitle {
-  margin-top: 8px;
-  font-size: 15px;
-  color: #e8f5e9;
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
   opacity: 0.9;
+  font-weight: 300;
 }
 
+/* Анімація логотипу */
+.animate-logo {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Покращений лоадер */
 .splash-loader {
-  position: relative;
-  margin: 22px auto 0;
-  width: 180px;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.45);
-  border-radius: 999px;
+  width: 200px;
+  height: 4px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 4px;
+  margin: 0 auto;
   overflow: hidden;
+  position: relative;
 }
 
 .loader-bar {
+  height: 100%;
+  width: 40%;
+  background: linear-gradient(90deg, #ffd89b, #19547b);
+  border-radius: 4px;
+  animation: loading 2s ease-in-out infinite;
+  position: relative;
+}
+
+.loader-bar::after {
+  content: '';
   position: absolute;
-  inset: 0 auto 0 0;
-  width: 60px;
-  background: #ffffff;
-  border-radius: 999px;
-  animation: loaderMove 1.2s infinite ease-in-out;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: shimmer 1.5s ease-in-out infinite;
 }
 
-@keyframes loaderMove {
-  0% {
-    left: -60px;
-    width: 60px;
-  }
-  50% {
-    left: 120px;
-    width: 90px;
-  }
-  100% {
-    left: 180px;
-    width: 60px;
-  }
+@keyframes loading {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(150%); }
+  100% { transform: translateX(250%); }
 }
 
-@keyframes splashIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px) scale(0.98);
-  }
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Анімація зникнення */
+.splash-wrapper.fade-out {
+  animation: fadeOut 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeOut {
   to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+    opacity: 0;
+    visibility: hidden;
   }
 }
 
+/* Адаптивність */
+@media (max-width: 768px) {
+  .splash-logo {
+    font-size: 2rem;
+  }
+  
+  .splash-subtitle {
+    font-size: 1rem;
+  }
+}
+/* Декоративні елементи фону */
+.splash-background-elements {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.bg-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  animation: float 6s ease-in-out infinite;
+}
+
+.circle-1 {
+  width: 100px;
+  height: 100px;
+  top: 20%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.circle-2 {
+  width: 150px;
+  height: 150px;
+  bottom: 30%;
+  right: 15%;
+  animation-delay: 2s;
+}
+
+.circle-3 {
+  width: 70px;
+  height: 70px;
+  top: 60%;
+  left: 80%;
+  animation-delay: 4s;
+}
+
+.logo-icon {
+  display: block;
+  font-size: 4rem;
+  margin-bottom: 0.5rem;
+}
+
+.logo-text {
+  display: block;
+  font-size: 2rem;
+}
