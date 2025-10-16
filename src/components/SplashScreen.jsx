@@ -5,7 +5,7 @@ function SplashScreen({
   ready = false, 
   minDuration = 1500, 
   onFinish,
-  logo = "🌱",
+  logo = "🍅",
   title = "Crop Protection",
   subtitle = "завантаження застосунку…"
 }) {

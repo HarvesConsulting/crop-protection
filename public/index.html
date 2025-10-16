@@ -3,11 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HarvestConsulting</title>
+    <title>Crop Protection</title>
 
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="theme-color" content="#184e2f" />
+    <meta name="theme-color" content="#2d5016" />
 
     <!-- iOS -->
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-touch-icon.png" />
@@ -19,19 +19,36 @@
       .splash-logo-box {
         text-align: center;
         color: #fff;
-        font-family: system-ui, Arial, sans-serif;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      .logo-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        display: block;
+        filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        animation: float 3s ease-in-out infinite;
       }
 
       .splash-title {
-        font-size: 28px;
-        font-weight: 800;
-        letter-spacing: 1px;
+        font-size: 2.5rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.3);
       }
 
       .splash-subtitle {
-        font-size: 14px;
+        font-size: 1.1rem;
         opacity: 0.9;
-        margin-top: 6px;
+        margin-top: 1rem;
+        font-weight: 300;
+        letter-spacing: 0.5px;
+      }
+
+      @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
       }
 
       /* Плавне зникнення splash */
@@ -39,6 +56,58 @@
         opacity: 0;
         transition: opacity 0.6s ease;
         pointer-events: none;
+      }
+
+      /* Декоративні елементи */
+      .bg-circle {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(233, 245, 219, 0.1);
+        animation: float 6s ease-in-out infinite;
+        pointer-events: none;
+      }
+
+      .circle-1 {
+        width: 120px;
+        height: 120px;
+        top: 15%;
+        left: 10%;
+        animation-delay: 0s;
+      }
+
+      .circle-2 {
+        width: 180px;
+        height: 180px;
+        bottom: 25%;
+        right: 10%;
+        animation-delay: 2s;
+      }
+
+      .circle-3 {
+        width: 80px;
+        height: 80px;
+        top: 65%;
+        left: 85%;
+        animation-delay: 4s;
+      }
+
+      /* Адаптивність */
+      @media (max-width: 768px) {
+        .logo-icon {
+          font-size: 3rem;
+        }
+        
+        .splash-title {
+          font-size: 2rem;
+        }
+        
+        .splash-subtitle {
+          font-size: 1rem;
+        }
+        
+        .bg-circle {
+          display: none;
+        }
       }
     </style>
   </head>
@@ -53,15 +122,50 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        background: #184e2f;
+        background: linear-gradient(135deg, #2d5016 0%, #4a7c2a 50%, #6ba543 100%);
         z-index: 99999;
         color: white;
-        font-family: system-ui, sans-serif;"
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;"
     >
+      <!-- Декоративні круги -->
+      <div class="bg-circle circle-1"></div>
+      <div class="bg-circle circle-2"></div>
+      <div class="bg-circle circle-3"></div>
+
       <div class="splash-logo-box">
-        <h1 class="splash-title"><em>by</em> HarvestConsulting</h1>        
+        <span class="logo-icon">🍅</span>
+        <h1 class="splash-title">Crop Protection</h1>
+        <div class="splash-subtitle">завантаження застосунку…</div>
+        
+        <!-- Лоадер -->
+        <div style="
+          width: 200px; 
+          height: 4px; 
+          background: rgba(255,255,255,0.2); 
+          border-radius: 4px; 
+          margin: 2rem auto 0; 
+          overflow: hidden;
+          position: relative;">
+          <div style="
+            height: 100%; 
+            width: 40%; 
+            background: linear-gradient(90deg, #e9f5db, #b7e4a8); 
+            border-radius: 4px; 
+            animation: loading 2s ease-in-out infinite;
+            position: relative;">
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- Додаємо стилі для анімації лоадера -->
+    <style>
+      @keyframes loading {
+        0% { transform: translateX(-100%); }
+        50% { transform: translateX(150%); }
+        100% { transform: translateX(250%); }
+      }
+    </style>
 
     <!-- Основний React root -->
     <div id="root"></div>
@@ -71,12 +175,26 @@
       window.addEventListener("load", () => {
         const splash = document.getElementById("initial-splash");
         if (splash) {
+          // Додаємо затримку для мінімального часу показу (як у React компоненті)
+          setTimeout(() => {
+            splash.classList.add("fade-out");
+            setTimeout(() => {
+              if (splash.parentNode) {
+                splash.remove();
+              }
+            }, 600);
+          }, 1500); // Мінімальний час показу - 1500мс
+        }
+      });
+
+      // Запасний варіант - видалити через максимальний час (на випадок помилок)
+      setTimeout(() => {
+        const splash = document.getElementById("initial-splash");
+        if (splash && splash.parentNode) {
           splash.classList.add("fade-out");
           setTimeout(() => splash.remove(), 600);
         }
-      });
+      }, 5000); // Максимум 5 секунд
     </script>
   </body>
 </html>
-
-
