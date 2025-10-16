@@ -5,6 +5,7 @@ import {
   createUserWithEmailAndPassword,
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
+import { Visibility, VisibilityOff, Email, Lock } from "@mui/icons-material";
 
 export default function LoginPage({ onLogin }) {
   const [email, setEmail] = useState("");
@@ -13,6 +14,7 @@ export default function LoginPage({ onLogin }) {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  
   const images = [
     "/images/bg1.png",
     "/images/bg2.png",
@@ -45,14 +47,27 @@ export default function LoginPage({ onLogin }) {
       }
       onLogin(userCredential.user);
     } catch (err) {
-      setError(err.message);
+      setError(getErrorMessage(err.code));
     } finally {
       setIsLoading(false);
     }
   };
 
+  const getErrorMessage = (code) => {
+    const messages = {
+      "auth/invalid-email": "Невірний формат email",
+      "auth/user-disabled": "Акаунт заблоковано",
+      "auth/user-not-found": "Користувача не знайдено",
+      "auth/wrong-password": "Невірний пароль",
+      "auth/email-already-in-use": "Цей email вже використовується",
+      "auth/weak-password": "Пароль занадто простий",
+      "auth/network-request-failed": "Помилка мережі",
+    };
+    return messages[code] || "Сталася помилка. Спробуйте ще раз.";
+  };
+
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleAuth();
     }
   };
@@ -66,24 +81,22 @@ export default function LoginPage({ onLogin }) {
         }}
       />
       <div style={overlayStyle} />
+      
       <div style={containerStyle}>
         <div style={cardStyle}>
+          {/* Заголовок з іконкою */}
           <div style={headerStyle}>
-            <div style={logoStyle}>
-              <div style={logoIconStyle}>⚡</div>
-            </div>
-            <h2 style={titleStyle}>
-              {isRegistering ? "Створити акаунт" : "Ласкаво просимо"}
-            </h2>
+            <div style={logoStyle}>🍅</div>
+            <h1 style={titleStyle}>Crop Protection</h1>
             <p style={subtitleStyle}>
-              {isRegistering 
-                ? "Зареєструйтесь, щоб почати роботу" 
-                : "Увійдіть у свій акаунт"}
+              {isRegistering ? "Створіть новий акаунт" : "Увійдіть у свій акаунт"}
             </p>
           </div>
 
+          {/* Форма */}
           <div style={formStyle}>
-            <div style={inputGroupStyle}>
+            <div style={inputContainerStyle}>
+              <Email style={inputIconStyle} />
               <input
                 type="email"
                 placeholder="Email"
@@ -94,69 +107,59 @@ export default function LoginPage({ onLogin }) {
                 disabled={isLoading}
               />
             </div>
-            
-            <div style={inputGroupStyle}>
-              <div style={passwordContainerStyle}>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Пароль"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  style={{ ...inputStyle, paddingRight: 50 }}
-                  disabled={isLoading}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  style={eyeButtonStyle}
-                  title={showPassword ? "Сховати пароль" : "Показати пароль"}
-                  disabled={isLoading}
-                >
-                  {showPassword ? "🙈" : "👁️"}
-                </button>
+
+            <div style={inputContainerStyle}>
+              <Lock style={inputIconStyle} />
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Пароль"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyPress={handleKeyPress}
+                style={{ ...inputStyle, paddingRight: 50 }}
+                disabled={isLoading}
+              />
+              <div 
+                style={eyeIconStyle}
+                onClick={() => setShowPassword(!showPassword)}
+                title={showPassword ? "Сховати пароль" : "Показати пароль"}
+              >
+                {showPassword ? <VisibilityOff /> : <Visibility />}
               </div>
             </div>
 
             <button 
               onClick={handleAuth} 
-              style={isLoading ? { ...buttonStyle, ...buttonLoadingStyle } : buttonStyle}
+              style={buttonStyle}
               disabled={isLoading || !email || !password}
             >
               {isLoading ? (
-                <div style={spinnerStyle} />
+                <div style={spinnerStyle}></div>
               ) : (
-                isRegistering ? "Створити акаунт" : "Увійти"
+                isRegistering ? "Зареєструватись" : "Увійти"
               )}
+              {!isLoading && (isRegistering ? " →" : " →")}
             </button>
 
             {error && (
               <div style={errorStyle}>
-                <span style={errorIconStyle}>⚠</span>
-                <span style={errorTextStyle}>
-                  {error.includes("invalid-credential") 
-                    ? "Невірний email або пароль" 
-                    : error.includes("email-already-in-use")
-                    ? "Користувач з таким email вже існує"
-                    : error.includes("weak-password")
-                    ? "Пароль повинен містити щонайменше 6 символів"
-                    : "Сталася помилка. Спробуйте ще раз"}
-                </span>
+                ⚠ {error}
               </div>
             )}
+          </div>
 
-            <div style={dividerStyle}>
-              <span style={dividerTextStyle}>або</span>
-            </div>
-
-            <p 
-              onClick={() => !isLoading && setIsRegistering(!isRegistering)} 
-              style={isLoading ? { ...toggleStyle, ...disabledStyle } : toggleStyle}
-            >
-              {isRegistering
-                ? "Вже є акаунт? Увійти"
-                : "Ще немає акаунта? Зареєструватись"}
+          {/* Перемикач */}
+          <div style={toggleContainerStyle}>
+            <p style={toggleTextStyle}>
+              {isRegistering ? "Вже маєте акаунт?" : "Ще не маєте акаунта?"}
             </p>
+            <button 
+              onClick={() => setIsRegistering(!isRegistering)}
+              style={toggleButtonStyle}
+              disabled={isLoading}
+            >
+              {isRegistering ? "Увійти" : "Зареєструватись"}
+            </button>
           </div>
         </div>
       </div>
@@ -164,13 +167,13 @@ export default function LoginPage({ onLogin }) {
   );
 }
 
-// 🎨 ОНОВЛЕНІ СТИЛІ
+// 🎨 ПОКРАЩЕНІ СТИЛІ
 const wrapperStyle = {
   position: "relative",
   width: "100%",
   height: "100vh",
   overflow: "hidden",
-  fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif",
+  fontFamily: "'Segoe UI', system-ui, sans-serif",
 };
 
 const backgroundStyle = {
@@ -181,7 +184,7 @@ const backgroundStyle = {
   height: "100%",
   backgroundSize: "cover",
   backgroundPosition: "center",
-  transition: "background-image 1.2s ease-in-out",
+  transition: "background-image 1.5s ease-in-out",
   zIndex: 0,
 };
 
@@ -191,7 +194,7 @@ const overlayStyle = {
   left: 0,
   width: "100%",
   height: "100%",
-  background: "linear-gradient(135deg, rgba(16, 57, 150, 0.85) 0%, rgba(52, 152, 219, 0.8) 100%)",
+  background: "linear-gradient(135deg, rgba(45, 80, 22, 0.85) 0%, rgba(74, 124, 42, 0.8) 100%)",
   zIndex: 1,
 };
 
@@ -209,13 +212,15 @@ const cardStyle = {
   background: "rgba(255, 255, 255, 0.95)",
   backdropFilter: "blur(20px)",
   padding: "40px",
-  borderRadius: "20px",
+  borderRadius: "24px",
   boxShadow: `
-    0 20px 40px rgba(0, 0, 0, 0.1),
-    0 0 0 1px rgba(255, 255, 255, 0.2)
+    0 20px 60px rgba(0, 0, 0, 0.15),
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6)
   `,
   width: "100%",
   maxWidth: "440px",
+  border: "1px solid rgba(255, 255, 255, 0.3)",
   animation: "slideUp 0.6s ease-out",
 };
 
@@ -225,106 +230,91 @@ const headerStyle = {
 };
 
 const logoStyle = {
-  display: "flex",
-  justifyContent: "center",
+  fontSize: "48px",
   marginBottom: "16px",
-};
-
-const logoIconStyle = {
-  width: "60px",
-  height: "60px",
-  borderRadius: "16px",
-  background: "linear-gradient(135deg, #2d6cdf 0%, #3498db 100%)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  fontSize: "28px",
-  color: "white",
-  boxShadow: "0 8px 20px rgba(45, 108, 223, 0.3)",
+  filter: "drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1))",
 };
 
 const titleStyle = {
   fontSize: "28px",
-  fontWeight: "700",
+  fontWeight: "800",
   color: "#1a202c",
   margin: "0 0 8px 0",
-  letterSpacing: "-0.5px",
+  background: "linear-gradient(135deg, #2d5016 0%, #4a7c2a 100%)",
+  WebkitBackgroundClip: "text",
+  WebkitTextFillColor: "transparent",
+  backgroundClip: "text",
 };
 
 const subtitleStyle = {
   fontSize: "16px",
   color: "#718096",
   margin: 0,
-  fontWeight: "400",
+  fontWeight: "500",
 };
 
 const formStyle = {
-  display: "flex",
-  flexDirection: "column",
-  gap: "20px",
+  marginBottom: "24px",
 };
 
-const inputGroupStyle = {
-  display: "flex",
-  flexDirection: "column",
-  gap: "8px",
+const inputContainerStyle = {
+  position: "relative",
+  marginBottom: "20px",
+};
+
+const inputIconStyle = {
+  position: "absolute",
+  left: "16px",
+  top: "50%",
+  transform: "translateY(-50%)",
+  color: "#a0aec0",
+  fontSize: "20px",
+  zIndex: 1,
 };
 
 const inputStyle = {
   width: "100%",
-  padding: "16px 20px",
+  padding: "16px 16px 16px 48px",
   border: "2px solid #e2e8f0",
   borderRadius: "12px",
   fontSize: "16px",
   boxSizing: "border-box",
-  transition: "all 0.2s ease",
-  background: "white",
+  backgroundColor: "rgba(255, 255, 255, 0.8)",
+  transition: "all 0.3s ease",
   outline: "none",
   fontFamily: "inherit",
 };
 
-const passwordContainerStyle = {
-  position: "relative",
-  display: "flex",
-  alignItems: "center",
-};
-
-const eyeButtonStyle = {
+const eyeIconStyle = {
   position: "absolute",
-  right: "12px",
-  background: "none",
-  border: "none",
-  fontSize: "20px",
+  right: "16px",
+  top: "50%",
+  transform: "translateY(-50%)",
   cursor: "pointer",
-  padding: "8px",
-  borderRadius: "8px",
-  transition: "background-color 0.2s ease",
-  color: "#718096",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
+  color: "#a0aec0",
+  zIndex: 1,
+  transition: "color 0.2s ease",
 };
 
 const buttonStyle = {
   width: "100%",
   padding: "16px 24px",
-  background: "linear-gradient(135deg, #2d6cdf 0%, #3498db 100%)",
+  background: "linear-gradient(135deg, #2d5016 0%, #4a7c2a 100%)",
   color: "white",
-  fontWeight: "600",
+  fontWeight: "700",
   border: "none",
   borderRadius: "12px",
   cursor: "pointer",
   fontSize: "16px",
-  transition: "all 0.3s ease",
-  boxShadow: "0 4px 15px rgba(45, 108, 223, 0.3)",
   fontFamily: "inherit",
+  transition: "all 0.3s ease",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: "8px",
+  boxShadow: "0 4px 16px rgba(45, 80, 22, 0.3)",
   position: "relative",
   overflow: "hidden",
-};
-
-const buttonLoadingStyle = {
-  opacity: 0.8,
-  cursor: "not-allowed",
 };
 
 const spinnerStyle = {
@@ -334,106 +324,92 @@ const spinnerStyle = {
   borderTop: "2px solid white",
   borderRadius: "50%",
   animation: "spin 1s linear infinite",
-  margin: "0 auto",
 };
 
 const errorStyle = {
-  display: "flex",
-  alignItems: "center",
-  gap: "12px",
-  padding: "16px",
-  background: "#fed7d7",
-  border: "1px solid #feb2b2",
-  borderRadius: "12px",
+  background: "linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%)",
   color: "#c53030",
-};
-
-const errorIconStyle = {
-  fontSize: "18px",
-  flexShrink: 0,
-};
-
-const errorTextStyle = {
-  fontSize: "14px",
-  fontWeight: "500",
-  lineHeight: "1.4",
-};
-
-const dividerStyle = {
-  position: "relative",
-  textAlign: "center",
-  margin: "8px 0",
-};
-
-const dividerTextStyle = {
-  display: "inline-block",
-  padding: "0 16px",
-  background: "rgba(255, 255, 255, 0.95)",
-  color: "#718096",
-  fontSize: "14px",
-  fontWeight: "500",
-};
-
-const toggleStyle = {
-  textAlign: "center",
-  color: "#2d6cdf",
-  cursor: "pointer",
-  fontWeight: "600",
-  fontSize: "15px",
-  transition: "color 0.2s ease",
-  margin: 0,
-  padding: "12px",
+  padding: "12px 16px",
   borderRadius: "8px",
+  marginTop: "16px",
+  fontSize: "14px",
+  fontWeight: "500",
+  border: "1px solid #fc8181",
+  textAlign: "center",
 };
 
-const disabledStyle = {
-  opacity: 0.5,
-  cursor: "not-allowed",
+const toggleContainerStyle = {
+  textAlign: "center",
+  paddingTop: "20px",
+  borderTop: "1px solid #e2e8f0",
 };
 
-// Додаємо CSS анімації
-const styles = `
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
+const toggleTextStyle = {
+  color: "#718096",
+  margin: "0 0 12px 0",
+  fontSize: "14px",
+};
 
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
+const toggleButtonStyle = {
+  background: "none",
+  border: "none",
+  color: "#2d5016",
+  cursor: "pointer",
+  fontSize: "14px",
+  fontWeight: "600",
+  textDecoration: "underline",
+  fontFamily: "inherit",
+  transition: "color 0.2s ease",
+};
 
-  input:focus {
-    border-color: #2d6cdf !important;
-    box-shadow: 0 0 0 3px rgba(45, 108, 223, 0.1) !important;
-    transform: translateY(-1px);
+// Додайте ці анімації до вашого глобального CSS
+const globalStyles = `
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
   }
-
-  button:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(45, 108, 223, 0.4);
-  }
-
-  p:hover:not(:disabled) {
-    color: #1a56db;
-  }
-
-  button:active:not(:disabled) {
+  to {
+    opacity: 1;
     transform: translateY(0);
   }
+}
 
-  .eye-button:hover {
-    background-color: #f7fafc;
-  }
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+input:focus {
+  border-color: #4a7c2a !important;
+  box-shadow: 0 0 0 3px rgba(74, 124, 42, 0.1) !important;
+  background: white !important;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(45, 80, 22, 0.4);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.eye-icon:hover {
+  color: #4a7c2a;
+}
+
+.toggle-button:hover {
+  color: #4a7c2a;
+}
 `;
 
-// Додаємо стилі в документ
-const styleSheet = document.createElement("style");
-styleSheet.innerText = styles;
-document.head.appendChild(styleSheet);
+// Додайте глобальні стилі
+const styleSheet = document.styleSheets[0];
+styleSheet.insertRule(globalStyles, styleSheet.cssRules.length);
