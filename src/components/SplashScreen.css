@@ -109,9 +109,13 @@
 }
 
 @keyframes fadeOut {
-  to { opacity: 0; visibility: hidden; }
+  to { 
+    opacity: 0; 
+    visibility: hidden; 
+  }
 }
 
+/* Декоративні елементи фону */
 .splash-background-elements {
   position: absolute;
   top: 0;
@@ -126,32 +130,124 @@
   position: absolute;
   border-radius: 50%;
   background: rgba(233, 245, 219, 0.1);
-  animation: float 6s ease-in-out infinite;
+  animation: circleFloat 6s ease-in-out infinite;
   backdrop-filter: blur(2px);
   z-index: 1;
 }
 
-.circle-1 { width: 120px; height: 120px; top: 15%; left: 10%; animation-delay: 0s; }
-.circle-2 { width: 180px; height: 180px; bottom: 25%; right: 10%; animation-delay: 2s; }
-.circle-3 { width: 80px; height: 80px; top: 65%; left: 85%; animation-delay: 4s; }
+.circle-1 { 
+  width: 120px; 
+  height: 120px; 
+  top: 15%; 
+  left: 10%; 
+  animation-delay: 0s; 
+  background: rgba(183, 228, 168, 0.15);
+}
+
+.circle-2 { 
+  width: 180px; 
+  height: 180px; 
+  bottom: 25%; 
+  right: 10%; 
+  animation-delay: 2s; 
+  background: rgba(233, 245, 219, 0.1);
+}
+
+.circle-3 { 
+  width: 80px; 
+  height: 80px; 
+  top: 65%; 
+  left: 85%; 
+  animation-delay: 4s; 
+  background: rgba(183, 228, 168, 0.2);
+}
+
+@keyframes circleFloat {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-20px) scale(1.05); }
+}
 
 .leaf {
   position: absolute;
   font-size: 2rem;
   opacity: 0.3;
-  animation: float 4s ease-in-out infinite;
+  animation: leafFloat 4s ease-in-out infinite;
   z-index: 1;
 }
 
-.leaf-1 { top: 20%; right: 15%; animation-delay: 1s; }
-.leaf-2 { bottom: 30%; left: 15%; animation-delay: 3s; }
-
-@media (max-width: 768px) {
-  .logo-icon { font-size: 3rem; }
-  .logo-text { font-size: 2rem; }
-  .splash-subtitle { font-size: 1rem; }
-  .splash-loader { width: 180px; }
-  .bg-circle { display: none; }
+.leaf-1 { 
+  top: 20%; 
+  right: 15%; 
+  animation-delay: 1s; 
 }
 
-body.splash-active { overflow: hidden !important; }
+.leaf-2 { 
+  bottom: 30%; 
+  left: 15%; 
+  animation-delay: 3s; 
+}
+
+@keyframes leafFloat {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-15px) rotate(5deg); }
+  66% { transform: translateY(-10px) rotate(-3deg); }
+}
+
+/* Анімація для логотипу */
+.animate-logo {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Блокування прокрутки */
+body.splash-active { 
+  overflow: hidden !important; 
+}
+
+/* Адаптивність */
+@media (max-width: 768px) {
+  .logo-icon { 
+    font-size: 3rem; 
+  }
+  
+  .logo-text { 
+    font-size: 2rem; 
+  }
+  
+  .splash-subtitle { 
+    font-size: 1rem; 
+  }
+  
+  .splash-loader { 
+    width: 180px; 
+  }
+  
+  .bg-circle { 
+    display: none; 
+  }
+  
+  .leaf {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .splash-content {
+    padding: 1.5rem;
+  }
+  
+  .logo-icon { 
+    font-size: 2.5rem; 
+  }
+  
+  .logo-text { 
+    font-size: 1.8rem; 
+  }
+  
+  .splash-subtitle { 
+    font-size: 0.9rem; 
+  }
+  
+  .splash-loader { 
+    width: 160px; 
+  }
+}
