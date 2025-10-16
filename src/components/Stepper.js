@@ -10,19 +10,15 @@ const steps = [
 
 export default function Stepper({ currentStep }) {
   return (
-    <ol className="stepper">
+    <div className="progress-bar">
       {steps.map((step, index) => (
-        <li
+        <div
           key={step.id}
-          className={`step ${currentStep === step.id ? "active" : ""} ${
-            currentStep > step.id ? "completed" : ""
-          }`}
+          className={`progress-step ${currentStep === step.id ? "active" : ""}`}
         >
-          <div className="circle">{step.id}</div>
-          <span className="label">{step.name}</span>
-          {index < steps.length - 1 && <div className="line"></div>}
-        </li>
+          {step.id}. {step.name}
+        </div>
       ))}
-    </ol>
+    </div>
   );
 }
