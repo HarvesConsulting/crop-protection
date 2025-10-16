@@ -118,18 +118,6 @@ export default function Step2Season({
     onNext({ diseases });
   };
 
-  // Розрахунок дати завершення для відображення
-  const getEndDateDisplay = () => {
-    if (!plantingDate || !calculationPeriod || parseInt(calculationPeriod) < 1) return "";
-    
-    const period = parseInt(calculationPeriod);
-    const startDate = new Date(plantingDate);
-    const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + period);
-    
-    return endDate.toLocaleDateString('uk-UA');
-  };
-
   const isAllSelected = diseases.length === allDiseases.length;
 
   return (
@@ -189,7 +177,7 @@ export default function Step2Season({
                     value={calculationPeriod}
                     onChange={handleCalculationPeriodChange}
                     onBlur={handleCalculationPeriodBlur}
-                    className="w-20 sm:w-24 border border-gray-300 rounded-xl px-4 py-3 text-base text-center focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                    className="w-24 border border-gray-300 rounded-xl px-4 py-3 text-base text-center focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
                   />
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-700 whitespace-nowrap">
@@ -197,7 +185,7 @@ export default function Step2Season({
                     </span>
                     <button
                       onClick={setMaxPeriodToField}
-                      className="bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs font-medium px-2 py-1 rounded-lg border border-blue-300 transition-colors whitespace-nowrap"
+                      className="bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-medium px-3 py-2 rounded-lg border border-blue-200 transition-colors whitespace-nowrap"
                       title={`Встановити максимальний період (${maxPeriod} днів)`}
                     >
                       макс: {maxPeriod}
@@ -214,34 +202,34 @@ export default function Step2Season({
               Оберіть хвороби для моделювання:
             </label>
             
-            {/* Кнопка "Вибрати всі" - тепер з такими ж стилями як поле вводу */}
+            {/* Кнопка "Вибрати всі" */}
             <button
               onClick={toggleSelectAll}
-              className={`w-full border-2 rounded-xl px-4 py-3 text-base font-semibold transition-all mb-4 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+              className={`w-full border border-gray-300 rounded-xl px-4 py-3 text-base font-medium transition-all mb-4 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${
                 isAllSelected
-                  ? "bg-green-100 border-green-400 text-green-800 hover:bg-green-200"
-                  : "bg-white border-gray-300 text-gray-800 hover:bg-gray-50"
+                  ? "bg-green-50 text-green-700 hover:bg-green-100"
+                  : "bg-white text-gray-800 hover:bg-gray-50"
               }`}
             >
               {isAllSelected ? "✅ Всі хвороби обрані" : "Вибрати всі хвороби"}
             </button>
 
-            <div className="space-y-3">
+            {/* Хвороби у два стовбці */}
+            <div className="grid grid-cols-2 gap-3">
               {[
-                { id: "lateBlight", name: "Фітофтороз", emoji: "🍅" },
-                { id: "grayMold", name: "Сіра гниль", emoji: "🍇" },
-                { id: "alternaria", name: "Альтернаріоз", emoji: "🥔" },
-                { id: "bacteriosis", name: "Бактеріоз", emoji: "🥬" },
+                { id: "lateBlight", name: "Фітофтороз" },
+                { id: "grayMold", name: "Сіра гниль" },
+                { id: "alternaria", name: "Альтернаріоз" },
+                { id: "bacteriosis", name: "Бактеріоз" },
               ].map((d) => (
-                <label key={d.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                <label key={d.id} className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
                   <input
                     type="checkbox"
                     checked={diseases.includes(d.id)}
                     onChange={() => toggleDisease(d.id)}
                     className="w-5 h-5 text-green-600 rounded border-gray-300 focus:ring-green-500"
                   />
-                  <span className="flex items-center gap-2 text-gray-800 text-sm sm:text-base">
-                    <span className="text-base">{d.emoji}</span>
+                  <span className="text-gray-800 text-sm">
                     {d.name}
                   </span>
                 </label>
@@ -262,7 +250,7 @@ export default function Step2Season({
               disabled={!plantingDate || !calculationPeriod || parseInt(calculationPeriod) < 1 || diseases.length === 0}
               className={`px-6 py-3 rounded-xl text-white font-semibold transition flex items-center justify-center gap-2 text-sm sm:text-base order-1 sm:order-2 ${
                 plantingDate && calculationPeriod && parseInt(calculationPeriod) > 0 && diseases.length > 0
-                  ? "bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-xl"
+                  ? "bg-green-600 hover:bg-green-700"
                   : "bg-gray-400 cursor-not-allowed"
               }`}
             >
