@@ -1,175 +1,124 @@
-/* ОНОВЛЕНІ СТИЛІ ДЛЯ ЗАГОЛОВКІВ - ПОКРАЩЕНА ВЕРСІЯ */
+/* ОНОВЛЕНІ СТИЛІ ДЛЯ ЗАГОЛОВКІВ - ЯК В STEP 2 */
 .step4-results-container {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  padding: 20px;
 }
 
 .results-content {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border-radius: 20px;
-  padding: 2.5rem;
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.1),
-    0 2px 8px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-/* ПОКРАЩЕНИЙ ЗАГОЛОВОК */
+/* СТИЛЬ ЗАГОЛОВКА ЯК В STEP 2 */
 .results-header {
-  margin-bottom: 2.5rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
 }
 
 .header-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1.5rem;
+  margin-bottom: 16px;
 }
 
 .step-title {
-  font-size: 2rem !important;
-  font-weight: 800 !important;
-  color: #1a202c !important;
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  color: #1f2937 !important;
   margin: 0 !important;
-  line-height: 1.2 !important;
-  background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.5px;
+  line-height: 1.4 !important;
 }
 
 .info-button {
-  background: rgba(59, 130, 246, 0.1);
-  border: 2px solid rgba(59, 130, 246, 0.2);
-  color: #3b82f6;
+  background: none;
+  border: none;
   cursor: pointer;
-  padding: 0.75rem;
-  border-radius: 12px;
+  color: #2563eb;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  width: 3rem;
-  height: 3rem;
+  padding: 4px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
 }
 
 .info-button:hover {
-  background: rgba(59, 130, 246, 0.2);
   color: #1d4ed8;
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+  background-color: #f3f4f6;
 }
 
 .info-panel {
-  background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
-  border: 2px solid #93c5fd;
-  padding: 1.5rem;
-  border-radius: 16px;
-  font-size: 1rem;
-  line-height: 1.7;
-  color: #1e40af;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
-  animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  background: #dbeafe;
+  border: 1px solid #93c5fd;
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1e3a8a;
 }
 
 .info-panel p {
-  margin: 0 0 1rem 0;
-  font-weight: 500;
+  margin: 0 0 8px 0;
 }
 
 .info-panel p:last-child {
   margin-bottom: 0;
 }
 
-/* ПОКРАЩЕНІ СТИЛІ ТАБЛИЦІ */
+/* СТИЛІ ТАБЛИЦІ */
 .treatment-table-section {
-  margin-bottom: 3rem;
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 16px;
-  padding: 1.5rem;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  margin-bottom: 2.5rem;
 }
 
 .table-section-title {
-  font-size: 1.375rem;
-  font-weight: 700;
-  color: #2d3748;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 3px solid;
-  border-image: linear-gradient(135deg, #3b82f6, #8b5cf6) 1;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e9ecef;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  letter-spacing: -0.25px;
+  gap: 8px;
 }
 
 .table-container {
   overflow-x: auto;
-  border-radius: 16px;
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 
-    0 4px 20px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  background: white;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .treatment-table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  font-size: 0.95rem;
-  min-width: 900px;
+  border-collapse: collapse;
+  font-size: 14px;
+  min-width: 800px;
   background: white;
-  border-radius: 16px;
 }
 
 .treatment-table th {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  padding: 1.25rem 1rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 14px 12px;
   text-align: left;
-  font-weight: 700;
-  color: #475569;
-  border-bottom: 2px solid #e2e8f0;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 2px solid #dee2e6;
   white-space: nowrap;
-  font-size: 0.875rem;
+  font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  position: sticky;
-  top: 0;
-  backdrop-filter: blur(10px);
 }
 
 .treatment-table td {
-  padding: 1.25rem 1rem;
-  border-bottom: 1px solid #f1f5f9;
-  vertical-align: middle;
-  transition: all 0.3s ease;
-  font-weight: 500;
-}
-
-.treatment-table tr {
-  transition: all 0.3s ease;
+  padding: 14px 12px;
+  border-bottom: 1px solid #e9ecef;
+  vertical-align: top;
+  transition: background-color 0.2s ease;
 }
 
 .treatment-table .even-row {
@@ -182,354 +131,500 @@
 
 .treatment-table .even-row:hover,
 .treatment-table .odd-row:hover {
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-  transform: translateY(-2px);
-  box-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.1),
-    0 2px 4px rgba(0, 0, 0, 0.05);
-  border-radius: 8px;
+  background: #e3f2fd;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/* ПОКРАЩЕНІ СТИЛІ КОМІРОК ТАБЛИЦІ */
+/* СТИЛІ КОМІРОК ТАБЛИЦІ */
 .number-cell {
-  font-weight: 800;
-  color: #475569;
+  font-weight: 700;
+  color: #495057;
   text-align: center;
-  width: 70px;
-  font-size: 1rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-radius: 8px 0 0 8px;
+  width: 60px;
+  font-size: 13px;
 }
 
 .date-cell {
-  font-weight: 700;
-  color: #1e40af;
+  font-weight: 600;
+  color: #1565c0;
   white-space: nowrap;
-  width: 120px;
-  font-size: 0.95rem;
-  background: rgba(59, 130, 246, 0.05);
-  border-radius: 8px;
-  padding: 0.75rem 1rem !important;
+  width: 110px;
+  font-size: 13px;
 }
 
 .product-cell {
-  font-weight: 700;
-  color: #059669;
-  min-width: 180px;
-  font-size: 0.95rem;
-  line-height: 1.5;
+  font-weight: 600;
+  color: #2e7d32;
+  min-width: 160px;
+  font-size: 13px;
 }
 
 .norm-cell,
 .unit-cell {
   text-align: center;
   white-space: nowrap;
-  width: 100px;
-  font-weight: 600;
-  font-size: 0.95rem;
-  color: #6b7280;
+  width: 90px;
+  font-weight: 500;
+  font-size: 13px;
 }
 
 .recommendation-cell {
-  min-width: 150px;
+  min-width: 130px;
 }
 
 .recommendation-cell a {
-  color: #1e40af;
+  color: #1976d2;
   text-decoration: none;
-  font-size: 0.9rem;
-  font-weight: 600;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-  border: 1px solid #93c5fd;
-  transition: all 0.3s ease;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #f0f8ff;
+  transition: all 0.2s ease;
   display: inline-block;
 }
 
 .recommendation-cell a:hover {
-  background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
   text-decoration: none;
+  background: #1976d2;
+  color: white;
+  transform: translateY(-1px);
 }
 
 .card-cell {
   text-align: center;
-  width: 120px;
+  width: 110px;
 }
 
 .card-button {
-  background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
   color: white;
   border: none;
-  padding: 0.75rem 1.25rem;
-  border-radius: 10px;
+  padding: 8px 16px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 0.875rem;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 2px 4px rgba(25, 118, 210, 0.3);
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  letter-spacing: 0.25px;
+  gap: 4px;
 }
 
 .card-button:hover {
-  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.5);
+  background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(25, 118, 210, 0.4);
 }
 
 .card-button:active {
-  transform: translateY(-1px);
+  transform: translateY(0);
 }
 
-/* ПОКРАЩЕНІ ПОВІДОМЛЕННЯ ПРО ВІДСУТНІСТЬ ДАНИХ */
 .no-data-message {
   text-align: center;
-  color: #6b7280;
+  color: #6c757d;
   font-style: italic;
-  padding: 3rem 2rem;
-  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
-  border-radius: 16px;
-  font-size: 1.125rem;
-  border: 2px dashed #d1d5db;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  font-size: 14px;
 }
 
-.no-treatments-message {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border: 2px dashed #cbd5e1;
+/* ОНОВЛЕНІ СТИЛІ ДЛЯ МОДАЛЬНОГО ВІКНА КАРТКИ */
+.card-modal-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 500px;
+  max-height: 85vh;
+  background: white;
   border-radius: 16px;
-  padding: 3rem 2rem;
-  margin: 2rem 0;
-  text-align: center;
-  font-size: 1.125rem;
-  color: #64748b;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  overflow: hidden;
+  outline: none;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e9ecef;
 }
 
-.no-treatments-message p {
+.card-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 2px solid #e9ecef;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  flex-shrink: 0;
+}
+
+.card-modal-header h2 {
   margin: 0;
-  font-weight: 500;
-  line-height: 1.6;
+  color: #2c3e50;
+  font-size: 1.25rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-/* ПОКРАЩЕНІ КНОПКИ ДІЙ */
+.card-modal-content {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+  overscroll-behavior-x: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* КОЛЬОРИ КАРТОК - ПОКРАЩЕНІ */
+.card-modal-content.card-green {
+  background: linear-gradient(135deg, #f8fff9 0%, #e8f5e9 100%);
+  border-left: 6px solid #4caf50;
+}
+
+.card-modal-content.card-yellow {
+  background: linear-gradient(135deg, #fffdf6 0%, #fff3cd 100%);
+  border-left: 6px solid #ffc107;
+}
+
+.card-modal-content.card-red {
+  background: linear-gradient(135deg, #fff5f5 0%, #f8d7da 100%);
+  border-left: 6px solid #dc3545;
+}
+
+.card-modal-section {
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: 1px solid #f0f0f0;
+  transition: all 0.3s ease;
+}
+
+.card-modal-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.card-modal-section:last-child {
+  margin-bottom: 0;
+}
+
+.card-modal-section h4 {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-modal-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.card-modal-item {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f8f9fa;
+  font-size: 14px;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-modal-item:last-child {
+  border-bottom: none;
+}
+
+.card-modal-item strong {
+  color: #495057;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.weather-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.weather-stat {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 1.25rem;
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.weather-stat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.stat-label {
+  display: block;
+  font-size: 12px;
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+/* КОЛЬОРИ ДЛЯ СТАТИСТИКИ */
+.card-green .stat-value {
+  color: #28a745;
+}
+
+.card-yellow .stat-value {
+  color: #ffc107;
+}
+
+.card-red .stat-value {
+  color: #dc3545;
+}
+
+/* СТИЛІ ДЛЯ СТАТУСУ РИЗИКУ */
+.risk-status {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+  margin-bottom: 1.5rem !important;
+  border: none !important;
+}
+
+.risk-status .MuiTypography-subtitle1 {
+  color: white !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+}
+
+.card-green .risk-status {
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%) !important;
+}
+
+.card-yellow .risk-status {
+  background: linear-gradient(135deg, #ffc107 0%, #e6a700 100%) !important;
+}
+
+.card-red .risk-status {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+}
+
+/* КНОПКИ ДІЙ */
 .action-buttons {
   display: flex;
   gap: 1rem;
   justify-content: center;
-  margin-top: 3rem;
+  margin-top: 2rem;
   flex-wrap: wrap;
 }
 
 .action-button,
 .scroll-top-button {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #198754 0%, #157347 100%);
   color: white;
   border: none;
-  padding: 1rem 2rem;
-  border-radius: 12px;
+  padding: 12px 24px;
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: 700;
-  font-size: 1rem;
+  font-weight: 600;
+  font-size: 14px;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 2px 8px rgba(25, 135, 84, 0.3);
   display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
-  letter-spacing: 0.25px;
-  min-width: 160px;
-  justify-content: center;
+  gap: 8px;
 }
 
 .action-button:hover,
 .scroll-top-button:hover {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.5);
+  background: linear-gradient(135deg, #157347 0%, #0f5132 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(25, 135, 84, 0.4);
 }
 
-.action-button:active,
-.scroll-top-button:active {
-  transform: translateY(-1px);
-}
-
-/* ПОКРАЩЕНА АДАПТИВНІСТЬ */
-@media (max-width: 1024px) {
-  .step4-results-container {
-    padding: 1.5rem;
-  }
-  
-  .results-content {
-    padding: 2rem;
-    border-radius: 16px;
-  }
-  
-  .step-title {
-    font-size: 1.75rem !important;
-  }
-}
-
+/* АДАПТИВНІСТЬ */
 @media (max-width: 768px) {
   .step4-results-container {
     padding: 1rem;
   }
   
   .results-content {
-    padding: 1.5rem;
-    border-radius: 12px;
+    padding: 1.25rem;
+    border-radius: 8px;
   }
   
   .step-title {
-    font-size: 1.5rem !important;
-  }
-  
-  .treatment-table-section {
-    padding: 1rem;
-    margin-bottom: 2rem;
-  }
-  
-  .table-section-title {
-    font-size: 1.25rem;
-    margin-bottom: 1.25rem;
+    font-size: 1.125rem !important;
   }
   
   .treatment-table {
-    font-size: 0.875rem;
-    min-width: 800px;
+    font-size: 12px;
+    min-width: 700px;
   }
   
   .treatment-table th,
   .treatment-table td {
-    padding: 1rem 0.75rem;
+    padding: 10px 8px;
   }
   
   .card-button {
-    padding: 0.625rem 1rem;
-    font-size: 0.8rem;
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+  
+  .weather-stats {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .card-modal-container {
+    width: 95%;
+    max-width: 95%;
+    max-height: 90vh;
+    margin: 0;
+    border-radius: 12px;
+  }
+  
+  .table-section-title {
+    font-size: 1.125rem;
+  }
+  
+  .card-modal-content {
+    padding: 1.25rem;
+  }
+  
+  .card-modal-section {
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .weather-stat {
+    padding: 1rem;
+  }
+  
+  .stat-value {
+    font-size: 1.25rem;
   }
   
   .action-buttons {
     gap: 0.75rem;
-    margin-top: 2rem;
   }
   
   .action-button,
   .scroll-top-button {
-    padding: 0.875rem 1.5rem;
-    font-size: 0.9rem;
-    min-width: 140px;
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .step-title {
+    font-size: 1.125rem !important;
+  }
+  
+  .results-content {
+    padding: 1rem;
+  }
+  
+  .treatment-table-section {
+    margin-bottom: 2rem;
   }
   
   .header-top {
     flex-direction: column;
-    gap: 1rem;
+    gap: 12px;
     align-items: flex-start;
   }
   
   .info-button {
     align-self: flex-end;
-    margin-top: -4rem;
   }
 }
 
-@media (max-width: 480px) {
-  .step4-results-container {
-    padding: 0.75rem;
-  }
-  
-  .results-content {
-    padding: 1.25rem;
-    border-radius: 12px;
-  }
-  
-  .step-title {
-    font-size: 1.375rem !important;
-  }
-  
-  .treatment-table-section {
-    padding: 1rem 0.75rem;
-  }
-  
-  .action-buttons {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .action-button,
-  .scroll-top-button {
-    width: 100%;
-    min-width: auto;
-  }
+/* ПОЛІПШЕННЯ ДЛЯ SCROLLBAR */
+.card-modal-content::-webkit-scrollbar {
+  width: 6px;
 }
 
-/* ПОКРАЩЕННЯ ДЛЯ ДОСТУПНОСТІ */
-@media (prefers-reduced-motion: reduce) {
-  .treatment-table tr,
-  .card-button,
-  .action-button,
-  .info-button {
-    transition: none;
-    transform: none;
-  }
+.card-modal-content::-webkit-scrollbar-track {
+  background: #f8f9fa;
+  border-radius: 3px;
 }
 
-/* ФОКУС-СТИЛІ ДЛЯ КЛАВІАТУРИ */
-.treatment-table tr:focus-within {
-  background: #e0f2fe;
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
+.card-modal-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
 }
 
-.card-button:focus-visible,
-.action-button:focus-visible,
-.info-button:focus-visible {
-  outline: 3px solid #3b82f6;
-  outline-offset: 2px;
+.card-modal-content::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+.step-title-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 }
 
-/* ПОКРАЩЕННЯ ЧИТАБЕЛЬНОСТІ ТЕКСТУ */
-.treatment-table {
-  line-height: 1.5;
+.step-title {
+  margin: 0;
+  display: flex;
+  align-items: center;
 }
 
-.product-cell,
-.recommendation-cell a {
-  word-break: break-word;
-  hyphens: auto;
+.info-button {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* ПОКРАЩЕНІ ТІНІ ТА ГЛИБИНА */
-.results-content,
-.treatment-table-section,
-.table-container {
-  box-shadow: 
-    0 1px 3px rgba(0, 0, 0, 0.02),
-    0 4px 8px rgba(0, 0, 0, 0.04),
-    0 8px 16px rgba(0, 0, 0, 0.06);
+.info-button:hover {
+  color: #0056b3;
 }
 
-/* ПОКРАЩЕНІ КОЛЬОРИ ДЛЯ КРАЩОГО КОНТРАСТУ */
-.treatment-table th {
-  color: #374151;
+.results-header {
+  margin-bottom: 20px;
 }
 
-.treatment-table td {
-  color: #4b5563;
+.info-panel {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  padding: 15px;
+  margin-top: 15px;
 }
-
-.number-cell {
-  color: #374151;
+.no-treatments-message {
+  background: #f9f9f9;
+  border: 1px dashed #ccc;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 30px 0;
+  text-align: center;
+  font-size: 1.1em;
+  color: #444;
 }
-
-.date-cell {
-  color: #1e40af;
-}
-
-.product-cell {
-  color: #065f46;
+.no-treatments-message p {
+  margin: 0;
 }
