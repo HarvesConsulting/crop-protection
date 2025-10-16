@@ -1,0 +1,235 @@
+.splash-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #2d5016 0%, #4a7c2a 50%, #6ba543 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.splash-content {
+  text-align: center;
+  color: white;
+  padding: 2rem;
+  max-width: 90%;
+  position: relative;
+  z-index: 3; /* Вище за декоративні елементи */
+}
+
+.splash-logo {
+  margin-bottom: 1rem;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  position: relative;
+  z-index: 4; /* Найвищий z-index */
+}
+
+.logo-icon {
+  display: block;
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+  animation: float 3s ease-in-out infinite;
+}
+
+.logo-text {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  position: relative;
+  z-index: 5; /* Найвищий пріоритет */
+}
+
+.splash-subtitle {
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  position: relative;
+  z-index: 4;
+}
+
+/* Анімація логотипу */
+.animate-logo {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Покращений лоадер */
+.splash-loader {
+  width: 200px;
+  height: 4px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 4px;
+  margin: 0 auto;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  z-index: 4;
+}
+
+.loader-bar {
+  height: 100%;
+  width: 40%;
+  background: linear-gradient(90deg, #e9f5db, #b7e4a8);
+  border-radius: 4px;
+  animation: loading 2s ease-in-out infinite;
+  position: relative;
+}
+
+.loader-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes loading {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(150%); }
+  100% { transform: translateX(250%); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Анімація зникнення */
+.splash-wrapper.fade-out {
+  animation: fadeOut 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* Декоративні елементи фону */
+.splash-background-elements {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1; /* Нижчий z-index */
+}
+
+.bg-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(233, 245, 219, 0.1);
+  animation: float 6s ease-in-out infinite;
+  backdrop-filter: blur(2px);
+  z-index: 1; /* Нижчий пріоритет */
+}
+
+.circle-1 {
+  width: 120px;
+  height: 120px;
+  top: 15%;
+  left: 10%;
+  animation-delay: 0s;
+  background: rgba(183, 228, 168, 0.15);
+}
+
+.circle-2 {
+  width: 180px;
+  height: 180px;
+  bottom: 25%;
+  right: 10%;
+  animation-delay: 2s;
+  background: rgba(233, 245, 219, 0.1);
+}
+
+.circle-3 {
+  width: 80px;
+  height: 80px;
+  top: 65%;
+  left: 85%;
+  animation-delay: 4s;
+  background: rgba(183, 228, 168, 0.2);
+}
+
+/* Додаткові декоративні елементи */
+.leaf {
+  position: absolute;
+  font-size: 2rem;
+  opacity: 0.3;
+  animation: float 4s ease-in-out infinite;
+  z-index: 1; /* Нижчий пріоритет */
+}
+
+.leaf-1 {
+  top: 20%;
+  right: 15%;
+  animation-delay: 1s;
+}
+
+.leaf-2 {
+  bottom: 30%;
+  left: 15%;
+  animation-delay: 3s;
+}
+
+/* Адаптивність */
+@media (max-width: 768px) {
+  .splash-content {
+    padding: 1.5rem;
+  }
+  
+  .logo-icon {
+    font-size: 3rem;
+  }
+  
+  .logo-text {
+    font-size: 2rem;
+  }
+  
+  .splash-subtitle {
+    font-size: 1rem;
+  }
+  
+  .splash-loader {
+    width: 180px;
+  }
+  
+  .bg-circle {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-icon {
+    font-size: 2.5rem;
+  }
+  
+  .logo-text {
+    font-size: 1.8rem;
+  }
+  
+  .splash-subtitle {
+    font-size: 0.9rem;
+  }
+  
+  .splash-loader {
+    width: 160px;
+  }
+}
