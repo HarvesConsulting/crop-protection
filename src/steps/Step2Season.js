@@ -172,9 +172,8 @@ export default function Step2Season({
                 type="date"
                 value={plantingDate}
                 onChange={(e) => setPlantingDate(e.target.value)}
-                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
               />
-              
             </div>
 
             <div>
@@ -190,7 +189,7 @@ export default function Step2Season({
                     value={calculationPeriod}
                     onChange={handleCalculationPeriodChange}
                     onBlur={handleCalculationPeriodBlur}
-                    className="w-20 sm:w-24 border border-gray-300 rounded-xl px-4 py-3 text-base text-center focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-20 sm:w-24 border border-gray-300 rounded-xl px-4 py-3 text-base text-center focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
                   />
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-700 whitespace-nowrap">
@@ -206,7 +205,6 @@ export default function Step2Season({
                   </div>
                 </div>
               </div>             
-              
             </div>
           </div>
 
@@ -216,26 +214,24 @@ export default function Step2Season({
               Оберіть хвороби для моделювання:
             </label>
             
-            {/* Кнопка "Вибрати всі" */}
-            <div className="mb-4">
-              <button
-                onClick={toggleSelectAll}
-                className={`w-full px-4 py-3 rounded-xl border-2 transition-all font-semibold text-sm sm:text-base ${
-                  isAllSelected
-                    ? "bg-green-100 border-green-400 text-green-800 hover:bg-green-200"
-                    : "bg-gray-100 border-gray-300 text-gray-800 hover:bg-gray-200"
-                }`}
-              >
-                {isAllSelected ? "✅ Всі хвороби обрані" : "Вибрати всі хвороби"}
-              </button>
-            </div>
+            {/* Кнопка "Вибрати всі" - тепер з такими ж стилями як поле вводу */}
+            <button
+              onClick={toggleSelectAll}
+              className={`w-full border-2 rounded-xl px-4 py-3 text-base font-semibold transition-all mb-4 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                isAllSelected
+                  ? "bg-green-100 border-green-400 text-green-800 hover:bg-green-200"
+                  : "bg-white border-gray-300 text-gray-800 hover:bg-gray-50"
+              }`}
+            >
+              {isAllSelected ? "✅ Всі хвороби обрані" : "Вибрати всі хвороби"}
+            </button>
 
             <div className="space-y-3">
               {[
-                { id: "lateBlight", name: "Фітофтороз"},
-                { id: "grayMold", name: "Сіра гниль"},
-                { id: "alternaria", name: "Альтернаріоз" },
-                { id: "bacteriosis", name: "Бактеріоз"},
+                { id: "lateBlight", name: "Фітофтороз", emoji: "🍅" },
+                { id: "grayMold", name: "Сіра гниль", emoji: "🍇" },
+                { id: "alternaria", name: "Альтернаріоз", emoji: "🥔" },
+                { id: "bacteriosis", name: "Бактеріоз", emoji: "🥬" },
               ].map((d) => (
                 <label key={d.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
                   <input
