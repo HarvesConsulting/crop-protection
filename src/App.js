@@ -66,30 +66,21 @@ export default function App() {
   const [harvestDate, setHarvestDate] = useState("");
   const [diseases, setDiseases] = useState(["lateBlight"]);
   const [result, setResult] = useState(null);
-  const [appReady, setAppReady] = useState(false);
+  const [appReady, setAppReady] = useState(false); // 🆕 splash screen state
 
-  // Перевірка авторизації Firebase
+  // Перевірка авторизації Firebase + splash
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => {
       setUser(u);
-      // Встановлюємо готовність після перевірки авторизації
-      setAppReady(true);
+      // затримка splash для плавності
+      setTimeout(() => setAppReady(true), 1000);
     });
-
-    // Запасний таймер - на випадок якщо Firebase зависне
-    const timer = setTimeout(() => {
-      setAppReady(true);
-    }, 3000);
-
-    return () => {
-      unsubscribe();
-      clearTimeout(timer);
-    };
+    return () => unsubscribe();
   }, []);
 
   // Якщо додаток ще завантажується — показуємо splash
   if (!appReady) {
-    return <SplashScreen ready={false} />;
+    return <SplashScreen />;
   }
 
   // Якщо користувач не авторизований
@@ -102,7 +93,7 @@ export default function App() {
   const back = () => setStep((s) => Math.max(s - 1, 1));
 
   return (
-    <Layout step={step} onLogout={() => auth.signOut().then(() => setUser(null))}>
+    <Layout step={step} onLogout={() => setUser(null)}>
       {step === 1 && (
         <Step1Region region={region} setRegion={setRegion} onNext={next} />
       )}

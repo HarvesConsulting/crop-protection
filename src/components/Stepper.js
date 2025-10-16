@@ -1,65 +1,28 @@
-import React, { useState } from "react";
-import LogoutButton from "./LogoutButton";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import { IconButton, Tooltip } from "@mui/material";
-import Stepper from "./Stepper";
+// src/components/Stepper.js
+import React from "react";
 
-export default function Layout({ children, step, onLogout }) {
-  const [showInfo, setShowInfo] = useState(false);
+const steps = [
+  { id: 1, name: "Місто" },
+  { id: 2, name: "Сезон" },
+  { id: 3, name: "Розрахунок" },
+  { id: 4, name: "Результати" },
+];
 
+export default function Stepper({ currentStep }) {
   return (
-    <div className="page-wrapper">
-      {/* Header */}
-      <header className="header">
-        <div className="logo">
-          <span>🍅</span>
-          Crop Protection
-          <Tooltip title="Інформація про застосунок">
-            <IconButton
-              onClick={() => setShowInfo(!showInfo)}
-              size="small"
-              sx={{ 
-                color: "white",
-                '&:hover': { 
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                },
-              }}
-            >
-              <InfoOutlinedIcon />
-            </IconButton>
-          </Tooltip>
-        </div>
-        <LogoutButton onLogout={onLogout} />
-      </header>
-
-      {/* Info Box */}
-      {showInfo && (
-        <div className="info-box">
-          <p>
-            <strong>Застосунок для аграріїв:</strong> прогнозує дати обробки томатів від основних хвороб - 
-            фітофторозу, сірої гнилі, альтернаріозу та бактеріозу на основі аналізу 
-            погодних даних. Будує систему захисту з рекомендованими датами, препаратами і годинами для обробки. 
-            Незамінний помічник в підвищенні врожайності та якості продукції.
-          </p>
-        </div>
-      )}
-
-      {/* Stepper */}
-      <Stepper currentStep={step} />
-
-      {/* Main content */}
-      <main className="main-content">
-        <div className="glass-container">
-          {children}
-        </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="footer">
-        <div className="byline">
-          <em>by</em> HarvestConsulting
-        </div>
-      </footer>
-    </div>
+    <ol className="stepper">
+      {steps.map((step, index) => (
+        <li
+          key={step.id}
+          className={`step ${currentStep === step.id ? "active" : ""} ${
+            currentStep > step.id ? "completed" : ""
+          }`}
+        >
+          <div className="circle">{step.id}</div>
+          <span className="label">{step.name}</span>
+          {index < steps.length - 1 && <div className="line"></div>}
+        </li>
+      ))}
+    </ol>
   );
 }
