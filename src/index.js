@@ -13,14 +13,3 @@ root.render(
   </React.StrictMode>
 );
 
-// 🟢 Прибираємо splash-екран після завантаження React
-window.addEventListener("load", () => {
-  const splash = document.getElementById("initial-splash");
-  if (splash) {
-    splash.style.transition = "opacity 0.8s ease";
-    splash.style.opacity = "0";
-
-    // Після анімації зникнення — повністю видаляємо splash
-    setTimeout(() => splash.remove(), 800);
-  }
-});

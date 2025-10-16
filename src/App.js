@@ -6,7 +6,6 @@ import Step4Results from "./steps/Step4Results";
 import LoginPage from "./components/LoginPage";
 import CalendarView from "./components/CalendarView";
 import Layout from "./components/Layout";
-import SplashScreen from "./components/SplashScreen";
 
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase";
@@ -78,10 +77,7 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  // Якщо додаток ще завантажується — показуємо splash
-  if (!appReady) {
-    return <SplashScreen />;
-  }
+ 
 
   // Якщо користувач не авторизований
   if (!user) {
