@@ -81,11 +81,9 @@ export default function LoginPage({ onLogin }) {
       <div style={overlayStyle} />
       <div style={containerStyle}>
         <div style={cardStyle}>
-          {/* Заголовок з іконкою */}
+          {/* Заголовок */}
           <div style={headerStyle}>
-            <div style={iconWrapperStyle}>
-              <div style={iconStyle}>⚡</div>
-            </div>
+            <h1 style={appTitleStyle}>Crop Protection</h1>
             <h2 style={titleStyle}>
               {isRegistering ? "Створення акаунта" : "Вхід в систему"}
             </h2>
@@ -176,7 +174,7 @@ export default function LoginPage({ onLogin }) {
   );
 }
 
-// 🎨 ПОКРАЩЕНІ СТИЛІ
+// 🎨 СТИЛІ З КОЛЬОРАМИ З КАРТИНКИ
 const wrapperStyle = {
   position: "relative",
   width: "100%",
@@ -203,7 +201,7 @@ const overlayStyle = {
   left: 0,
   width: "100%",
   height: "100%",
-  backgroundColor: "rgba(0, 0, 0, 0.5)",
+  backgroundColor: "rgba(74, 119, 94, 0.85)", // Темно-зелений з прозорістю
   zIndex: 1,
 };
 
@@ -220,14 +218,14 @@ const containerStyle = {
 const cardStyle = {
   background: "#ffffff",
   padding: "40px 35px",
-  borderRadius: "16px",
+  borderRadius: "12px",
   boxShadow: `
-    0 10px 40px rgba(0, 0, 0, 0.15),
-    0 2px 10px rgba(0, 0, 0, 0.05)
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.05)
   `,
   width: "100%",
   maxWidth: "420px",
-  border: "1px solid rgba(255, 255, 255, 0.2)",
+  border: "1px solid #e8f5e8",
 };
 
 const headerStyle = {
@@ -235,27 +233,17 @@ const headerStyle = {
   marginBottom: "32px",
 };
 
-const iconWrapperStyle = {
-  display: "flex",
-  justifyContent: "center",
-  marginBottom: "20px",
-};
-
-const iconStyle = {
-  width: "64px",
-  height: "64px",
-  borderRadius: "16px",
-  backgroundColor: "#2d6cdf",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
+const appTitleStyle = {
   fontSize: "28px",
-  color: "white",
-  boxShadow: "0 4px 12px rgba(45, 108, 223, 0.3)",
+  fontWeight: "700",
+  color: "#2d6c4d", // Основний зелений колір
+  margin: "0 0 16px 0",
+  lineHeight: "1.2",
+  letterSpacing: "-0.5px",
 };
 
 const titleStyle = {
-  fontSize: "24px",
+  fontSize: "22px",
   fontWeight: "600",
   color: "#1a202c",
   margin: "0 0 8px 0",
@@ -284,7 +272,7 @@ const inputStyle = {
   width: "100%",
   padding: "16px 18px",
   border: "2px solid #e2e8f0",
-  borderRadius: "12px",
+  borderRadius: "10px",
   fontSize: "15px",
   boxSizing: "border-box",
   transition: "all 0.2s ease",
@@ -321,18 +309,18 @@ const eyeButtonStyle = {
 const buttonStyle = {
   width: "100%",
   padding: "16px 24px",
-  backgroundColor: "#2d6cdf",
+  backgroundColor: "#2d6c4d", // Зелений колір з картинки
   color: "white",
   fontWeight: "600",
   border: "none",
-  borderRadius: "12px",
+  borderRadius: "10px",
   cursor: "pointer",
   fontSize: "15px",
   transition: "all 0.2s ease",
   fontFamily: "inherit",
   position: "relative",
   overflow: "hidden",
-  boxShadow: "0 2px 8px rgba(45, 108, 223, 0.2)",
+  boxShadow: "0 2px 8px rgba(45, 108, 77, 0.3)",
 };
 
 const buttonDisabledStyle = {
@@ -364,7 +352,7 @@ const errorStyle = {
   padding: "14px",
   backgroundColor: "#fef2f2",
   border: "1px solid #fecaca",
-  borderRadius: "10px",
+  borderRadius: "8px",
   color: "#dc2626",
 };
 
@@ -389,7 +377,7 @@ const dividerStyle = {
 
 const toggleStyle = {
   textAlign: "center",
-  color: "#2d6cdf",
+  color: "#2d6c4d", // Зелений колір
   cursor: "pointer",
   fontWeight: "500",
   fontSize: "14px",
@@ -412,20 +400,20 @@ const styles = `
   }
 
   input:focus {
-    border-color: #2d6cdf !important;
-    box-shadow: 0 0 0 3px rgba(45, 108, 223, 0.1) !important;
+    border-color: #2d6c4d !important;
+    box-shadow: 0 0 0 3px rgba(45, 108, 77, 0.1) !important;
     transform: translateY(-1px);
   }
 
   button:hover:not(:disabled) {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(45, 108, 223, 0.3);
-    background-color: #2563eb !important;
+    box-shadow: 0 4px 12px rgba(45, 108, 77, 0.4);
+    background-color: #245c3f !important;
   }
 
   p:hover:not(:disabled) {
-    color: #1e40af;
-    background-color: #f8fafc;
+    color: #245c3f;
+    background-color: #f8faf8;
   }
 
   button:active:not(:disabled) {
@@ -433,7 +421,7 @@ const styles = `
   }
 
   .eye-button:hover:not(:disabled) {
-    background-color: #f7fafc;
+    background-color: #f7faf7;
     transform: scale(1.1);
   }
 `;
