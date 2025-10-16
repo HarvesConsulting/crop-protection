@@ -55,6 +55,8 @@ function SplashScreen({ ready = false, minDuration = 1500, onFinish }) {
           <div className="bg-circle circle-1"></div>
           <div className="bg-circle circle-2"></div>
           <div className="bg-circle circle-3"></div>
+          <div class="leaf leaf-1" aria-hidden="true">🍃</div>
+          <div class="leaf leaf-2" aria-hidden="true">🌿</div>
         </div>
       </div>
     </div>
