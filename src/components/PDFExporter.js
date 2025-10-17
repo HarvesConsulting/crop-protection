@@ -3,12 +3,12 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export default function PDFExporter({ data }) {
-  const { t, i18n } = useTranslation("integratedTable", { keyPrefix: "pdfExporter" });
+  const { t, i18n } = useTranslation();
   const [isGenerating, setIsGenerating] = useState(false);
 
   const exportToPDF = async () => {
     if (!data || data.length === 0) {
-      alert(t("noDataAlert"));
+      alert(t("noDataAlert", "Немає даних для експорту"));
       return;
     }
 
@@ -27,17 +27,25 @@ export default function PDFExporter({ data }) {
       pdfContainer.style.boxSizing = "border-box";
       pdfContainer.style.lineHeight = "1.3";
 
+      // Використовуємо переклади з файлів локалізації
       pdfContainer.innerHTML = `
         <div style="border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 20px;">
           <table width="100%">
             <tr>
-              <td width="20%"><img src="${logoUrl}" alt="${t("logoAlt")}" style="height: 70px;" /></td>
+              <td width="20%">
+                <img src="${logoUrl}" alt="Logo" style="height: 70px;" onerror="this.style.display='none'" />
+              </td>
               <td width="60%" style="text-align: center;">
-                <h1 style="margin: 0; font-size: 22px;">${t("mainTitle")}</h1>
+                <h1 style="margin: 0; font-size: 22px;">
+                  ${t("integratedSystem", "ІНТЕГРОВАНА СИСТЕМА ЗАХИСТУ РОСЛИН")}
+                </h1>
+                <p style="margin: 5px 0 0 0; font-size: 14px; color: #666;">
+                  ${t("individualProtectionPlan", "Індивідуальний план захисту")}
+                </p>
               </td>
               <td width="20%" style="text-align: right; font-size: 11px; color: #666;">
-                <div>${t("date")}: ${new Date().toLocaleDateString(i18n.language)}</div>
-                <div>${t("docNumber")} ${Math.random().toString(36).substr(2, 6).toUpperCase()}</div>
+                <div>${t("date", "Дата")}: ${new Date().toLocaleDateString(i18n.language)}</div>
+                <div>${t("docNumber", "Док. №")} ${Math.random().toString(36).substr(2, 6).toUpperCase()}</div>
               </td>
             </tr>
           </table>
@@ -46,29 +54,31 @@ export default function PDFExporter({ data }) {
         <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; background: #f9f9f9;">
           <table width="100%" style="font-size: 13px;">
             <tr>
-              <td width="25%"><strong>${t("analysisPeriod")}:</strong></td>
-              <td width="25%">${data[0]?.Дата || '—'} - ${data[data.length - 1]?.Дата || '—'}</td>
-              <td width="25%"><strong>${t("treatmentsCount")}:</strong></td>
-              <td width="25%">${data.length}</td>
+              <td width="25%" style="padding: 8px;"><strong>${t("analysisPeriod", "Період аналізу")}:</strong></td>
+              <td width="25%" style="padding: 8px;">${data[0]?.Дата || '—'} - ${data[data.length - 1]?.Дата || '—'}</td>
+              <td width="25%" style="padding: 8px;"><strong>${t("treatmentsCount", "Кількість обробок")}:</strong></td>
+              <td width="25%" style="padding: 8px;">${data.length}</td>
             </tr>
             <tr>
-              <td><strong>${t("crop")}:</strong></td>
-              <td>${t("tomatoes")}</td>
-              <td><strong>${t("status")}:</strong></td>
-              <td><strong style="color: #006600;">${t("recommended")}</strong></td>
+              <td style="padding: 8px;"><strong>${t("crop", "Культура")}:</strong></td>
+              <td style="padding: 8px;">${t("tomatoes", "Томати")}</td>
+              <td style="padding: 8px;"><strong>${t("status", "Статус")}:</strong></td>
+              <td style="padding: 8px;"><strong style="color: #006600;">${t("recommended", "Рекомендовано")}</strong></td>
             </tr>
           </table>
         </div>
 
         <div style="margin-bottom: 25px;">
-          <h2 style="font-size: 18px; border-bottom: 1px solid #333; padding-bottom: 8px;">${t("protectionPlan")}</h2>
+          <h2 style="font-size: 18px; border-bottom: 1px solid #333; padding-bottom: 8px;">
+            ${t("protectionPlan", "План захистних заходів")}
+          </h2>
           <table width="100%" style="font-size: 12px; border: 1px solid #333;">
             <thead>
               <tr style="background: #333; color: white;">
                 <th style="padding: 10px; width: 8%;">№</th>
-                <th style="padding: 10px; width: 15%;">${t("table.date")}</th>
-                <th style="padding: 10px; width: 52%;">${t("table.products")}</th>
-                <th style="padding: 10px; width: 25%;">${t("table.diseases")}</th>
+                <th style="padding: 10px; width: 15%;">${t("date", "Дата")}</th>
+                <th style="padding: 10px; width: 52%;">${t("products", "Препарати")}</th>
+                <th style="padding: 10px; width: 25%;">${t("diseases", "Хвороби")}</th>
               </tr>
             </thead>
             <tbody>
@@ -76,11 +86,15 @@ export default function PDFExporter({ data }) {
                 const diseases = (entry.Хвороби || '').split(', ').filter(Boolean);
                 return `
                   <tr style="background: ${index % 2 === 0 ? '#f5f5f5' : 'white'};">
-                    <td style="padding: 8px; text-align: center;">${index + 1}</td>
-                    <td style="padding: 8px;">${entry.Дата || ''}</td>
+                    <td style="padding: 8px; text-align: center; font-weight: bold;">${index + 1}</td>
+                    <td style="padding: 8px; font-weight: bold;">${entry.Дата || ''}</td>
                     <td style="padding: 8px;">${entry.Препарат || ''}</td>
                     <td style="padding: 8px;">
-                      ${diseases.length > 0 ? diseases.map(d => `<div style='background: #e9e9e9; padding: 3px 6px; margin: 1px 0; border-radius: 3px;'>${d}</div>`).join('') : '<span style="color: #999;">—</span>'}
+                      ${diseases.length > 0 ? diseases.map(d => `
+                        <div style="background: #e9e9e9; padding: 3px 6px; margin: 1px 0; border-radius: 3px; font-size: 11px;">
+                          ${d}
+                        </div>
+                      `).join('') : '<span style="color: #999;">—</span>'}
                     </td>
                   </tr>`;
               }).join('')}
@@ -89,12 +103,12 @@ export default function PDFExporter({ data }) {
         </div>
 
         <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; background: #fffde7;">
-          <h3 style="font-size: 14px; margin-bottom: 10px;">${t("notes")}:</h3>
-          <ul style="font-size: 12px; color: #666;">
-            <li>${t("note1")}</li>
-            <li>${t("note2")}</li>
-            <li>${t("note3")}</li>
-            <li>${t("note4")}</li>
+          <h3 style="font-size: 14px; margin-bottom: 10px;">${t("notes", "Примітки")}:</h3>
+          <ul style="font-size: 12px; color: #666; margin: 0; padding-left: 20px;">
+            <li>${t("note1", "Обробки проводять в сприятливі погодні умови")}</li>
+            <li>${t("note2", "Дотримуйтесь регламенту чергування препаратів")}</li>
+            <li>${t("note3", "Враховуйте період очікування до збору врожаю")}</li>
+            <li>${t("note4", "Використовуйте засоби індивідуального захисту")}</li>
           </ul>
         </div>
 
@@ -102,17 +116,21 @@ export default function PDFExporter({ data }) {
           <table width="100%" style="font-size: 11px; color: #666;">
             <tr>
               <td width="70%">
-                <strong>${t("legalInfo")}</strong>
-                <div>${t("legalDescription")}</div>
+                <div style="margin-bottom: 8px;"><strong>${t("legalInfo", "Юридична інформація")}:</strong></div>
+                <div>${t("legalDescription", "Документ сформовано автоматично")}</div>
               </td>
               <td width="30%" style="text-align: center;">
-                <strong>${t("agronomist")}</strong>
-                <div style="border-bottom: 1px solid #999; margin: 8px 0;">${t("agronomistName")}</div>
-                <div>${t("signature")}</div>
+                <div style="margin-bottom: 8px;"><strong>${t("agronomist", "Агроном-консультант")}:</strong></div>
+                <div style="border-bottom: 1px solid #999; padding-bottom: 8px; margin-bottom: 8px;">
+                  ${t("agronomistName", "Лашин Олександр")}
+                </div>
+                <div>${t("signature", "підпис та ПІБ")}</div>
               </td>
             </tr>
           </table>
-          <div style="text-align: center; font-size: 10px; margin-top: 20px;">© ${new Date().getFullYear()} ${t("copyright")}</div>
+          <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #ddd; font-size: 10px; color: #999;">
+            © ${new Date().getFullYear()} ${t("copyright", "Агрономічна служба")}
+          </div>
         </div>
       `;
 
@@ -121,7 +139,7 @@ export default function PDFExporter({ data }) {
 
       const opt = {
         margin: 10,
-        filename: `${t("filename")}_${new Date().toISOString().split('T')[0]}.pdf`,
+        filename: `${t("filename", "Система_захисту")}_${new Date().toISOString().split('T')[0]}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: {
           scale: 2,
@@ -139,7 +157,7 @@ export default function PDFExporter({ data }) {
 
     } catch (err) {
       console.error("PDF error:", err);
-      alert(t("errorAlert"));
+      alert(t("errorAlert", "Помилка при створенні PDF файлу"));
     } finally {
       setIsGenerating(false);
     }
@@ -148,7 +166,7 @@ export default function PDFExporter({ data }) {
   return (
     <button
       onClick={exportToPDF}
-      disabled={isGenerating}
+      disabled={isGenerating || !data || data.length === 0}
       style={{
         background: '#333',
         color: 'white',
@@ -156,12 +174,13 @@ export default function PDFExporter({ data }) {
         padding: '10px 20px',
         borderRadius: '4px',
         fontWeight: 'bold',
-        cursor: isGenerating ? 'not-allowed' : 'pointer',
-        opacity: isGenerating ? 0.6 : 1,
-        fontSize: '14px'
+        cursor: (isGenerating || !data || data.length === 0) ? 'not-allowed' : 'pointer',
+        opacity: (isGenerating || !data || data.length === 0) ? 0.6 : 1,
+        fontSize: '14px',
+        minWidth: '140px'
       }}
     >
-      {isGenerating ? t("generating") : t("savePdf")}
+      {isGenerating ? t("generating", "Генерація...") : `📄 ${t("savePdf", "Зберегти PDF")}`}
     </button>
   );
 }
