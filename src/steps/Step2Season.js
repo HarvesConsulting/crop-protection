@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Info, ArrowRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function Step2Season({
   plantingDate,
@@ -9,13 +10,13 @@ export default function Step2Season({
   onNext,
   onBack,
 }) {
+  const { t } = useTranslation();
   const allDiseases = ["lateBlight", "grayMold", "alternaria", "bacteriosis"];
   const [diseases, setDiseases] = useState(["lateBlight"]);
   const [showInfo, setShowInfo] = useState(false);
   const [calculationPeriod, setCalculationPeriod] = useState("15");
   const [maxPeriod, setMaxPeriod] = useState(45);
 
-  // Встановлення поточної дати за замовчуванням
   useEffect(() => {
     const today = new Date();
     const formattedDate = today.toISOString().split('T')[0];
@@ -24,31 +25,27 @@ export default function Step2Season({
     }
   }, [plantingDate, setPlantingDate]);
 
-  // Розрахунок максимального періоду (поточна дата + 15 днів)
   useEffect(() => {
     const today = new Date();
     const maxDate = new Date(today);
     maxDate.setDate(maxDate.getDate() + 14);
-    
+
     if (plantingDate) {
       const startDate = new Date(plantingDate);
       const diffTime = maxDate - startDate;
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      setMaxPeriod(Math.max(1, diffDays)); // Мінімум 1 день
+      setMaxPeriod(Math.max(1, diffDays));
     } else {
-      setMaxPeriod(45); // Значення за замовчуванням
+      setMaxPeriod(45);
     }
   }, [plantingDate]);
 
-  // Оновлення дати завершення при зміні точки відліку або періоду
   useEffect(() => {
     if (plantingDate && calculationPeriod && parseInt(calculationPeriod) > 0) {
       const period = parseInt(calculationPeriod);
       const startDate = new Date(plantingDate);
       const endDate = new Date(startDate);
       endDate.setDate(endDate.getDate() + period);
-      
-      // Форматуємо дату у формат YYYY-MM-DD
       const formattedDate = endDate.toISOString().split('T')[0];
       setHarvestDate(formattedDate);
     }
@@ -72,12 +69,8 @@ export default function Step2Season({
 
   const handleCalculationPeriodChange = (e) => {
     const value = e.target.value;
-    
-    // Дозволяємо пустий рядок або числа
     if (value === "" || /^\d+$/.test(value)) {
       const numValue = value === "" ? "" : parseInt(value);
-      
-      // Якщо число, перевіряємо межі
       if (numValue !== "") {
         if (numValue < 1) {
           setCalculationPeriod("1");
@@ -92,8 +85,7 @@ export default function Step2Season({
     }
   };
 
-  const handleCalculationPeriodBlur = (e) => {
-    // При втраті фокусу нормалізуємо значення
+  const handleCalculationPeriodBlur = () => {
     if (calculationPeriod === "" || parseInt(calculationPeriod) < 1) {
       setCalculationPeriod("1");
     } else if (parseInt(calculationPeriod) > maxPeriod) {
@@ -101,18 +93,17 @@ export default function Step2Season({
     }
   };
 
-  // Функція для встановлення максимального періоду
   const setMaxPeriodToField = () => {
     setCalculationPeriod(maxPeriod.toString());
   };
 
   const handleNext = () => {
     if (!plantingDate || !calculationPeriod || parseInt(calculationPeriod) < 1) {
-      alert("Будь ласка, оберіть точку відліку та коректний період розрахунку");
+      alert(t("step2_alert_invalid"));
       return;
     }
     if (diseases.length === 0) {
-      alert("Будь ласка, оберіть хоча б одну хворобу");
+      alert(t("step2_alert_diseases"));
       return;
     }
     onNext({ diseases });
@@ -124,15 +115,14 @@ export default function Step2Season({
     <main className="flex justify-center items-start min-h-[70vh] px-3 sm:px-4">
       <div className="w-full max-w-xl mx-auto bg-white rounded-xl shadow-lg">
         <div className="px-4 sm:px-8 py-5 sm:py-6 space-y-5 sm:space-y-6">
-          {/* Заголовок + Інфо */}
           <div className="flex items-center justify-between">
             <h2 className="text-xl sm:text-2xl font-bold text-gray-800 leading-tight">
-              Крок 2: Дані про сезон
+              {t("step2_title")}
             </h2>
             <button
               onClick={() => setShowInfo(!showInfo)}
               className="text-blue-600 hover:text-blue-800 transition p-1"
-              title="Інформація"
+              title={t("info")}
             >
               <Info size={22} />
             </button>
@@ -140,21 +130,15 @@ export default function Step2Season({
 
           {showInfo && (
             <div className="bg-blue-50 border border-blue-200 text-sm text-gray-700 p-3 sm:p-4 rounded-lg leading-relaxed">
-              <p className="mb-2">
-                <strong>Точка відліку</strong> - це дата початку розрахунків. Це може бути дата сходів чи висадки культури, 
-                або дата останнього внесення фунгіциду.
-              </p>
-              <p>
-                <strong>Період розрахунку</strong> не може перевищувати 15 днів від поточної дати для забезпечення точності прогнозу.
-              </p>
+              <p className="mb-2">{t("step2_info_1")}</p>
+              <p>{t("step2_info_2")}</p>
             </div>
           )}
 
-          {/* Поля вводу */}
           <div className="space-y-4 sm:space-y-5">
             <div>
               <label className="block text-sm font-semibold text-gray-800 mb-2 sm:mb-3">
-                Точка відліку
+                {t("step2_label_start")}
               </label>
               <input
                 type="date"
@@ -166,7 +150,7 @@ export default function Step2Season({
 
             <div>
               <label className="block text-sm font-semibold text-gray-800 mb-2 sm:mb-3">
-                Період розрахунку
+                {t("step2_label_period")}
               </label>
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                 <div className="flex items-center gap-3">
@@ -181,28 +165,26 @@ export default function Step2Season({
                   />
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-700 whitespace-nowrap">
-                      днів
+                      {t("step2_days")}
                     </span>
                     <button
                       onClick={setMaxPeriodToField}
                       className="bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-medium px-3 py-2 rounded-lg border border-blue-200 transition-colors whitespace-nowrap"
-                      title={`Встановити максимальний період (${maxPeriod} днів)`}
+                      title={t("step2_max", { days: maxPeriod })}
                     >
-                      макс: {maxPeriod}
+                      {t("step2_max", { days: maxPeriod })}
                     </button>
                   </div>
                 </div>
-              </div>             
+              </div>
             </div>
           </div>
 
-          {/* Чекбокси хвороб */}
           <div className="border border-gray-200 rounded-xl p-4 sm:p-5">
             <label className="block font-semibold text-gray-800 mb-3 text-sm sm:text-base">
-              Оберіть хвороби для моделювання:
+              {t("step2_select_disease")}
             </label>
-            
-            {/* Кнопка "Вибрати всі" */}
+
             <button
               onClick={toggleSelectAll}
               className={`w-full border border-gray-300 rounded-xl px-4 py-3 text-base font-medium transition-all mb-4 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${
@@ -211,50 +193,52 @@ export default function Step2Season({
                   : "bg-white text-gray-800 hover:bg-gray-50"
               }`}
             >
-              {isAllSelected ? "✅ Всі хвороби обрані" : "Вибрати всі хвороби"}
+              {isAllSelected ? t("step2_all_selected") : t("step2_select_all")}
             </button>
 
-            {/* Хвороби у два стовбці */}
             <div className="grid grid-cols-2 gap-3">
-              {[
-                { id: "lateBlight", name: "Фітофтороз" },
-                { id: "grayMold", name: "Сіра гниль" },
-                { id: "alternaria", name: "Альтернаріоз" },
-                { id: "bacteriosis", name: "Бактеріоз" },
-              ].map((d) => (
-                <label key={d.id} className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+              {["lateBlight", "grayMold", "alternaria", "bacteriosis"].map((id) => (
+                <label
+                  key={id}
+                  className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                >
                   <input
                     type="checkbox"
-                    checked={diseases.includes(d.id)}
-                    onChange={() => toggleDisease(d.id)}
+                    checked={diseases.includes(id)}
+                    onChange={() => toggleDisease(id)}
                     className="w-5 h-5 text-green-600 rounded border-gray-300 focus:ring-green-500"
                   />
-                  <span className="text-gray-800 text-sm">
-                    {d.name}
-                  </span>
+                  <span className="text-gray-800 text-sm">{t(`disease_${id}`)}</span>
                 </label>
               ))}
             </div>
           </div>
 
-          {/* Кнопки */}
           <div className="flex flex-col sm:flex-row justify-between gap-3 pt-4">
             <button
               onClick={onBack}
               className="px-6 py-3 bg-gray-100 rounded-xl hover:bg-gray-200 transition font-semibold text-gray-800 text-sm sm:text-base order-2 sm:order-1"
             >
-              ← Назад
+              {t("button_back")}
             </button>
             <button
               onClick={handleNext}
-              disabled={!plantingDate || !calculationPeriod || parseInt(calculationPeriod) < 1 || diseases.length === 0}
+              disabled={
+                !plantingDate ||
+                !calculationPeriod ||
+                parseInt(calculationPeriod) < 1 ||
+                diseases.length === 0
+              }
               className={`px-6 py-3 rounded-xl text-white font-semibold transition flex items-center justify-center gap-2 text-sm sm:text-base order-1 sm:order-2 ${
-                plantingDate && calculationPeriod && parseInt(calculationPeriod) > 0 && diseases.length > 0
+                plantingDate &&
+                calculationPeriod &&
+                parseInt(calculationPeriod) > 0 &&
+                diseases.length > 0
                   ? "bg-green-600 hover:bg-green-700"
                   : "bg-gray-400 cursor-not-allowed"
               }`}
             >
-              Продовжити
+              {t("button_continue")}
               <ArrowRight size={18} />
             </button>
           </div>

@@ -3,5 +3,23 @@
   "step1_description": "Select a city to calculate protection.",
   "placeholder_city": "e.g. Lviv",
   "button_continue": "Continue",
-  "no_matches": "No matches"
+  "no_matches": "No matches",
+
+  "step2_title": "Step 2: Season Details",
+  "step2_info_1": "The starting point is the date when the calculation begins – sowing, transplanting, or last fungicide application.",
+  "step2_info_2": "The calculation period cannot exceed 15 days from today to ensure forecast accuracy.",
+  "step2_label_start": "Start date",
+  "step2_label_period": "Calculation period",
+  "step2_days": "days",
+  "step2_max": "max: {{days}}",
+  "step2_select_disease": "Select diseases for modeling:",
+  "step2_select_all": "Select all diseases",
+  "step2_all_selected": "✅ All diseases selected",
+  "step2_alert_invalid": "Please choose a valid start date and period",
+  "step2_alert_diseases": "Please select at least one disease",
+  "disease_lateBlight": "Late Blight",
+  "disease_grayMold": "Gray Mold",
+  "disease_alternaria": "Alternaria",
+  "disease_bacteriosis": "Bacteriosis",
+  "button_back": "← Back"
 }

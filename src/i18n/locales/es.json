@@ -3,5 +3,23 @@
   "step1_description": "Selecciona una ciudad para calcular la protección.",
   "placeholder_city": "por ejemplo: Lviv",
   "button_continue": "Continuar",
-  "no_matches": "Sin coincidencias"
+  "no_matches": "Sin coincidencias",
+
+  "step2_title": "Paso 2: Detalles de la temporada",
+  "step2_info_1": "El punto de partida es la fecha en que comienza el cálculo: siembra, trasplante o última aplicación de fungicida.",
+  "step2_info_2": "El período de cálculo no puede exceder los 15 días desde hoy para garantizar la precisión del pronóstico.",
+  "step2_label_start": "Fecha de inicio",
+  "step2_label_period": "Período de cálculo",
+  "step2_days": "días",
+  "step2_max": "máx: {{days}}",
+  "step2_select_disease": "Seleccione enfermedades para modelar:",
+  "step2_select_all": "Seleccionar todas las enfermedades",
+  "step2_all_selected": "✅ Todas las enfermedades seleccionadas",
+  "step2_alert_invalid": "Por favor seleccione una fecha y un período válidos",
+  "step2_alert_diseases": "Seleccione al menos una enfermedad",
+  "disease_lateBlight": "Tizón tardío",
+  "disease_grayMold": "Moho gris",
+  "disease_alternaria": "Alternaria",
+  "disease_bacteriosis": "Bacteriosis",
+  "button_back": "← Atrás"
 }
