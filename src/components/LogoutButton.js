@@ -15,7 +15,7 @@ export default function LogoutButton({ onLogout }) {
   return (
     <button
       onClick={handleLogout}
-      className="logout-btn-glass flex items-center justify-center w-9 h-9 rounded-lg hover:bg-white/10 transition-colors"
+      className="p-2 hover:bg-white/10 rounded-lg transition-colors"
       title="Вийти з акаунту"
     >
       <svg
