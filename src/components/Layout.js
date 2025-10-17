@@ -12,7 +12,7 @@ export default function Layout({ children, step, onLogout }) {
     <div className="min-h-screen bg-gray-50 text-gray-800 font-sans">
       {/* Header */}
       <header className="flex justify-between items-center p-4 bg-green-700 text-white shadow">
-        {/* Ліва частина: назва + іконка інфо */}
+        {/* App title & info icon */}
         <div className="flex items-center gap-2 text-lg font-semibold">
           🍅 Crop Protection
           <Tooltip title="Інформація про застосунок">
@@ -26,10 +26,14 @@ export default function Layout({ children, step, onLogout }) {
           </Tooltip>
         </div>
 
-        {/* Права частина: перемикач мови + кнопка виходу */}
-        <div className="flex items-center gap-3">
-          <LanguageSwitcher />
-          <LogoutButton onLogout={onLogout} />
+        {/* Language switcher + Logout - ВИПРАВЛЕНО */}
+        <div className="flex items-center gap-4 relative">
+          <div className="relative z-10">
+            <LanguageSwitcher />
+          </div>
+          <div className="relative z-20">
+            <LogoutButton onLogout={onLogout} />
+          </div>
         </div>
       </header>
 
