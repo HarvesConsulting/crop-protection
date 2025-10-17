@@ -95,9 +95,9 @@ function CardModal({ open, onClose, cardData }) {
 
   const getStatusText = () => {
     const hours = cardData.backData?.condHours ?? 0;
-    if (hours <= 10) return t("results.riskStatus.low");
-    if (hours <= 20) return t("results.riskStatus.medium");
-    return t("results.riskStatus.high");
+    if (hours <= 10) return t("step4.riskStatus.low");
+    if (hours <= 20) return t("step4.riskStatus.medium");
+    return t("step4.riskStatus.high");
   };
 
   return (
@@ -105,7 +105,7 @@ function CardModal({ open, onClose, cardData }) {
       <Box className="card-modal-container">
         <div className="card-modal-header">
           <Typography variant="h6" component="h2">
-            {t("results.cardModal.title", { index: cardData.index })}
+            {t("step4.cardModal.title", { index: cardData.index })}
           </Typography>
           <IconButton onClick={onClose} size="small">
             <CloseIcon />
@@ -122,24 +122,24 @@ function CardModal({ open, onClose, cardData }) {
 
           <div className="card-modal-section">
             <Typography variant="subtitle1" gutterBottom style={{ fontWeight: '600' }}>
-              {t("results.cardModal.basicInfo")}
+              {t("step4.cardModal.basicInfo")}
             </Typography>
             <div className="card-modal-grid">
               <div className="card-modal-item">
-                <strong>{t("results.table.date")}:</strong> {cardData.Дата}
+                <strong>{t("step4.table.date")}:</strong> {cardData.Дата}
               </div>
               <div className="card-modal-item">
-                <strong>{t("results.table.product")}:</strong> {cardData.Препарат}
+                <strong>{t("step4.table.product")}:</strong> {cardData.Препарат}
               </div>
               <div className="card-modal-item">
-                <strong>{t("results.table.interval")}:</strong> {cardData.Інтервал}
+                <strong>{t("step4.table.interval")}:</strong> {cardData.Інтервал}
               </div>
             </div>
           </div>
 
           <div className="card-modal-section">
             <Typography variant="subtitle1" gutterBottom style={{ fontWeight: '600' }}>
-              {t("results.table.recommendations")}
+              {t("step4.table.recommendations")}
             </Typography>
             <div className="card-modal-item">
               {cardData.Рекомендація}
@@ -149,7 +149,7 @@ function CardModal({ open, onClose, cardData }) {
           {cardData["Рекомендовані години"] && cardData["Рекомендовані години"] !== "—" && (
             <div className="card-modal-section">
               <Typography variant="subtitle1" gutterBottom style={{ fontWeight: '600' }}>
-                {t("results.cardModal.favorableHours")}
+                {t("step4.cardModal.favorableHours")}
               </Typography>
               <div className="card-modal-item">
                 <HourTimeline
@@ -163,18 +163,18 @@ function CardModal({ open, onClose, cardData }) {
 
           <div className="card-modal-section">
             <Typography variant="subtitle1" gutterBottom style={{ fontWeight: '600' }}>
-              {t("results.cardModal.weatherConditions")}
+              {t("step4.cardModal.weatherConditions")}
             </Typography>
             <div className="weather-stats">
               <div className="weather-stat">
                 <span className="stat-value">{cardData.backData?.condHours ?? 0}</span>
-                <span className="stat-label">{t("results.cardModal.favorableHoursCount")}</span>
+                <span className="stat-label">{t("step4.cardModal.favorableHoursCount")}</span>
               </div>
               <div className="weather-stat">
                 <span className="stat-value">
-                  {cardData.backData?.rain !== undefined ? cardData.backData.rain.toFixed(1) : 0} {t("results.cardModal.mm")}
+                  {cardData.backData?.rain !== undefined ? cardData.backData.rain.toFixed(1) : 0} {t("step4.cardModal.mm")}
                 </span>
-                <span className="stat-label">{t("results.cardModal.precipitation")}</span>
+                <span className="stat-label">{t("step4.cardModal.precipitation")}</span>
               </div>
             </div>
           </div>
@@ -192,7 +192,7 @@ function TreatmentTable({ data, title, onCardClick }) {
     return (
       <div className="treatment-table-section">
         <h3 className="table-section-title">{title}</h3>
-        <p className="no-data-message">{t("results.table.noTreatments")}</p>
+        <p className="no-data-message">{t("step4.table.noTreatments")}</p>
       </div>
     );
   }
@@ -205,12 +205,12 @@ function TreatmentTable({ data, title, onCardClick }) {
           <thead>
             <tr>
               <th>№</th>
-              <th>{t("results.table.date")}</th>
-              <th>{t("results.table.product")}</th>
-              <th>{t("results.table.norm")}</th>
-              <th>{t("results.table.unit")}</th>
-              <th>{t("results.table.recommendations")}</th>
-              <th>{t("results.table.card")}</th>
+              <th>{t("step4.table.date")}</th>
+              <th>{t("step4.table.product")}</th>
+              <th>{t("step4.table.norm")}</th>
+              <th>{t("step4.table.unit")}</th>
+              <th>{t("step4.table.recommendations")}</th>
+              <th>{t("step4.table.card")}</th>
             </tr>
           </thead>
           <tbody>
@@ -218,7 +218,7 @@ function TreatmentTable({ data, title, onCardClick }) {
               const productName = item.Препарат.split(' (')[0];
               const normMatch = item.Препарат.match(/\(([^)]+)\)/);
               const norm = normMatch ? normMatch[1] : '—';
-              const unit = norm.includes('л') ? t("results.table.litersPerHa") : norm.includes('кг') ? t("results.table.kgPerHa") : '—';
+              const unit = norm.includes('л') ? t("step4.table.litersPerHa") : norm.includes('кг') ? t("step4.table.kgPerHa") : '—';
               const normValue = norm.replace('л/га', '').replace('кг/га', '').trim();
               
               return (
@@ -235,9 +235,9 @@ function TreatmentTable({ data, title, onCardClick }) {
                     <button 
                       className="card-button"
                       onClick={() => onCardClick({...item, index: index + 1})}
-                      title={t("results.table.viewDetails")}
+                      title={t("step4.table.viewDetails")}
                     >
-                      📋 {t("results.table.card")}
+                      📋 {t("step4.table.card")}
                     </button>
                   </td>
                 </tr>
@@ -386,7 +386,7 @@ export default function Step4Results({ result, onRestart }) {
       const cur = parseISO(d.split(".").reverse().join("-"));
       const prev = i > 0 ? parseISO(sprayDates[i - 1].split(".").reverse().join("-")) : plantingDate;
 
-      const gap = prev ? t("results.daysAfterPrevious", { days: differenceInDays(cur, prev) }) : "—";
+      const gap = prev ? t("step4.daysAfterPrevious", { days: differenceInDays(cur, prev) }) : "—";
       const product = rotationProducts[i % rotationProducts.length];
       const recommendedHours = suitableHours[d] || [];
       const backData = getAccumulatedStats(diagnostics, prev, cur, rainDaily);
@@ -396,7 +396,7 @@ export default function Step4Results({ result, onRestart }) {
         Препарат: `${product} (${productInfo[product] || "—"})`,
         Рекомендація: productLinks[product] ? (
           <a href={productLinks[product]} target="_blank" rel="noreferrer">
-            {t("results.productDetails")}
+            {t("step4.productDetails")}
           </a>
         ) : "—",
         Інтервал: gap,
@@ -426,10 +426,10 @@ export default function Step4Results({ result, onRestart }) {
           Препарат: `${product} (${productInfo[product] || "—"})`,
           Рекомендація: productLinks[product] ? (
             <a href={productLinks[product]} target="_blank" rel="noreferrer">
-              {t("results.productDetails")}
+              {t("step4.productDetails")}
             </a>
           ) : "—",
-          Інтервал: i === 0 ? "—" : t("results.daysAfterPrevious", { days: differenceInDays(item.date, treatments[i - 1].date) }),
+          Інтервал: i === 0 ? "—" : t("step4.daysAfterPrevious", { days: differenceInDays(item.date, treatments[i - 1].date) }),
           "Рекомендовані години": recommendedHours.length ? recommendedHours.join(", ") : "—",
           backData,
         };
@@ -515,21 +515,21 @@ export default function Step4Results({ result, onRestart }) {
 
   const exportToExcel = () => {
     const exportData = integratedSystem.map((entry) => ({
-      [t("results.table.date")]: entry.Дата,
-      [t("results.table.products")]: entry.Препарат,
-      [t("results.table.diseases")]: entry.Хвороби,
+      [t("step4.table.date")]: entry.Дата,
+      [t("step4.table.products")]: entry.Препарат,
+      [t("step4.table.diseases")]: entry.Хвороби,
     }));
 
-    const ws = XLSX.utils.aoa_to_sheet([[t("results.integratedSystem")]]);
+    const ws = XLSX.utils.aoa_to_sheet([[t("step4.integratedSystem")]]);
     ws["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 2 } }];
     XLSX.utils.sheet_add_json(ws, exportData, { origin: "A2", skipHeader: false });
 
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, t("results.integratedTable"));
-    XLSX.writeFile(wb, `${t("results.integratedSystem")}.xlsx`);
+    XLSX.utils.book_append_sheet(wb, ws, t("step4.integratedTable"));
+    XLSX.writeFile(wb, `${t("step4.integratedSystem")}.xlsx`);
   };
 
-  if (!result) return <p>{t("results.noData")}</p>;
+  if (!result) return <p>{t("step4.noData")}</p>;
 
   return (
     <main ref={topRef} className="step4-results-container">
@@ -537,11 +537,11 @@ export default function Step4Results({ result, onRestart }) {
         {/* Заголовок тепер вище меню дій */}
         <div className="results-header">
           <div className="step-title-container">
-            <h2 className="step-title">{t("results.title")}</h2>
+            <h2 className="step-title">{t("step4.title")}</h2>
             <button
               className="info-button"
               onClick={() => setShowInfo(!showInfo)}
-              title={t("results.showInfo")}
+              title={t("step4.showInfo")}
             >
               <InfoOutlinedIcon />
             </button>
@@ -550,12 +550,12 @@ export default function Step4Results({ result, onRestart }) {
           {showInfo && (
             <div className="info-panel">
               <p>
-                {t("results.calculationPeriod")}:{" "}
+                {t("step4.calculationPeriod")}:{" "}
                 <strong>{format(new Date(result.plantingDate), "dd.MM.yyyy")}</strong> —{" "}
                 <strong>{format(new Date(result.harvestDate), "dd.MM.yyyy")}</strong>
               </p>
               <p>
-                {t("results.infoDescription")}
+                {t("step4.infoDescription")}
               </p>
             </div>
           )}
@@ -577,7 +577,7 @@ export default function Step4Results({ result, onRestart }) {
             <IntegratedTableView data={integratedSystem} />
             <div className="action-buttons">
               <button onClick={exportToExcel} className="action-button">
-                {t("results.exportToExcel")}
+                {t("step4.exportToExcel")}
               </button>
               <PDFExporter data={integratedSystem} />
             </div>
@@ -587,7 +587,7 @@ export default function Step4Results({ result, onRestart }) {
             {sprayData.length === 0 && 
              (!diseaseCardsGrouped || diseaseCardsGrouped.every(g => g.entries.length === 0)) ? (
               <div className="no-treatments-message">
-                <p>{t("results.noTreatmentsRecommended")}</p>
+                <p>{t("step4.noTreatmentsRecommended")}</p>
               </div>
             ) : (
               <>
@@ -595,7 +595,7 @@ export default function Step4Results({ result, onRestart }) {
                 {sprayData.length > 0 && (
                   <TreatmentTable
                     data={sprayData}
-                    title={t("results.phytophthoraMeasures")}
+                    title={t("step4.phytophthoraMeasures")}
                     onCardClick={handleCardClick}
                   />
                 )}
@@ -606,7 +606,7 @@ export default function Step4Results({ result, onRestart }) {
                     <TreatmentTable
                       key={name}
                       data={entries}
-                      title={t(`results.diseaseMeasures.${name.toLowerCase().replace(" ", "")}`, { name })}
+                      title={t(`step4.diseaseMeasures.${name.toLowerCase().replace(" ", "")}`, { name })}
                       onCardClick={handleCardClick}
                     />
                   )
@@ -619,7 +619,7 @@ export default function Step4Results({ result, onRestart }) {
                 className="scroll-top-button"
                 onClick={() => topRef.current?.scrollIntoView({ behavior: "smooth" })}
               >
-                ↑ {t("results.scrollToTop")}
+                ↑ {t("step4.scrollToTop")}
               </button>
             </div>
           </>
