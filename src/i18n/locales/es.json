@@ -46,16 +46,18 @@
   "phytophthora_protection": "Medidas contra Tizón tardío",
   "click_card_hint": "Haga clic en Tarjeta para obtener detalles del procesamiento.",
 
+  "app": {
+    "title": "Protección de Cultivos"
+  },
   "layout": {
-    "appName": "Crop Protection",
-    "appInfoTooltip": "Información de la aplicación",
-    "appDescription": "Aplicación para agricultores: predice fechas de tratamiento de tomates para enfermedades principales - tizón tardío, moho gris, alternaria y bacteriosis - basado en condiciones climáticas. Desarrolla un sistema de protección con preparaciones, fechas y horarios de tratamiento para aumentar el rendimiento.",
-    "steps": {
-      "city": "Ciudad",
-      "season": "Temporada",
-      "calculation": "Cálculo",
-      "results": "Resultados"
-    }
+    "infoTooltip": "Información de la aplicación",
+    "infoText": "Aplicación para agricultores: predice fechas de tratamiento del tomate contra enfermedades principales — tizón tardío, moho gris, alternaria y bacteriosis — en función de las condiciones climáticas. Desarrolla un plan de protección con productos, fechas y horas para mejorar el rendimiento."
+  },
+  "step": {
+    "city": "Ciudad",
+    "season": "Temporada",
+    "calculation": "Cálculo",
+    "results": "Resultados"
   }
 }
 }
