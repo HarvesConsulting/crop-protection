@@ -120,5 +120,18 @@
     "humidity": "💧 Humidity (%)",
     "wind": "🌬️ Wind (m/s)",
     "precipitation": "☔ Precipitation (mm)"
+  },
+
+   "summaryModal": {
+    "title": "Spray Schedule",
+    "close": "Close",
+    "diseaseRiskLevel": "Disease risk level",
+    "riskLevels": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "favorableHours": "Favorable hours",
+    "fungicideDates": "Fungicide application dates"
   }
 }

@@ -119,5 +119,18 @@
     "humidity": "💧 Вологість (%)",
     "wind": "🌬️ Вітер (м/с)",
     "precipitation": "☔ Опади (мм)"
+  },
+  
+  "summaryModal": {
+    "title": "Графік обприскування",
+    "close": "Закрити",
+    "diseaseRiskLevel": "Рівень ризику захворювання",
+    "riskLevels": {
+      "low": "Низький",
+      "medium": "Середній",
+      "high": "Високий"
+    },
+    "favorableHours": "Сприятливі години",
+    "fungicideDates": "Дати внесення фунгіцидів"
   }
 }

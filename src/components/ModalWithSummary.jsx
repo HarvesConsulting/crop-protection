@@ -14,6 +14,7 @@ import {
   Legend,
 } from "recharts";
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function ModalWithSummary({
   open,
@@ -23,6 +24,7 @@ export default function ModalWithSummary({
   diagnostics = [],
   integratedTreatments = [],
 }) {
+  const { t } = useTranslation();
   const [tooltipData, setTooltipData] = useState(null);
 
   const numDays =
@@ -35,18 +37,18 @@ export default function ModalWithSummary({
 
   const hoursPerDay = totalHours / numDays;
 
-  let riskLevel = "Низький";
+  let riskLevel = t("summaryModal.riskLevels.low");
   let riskColor = "text-green-700 bg-green-100";
   let riskDot = "🟢";
   let lineColor = "#22c55e";
 
   if (hoursPerDay > 2.5) {
-    riskLevel = "Високий";
+    riskLevel = t("summaryModal.riskLevels.high");
     riskColor = "text-red-700 bg-red-100";
     riskDot = "🔴";
     lineColor = "#ef4444";
   } else if (hoursPerDay > 1.5) {
-    riskLevel = "Середній";
+    riskLevel = t("summaryModal.riskLevels.medium");
     riskColor = "text-yellow-700 bg-yellow-100";
     riskDot = "🟡";
     lineColor = "#facc15";
@@ -85,12 +87,12 @@ export default function ModalWithSummary({
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-3 border-b bg-gray-50">
               <h2 className="text-lg font-semibold text-gray-800">
-                🌾 Графік обприскування
+                🌾 {t("summaryModal.title")}
               </h2>
               <Dialog.Close asChild>
                 <button
                   className="text-gray-500 hover:text-red-500 transition"
-                  aria-label="Закрити"
+                  aria-label={t("summaryModal.close")}
                 >
                   <Cross2Icon />
                 </button>
@@ -100,7 +102,7 @@ export default function ModalWithSummary({
             {/* Body */}
             <div className="flex-1 overflow-auto p-5 bg-white space-y-5 text-base">
               <div>
-                <strong>Рівень ризику захворювання:</strong>{" "}
+                <strong>{t("summaryModal.diseaseRiskLevel")}:</strong>{" "}
                 <span
                   className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-sm font-medium ${riskColor}`}
                 >
@@ -132,13 +134,13 @@ export default function ModalWithSummary({
                       height={36}
                       payload={[
                         {
-                          value: "Сприятливі години",
+                          value: t("summaryModal.favorableHours"),
                           type: "line",
                           id: "hours",
                           color: lineColor,
                         },
                         {
-                          value: "Дати внесення фунгіцидів",
+                          value: t("summaryModal.fungicideDates"),
                           type: "line",
                           color: "#3b82f6",
                           id: "fungicide-dates",
@@ -150,7 +152,7 @@ export default function ModalWithSummary({
                       type="monotone"
                       dataKey="hours"
                       stroke={lineColor}
-                      name="Сприятливі години"
+                      name={t("summaryModal.favorableHours")}
                       strokeWidth={2}
                       dot={{ r: 3 }}
                     />

@@ -120,5 +120,18 @@
     "humidity": "💧 Humedad (%)",
     "wind": "🌬️ Viento (m/s)",
     "precipitation": "☔ Precipitación (mm)"
+  },
+
+  "summaryModal": {
+    "title": "Calendario de Pulverizaciones",
+    "close": "Cerrar",
+    "diseaseRiskLevel": "Nivel de riesgo de enfermedad",
+    "riskLevels": {
+      "low": "Bajo",
+      "medium": "Medio",
+      "high": "Alto"
+    },
+    "favorableHours": "Horas favorables",
+    "fungicideDates": "Fechas de aplicación de fungicidas"
   }
 }
