@@ -4,25 +4,22 @@ import { useTranslation } from "react-i18next";
 export default function Stepper({ currentStep }) {
   const { t } = useTranslation();
 
-  const steps = [
-    { id: 1, name: t("step.city") },
-    { id: 2, name: t("step.season") },
-    { id: 3, name: t("step.calculation") },
-    { id: 4, name: t("step.results") },
-  ];
+  const stepIds = [1, 2, 3, 4];
 
   return (
     <ol className="stepper">
-      {steps.map((step, index) => (
+      {stepIds.map((id, index) => (
         <li
-          key={step.id}
-          className={`step ${currentStep === step.id ? "active" : ""} ${
-            currentStep > step.id ? "completed" : ""
+          key={id}
+          className={`step ${currentStep === id ? "active" : ""} ${
+            currentStep > id ? "completed" : ""
           }`}
         >
-          <div className="circle">{step.id}</div>
-          <span className="label">{step.name}</span>
-          {index < steps.length - 1 && <div className="line"></div>}
+          <div className="circle">{id}</div>
+          <span className="label">
+            {t(`step.${["city", "season", "calculation", "results"][index]}`)}
+          </span>
+          {index < stepIds.length - 1 && <div className="line"></div>}
         </li>
       ))}
     </ol>

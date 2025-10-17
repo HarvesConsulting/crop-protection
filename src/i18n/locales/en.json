@@ -46,11 +46,16 @@
   "phytophthora_protection": "Protection measures against Late Blight",
   "click_card_hint": "Click Card for processing details.",
 
-"step": {
-    "city": "City",
-    "season": "Season",
-    "calculation": "Calculation",
-    "results": "Results"
+  "layout": {
+    "appName": "Crop Protection",
+    "appInfoTooltip": "Application information",
+    "appDescription": "Application for farmers: predicts tomato treatment dates for major diseases - late blight, gray mold, alternaria and bacteriosis - based on weather conditions. Develops a protection system with preparations, dates and treatment times to increase yield.",
+    "steps": {
+      "city": "City",
+      "season": "Season",
+      "calculation": "Calculation",
+      "results": "Results"
+    }
   }
 }
 }
