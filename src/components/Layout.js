@@ -27,10 +27,11 @@ export default function Layout({ children, step, onLogout }) {
         </div>
 
         {/* Language switcher + Logout */}
-        <div className="flex items-center gap-3">
-          <LanguageSwitcher />
-          <LogoutButton onLogout={onLogout} />
-        </div>
+        <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center">
+        <LanguageSwitcher />
+        <LogoutButton onLogout={onLogout} />
+      </div>
+
       </header>
 
       {/* Info box */}
