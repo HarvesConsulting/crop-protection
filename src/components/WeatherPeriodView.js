@@ -11,6 +11,7 @@ import {
   CartesianGrid,
   Brush
 } from "recharts";
+import { useTranslation } from "react-i18next";
 
 // Перевірка дати
 function asDate(v) {
@@ -20,6 +21,7 @@ function asDate(v) {
 }
 
 export default function WeatherPeriodView({ startDate, endDate, hourlyData }) {
+  const { t } = useTranslation();
   const start = asDate(startDate);
   const end = asDate(endDate);
 
@@ -61,17 +63,37 @@ export default function WeatherPeriodView({ startDate, endDate, hourlyData }) {
     <div className="rounded-xl border border-gray-200 bg-white p-4 mb-4 shadow-sm">
       <div className="flex items-center gap-2 mb-3">
         <span role="img" aria-label="weather">⏱️</span>
-        <h4 className="font-semibold text-lg">Погодні умови (графіки)</h4>
+        <h4 className="font-semibold text-lg">{t("weatherPeriod.title")}</h4>
       </div>
 
       {rows.length === 0 ? (
-        <div className="text-center text-gray-500 p-4">Немає погодинних даних</div>
+        <div className="text-center text-gray-500 p-4">{t("weatherPeriod.noData")}</div>
       ) : (
         <div className="space-y-10">
-          <ChartSection title="🌡️ Температура (°C)" dataKey="temperature" color="#ef4444" data={rows} />
-          <ChartSection title="💧 Вологість (%)" dataKey="humidity" color="#3b82f6" data={rows} />
-          <ChartSection title="🌬️ Вітер (м/с)" dataKey="windspeed" color="#10b981" data={rows} />
-          <ChartSection title="☔ Опади (мм)" dataKey="precipitation" color="#8b5cf6" data={rows} />
+          <ChartSection 
+            title={t("weatherPeriod.temperature")} 
+            dataKey="temperature" 
+            color="#ef4444" 
+            data={rows} 
+          />
+          <ChartSection 
+            title={t("weatherPeriod.humidity")} 
+            dataKey="humidity" 
+            color="#3b82f6" 
+            data={rows} 
+          />
+          <ChartSection 
+            title={t("weatherPeriod.wind")} 
+            dataKey="windspeed" 
+            color="#10b981" 
+            data={rows} 
+          />
+          <ChartSection 
+            title={t("weatherPeriod.precipitation")} 
+            dataKey="precipitation" 
+            color="#8b5cf6" 
+            data={rows} 
+          />
         </div>
       )}
     </div>

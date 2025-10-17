@@ -111,5 +111,14 @@
    "weatherModal": {
     "title": "Condiciones Climáticas del Período",
     "close": "Cerrar"
+  },
+
+  "weatherPeriod": {
+    "title": "Condiciones Climáticas (Gráficos)",
+    "noData": "No hay datos climáticos por hora",
+    "temperature": "🌡️ Temperatura (°C)",
+    "humidity": "💧 Humedad (%)",
+    "wind": "🌬️ Viento (m/s)",
+    "precipitation": "☔ Precipitación (mm)"
   }
 }

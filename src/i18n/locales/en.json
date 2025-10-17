@@ -111,5 +111,14 @@
   "weatherModal": {
     "title": "Weather Conditions for Period",
     "close": "Close"
+  },
+    
+  "weatherPeriod": {
+    "title": "Weather Conditions (Charts)",
+    "noData": "No hourly weather data",
+    "temperature": "🌡️ Temperature (°C)",
+    "humidity": "💧 Humidity (%)",
+    "wind": "🌬️ Wind (m/s)",
+    "precipitation": "☔ Precipitation (mm)"
   }
 }
