@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import LogoutButton from "./LogoutButton";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { IconButton, Tooltip } from "@mui/material";
+import LanguageSwitcher from "./LanguageSwitcher"; // ⬅️ Додано
 
 export default function Layout({ children, step, onLogout }) {
   const [showInfo, setShowInfo] = useState(false);
@@ -11,6 +12,7 @@ export default function Layout({ children, step, onLogout }) {
     <div className="min-h-screen bg-gray-50 text-gray-800 font-sans">
       {/* Header */}
       <header className="flex justify-between items-center p-4 bg-green-700 text-white shadow">
+        {/* App title & info icon */}
         <div className="flex items-center gap-2 text-lg font-semibold">
           🍅 Crop Protection
           <Tooltip title="Інформація про застосунок">
@@ -23,16 +25,22 @@ export default function Layout({ children, step, onLogout }) {
             </IconButton>
           </Tooltip>
         </div>
-        <LogoutButton onLogout={onLogout} />
+
+        {/* Language switcher + Logout */}
+        <div className="flex items-center gap-3">
+          <LanguageSwitcher />
+          <LogoutButton onLogout={onLogout} />
+        </div>
       </header>
 
-      {/* Info Box */}
+      {/* Info box */}
       {showInfo && (
         <div className="bg-yellow-50 border border-yellow-200 text-sm text-gray-800 px-6 py-4">
           <p>
-            Застосунок для аграріїв: прогнозує дати обробки томатів від основних хвороб - 
-            фітофторозу, сірої гнилі, альтернаріозу та бактеріозу на основі аналізу 
-            погодних даних. Будує систему захисту з рекомендованими датами, препаратами і годинами для обробки. Незамінний помічник в підвищенні врожайності та якості продукції.
+            Застосунок для аграріїв: прогнозує дати обробки томатів від основних
+            хвороб — фітофторозу, сірої гнилі, альтернаріозу та бактеріозу — на
+            основі погодних умов. Розробляє систему захисту з препаратами,
+            датами та годинами обробки для підвищення врожайності.
           </p>
         </div>
       )}
