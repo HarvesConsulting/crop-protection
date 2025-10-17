@@ -133,5 +133,17 @@
     },
     "favorableHours": "Horas favorables",
     "fungicideDates": "Fechas de aplicación de fungicidas"
+  },
+  
+  "integratedTable": {
+    "title": "Sistema Integrado de Protección",
+    "close": "Cerrar",
+    "exportExcel": "Exportar a Excel",
+    "fileName": "Sistema_integrado_de_proteccion",
+    "protection": "Protección",
+    "table": {
+      "date": "Fecha",
+      "preparations": "Preparaciones"
+    }
   }
 }

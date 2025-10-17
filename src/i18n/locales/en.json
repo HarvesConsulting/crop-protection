@@ -133,5 +133,17 @@
     },
     "favorableHours": "Favorable hours",
     "fungicideDates": "Fungicide application dates"
+  },
+
+   "integratedTable": {
+    "title": "Integrated Protection System",
+    "close": "Close",
+    "exportExcel": "Export to Excel",
+    "fileName": "Integrated_protection_system",
+    "protection": "Protection",
+    "table": {
+      "date": "Date",
+      "preparations": "Preparations"
+    }
   }
 }

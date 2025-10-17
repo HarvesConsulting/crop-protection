@@ -2,6 +2,7 @@ import React from "react";
 import "./IntegratedTableView.css";
 import * as XLSX from "xlsx";
 import PDFExporter from "./PDFExporter";
+import { useTranslation } from "react-i18next";
 
 /**
  * 📊 Модальне вікно з інтегрованою системою захисту
@@ -12,6 +13,8 @@ export default function IntegratedTableView({
   isOpen, 
   onClose
 }) {
+  const { t } = useTranslation();
+  
   const mergedByDate = {};
 
   data.forEach((entry) => {
@@ -31,14 +34,14 @@ export default function IntegratedTableView({
   // ✅ ЕКСПОРТ В EXCEL
   const handleExportToExcel = () => {
     const exportData = sortedDates.map((date) => ({
-      Дата: date,
-      Препарати: mergedByDate[date].join(", "),
+      [t("integratedTable.table.date")]: date,
+      [t("integratedTable.table.preparations")]: mergedByDate[date].join(", "),
     }));
 
     const ws = XLSX.utils.json_to_sheet(exportData);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Захист");
-    XLSX.writeFile(wb, "Інтегрована_система_захисту.xlsx");
+    XLSX.utils.book_append_sheet(wb, ws, t("integratedTable.protection"));
+    XLSX.writeFile(wb, `${t("integratedTable.fileName")}.xlsx`);
   };
 
   const handleBackdropClick = (e) => {
@@ -72,8 +75,8 @@ export default function IntegratedTableView({
       <div className="modal-content">
         {/* Шапка модального вікна */}
         <div className="modal-header">
-          <h2 className="modal-title">Інтегрована система захисту</h2>
-          <button className="modal-close-btn" onClick={onClose} aria-label="Закрити">
+          <h2 className="modal-title">{t("integratedTable.title")}</h2>
+          <button className="modal-close-btn" onClick={onClose} aria-label={t("integratedTable.close")}>
             ×
           </button>
         </div>
@@ -84,8 +87,8 @@ export default function IntegratedTableView({
             <table className="integrated-table">
               <thead>
                 <tr>
-                  <th className="date-header">Дата</th>
-                  <th className="preparations-header">Препарати</th>
+                  <th className="date-header">{t("integratedTable.table.date")}</th>
+                  <th className="preparations-header">{t("integratedTable.table.preparations")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -113,14 +116,14 @@ export default function IntegratedTableView({
               className="export-btn excel-btn" 
               onClick={handleExportToExcel}
             >
-              📊 Експорт в Excel
+              📊 {t("integratedTable.exportExcel")}
             </button>
             
             {/* Використовуємо готовий PDFExporter з фірмовим бланком */}
             <PDFExporter data={data} />
           </div>
           <button className="close-button" onClick={onClose}>
-            Закрити
+            {t("integratedTable.close")}
           </button>
         </div>
       </div>

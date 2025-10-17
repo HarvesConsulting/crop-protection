@@ -132,5 +132,17 @@
     },
     "favorableHours": "Сприятливі години",
     "fungicideDates": "Дати внесення фунгіцидів"
+  },
+
+  "integratedTable": {
+    "title": "Інтегрована система захисту",
+    "close": "Закрити",
+    "exportExcel": "Експорт в Excel",
+    "fileName": "Інтегрована_система_захисту",
+    "protection": "Захист",
+    "table": {
+      "date": "Дата",
+      "preparations": "Препарати"
+    }
   }
 }
