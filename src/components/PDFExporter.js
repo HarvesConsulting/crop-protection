@@ -3,12 +3,12 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export default function PDFExporter({ data }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation("integratedTable", { keyPrefix: "pdfExporter" });
   const [isGenerating, setIsGenerating] = useState(false);
 
   const exportToPDF = async () => {
     if (!data || data.length === 0) {
-      alert(t("pdfExporter.noDataAlert"));
+      alert(t("noDataAlert"));
       return;
     }
 
@@ -31,13 +31,13 @@ export default function PDFExporter({ data }) {
         <div style="border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 20px;">
           <table width="100%">
             <tr>
-              <td width="20%"><img src="${logoUrl}" alt="${t("pdfExporter.logoAlt")}" style="height: 70px;" /></td>
+              <td width="20%"><img src="${logoUrl}" alt="${t("logoAlt")}" style="height: 70px;" /></td>
               <td width="60%" style="text-align: center;">
-                <h1 style="margin: 0; font-size: 22px;">${t("pdfExporter.mainTitle")}</h1>
+                <h1 style="margin: 0; font-size: 22px;">${t("mainTitle")}</h1>
               </td>
               <td width="20%" style="text-align: right; font-size: 11px; color: #666;">
-                <div>${t("pdfExporter.date")}: ${new Date().toLocaleDateString()}</div>
-                <div>${t("pdfExporter.docNumber")} ${Math.random().toString(36).substr(2, 6).toUpperCase()}</div>
+                <div>${t("date")}: ${new Date().toLocaleDateString(i18n.language)}</div>
+                <div>${t("docNumber")} ${Math.random().toString(36).substr(2, 6).toUpperCase()}</div>
               </td>
             </tr>
           </table>
@@ -46,29 +46,29 @@ export default function PDFExporter({ data }) {
         <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; background: #f9f9f9;">
           <table width="100%" style="font-size: 13px;">
             <tr>
-              <td width="25%"><strong>${t("pdfExporter.analysisPeriod")}:</strong></td>
+              <td width="25%"><strong>${t("analysisPeriod")}:</strong></td>
               <td width="25%">${data[0]?.Дата || '—'} - ${data[data.length - 1]?.Дата || '—'}</td>
-              <td width="25%"><strong>${t("pdfExporter.treatmentsCount")}:</strong></td>
+              <td width="25%"><strong>${t("treatmentsCount")}:</strong></td>
               <td width="25%">${data.length}</td>
             </tr>
             <tr>
-              <td><strong>${t("pdfExporter.crop")}:</strong></td>
-              <td>${t("pdfExporter.tomatoes")}</td>
-              <td><strong>${t("pdfExporter.status")}:</strong></td>
-              <td><strong style="color: #006600;">${t("pdfExporter.recommended")}</strong></td>
+              <td><strong>${t("crop")}:</strong></td>
+              <td>${t("tomatoes")}</td>
+              <td><strong>${t("status")}:</strong></td>
+              <td><strong style="color: #006600;">${t("recommended")}</strong></td>
             </tr>
           </table>
         </div>
 
         <div style="margin-bottom: 25px;">
-          <h2 style="font-size: 18px; border-bottom: 1px solid #333; padding-bottom: 8px;">${t("pdfExporter.protectionPlan")}</h2>
+          <h2 style="font-size: 18px; border-bottom: 1px solid #333; padding-bottom: 8px;">${t("protectionPlan")}</h2>
           <table width="100%" style="font-size: 12px; border: 1px solid #333;">
             <thead>
               <tr style="background: #333; color: white;">
                 <th style="padding: 10px; width: 8%;">№</th>
-                <th style="padding: 10px; width: 15%;">${t("pdfExporter.table.date")}</th>
-                <th style="padding: 10px; width: 52%;">${t("pdfExporter.table.products")}</th>
-                <th style="padding: 10px; width: 25%;">${t("pdfExporter.table.diseases")}</th>
+                <th style="padding: 10px; width: 15%;">${t("table.date")}</th>
+                <th style="padding: 10px; width: 52%;">${t("table.products")}</th>
+                <th style="padding: 10px; width: 25%;">${t("table.diseases")}</th>
               </tr>
             </thead>
             <tbody>
@@ -89,12 +89,12 @@ export default function PDFExporter({ data }) {
         </div>
 
         <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; background: #fffde7;">
-          <h3 style="font-size: 14px; margin-bottom: 10px;">${t("pdfExporter.notes")}:</h3>
+          <h3 style="font-size: 14px; margin-bottom: 10px;">${t("notes")}:</h3>
           <ul style="font-size: 12px; color: #666;">
-            <li>${t("pdfExporter.note1")}</li>
-            <li>${t("pdfExporter.note2")}</li>
-            <li>${t("pdfExporter.note3")}</li>
-            <li>${t("pdfExporter.note4")}</li>
+            <li>${t("note1")}</li>
+            <li>${t("note2")}</li>
+            <li>${t("note3")}</li>
+            <li>${t("note4")}</li>
           </ul>
         </div>
 
@@ -102,17 +102,17 @@ export default function PDFExporter({ data }) {
           <table width="100%" style="font-size: 11px; color: #666;">
             <tr>
               <td width="70%">
-                <strong>${t("pdfExporter.legalInfo")}</strong>
-                <div>${t("pdfExporter.legalDescription")}</div>
+                <strong>${t("legalInfo")}</strong>
+                <div>${t("legalDescription")}</div>
               </td>
               <td width="30%" style="text-align: center;">
-                <strong>${t("pdfExporter.agronomist")}</strong>
-                <div style="border-bottom: 1px solid #999; margin: 8px 0;">${t("pdfExporter.agronomistName")}</div>
-                <div>${t("pdfExporter.signature")}</div>
+                <strong>${t("agronomist")}</strong>
+                <div style="border-bottom: 1px solid #999; margin: 8px 0;">${t("agronomistName")}</div>
+                <div>${t("signature")}</div>
               </td>
             </tr>
           </table>
-          <div style="text-align: center; font-size: 10px; margin-top: 20px;">© ${new Date().getFullYear()} ${t("pdfExporter.copyright")}</div>
+          <div style="text-align: center; font-size: 10px; margin-top: 20px;">© ${new Date().getFullYear()} ${t("copyright")}</div>
         </div>
       `;
 
@@ -121,7 +121,7 @@ export default function PDFExporter({ data }) {
 
       const opt = {
         margin: 10,
-        filename: `${t("pdfExporter.filename")}_${new Date().toISOString().split('T')[0]}.pdf`,
+        filename: `${t("filename")}_${new Date().toISOString().split('T')[0]}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: {
           scale: 2,
@@ -139,7 +139,7 @@ export default function PDFExporter({ data }) {
 
     } catch (err) {
       console.error("PDF error:", err);
-      alert(t("pdfExporter.errorAlert"));
+      alert(t("errorAlert"));
     } finally {
       setIsGenerating(false);
     }
@@ -161,7 +161,7 @@ export default function PDFExporter({ data }) {
         fontSize: '14px'
       }}
     >
-      {isGenerating ? t("pdfExporter.generating") : t("pdfExporter.savePdf")}
+      {isGenerating ? t("generating") : t("savePdf")}
     </button>
   );
 }
