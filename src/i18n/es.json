@@ -1,0 +1,7 @@
+{
+  "step1_title": "Paso 1: Elige tu ciudad",
+  "step1_description": "Selecciona una ciudad para calcular la protección.",
+  "placeholder_city": "por ejemplo: Lviv",
+  "button_continue": "Continuar",
+  "no_matches": "Sin coincidencias"
+}

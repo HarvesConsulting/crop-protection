@@ -1,6 +1,7 @@
 ﻿import "./index.css";
 import React from "react";
 import { createRoot } from "react-dom/client";
+import './i18n'; // важливо: підключаємо i18n перед рендером App
 import App from "./App";
 
 // Створюємо корінь React

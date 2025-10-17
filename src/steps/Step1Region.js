@@ -1,15 +1,37 @@
+// Step1Region.js — сучасний вигляд з i18next, info-іконкою та покращенням UX
 import React, { useState, useEffect } from "react";
 import { regions as allRegions } from "../regions";
 import { norm, searchTextFor, placeKey } from "../helpers";
-import { Info } from "lucide-react"; // npm i lucide-react
+import { Info } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 // 🔁 Фільтрація лише унікальних назв
 const regions = allRegions.filter(
-  (r, i, arr) =>
-    i === arr.findIndex((x) => x.name === r.name)
+  (r, i, arr) => i === arr.findIndex((x) => x.name === r.name)
 );
 
+function LanguageSwitcher() {
+  const { i18n } = useTranslation();
+  return (
+    <div className="flex justify-end gap-2 mb-4">
+      <button
+        onClick={() => i18n.changeLanguage("en")}
+        className="px-2 py-1 rounded text-sm border border-gray-300 hover:bg-gray-100"
+      >
+        🇬🇧 EN
+      </button>
+      <button
+        onClick={() => i18n.changeLanguage("es")}
+        className="px-2 py-1 rounded text-sm border border-gray-300 hover:bg-gray-100"
+      >
+        🇪🇸 ES
+      </button>
+    </div>
+  );
+}
+
 export default function Step1Region({ region, setRegion, onNext }) {
+  const { t } = useTranslation();
   const [inputValue, setInputValue] = useState(region?.name || "");
   const [suggestions, setSuggestions] = useState([]);
   const [active, setActive] = useState(-1);
@@ -47,16 +69,15 @@ export default function Step1Region({ region, setRegion, onNext }) {
   return (
     <main className="flex justify-center items-start min-h-[70vh] px-4">
       <div className="w-full max-w-xl bg-white rounded-xl shadow-lg p-6 space-y-6">
+        <LanguageSwitcher />
 
         {/* Заголовок з кнопкою info */}
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-800">
-            Крок 1: Оберіть місто
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-800">{t("step1_title")}</h2>
           <button
             onClick={() => setShowInfo(!showInfo)}
             className="text-blue-600 hover:text-blue-800 transition"
-            title="Інформація"
+            title={t("info")}
           >
             <Info size={24} />
           </button>
@@ -65,8 +86,7 @@ export default function Step1Region({ region, setRegion, onNext }) {
         {/* Інфо-бокс */}
         {showInfo && (
           <div className="bg-blue-50 border border-blue-200 text-sm text-gray-700 p-4 rounded-md shadow-sm">
-            Введіть назву населеного пункту (мінімум 2 букви). Застосунок запропонує відповідні
-            варіанти зі списку, з яких можна обрати потрібний.
+            {t("step1_description")}
           </div>
         )}
 
@@ -83,21 +103,20 @@ export default function Step1Region({ region, setRegion, onNext }) {
               const exact = regions.find((r) => searchTextFor(r) === q);
               setRegion(exact || null);
             }}
-            placeholder="Почніть вводити (мін. 2 букви)"
+            placeholder={t("placeholder_city")}
           />
         </div>
+
         {/* Список підказок */}
         {inputValue.trim().length >= 2 && !region && (
           <div className="max-w-sm mx-auto mt-2 border border-gray-200 rounded-md bg-white max-h-60 overflow-y-auto shadow-md">
             {suggestions.length === 0 ? (
-              <div className="p-2 text-gray-500">Немає збігів</div>
+              <div className="p-2 text-gray-500">{t("no_matches")}</div>
             ) : (
               suggestions.map((c, i) => (
                 <div
                   key={`${c.name}-${c.lat}-${c.lon}`}
-                  className={`p-2 cursor-pointer hover:bg-blue-100 ${
-                    active === i ? "bg-blue-50" : ""
-                  }`}
+                  className={`p-2 cursor-pointer hover:bg-blue-100 ${active === i ? "bg-blue-50" : ""}`}
                   onClick={() => {
                     setInputValue(c.name);
                     setRegion(c);
@@ -123,7 +142,7 @@ export default function Step1Region({ region, setRegion, onNext }) {
                 : "bg-gray-300 cursor-not-allowed"
             }`}
           >
-            Продовжити
+            {t("button_continue")}
           </button>
         </div>
       </div>
