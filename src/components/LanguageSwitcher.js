@@ -12,7 +12,7 @@ export default function LanguageSwitcher() {
   const { i18n } = useTranslation();
 
   return (
-    <div className="flex gap-2 items-center text-sm absolute top-4 right-4 z-50">
+    <div className="flex gap-2 items-center text-sm">
       {languages.map(({ code, label }) => (
         <button
           key={code}
