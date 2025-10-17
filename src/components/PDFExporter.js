@@ -3,14 +3,116 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 const translations = {
-  // same translation object from before (uk, en, de)
-  // ... [omitted here for brevity but should be fully included in real code]
+  uk: {
+    noDataAlert: "Немає даних для експорту",
+    logoAlt: "Логотип",
+    mainTitle: "ІНТЕГРОВАНА СИСТЕМА ЗАХИСТУ РОСЛИН",
+    subTitle: "Індивідуальний план захисту",
+    date: "Дата",
+    docNumber: "Док. №",
+    analysisPeriod: "Період аналізу",
+    treatmentsCount: "Кількість обробок",
+    crop: "Культура",
+    tomatoes: "Томати",
+    status: "Статус",
+    recommended: "Рекомендовано",
+    protectionPlan: "План захистних заходів",
+    table: {
+      date: "Дата",
+      products: "Препарати",
+      diseases: "Хвороби"
+    },
+    notes: "Примітки",
+    note1: "Обробки проводять в сприятливі погодні умови (дивитись в картках обробок - рекомендовані години)",
+    note2: "Дотримуйтесь регламенту чергування препаратів",
+    note3: "Враховуйте період очікування до збору врожаю згідно рекомендацій виробника",
+    note4: "Використовуйте засоби індивідуального захисту",
+    legalInfo: "Юридична інформація",
+    legalDescription: "Документ сформовано автоматично. Рекомендації базуються на агрономічних моделях.",
+    agronomist: "Агроном-консультант",
+    agronomistName: "Лашин Олександр",
+    signature: "підпис та ПІБ",
+    copyright: "Агрономічна служба. Усі права захищено.",
+    generating: "Генерація...",
+    savePdf: "📄 Зберегти PDF",
+    errorAlert: "Помилка при створенні PDF файлу"
+  },
+  en: {
+    noDataAlert: "No data to export",
+    logoAlt: "Logo",
+    mainTitle: "INTEGRATED PLANT PROTECTION SYSTEM",
+    subTitle: "Individual Protection Plan",
+    date: "Date",
+    docNumber: "Doc. №",
+    analysisPeriod: "Analysis period",
+    treatmentsCount: "Treatment count",
+    crop: "Crop",
+    tomatoes: "Tomatoes",
+    status: "Status",
+    recommended: "Recommended",
+    protectionPlan: "Protection Plan",
+    table: {
+      date: "Date",
+      products: "Products",
+      diseases: "Diseases"
+    },
+    notes: "Notes",
+    note1: "Treatments should be carried out in favorable weather (see treatment cards - recommended hours)",
+    note2: "Follow the rotation rules of the products",
+    note3: "Respect the pre-harvest interval according to manufacturer recommendations",
+    note4: "Use personal protective equipment",
+    legalInfo: "Legal information",
+    legalDescription: "This document is generated automatically. Recommendations are based on agronomic models.",
+    agronomist: "Consulting agronomist",
+    agronomistName: "Oleksandr Lashin",
+    signature: "signature and full name",
+    copyright: "Agronomic Service. All rights reserved.",
+    generating: "Generating...",
+    savePdf: "📄 Save PDF",
+    errorAlert: "Error creating PDF file"
+  },
+  de: {
+    noDataAlert: "Keine Daten zum Exportieren",
+    logoAlt: "Logo",
+    mainTitle: "INTEGRIERTES PFLANZENSCHUTZSYSTEM",
+    subTitle: "Individueller Schutzplan",
+    date: "Datum",
+    docNumber: "Dok. Nr.",
+    analysisPeriod: "Analysezeitraum",
+    treatmentsCount: "Behandlungsanzahl",
+    crop: "Kultur",
+    tomatoes: "Tomaten",
+    status: "Status",
+    recommended: "Empfohlen",
+    protectionPlan: "Schutzmaßnahmenplan",
+    table: {
+      date: "Datum",
+      products: "Produkte",
+      diseases: "Krankheiten"
+    },
+    notes: "Hinweise",
+    note1: "Behandlungen bei günstigen Wetterbedingungen durchführen (siehe Behandlungszeiten)",
+    note2: "Beachten Sie den Rotationsplan der Produkte",
+    note3: "Beachten Sie die Wartezeit vor der Ernte gemäß den Empfehlungen des Herstellers",
+    note4: "Tragen Sie persönliche Schutzausrüstung",
+    legalInfo: "Rechtliche Hinweise",
+    legalDescription: "Dokument automatisch erstellt. Empfehlungen basieren auf agronomischen Modellen.",
+    agronomist: "Beratender Agronom",
+    agronomistName: "Oleksandr Lashin",
+    signature: "Unterschrift und Name",
+    copyright: "Agronomischer Dienst. Alle Rechte vorbehalten.",
+    generating: "Erstelle PDF...",
+    savePdf: "📄 PDF speichern",
+    errorAlert: "Fehler beim Erstellen der PDF-Datei"
+  }
 };
 
 export default function PDFExporter({ data }) {
   const { i18n } = useTranslation();
   const language = i18n.language || 'uk';
-  const t = translations[language] || translations.uk;
+  const t = translations[language] && translations[language].savePdf
+    ? translations[language]
+    : translations.uk;
   const [isGenerating, setIsGenerating] = useState(false);
 
   const exportToPDF = async () => {
@@ -168,7 +270,7 @@ export default function PDFExporter({ data }) {
         fontSize: '14px'
       }}
     >
-      {isGenerating ? t.generating : t.savePdf}
+      {isGenerating ? (t?.generating || 'Generating...') : (t?.savePdf || 'Save PDF')}
     </button>
   );
 }
