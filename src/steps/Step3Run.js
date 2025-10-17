@@ -97,7 +97,7 @@ export default function Step3Run({
       }
 
       if (weatherDaily.length === 0) {
-        setError("Не вдалося отримати погодні дані.");
+        setError(t("error_no_weather"));
         setLoading(false);
         return;
       }
@@ -139,12 +139,12 @@ export default function Step3Run({
 
       if (diseases.includes("grayMold")) {
         const riskDates = rowsAfter.filter(isGrayMoldRisk).map((d) => d.date);
-        diseaseSummary.push({ name: "Сіра гниль", riskDates });
+        diseaseSummary.push({ name: t("disease_grayMold"), riskDates });
       }
 
       if (diseases.includes("alternaria")) {
         const riskDates = rowsAfter.filter(isAlternariaRisk).map((d) => d.date);
-        diseaseSummary.push({ name: "Альтернаріоз", riskDates });
+        diseaseSummary.push({ name: t("disease_alternaria"), riskDates });
       }
 
       if (diseases.includes("bacteriosis")) {
@@ -157,7 +157,7 @@ export default function Step3Run({
             return isBacterialRisk(d, rv);
           })
           .map((d) => d.date);
-        diseaseSummary.push({ name: "Бактеріоз", riskDates });
+        diseaseSummary.push({ name: t("disease_bacteriosis"), riskDates });
       }
 
       const result = {
@@ -177,7 +177,7 @@ export default function Step3Run({
 
       onResult(result);
     } catch (e) {
-      setError(`Помилка обчислення: ${e.message || e}`);
+      setError(`${t("error_calc")}: ${e.message || e}`);
     } finally {
       setLoading(false);
     }
@@ -187,69 +187,45 @@ export default function Step3Run({
     <main className="flex justify-center items-start min-h-[70vh] px-3 sm:px-4">
       <div className="w-full max-w-xl mx-auto bg-white rounded-xl shadow-lg">
         <div className="px-4 sm:px-8 py-5 sm:py-6 space-y-5 sm:space-y-6">
-          
+
           {/* Заголовок */}
           <h2 className="text-xl sm:text-2xl font-bold text-gray-800 leading-tight">
-            Крок 3: Розрахунок <span role="img" aria-label="lab"></span>
+            {t("step3_title")}
           </h2>
-          
-          {/* Обране користувачем */}  
+
+          {/* Обране користувачем */}
           <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="text-lg"></span>
-              <div>
-                <div className="text-xs text-gray-600 font-medium">Обране місто</div>
-                <div className="text-sm font-semibold text-gray-800">
-                  {region?.name || "—"}
-                </div>
+            <div>
+              <div className="text-xs text-gray-600 font-medium">{t("step3_region")}</div>
+              <div className="text-sm font-semibold text-gray-800">
+                {region?.name || "—"}
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-lg"></span>
-              <div>
-                <div className="text-xs text-gray-600 font-medium">Період розрахунку</div>
-                <div className="text-sm font-semibold text-gray-800">
-                  {plantingDate} — {harvestDate}
-                </div>
+            <div>
+              <div className="text-xs text-gray-600 font-medium">{t("step3_period")}</div>
+              <div className="text-sm font-semibold text-gray-800">
+                {plantingDate} — {harvestDate}
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-lg"></span>
-              <div>
-                <div className="text-xs text-gray-600 font-medium">Обрані хвороби</div>
-                <div className="text-sm font-semibold text-gray-800">
-                  {diseases.length === 0
-                    ? "Жодної"
-                    : diseases
-                        .map((id) => {
-                          switch (id) {
-                            case "lateBlight":
-                              return "Фітофтороз";
-                            case "grayMold":
-                              return "Сіра гниль";
-                            case "alternaria":
-                              return "Альтернаріоз";
-                            case "bacteriosis":
-                              return "Бактеріоз";
-                            default:
-                              return id;
-                          }
-                        })
-                        .join(", ")}
-                </div>
+            <div>
+              <div className="text-xs text-gray-600 font-medium">{t("step3_diseases")}</div>
+              <div className="text-sm font-semibold text-gray-800">
+                {diseases.length === 0
+                  ? t("none")
+                  : diseases.map((id) => t(`disease_${id}`)).join(", ")}
               </div>
             </div>
           </div>
-         
+
           {/* Повідомлення про помилку */}
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-xl p-4">
               <div className="flex items-center gap-3">
                 <span className="text-lg">⚠️</span>
                 <div>
-                  <div className="font-semibold text-red-800 text-sm">Помилка</div>
+                  <div className="font-semibold text-red-800 text-sm">{t("error")}</div>
                   <div className="text-red-700 text-sm mt-1">{error}</div>
                 </div>
               </div>
@@ -259,7 +235,7 @@ export default function Step3Run({
           {/* Анімація або кнопки */}
           {loading ? (
             <div className="text-center py-8">
-              <LoadingTractor />                          
+              <LoadingTractor />
             </div>
           ) : (
             <div className="flex flex-col sm:flex-row justify-between gap-3 pt-4">
@@ -267,13 +243,13 @@ export default function Step3Run({
                 onClick={onBack}
                 className="px-6 py-3 bg-gray-100 rounded-xl hover:bg-gray-200 transition font-semibold text-gray-800 text-sm sm:text-base order-2 sm:order-1"
               >
-                ← Назад
+                ← {t("back")}
               </button>
               <button
                 onClick={runModel}
                 className="px-6 py-3 rounded-xl text-white font-semibold transition flex items-center justify-center gap-2 text-sm sm:text-base order-1 sm:order-2 bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-xl"
               >
-                Розрахувати
+                {t("run")}
               </button>
             </div>
           )}
