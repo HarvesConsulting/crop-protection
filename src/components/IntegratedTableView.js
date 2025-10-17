@@ -13,8 +13,7 @@ export default function IntegratedTableView({
   isOpen, 
   onClose
 }) {
-  const { t } = useTranslation();
-  
+  const { t, i18n } = useTranslation();  
   const mergedByDate = {};
 
   data.forEach((entry) => {
