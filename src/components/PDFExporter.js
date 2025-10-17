@@ -107,9 +107,7 @@ const translations = {
   }
 };
 
-export default function PDFExporter({ data }) {
-  const { i18n } = useTranslation();
-  const language = i18n.language || 'uk';
+  export default function PDFExporter({ data, language = 'uk' }) {
   const t = translations[language] && translations[language].savePdf
     ? translations[language]
     : translations.uk;

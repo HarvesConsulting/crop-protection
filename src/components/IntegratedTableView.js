@@ -120,7 +120,7 @@ export default function IntegratedTableView({
             </button>
             
             {/* Використовуємо готовий PDFExporter з фірмовим бланком */}
-            <PDFExporter data={data} />
+            <PDFExporter data={data} language={i18n.language.split('-')[0]} />
           </div>
           <button className="close-button" onClick={onClose}>
             {t("integratedTable.close")}
