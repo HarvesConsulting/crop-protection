@@ -264,6 +264,8 @@ function TreatmentTable({ data, title, onCardClick }) {
 
 // ДОПОМІЖНІ ФУНКЦІЇ
 function getAdvancedTreatments(riskDates, minGap = 7, shortGap = 5) {
+  if (!riskDates || riskDates.length === 0) return [];
+  
   const parsedDates = riskDates
     .map((d) =>
       typeof d === "string"
@@ -271,6 +273,8 @@ function getAdvancedTreatments(riskDates, minGap = 7, shortGap = 5) {
         : d
     )
     .filter((d) => isValid(d));
+
+  if (parsedDates.length === 0) return [];
 
   const sorted = parsedDates.sort((a, b) => a - b);
   const selected = [];
@@ -404,7 +408,7 @@ export default function Step4Results({ result, onRestart }) {
     } = result;
 
     // Обчислення sprayData для фітофторозу
-    const calculatedSprayData = sprayDates.map((d, i) => {
+    const calculatedSprayData = sprayDates && sprayDates.length > 0 ? sprayDates.map((d, i) => {
       const cur = parseISO(d.split(".").reverse().join("-"));
       const prev = i > 0 ? parseISO(sprayDates[i - 1].split(".").reverse().join("-")) : plantingDate;
 
@@ -425,12 +429,23 @@ export default function Step4Results({ result, onRestart }) {
         "Рекомендовані години": recommendedHours.length ? recommendedHours.join(", ") : "—",
         backData,
       };
-    });
+    }) : [];
 
-    // Обчислення для інших хвороб
+    // Обчислення для інших хвороб - ВИПРАВЛЕНА ВЕРСІЯ
     const calculatedDiseaseCardsGrouped = diseaseSummary?.map(({ name, riskDates }) => {
-      // ВИПРАВЛЕНІ КЛЮЧІ ДЛЯ ХВОРОБ
+      console.log(`🔍 Processing disease from backend:`, name, riskDates);
+
+      // УНІВЕРСАЛЬНА МАПА ДЛЯ ВСІХ МОЖЛИВИХ НАЗВ ХВОРОБ
       const diseaseRotationMap = {
+        // Українські назви
+        "Сіра гниль": rotationGrayMold,
+        "Альтернаріоз": rotationAlternaria,
+        "Бактеріоз": rotationBacteriosis,
+        // Англійські назви
+        "Gray Mold": rotationGrayMold,
+        "Alternaria": rotationAlternaria,
+        "Bacteriosis": rotationBacteriosis,
+        // Ключі для локалізації
         "gray_mold": rotationGrayMold,
         "alternaria": rotationAlternaria,
         "bacteriosis": rotationBacteriosis,
@@ -438,18 +453,21 @@ export default function Step4Results({ result, onRestart }) {
 
       const rotation = diseaseRotationMap[name] || [];
 
-      console.log(`🔍 Processing disease: ${name}`, {
-        rotation,
-        riskDates
-      });
+      console.log(`🔍 Found rotation for ${name}:`, rotation);
 
-      // Перевірка на порожній масив
-      if (!rotation || rotation.length === 0) {
-        console.warn(`⚠️ No rotation products defined for disease: ${name}`);
+      // Перевірка на порожній масив або відсутність дат
+      if (!rotation || rotation.length === 0 || !riskDates || riskDates.length === 0) {
+        console.warn(`⚠️ No rotation products or risk dates for disease: ${name}`);
         return { name, entries: [] };
       }
 
       const treatments = getAdvancedTreatments(riskDates);
+      
+      if (treatments.length === 0) {
+        console.warn(`⚠️ No treatments calculated for disease: ${name}`);
+        return { name, entries: [] };
+      }
+
       const entries = treatments.map((item, i) => {
         const product = rotation[i % rotation.length];
         
@@ -476,10 +494,14 @@ export default function Step4Results({ result, onRestart }) {
           "Рекомендовані години": recommendedHours.length ? recommendedHours.join(", ") : "—",
           backData,
         };
-      }).filter(entry => entry !== null); // Фільтруємо null значення
+      }).filter(entry => entry !== null);
+
+      console.log(`✅ Created ${entries.length} entries for disease: ${name}`);
 
       return { name, entries };
-    }) || [];
+    }).filter(group => group.entries.length > 0) || [];
+
+    console.log("✅ Final disease groups:", calculatedDiseaseCardsGrouped);
 
     // Інтегрована система
     const integratedMap = calculatedSprayData.map((spray) => {
@@ -505,11 +527,17 @@ export default function Step4Results({ result, onRestart }) {
           if (diff <= 3 * 24 * 60 * 60 * 1000) {
             record.Препарати.push(entry.Препарат);
             record.Рекомендації.push(entry.Рекомендація);
-            // ВИПРАВЛЕНІ НАЗВИ ХВОРОБ ДЛЯ ІНТЕГРОВАНОЇ СИСТЕМИ
+            // УНІВЕРСАЛЬНА МАПА ДЛЯ НАЗВ ХВОРОБ
             const diseaseNameMap = {
               "gray_mold": "Сіра гниль",
               "alternaria": "Альтернаріоз", 
-              "bacteriosis": "Бактеріоз"
+              "bacteriosis": "Бактеріоз",
+              "Gray Mold": "Сіра гниль",
+              "Alternaria": "Альтернаріоз",
+              "Bacteriosis": "Бактеріоз",
+              "Сіра гниль": "Сіра гниль",
+              "Альтернаріоз": "Альтернаріоз",
+              "Бактеріоз": "Бактеріоз"
             };
             record.diseases.add(diseaseNameMap[group.name] || group.name);
             merged = true;
@@ -521,7 +549,13 @@ export default function Step4Results({ result, onRestart }) {
           const diseaseNameMap = {
             "gray_mold": "Сіра гниль",
             "alternaria": "Альтернаріоз",
-            "bacteriosis": "Бактеріоз"
+            "bacteriosis": "Бактеріоз",
+            "Gray Mold": "Сіра гниль",
+            "Alternaria": "Альтернаріоз",
+            "Bacteriosis": "Бактеріоз",
+            "Сіра гниль": "Сіра гниль",
+            "Альтернаріоз": "Альтернаріоз",
+            "Бактеріоз": "Бактеріоз"
           };
           integratedMap.push({
             Дата: entry.Дата,
@@ -583,6 +617,23 @@ export default function Step4Results({ result, onRestart }) {
     XLSX.writeFile(wb, `${t("step4.integratedSystem")}.xlsx`);
   };
 
+  // Функція для отримання заголовку хвороби
+  const getDiseaseTitle = (diseaseName) => {
+    const diseaseTitleMap = {
+      "gray_mold": t("step4.disease_protection_gray_mold"),
+      "alternaria": t("step4.disease_protection_alternaria"),
+      "bacteriosis": t("step4.disease_protection_bacteriosis"),
+      "Gray Mold": t("step4.disease_protection_gray_mold"),
+      "Alternaria": t("step4.disease_protection_alternaria"),
+      "Bacteriosis": t("step4.disease_protection_bacteriosis"),
+      "Сіра гниль": t("step4.disease_protection_gray_mold"),
+      "Альтернаріоз": t("step4.disease_protection_alternaria"),
+      "Бактеріоз": t("step4.disease_protection_bacteriosis"),
+    };
+    
+    return diseaseTitleMap[diseaseName] || t("step4.disease_protection", { disease: diseaseName });
+  };
+
   if (!result) return <p>{t("step4.noData")}</p>;
 
   return (
@@ -637,7 +688,7 @@ export default function Step4Results({ result, onRestart }) {
         ) : (
           <>
             {sprayData.length === 0 && 
-             (!diseaseCardsGrouped || diseaseCardsGrouped.every(g => g.entries.length === 0)) ? (
+             (!diseaseCardsGrouped || diseaseCardsGrouped.length === 0) ? (
               <div className="no-treatments-message">
                 <p>{t("step4.no_treatments")}</p>
               </div>
@@ -656,8 +707,7 @@ export default function Step4Results({ result, onRestart }) {
                     <TreatmentTable
                       key={name}
                       data={entries}
-                      // ВИПРАВЛЕНІ КЛЮЧІ ДЛЯ НАЗВ ХВОРОБ
-                      title={t(`step4.disease_protection_${name}`)}
+                      title={getDiseaseTitle(name)}
                       onCardClick={handleCardClick}
                     />
                   )
