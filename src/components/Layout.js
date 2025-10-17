@@ -3,10 +3,18 @@ import LogoutButton from "./LogoutButton";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { IconButton, Tooltip } from "@mui/material";
 import LanguageSwitcher from "./LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 export default function Layout({ children, step, onLogout }) {
+  const { t } = useTranslation();
   const [showInfo, setShowInfo] = useState(false);
-  const steps = ["Місто", "Сезон", "Розрахунок", "Результати"];
+
+  const steps = [
+    t("step.city"),
+    t("step.season"),
+    t("step.calculation"),
+    t("step.results"),
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800 font-sans">
@@ -16,8 +24,8 @@ export default function Layout({ children, step, onLogout }) {
         <div className="flex justify-between items-center">
           {/* App title & info icon */}
           <div className="flex items-center gap-2 text-lg font-semibold">
-            🍅 Crop Protection
-            <Tooltip title="Інформація про застосунок">
+            🍅 {t("app.title")}
+            <Tooltip title={t("layout.infoTooltip")}>
               <IconButton
                 onClick={() => setShowInfo(!showInfo)}
                 size="small"
@@ -34,19 +42,12 @@ export default function Layout({ children, step, onLogout }) {
             <LanguageSwitcher />
           </div>
         </div>
-
-        {/* Тут можна додати додатковий контент, який буде під основним рядком */}
       </header>
 
       {/* Info box */}
       {showInfo && (
         <div className="bg-yellow-50 border border-yellow-200 text-sm text-gray-800 px-6 py-4">
-          <p>
-            Застосунок для аграріїв: прогнозує дати обробки томатів від основних
-            хвороб — фітофторозу, сірої гнилі, альтернаріозу та бактеріозу — на
-            основі погодних умов. Розробляє систему захисту з препаратами,
-            датами та годинами обробки для підвищення врожайності.
-          </p>
+          <p>{t("layout.infoText")}</p>
         </div>
       )}
 
