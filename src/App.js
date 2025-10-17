@@ -7,6 +7,7 @@ import LoginPage from "./components/LoginPage";
 import CalendarView from "./components/CalendarView";
 import Layout from "./components/Layout";
 import SplashScreen from "./components/SplashScreen";
+import LanguageSwitcher from "./components/LanguageSwitcher";
 
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase";
@@ -138,6 +139,12 @@ export default function App() {
           <CalendarView events={extractCalendarEvents(result)} />
         </>
       )}
+      <>
+      <LanguageSwitcher /> {/* 👈 Додаємо перемикач тут */}
+      <Layout step={step} onLogout={() => setUser(null)}>
+        {/* решта кроків */}
+      </Layout>
+    </>
     </Layout>
   );
 }
