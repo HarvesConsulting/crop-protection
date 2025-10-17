@@ -66,6 +66,9 @@
     "infoDescription": "A continuación se muestran las fechas de tratamiento recomendadas. Haga clic en 'Tarjeta' para ver información detallada sobre las condiciones climáticas y las recomendaciones.",
     "daysAfterPrevious": "{{days}} días después del anterior",
     "productDetails": "Detalles del producto",
+    "disease_protection_gray_mold": "Pulverización contra Moho Gris",
+    "disease_protection_alternaria": "Pulverización contra Alternaria",
+    "disease_protection_bacteriosis": "Pulverización contra Bacteriosis",
     "integratedSystem": "Sistema de protección integrado",
     "integratedTable": "Tabla integrada",
     "table": {

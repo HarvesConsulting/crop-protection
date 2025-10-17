@@ -66,6 +66,9 @@
     "infoDescription": "Нижче показано рекомендовані дати обробки. Натисніть \"Картка\" для перегляду детальної інформації про погодні умови та рекомендації.",
     "daysAfterPrevious": "{{days}} діб після попередньої",
     "productDetails": "Деталі препарату",
+    "disease_protection_gray_mold": "Обприскування проти Сірої гнилі",
+    "disease_protection_alternaria": "Обприскування проти Альтернаріозу",
+    "disease_protection_bacteriosis": "Обприскування проти Бактеріозу",
     "integratedSystem": "Інтегрована система захисту",
     "integratedTable": "Інтегрована таблиця",
     "table": {

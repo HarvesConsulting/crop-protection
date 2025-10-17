@@ -56,7 +56,7 @@ const productLinks = {
   "Серенада": "https://www.cropscience.bayer.ua/Products/Fungicides/Serenada.aspx",
 };
 
-// ВИПРАВЛЕНІ МАСИВИ ПРЕПАРАТІВ
+// МАСИВИ ПРЕПАРАТІВ
 const rotationProducts = [
   "Зорвек Інкантія",
   "Ридоміл Голд",
@@ -78,7 +78,6 @@ const rotationGrayMold = [
   "Натіво",
 ];
 
-// ВИПРАВЛЕНО: явно задаємо масиви для кожної хвороби
 const rotationAlternaria = [
   "Луна Експірієнс",
   "Сігнум", 
@@ -430,11 +429,14 @@ export default function Step4Results({ result, onRestart }) {
 
     // Обчислення для інших хвороб
     const calculatedDiseaseCardsGrouped = diseaseSummary?.map(({ name, riskDates }) => {
-      const rotation = {
-        "Сіра гниль": rotationGrayMold,
-        "Альтернаріоз": rotationAlternaria,
-        "Бактеріоз": rotationBacteriosis,
-      }[name] || [];
+      // ВИПРАВЛЕНІ КЛЮЧІ ДЛЯ ХВОРОБ
+      const diseaseRotationMap = {
+        "gray_mold": rotationGrayMold,
+        "alternaria": rotationAlternaria,
+        "bacteriosis": rotationBacteriosis,
+      };
+
+      const rotation = diseaseRotationMap[name] || [];
 
       console.log(`🔍 Processing disease: ${name}`, {
         rotation,
@@ -503,19 +505,30 @@ export default function Step4Results({ result, onRestart }) {
           if (diff <= 3 * 24 * 60 * 60 * 1000) {
             record.Препарати.push(entry.Препарат);
             record.Рекомендації.push(entry.Рекомендація);
-            record.diseases.add(group.name);
+            // ВИПРАВЛЕНІ НАЗВИ ХВОРОБ ДЛЯ ІНТЕГРОВАНОЇ СИСТЕМИ
+            const diseaseNameMap = {
+              "gray_mold": "Сіра гниль",
+              "alternaria": "Альтернаріоз", 
+              "bacteriosis": "Бактеріоз"
+            };
+            record.diseases.add(diseaseNameMap[group.name] || group.name);
             merged = true;
             break;
           }
         }
 
         if (!merged) {
+          const diseaseNameMap = {
+            "gray_mold": "Сіра гниль",
+            "alternaria": "Альтернаріоз",
+            "bacteriosis": "Бактеріоз"
+          };
           integratedMap.push({
             Дата: entry.Дата,
             timestamp: diseaseTime,
             Препарати: [entry.Препарат],
             Рекомендації: [entry.Рекомендація],
-            diseases: new Set([group.name]),
+            diseases: new Set([diseaseNameMap[group.name] || group.name]),
             backData: entry.backData,
           });
         }
@@ -643,7 +656,8 @@ export default function Step4Results({ result, onRestart }) {
                     <TreatmentTable
                       key={name}
                       data={entries}
-                      title={t("step4.disease_protection", { disease: name })}
+                      // ВИПРАВЛЕНІ КЛЮЧІ ДЛЯ НАЗВ ХВОРОБ
+                      title={t(`step4.disease_protection_${name}`)}
                       onCardClick={handleCardClick}
                     />
                   )

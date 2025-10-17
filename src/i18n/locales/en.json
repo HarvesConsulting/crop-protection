@@ -66,6 +66,9 @@
     "infoDescription": "Below are the recommended treatment dates. Click 'Card' to view detailed information about weather conditions and recommendations.",
     "daysAfterPrevious": "{{days}} days after previous",
     "productDetails": "Product details",
+    "disease_protection_gray_mold": "Spraying against Gray Mold",
+    "disease_protection_alternaria": "Spraying against Alternaria",
+    "disease_protection_bacteriosis": "Spraying against Bacteriosis",
     "integratedSystem": "Integrated protection system",
     "integratedTable": "Integrated table",
     "table": {
