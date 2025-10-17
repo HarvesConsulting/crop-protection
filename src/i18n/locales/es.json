@@ -1,14 +1,15 @@
 {
   "step1_title": "Paso 1: Elige tu ciudad",
-  "step1_description": "Selecciona una ciudad para calcular la protección.",
+  "step1_description": "Selecciona una ciudad para calcular la protección",
   "placeholder_city": "por ejemplo: Lviv",
   "button_continue": "Continuar",
+  "info": "Ingrese el nombre del asentamiento (mínimo 2 letras)...",
   "no_matches": "Sin coincidencias",
 
   "step2_title": "Paso 2: Detalles de la temporada",
   "step2_info_1": "El punto de partida es la fecha en que comienza el cálculo: siembra, trasplante o última aplicación de fungicida.",
   "step2_info_2": "El período de cálculo no puede exceder los 15 días desde hoy para garantizar la precisión del pronóstico.",
-  "step2_label_start": "Fecha de inicio",
+  "step2_label_start": "Punto de partida",
   "step2_label_period": "Período de cálculo",
   "step2_days": "días",
   "step2_max": "máx: {{days}}",
@@ -36,7 +37,7 @@
   "loading_spray": "Pulverización",
 
   "app": {
-    "title": "Crop Protection"
+    "title": "Protección de Cultivos"
   },
   "layout": {
     "infoTooltip": "Información de la aplicación",
@@ -56,8 +57,54 @@
     "no_treatments": "💡 No se recomienda la aplicación de fungicidas.",
     "scroll_up": "↑ Subir",
     "export_excel": "Exportar a Excel",
-    "disease_protection": "Medidas contra {{disease}}",
-    "phytophthora_protection": "Medidas contra Tizón tardío",
-    "click_card_hint": "Haga clic en Tarjeta para obtener detalles del procesamiento."
+    "disease_protection": "Pulverización contra {{disease}}",
+    "phytophthora_protection": "Pulverización contra Tizón tardío",
+    "click_card_hint": "Haga clic en Tarjeta para obtener detalles del procesamiento.",
+    "noData": "Datos no disponibles",
+    "showInfo": "Mostrar información",
+    "calculationPeriod": "Período de cálculo",
+    "infoDescription": "A continuación se muestran las fechas de tratamiento recomendadas. Haga clic en 'Tarjeta' para ver información detallada sobre las condiciones climáticas y las recomendaciones.",
+    "daysAfterPrevious": "{{days}} días después del anterior",
+    "productDetails": "Detalles del producto",
+    "integratedSystem": "Sistema de protección integrado",
+    "integratedTable": "Tabla integrada",
+    "table": {
+      "date": "Fecha",
+      "product": "Producto",
+      "products": "Productos",
+      "norm": "Norma",
+      "unit": "kg(l)/ha",
+      "litersPerHa": "l/ha",
+      "kgPerHa": "kg/ha",
+      "recommendations": "Recomendaciones",
+      "card": "Tarjeta",
+      "interval": "Intervalo",
+      "diseases": "Enfermedades",
+      "noTreatments": "No hay tratamientos programados",
+      "viewDetails": "Ver información detallada"
+    },
+    "cardModal": {
+      "title": "📋 Tarjeta de tratamiento #{{index}}",
+      "basicInfo": "📅 Información básica",
+      "favorableHours": "🕒 Horas favorables para el tratamiento",
+      "weatherConditions": "🌤️ Condiciones climáticas del período",
+      "favorableHoursCount": "Horas favorables",
+      "precipitation": "Precipitación",
+      "mm": "mm"
+    },
+    "riskStatus": {
+      "low": "🟢 Riesgo bajo",
+      "medium": "🟡 Riesgo medio",
+      "high": "🔴 Riesgo alto"
+    }
+  },
+
+  "actionMenu": {
+    "menuTitle": "Menú de Acciones",
+    "restart": "Comenzar de Nuevo",
+    "weatherConditions": "Condiciones Climáticas del Período",
+    "spraySchedule": "Calendario de Pulverizaciones",
+    "showIntegrated": "Generar Sistema Integrado",
+    "hideIntegrated": "Ocultar Sistema Integrado"
   }
 }

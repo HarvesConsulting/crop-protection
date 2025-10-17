@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import "./ActionMenu.css";
 
 export default function ActionMenu({
@@ -9,6 +10,7 @@ export default function ActionMenu({
   showIntegrated,
   onShowSummary,
 }) {
+  const { t } = useTranslation();
   const [showMenu, setShowMenu] = useState(false);
   const closeTimeoutRef = useRef(null);
 
@@ -59,7 +61,7 @@ export default function ActionMenu({
           }
         }}
       >
-        ☰ Меню дій
+        ☰ {t("actionMenu.menuTitle")}
       </button>
 
       {/* === МОБІЛЬНЕ МЕНЮ === */}
@@ -74,27 +76,27 @@ export default function ActionMenu({
               className="menu-item"
               onClick={() => handleMenuAction(onRestart)}
             >
-              Почати спочатку
+              {t("actionMenu.restart")}
             </button>
             <button
               className="menu-item"
               onClick={() => handleMenuAction(onShowWeather)}
             >
-              Погодні умови за період
+              {t("actionMenu.weatherConditions")}
             </button>
             <button
               className="menu-item"
               onClick={() => handleMenuAction(onShowSummary)}
             >
-              Графік обприскуаань
+              {t("actionMenu.spraySchedule")}
             </button>
             <button
               className="menu-item"
               onClick={() => handleMenuAction(onToggleIntegrated)}
             >
               {showIntegrated
-                ? "Сховати інтегровану систему"
-                : "Сформувати інтегровану систему"}
+                ? t("actionMenu.hideIntegrated")
+                : t("actionMenu.showIntegrated")}
             </button>
           </div>
         </>
@@ -107,27 +109,27 @@ export default function ActionMenu({
             className="menu-item"
             onClick={() => handleMenuAction(onRestart)}
           >
-            Почати спочатку
+            {t("actionMenu.restart")}
           </button>
           <button
             className="menu-item"
             onClick={() => handleMenuAction(onShowWeather)}
           >
-            Погодні умови за період
+            {t("actionMenu.weatherConditions")}
           </button>
           <button
             className="menu-item"
             onClick={() => handleMenuAction(onShowSummary)}
           >
-            Графік обприскуаань
+            {t("actionMenu.spraySchedule")}
           </button>
           <button
             className="menu-item"
             onClick={() => handleMenuAction(onToggleIntegrated)}
           >
             {showIntegrated
-              ? "Сховати інтегровану систему"
-              : "Сформувати інтегровану систему"}
+              ? t("actionMenu.hideIntegrated")
+              : t("actionMenu.showIntegrated")}
           </button>
         </div>
       )}

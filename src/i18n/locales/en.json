@@ -1,14 +1,15 @@
 {
   "step1_title": "Step 1: Choose your city",
-  "step1_description": "Select a city to calculate protection.",
+  "step1_description": "Select a city to calculate protection",
   "placeholder_city": "e.g. Lviv",
   "button_continue": "Continue",
+  "info": "Enter settlement name (minimum 2 letters)...",
   "no_matches": "No matches",
 
   "step2_title": "Step 2: Season Details",
   "step2_info_1": "The starting point is the date when the calculation begins – sowing, transplanting, or last fungicide application.",
   "step2_info_2": "The calculation period cannot exceed 15 days from today to ensure forecast accuracy.",
-  "step2_label_start": "Start date",
+  "step2_label_start": "Starting point",
   "step2_label_period": "Calculation period",
   "step2_days": "days",
   "step2_max": "max: {{days}}",
@@ -27,7 +28,7 @@
   "step3_region": "Selected city",
   "step3_period": "Calculation period",
   "step3_diseases": "Selected diseases",
-  "run": "Run",
+  "run": "Calculate",
   "back": "Back",
   "error": "Error",
   "none": "None",
@@ -52,12 +53,58 @@
   "step4": {
     "title": "Step 4: Results",
     "period": "Calculation period",
-    "details": "Click 'Card' to view detailed weather and recommendations.",
+    "details": "Click 'Card' to view detailed information.",
     "no_treatments": "💡 Fungicide applications are not recommended.",
     "scroll_up": "↑ Scroll to top",
     "export_excel": "Export to Excel",
-    "disease_protection": "Protection measures against {{disease}}",
-    "phytophthora_protection": "Protection measures against Late Blight",
-    "click_card_hint": "Click Card for processing details."
+    "disease_protection": "Spraying against {{disease}}",
+    "phytophthora_protection": "Spraying against Late Blight",
+    "click_card_hint": "Click Card for processing details.",
+    "noData": "No data available",
+    "showInfo": "Show information",
+    "calculationPeriod": "Calculation period",
+    "infoDescription": "Below are the recommended treatment dates. Click 'Card' to view detailed information about weather conditions and recommendations.",
+    "daysAfterPrevious": "{{days}} days after previous",
+    "productDetails": "Product details",
+    "integratedSystem": "Integrated protection system",
+    "integratedTable": "Integrated table",
+    "table": {
+      "date": "Date",
+      "product": "Product",
+      "products": "Products",
+      "norm": "Norm",
+      "unit": "kg(l)/ha",
+      "litersPerHa": "l/ha",
+      "kgPerHa": "kg/ha",
+      "recommendations": "Recommendations",
+      "card": "Card",
+      "interval": "Interval",
+      "diseases": "Diseases",
+      "noTreatments": "No treatments scheduled",
+      "viewDetails": "View detailed information"
+    },
+    "cardModal": {
+      "title": "📋 Treatment card #{{index}}",
+      "basicInfo": "📅 Basic information",
+      "favorableHours": "🕒 Favorable hours for treatment",
+      "weatherConditions": "🌤️ Weather conditions of the period",
+      "favorableHoursCount": "Favorable hours",
+      "precipitation": "Precipitation",
+      "mm": "mm"
+    },
+    "riskStatus": {
+      "low": "🟢 Low risk",
+      "medium": "🟡 Medium risk",
+      "high": "🔴 High risk"
+    }
+  },
+
+  "actionMenu": {
+    "menuTitle": "Action Menu",
+    "restart": "Start Over",
+    "weatherConditions": "Weather Conditions for Period",
+    "spraySchedule": "Spray Schedule",
+    "showIntegrated": "Generate Integrated System",
+    "hideIntegrated": "Hide Integrated System"
   }
 }
