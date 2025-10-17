@@ -147,6 +147,44 @@
     "table": {
       "date": "Date",
       "preparations": "Preparations"
-    }
+    },
+ 
+  "pdfExporter": {
+    "noDataAlert": "No data to export",
+    "logoAlt": "Logo",
+    "mainTitle": "INTEGRATED PLANT PROTECTION SYSTEM",
+    "subTitle": "Individual protection plan",
+    "date": "Date",
+    "docNumber": "Doc. No.",
+    "analysisPeriod": "Analysis period",
+    "treatmentsCount": "Number of treatments",
+    "crop": "Crop",
+    "tomatoes": "Tomatoes",
+    "status": "Status",
+    "recommended": "Recommended",
+    "protectionPlan": "Protection measures plan",
+    "table": {
+      "date": "Date",
+      "products": "Products",
+      "diseases": "Diseases"
+    },
+
+    "notes": "Notes",
+    "note1": "Treatments should be carried out in favorable weather conditions (see treatment cards - recommended hours)",
+    "note2": "Follow the product rotation schedule",
+    "note3": "Consider the waiting period before harvest according to manufacturer's recommendations",
+    "note4": "Use personal protective equipment",
+    "legalInfo": "Legal information",
+    "legalDescription": "Document generated automatically. Recommendations are based on agronomic models.",
+    "agronomist": "Agronomist consultant",
+    "agronomistName": "Lashyn Oleksandr",
+    "signature": "signature and full name",
+    "copyright": "Agronomic Service. All rights reserved.",
+    "filename": "Protection_system",
+    "errorAlert": "Error creating PDF file",
+    "noDataTooltip": "No data to export",
+    "generating": "Generating...",
+    "savePdf": "Save PDF"
+  }
   }
 }

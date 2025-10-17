@@ -147,6 +147,43 @@
     "table": {
       "date": "Fecha",
       "preparations": "Preparaciones"
-    }
+    },
+
+    "pdfExporter": {
+    "noDataAlert": "No hay datos para exportar",
+    "logoAlt": "Logo",
+    "mainTitle": "SISTEMA INTEGRADO DE PROTECCIÓN DE PLANTAS",
+    "subTitle": "Plan de protección individual",
+    "date": "Fecha",
+    "docNumber": "Doc. No.",
+    "analysisPeriod": "Período de análisis",
+    "treatmentsCount": "Número de tratamientos",
+    "crop": "Cultivo",
+    "tomatoes": "Tomates",
+    "status": "Estado",
+    "recommended": "Recomendado",
+    "protectionPlan": "Plan de medidas de protección",
+    "table": {
+      "date": "Fecha",
+      "products": "Productos",
+      "diseases": "Enfermedades"
+    },
+    "notes": "Notas",
+    "note1": "Los tratamientos se realizan en condiciones meteorológicas favorables (ver en las tarjetas de tratamiento - horas recomendadas)",
+    "note2": "Siga el programa de rotación de productos",
+    "note3": "Considere el período de espera antes de la cosecha según las recomendaciones del fabricante",
+    "note4": "Use equipo de protección personal",
+    "legalInfo": "Información legal",
+    "legalDescription": "Documento generado automáticamente. Las recomendaciones se basan en modelos agronómicos.",
+    "agronomist": "Asesor agronómico",
+    "agronomistName": "Lashyn Oleksandr",
+    "signature": "firma y nombre completo",
+    "copyright": "Servicio Agronómico. Todos los derechos reservados.",
+    "filename": "Sistema_protección",
+    "errorAlert": "Error al crear archivo PDF",
+    "noDataTooltip": "No hay datos para exportar",
+    "generating": "Generando...",
+    "savePdf": "Guardar PDF"
+  }
   }
 }
