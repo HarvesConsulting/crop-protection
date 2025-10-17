@@ -616,7 +616,7 @@ export default function Step4Results({ result, onRestart }) {
             <IntegratedTableView data={integratedSystem} />
             <div className="action-buttons">
               <button onClick={exportToExcel} className="action-button">
-                {t("step4.exportToExcel")}
+                {t("step4.export_excel")}
               </button>
               <PDFExporter data={integratedSystem} />
             </div>
@@ -626,14 +626,14 @@ export default function Step4Results({ result, onRestart }) {
             {sprayData.length === 0 && 
              (!diseaseCardsGrouped || diseaseCardsGrouped.every(g => g.entries.length === 0)) ? (
               <div className="no-treatments-message">
-                <p>{t("step4.noTreatmentsRecommended")}</p>
+                <p>{t("step4.no_treatments")}</p>
               </div>
             ) : (
               <>
                 {sprayData.length > 0 && (
                   <TreatmentTable
                     data={sprayData}
-                    title={t("step4.phytophthoraProtection")}
+                    title={t("step4.phytophthora_protection")}
                     onCardClick={handleCardClick}
                   />
                 )}
@@ -643,7 +643,7 @@ export default function Step4Results({ result, onRestart }) {
                     <TreatmentTable
                       key={name}
                       data={entries}
-                      title={t("step4.diseaseProtection", { disease: name })}
+                      title={t("step4.disease_protection", { disease: name })}
                       onCardClick={handleCardClick}
                     />
                   )
@@ -656,7 +656,7 @@ export default function Step4Results({ result, onRestart }) {
                 className="scroll-top-button"
                 onClick={() => topRef.current?.scrollIntoView({ behavior: "smooth" })}
               >
-                ↑ {t("step4.scrollToTop")}
+                {t("step4.scroll_up")}
               </button>
             </div>
           </>
