@@ -9,27 +9,6 @@ import { useTranslation } from "react-i18next";
 const regions = allRegions.filter(
   (r, i, arr) => i === arr.findIndex((x) => x.name === r.name)
 );
-
-function LanguageSwitcher() {
-  const { i18n } = useTranslation();
-  return (
-    <div className="flex justify-end gap-2 mb-4">
-      <button
-        onClick={() => i18n.changeLanguage("en")}
-        className="px-2 py-1 rounded text-sm border border-gray-300 hover:bg-gray-100"
-      >
-        🇬🇧 EN
-      </button>
-      <button
-        onClick={() => i18n.changeLanguage("es")}
-        className="px-2 py-1 rounded text-sm border border-gray-300 hover:bg-gray-100"
-      >
-        🇪🇸 ES
-      </button>
-    </div>
-  );
-}
-
 export default function Step1Region({ region, setRegion, onNext }) {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState(region?.name || "");
