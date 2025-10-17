@@ -13,7 +13,6 @@ import { Modal, Box, IconButton, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { parseISO, format, differenceInDays, isValid } from 'date-fns';
 import { useTranslation } from "react-i18next";
-import { useTranslation } from "react-i18next";
 
 const productInfo = {
   "Зорвек Інкантія": "0,5л/га",
