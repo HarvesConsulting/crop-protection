@@ -102,11 +102,11 @@ export default function PDFExporter({ data }) {
           <table width="100%" style="font-size: 11px; color: #666;">
             <tr>
               <td width="70%">
-                <strong>${t("pdfExporter.legalInfo")}:</strong>
+                <strong>${t("pdfExporter.legalInfo")}</strong>
                 <div>${t("pdfExporter.legalDescription")}</div>
               </td>
               <td width="30%" style="text-align: center;">
-                <strong>${t("pdfExporter.agronomist")}:</strong>
+                <strong>${t("pdfExporter.agronomist")}</strong>
                 <div style="border-bottom: 1px solid #999; margin: 8px 0;">${t("pdfExporter.agronomistName")}</div>
                 <div>${t("pdfExporter.signature")}</div>
               </td>
@@ -121,7 +121,7 @@ export default function PDFExporter({ data }) {
 
       const opt = {
         margin: 10,
-        filename: `System_Protection_${new Date().toISOString().split('T')[0]}.pdf`,
+        filename: `${t("pdfExporter.filename")}_${new Date().toISOString().split('T')[0]}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: {
           scale: 2,
