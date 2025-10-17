@@ -20,5 +20,14 @@
   "disease_grayMold": "Сіра гниль",
   "disease_alternaria": "Альтернаріоз",
   "disease_bacteriosis": "Бактеріоз",
-  "button_back": "← Назад"
+  "button_back": "← Назад",
+
+  "step3_title": "Крок 3: Розрахунок",
+"step3_region": "Обране місто",
+"step3_period": "Період розрахунку",
+"step3_diseases": "Обрані хвороби",
+"run": "Розрахувати",
+"back": "Назад",
+"error": "Помилка",
+"none": "Жодної"
 }

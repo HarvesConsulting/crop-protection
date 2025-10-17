@@ -21,5 +21,14 @@
   "disease_grayMold": "Moho gris",
   "disease_alternaria": "Alternaria",
   "disease_bacteriosis": "Bacteriosis",
-  "button_back": "← Atrás"
+  "button_back": "← Atrás",
+
+  "step3_title": "Paso 3: Cálculo",
+"step3_region": "Ciudad seleccionada",
+"step3_period": "Período de cálculo",
+"step3_diseases": "Enfermedades seleccionadas",
+"run": "Calcular",
+"back": "Atrás",
+"error": "Error",
+"none": "Ninguna"
 }

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import LoadingTractor from "../components/LoadingTractor";
+import { useTranslation } from "react-i18next";
 import {
   fetchForecastHourly,
   fetchForecastDailyRain,
@@ -34,6 +35,7 @@ export default function Step3Run({
   onResult,
   onBack,
 }) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 

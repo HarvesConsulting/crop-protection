@@ -21,5 +21,14 @@
   "disease_grayMold": "Gray Mold",
   "disease_alternaria": "Alternaria",
   "disease_bacteriosis": "Bacteriosis",
-  "button_back": "← Back"
+  "button_back": "← Back",
+
+"step3_title": "Step 3: Calculation",
+"step3_region": "Selected city",
+"step3_period": "Calculation period",
+"step3_diseases": "Selected diseases",
+"run": "Run",
+"back": "Back",
+"error": "Error",
+"none": "None"
 }
