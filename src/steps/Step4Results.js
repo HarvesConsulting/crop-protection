@@ -12,6 +12,7 @@ import PDFExporter from "../components/PDFExporter";
 import { Modal, Box, IconButton, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { parseISO, format, differenceInDays, isValid } from 'date-fns';
+import { useTranslation } from "react-i18next";
 
 const productInfo = {
   "Зорвек Інкантія": "0,5л/га",
@@ -81,6 +82,8 @@ const rotationBacteriosis = ["Медян Екстра", "Казумін", "Се�
 
 // МОДАЛЬНЕ ВІКНО ДЛЯ КАРТКИ - ПОКРАЩЕНА ВЕРСІЯ
 function CardModal({ open, onClose, cardData }) {
+  const { t } = useTranslation();
+  
   if (!cardData) return null;
 
   const getCardClass = () => {
@@ -92,9 +95,9 @@ function CardModal({ open, onClose, cardData }) {
 
   const getStatusText = () => {
     const hours = cardData.backData?.condHours ?? 0;
-    if (hours <= 10) return "🟢 Низький ризик";
-    if (hours <= 20) return "🟡 Середній ризик";
-    return "🔴 Високий ризик";
+    if (hours <= 10) return t("results.riskStatus.low");
+    if (hours <= 20) return t("results.riskStatus.medium");
+    return t("results.riskStatus.high");
   };
 
   return (
@@ -102,7 +105,7 @@ function CardModal({ open, onClose, cardData }) {
       <Box className="card-modal-container">
         <div className="card-modal-header">
           <Typography variant="h6" component="h2">
-            📋 Картка обробки #{cardData.index}
+            {t("results.cardModal.title", { index: cardData.index })}
           </Typography>
           <IconButton onClick={onClose} size="small">
             <CloseIcon />
@@ -119,24 +122,24 @@ function CardModal({ open, onClose, cardData }) {
 
           <div className="card-modal-section">
             <Typography variant="subtitle1" gutterBottom style={{ fontWeight: '600' }}>
-              📅 Основна інформація
+              {t("results.cardModal.basicInfo")}
             </Typography>
             <div className="card-modal-grid">
               <div className="card-modal-item">
-                <strong>Дата:</strong> {cardData.Дата}
+                <strong>{t("results.table.date")}:</strong> {cardData.Дата}
               </div>
               <div className="card-modal-item">
-                <strong>Препарат:</strong> {cardData.Препарат}
+                <strong>{t("results.table.product")}:</strong> {cardData.Препарат}
               </div>
               <div className="card-modal-item">
-                <strong>Інтервал:</strong> {cardData.Інтервал}
+                <strong>{t("results.table.interval")}:</strong> {cardData.Інтервал}
               </div>
             </div>
           </div>
 
           <div className="card-modal-section">
             <Typography variant="subtitle1" gutterBottom style={{ fontWeight: '600' }}>
-              📖 Рекомендації
+              {t("results.table.recommendations")}
             </Typography>
             <div className="card-modal-item">
               {cardData.Рекомендація}
@@ -146,7 +149,7 @@ function CardModal({ open, onClose, cardData }) {
           {cardData["Рекомендовані години"] && cardData["Рекомендовані години"] !== "—" && (
             <div className="card-modal-section">
               <Typography variant="subtitle1" gutterBottom style={{ fontWeight: '600' }}>
-                🕒 Сприятливі години для обробки
+                {t("results.cardModal.favorableHours")}
               </Typography>
               <div className="card-modal-item">
                 <HourTimeline
@@ -160,18 +163,18 @@ function CardModal({ open, onClose, cardData }) {
 
           <div className="card-modal-section">
             <Typography variant="subtitle1" gutterBottom style={{ fontWeight: '600' }}>
-              🌤️ Погодні умови періоду
+              {t("results.cardModal.weatherConditions")}
             </Typography>
             <div className="weather-stats">
               <div className="weather-stat">
                 <span className="stat-value">{cardData.backData?.condHours ?? 0}</span>
-                <span className="stat-label">Сприятливі години</span>
+                <span className="stat-label">{t("results.cardModal.favorableHoursCount")}</span>
               </div>
               <div className="weather-stat">
                 <span className="stat-value">
-                  {cardData.backData?.rain !== undefined ? cardData.backData.rain.toFixed(1) : 0} мм
+                  {cardData.backData?.rain !== undefined ? cardData.backData.rain.toFixed(1) : 0} {t("results.cardModal.mm")}
                 </span>
-                <span className="stat-label">Опади</span>
+                <span className="stat-label">{t("results.cardModal.precipitation")}</span>
               </div>
             </div>
           </div>
@@ -183,11 +186,13 @@ function CardModal({ open, onClose, cardData }) {
 
 // КОМПОНЕНТ ТАБЛИЦІ
 function TreatmentTable({ data, title, onCardClick }) {
+  const { t } = useTranslation();
+
   if (!data || data.length === 0) {
     return (
       <div className="treatment-table-section">
         <h3 className="table-section-title">{title}</h3>
-        <p className="no-data-message">Обробок не заплановано</p>
+        <p className="no-data-message">{t("results.table.noTreatments")}</p>
       </div>
     );
   }
@@ -200,12 +205,12 @@ function TreatmentTable({ data, title, onCardClick }) {
           <thead>
             <tr>
               <th>№</th>
-              <th>Дата</th>
-              <th>Препарат</th>
-              <th>Норма</th>
-              <th>кг(л)/га</th>
-              <th>Рекомендації</th>
-              <th>Картка</th>
+              <th>{t("results.table.date")}</th>
+              <th>{t("results.table.product")}</th>
+              <th>{t("results.table.norm")}</th>
+              <th>{t("results.table.unit")}</th>
+              <th>{t("results.table.recommendations")}</th>
+              <th>{t("results.table.card")}</th>
             </tr>
           </thead>
           <tbody>
@@ -213,7 +218,7 @@ function TreatmentTable({ data, title, onCardClick }) {
               const productName = item.Препарат.split(' (')[0];
               const normMatch = item.Препарат.match(/\(([^)]+)\)/);
               const norm = normMatch ? normMatch[1] : '—';
-              const unit = norm.includes('л') ? 'л/га' : norm.includes('кг') ? 'кг/га' : '—';
+              const unit = norm.includes('л') ? t("results.table.litersPerHa") : norm.includes('кг') ? t("results.table.kgPerHa") : '—';
               const normValue = norm.replace('л/га', '').replace('кг/га', '').trim();
               
               return (
@@ -230,9 +235,9 @@ function TreatmentTable({ data, title, onCardClick }) {
                     <button 
                       className="card-button"
                       onClick={() => onCardClick({...item, index: index + 1})}
-                      title="Переглянути детальну інформацію"
+                      title={t("results.table.viewDetails")}
                     >
-                      📋 Картка
+                      📋 {t("results.table.card")}
                     </button>
                   </td>
                 </tr>
@@ -328,6 +333,7 @@ function getAccumulatedStats(diagnostics = [], prevDate, currentDate, rainDaily 
 
 // ОСНОВНИЙ КОМПОНЕНТ
 export default function Step4Results({ result, onRestart }) {
+  const { t } = useTranslation();
   const [showIntegrated, setShowIntegrated] = useState(false);
   const [showIntegratedModal, setShowIntegratedModal] = useState(false);
   const topRef = React.useRef(null);
@@ -380,7 +386,7 @@ export default function Step4Results({ result, onRestart }) {
       const cur = parseISO(d.split(".").reverse().join("-"));
       const prev = i > 0 ? parseISO(sprayDates[i - 1].split(".").reverse().join("-")) : plantingDate;
 
-      const gap = prev ? `${differenceInDays(cur, prev)} діб після попередньої` : "—";
+      const gap = prev ? t("results.daysAfterPrevious", { days: differenceInDays(cur, prev) }) : "—";
       const product = rotationProducts[i % rotationProducts.length];
       const recommendedHours = suitableHours[d] || [];
       const backData = getAccumulatedStats(diagnostics, prev, cur, rainDaily);
@@ -390,7 +396,7 @@ export default function Step4Results({ result, onRestart }) {
         Препарат: `${product} (${productInfo[product] || "—"})`,
         Рекомендація: productLinks[product] ? (
           <a href={productLinks[product]} target="_blank" rel="noreferrer">
-            Деталі препарату
+            {t("results.productDetails")}
           </a>
         ) : "—",
         Інтервал: gap,
@@ -420,10 +426,10 @@ export default function Step4Results({ result, onRestart }) {
           Препарат: `${product} (${productInfo[product] || "—"})`,
           Рекомендація: productLinks[product] ? (
             <a href={productLinks[product]} target="_blank" rel="noreferrer">
-              Деталі препарату
+              {t("results.productDetails")}
             </a>
           ) : "—",
-          Інтервал: i === 0 ? "—" : `${differenceInDays(item.date, treatments[i - 1].date)} діб після попередньої`,
+          Інтервал: i === 0 ? "—" : t("results.daysAfterPrevious", { days: differenceInDays(item.date, treatments[i - 1].date) }),
           "Рекомендовані години": recommendedHours.length ? recommendedHours.join(", ") : "—",
           backData,
         };
@@ -505,56 +511,55 @@ export default function Step4Results({ result, onRestart }) {
     setDiseaseCardsGrouped(calculatedDiseaseCardsGrouped || []);
     setIntegratedSystem(calculatedIntegratedSystem);
     setEnrichedHourlyData(calculatedEnrichedHourlyData);
-  }, [result]);
+  }, [result, t]);
 
   const exportToExcel = () => {
     const exportData = integratedSystem.map((entry) => ({
-      Дата: entry.Дата,
-      Препарати: entry.Препарат,
-      Хвороби: entry.Хвороби,
+      [t("results.table.date")]: entry.Дата,
+      [t("results.table.products")]: entry.Препарат,
+      [t("results.table.diseases")]: entry.Хвороби,
     }));
 
-    const ws = XLSX.utils.aoa_to_sheet([["Інтегрована система захисту"]]);
+    const ws = XLSX.utils.aoa_to_sheet([[t("results.integratedSystem")]]);
     ws["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 2 } }];
     XLSX.utils.sheet_add_json(ws, exportData, { origin: "A2", skipHeader: false });
 
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Інтегрована таблиця");
-    XLSX.writeFile(wb, "Інтегрована_таблиця_захисту.xlsx");
+    XLSX.utils.book_append_sheet(wb, ws, t("results.integratedTable"));
+    XLSX.writeFile(wb, `${t("results.integratedSystem")}.xlsx`);
   };
 
-  if (!result) return <p>Дані відсутні</p>;
+  if (!result) return <p>{t("results.noData")}</p>;
 
   return (
     <main ref={topRef} className="step4-results-container">
       <div className="results-content">
         {/* Заголовок тепер вище меню дій */}
         <div className="results-header">
-  <div className="step-title-container">
-    <h2 className="step-title">Крок 4: Результати</h2>
-    <button
-      className="info-button"
-      onClick={() => setShowInfo(!showInfo)}
-      title="Показати інформацію"
-    >
-      <InfoOutlinedIcon />
-    </button>
-  </div>
+          <div className="step-title-container">
+            <h2 className="step-title">{t("results.title")}</h2>
+            <button
+              className="info-button"
+              onClick={() => setShowInfo(!showInfo)}
+              title={t("results.showInfo")}
+            >
+              <InfoOutlinedIcon />
+            </button>
+          </div>
 
-  {showInfo && (
-    <div className="info-panel">
-      <p>
-        Період розрахунку:{" "}
-        <strong>{format(new Date(result.plantingDate), "dd.MM.yyyy")}</strong> —{" "}
-        <strong>{format(new Date(result.harvestDate), "dd.MM.yyyy")}</strong>
-      </p>
-      <p>
-        Нижче показано рекомендовані дати обробки. Натисніть "Картка" для перегляду 
-        детальної інформації про погодні умови та рекомендації.
-      </p>
-    </div>
-  )}
-</div>
+          {showInfo && (
+            <div className="info-panel">
+              <p>
+                {t("results.calculationPeriod")}:{" "}
+                <strong>{format(new Date(result.plantingDate), "dd.MM.yyyy")}</strong> —{" "}
+                <strong>{format(new Date(result.harvestDate), "dd.MM.yyyy")}</strong>
+              </p>
+              <p>
+                {t("results.infoDescription")}
+              </p>
+            </div>
+          )}
+        </div>
 
         {/* Меню дій тепер під заголовком */}
         <ActionMenu
@@ -568,58 +573,57 @@ export default function Step4Results({ result, onRestart }) {
         />
 
         {showIntegrated ? (
-  <>
-    <IntegratedTableView data={integratedSystem} />
-    <div className="action-buttons">
-      <button onClick={exportToExcel} className="action-button">
-        Експорт в Excel
-      </button>
-      <PDFExporter data={integratedSystem} />
-    </div>
-  </>
-) : (
-  <>
-    {sprayData.length === 0 && 
-     (!diseaseCardsGrouped || diseaseCardsGrouped.every(g => g.entries.length === 0)) ? (
-      <div className="no-treatments-message">
-        <p>💡 Внесення фунгіцидів не рекомендовано.</p>
-      </div>
-    ) : (
-      <>
-        {/* ТАБЛИЦЯ ДЛЯ ФІТОФТОРОЗУ */}
-        {sprayData.length > 0 && (
-          <TreatmentTable
-            data={sprayData}
-            title="Захисні заходи проти Фітофторозу"
-            onCardClick={handleCardClick}
-          />
+          <>
+            <IntegratedTableView data={integratedSystem} />
+            <div className="action-buttons">
+              <button onClick={exportToExcel} className="action-button">
+                {t("results.exportToExcel")}
+              </button>
+              <PDFExporter data={integratedSystem} />
+            </div>
+          </>
+        ) : (
+          <>
+            {sprayData.length === 0 && 
+             (!diseaseCardsGrouped || diseaseCardsGrouped.every(g => g.entries.length === 0)) ? (
+              <div className="no-treatments-message">
+                <p>{t("results.noTreatmentsRecommended")}</p>
+              </div>
+            ) : (
+              <>
+                {/* ТАБЛИЦЯ ДЛЯ ФІТОФТОРОЗУ */}
+                {sprayData.length > 0 && (
+                  <TreatmentTable
+                    data={sprayData}
+                    title={t("results.phytophthoraMeasures")}
+                    onCardClick={handleCardClick}
+                  />
+                )}
+
+                {/* ТАБЛИЦІ ДЛЯ ІНШИХ ХВОРОБ */}
+                {diseaseCardsGrouped?.map(({ name, entries }) => (
+                  entries.length > 0 && (
+                    <TreatmentTable
+                      key={name}
+                      data={entries}
+                      title={t(`results.diseaseMeasures.${name.toLowerCase().replace(" ", "")}`, { name })}
+                      onCardClick={handleCardClick}
+                    />
+                  )
+                ))}
+              </>
+            )}
+
+            <div className="action-buttons">
+              <button
+                className="scroll-top-button"
+                onClick={() => topRef.current?.scrollIntoView({ behavior: "smooth" })}
+              >
+                ↑ {t("results.scrollToTop")}
+              </button>
+            </div>
+          </>
         )}
-
-        {/* ТАБЛИЦІ ДЛЯ ІНШИХ ХВОРОБ */}
-        {diseaseCardsGrouped?.map(({ name, entries }) => (
-          entries.length > 0 && (
-            <TreatmentTable
-              key={name}
-              data={entries}
-              title={`Захисні заходи проти ${name}`}
-              onCardClick={handleCardClick}
-            />
-          )
-        ))}
-      </>
-    )}
-
-    <div className="action-buttons">
-      <button
-        className="scroll-top-button"
-        onClick={() => topRef.current?.scrollIntoView({ behavior: "smooth" })}
-      >
-        ↑ Вгору
-      </button>
-    </div>
-  </>
-)}
-
 
         {/* МОДАЛЬНЕ ВІКНО ДЛЯ КАРТКИ */}
         <CardModal

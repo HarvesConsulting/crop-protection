@@ -33,5 +33,16 @@
 "none": "None",
 
 "loading_text": "Calculating protection system...",
-"loading_spray": "Spraying"
+"loading_spray": "Spraying",
+
+"step4": {
+  "title": "Step 4: Results",
+  "period": "Calculation period",
+  "details": "Click 'Card' to view detailed weather and recommendations.",
+  "no_treatments": "💡 Fungicide applications are not recommended.",
+  "scroll_up": "↑ Scroll to top",
+  "export_excel": "Export to Excel",
+  "disease_protection": "Protection measures against {{disease}}",
+  "phytophthora_protection": "Protection measures against Late Blight"
+}
 }

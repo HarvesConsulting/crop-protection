@@ -33,5 +33,16 @@
 "none": "Ninguna",
 
 "loading_text": "Calculando el sistema de protección...",
-"loading_spray": "Pulverización"
+"loading_spray": "Pulverización",
+
+"step4": {
+  "title": "Paso 4: Resultados",
+  "period": "Período de cálculo",
+  "details": "Haz clic en 'Tarjeta' para ver información detallada.",
+  "no_treatments": "💡 No se recomienda la aplicación de fungicidas.",
+  "scroll_up": "↑ Subir",
+  "export_excel": "Exportar a Excel",
+  "disease_protection": "Medidas contra {{disease}}",
+  "phytophthora_protection": "Medidas contra Tizón tardío"
+}
 }
