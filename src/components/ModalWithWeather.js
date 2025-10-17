@@ -1,6 +1,7 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import WeatherPeriodView from "./WeatherPeriodView";
+import { useTranslation } from "react-i18next";
 
 export default function ModalWithWeather({
   open,
@@ -11,6 +12,8 @@ export default function ModalWithWeather({
   lon,
   hourlyData,
 }) {
+  const { t } = useTranslation();
+
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
@@ -23,12 +26,12 @@ export default function ModalWithWeather({
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-3 border-b bg-gray-50">
               <h2 className="text-lg font-semibold text-gray-800">
-                ⛅ Погодні умови за період
+                ⛅ {t("weatherModal.title")}
               </h2>
               <Dialog.Close asChild>
                 <button
                   className="text-gray-500 hover:text-red-500 transition"
-                  aria-label="Закрити"
+                  aria-label={t("weatherModal.close")}
                 >
                   <Cross2Icon />
                 </button>

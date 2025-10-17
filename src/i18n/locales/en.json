@@ -106,5 +106,10 @@
     "spraySchedule": "Spray Schedule",
     "showIntegrated": "Generate Integrated System",
     "hideIntegrated": "Hide Integrated System"
+  },
+
+  "weatherModal": {
+    "title": "Weather Conditions for Period",
+    "close": "Close"
   }
 }

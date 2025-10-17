@@ -106,5 +106,10 @@
     "spraySchedule": "Calendario de Pulverizaciones",
     "showIntegrated": "Generar Sistema Integrado",
     "hideIntegrated": "Ocultar Sistema Integrado"
+  },
+
+   "weatherModal": {
+    "title": "Condiciones Climáticas del Período",
+    "close": "Cerrar"
   }
 }
