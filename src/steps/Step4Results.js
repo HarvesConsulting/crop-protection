@@ -56,6 +56,7 @@ const productLinks = {
   "Серенада": "https://www.cropscience.bayer.ua/Products/Fungicides/Serenada.aspx",
 };
 
+// ВИПРАВЛЕНІ МАСИВИ ПРЕПАРАТІВ
 const rotationProducts = [
   "Зорвек Інкантія",
   "Ридоміл Голд",
@@ -77,11 +78,26 @@ const rotationGrayMold = [
   "Натіво",
 ];
 
-const rotationAlternaria = rotationGrayMold;
-const rotationBacteriosis = ["Медян Екстра", "Казумін", "Серенада"];
+// ВИПРАВЛЕНО: явно задаємо масиви для кожної хвороби
+const rotationAlternaria = [
+  "Луна Експірієнс",
+  "Сігнум", 
+  "Скала",
+  "Тельдор",
+  "Скор",
+  "Натіво"
+];
 
-// МОДАЛЬНЕ ВІКНО ДЛЯ КАРТКИ - ПОКРАЩЕНА ВЕРСІЯ
+const rotationBacteriosis = [
+  "Медян Екстра",
+  "Казумін",
+  "Серенада"
+];
+
+// МОДАЛЬНЕ ВІКНО ДЛЯ КАРТКИ
 function CardModal({ open, onClose, cardData }) {
+  const { t } = useTranslation();
+  
   if (!cardData) return null;
 
   const getCardClass = () => {
@@ -93,9 +109,9 @@ function CardModal({ open, onClose, cardData }) {
 
   const getStatusText = () => {
     const hours = cardData.backData?.condHours ?? 0;
-    if (hours <= 10) return "🟢 Низький ризик";
-    if (hours <= 20) return "🟡 Середній ризик";
-    return "🔴 Високий ризик";
+    if (hours <= 10) return t("step4.riskStatus.low");
+    if (hours <= 20) return t("step4.riskStatus.medium");
+    return t("step4.riskStatus.high");
   };
 
   return (
@@ -103,7 +119,7 @@ function CardModal({ open, onClose, cardData }) {
       <Box className="card-modal-container">
         <div className="card-modal-header">
           <Typography variant="h6" component="h2">
-            📋 Картка обробки #{cardData.index}
+            {t("step4.cardModal.title", { index: cardData.index })}
           </Typography>
           <IconButton onClick={onClose} size="small">
             <CloseIcon />
@@ -111,7 +127,6 @@ function CardModal({ open, onClose, cardData }) {
         </div>
         
         <div className={`card-modal-content ${getCardClass()}`}>
-          {/* СТАТУС РИЗИКУ */}
           <div className="card-modal-section risk-status">
             <Typography variant="subtitle1" gutterBottom style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
               {getStatusText()}
@@ -120,24 +135,24 @@ function CardModal({ open, onClose, cardData }) {
 
           <div className="card-modal-section">
             <Typography variant="subtitle1" gutterBottom style={{ fontWeight: '600' }}>
-              📅 Основна інформація
+              {t("step4.cardModal.basicInfo")}
             </Typography>
             <div className="card-modal-grid">
               <div className="card-modal-item">
-                <strong>Дата:</strong> {cardData.Дата}
+                <strong>{t("step4.table.date")}:</strong> {cardData.Дата}
               </div>
               <div className="card-modal-item">
-                <strong>Препарат:</strong> {cardData.Препарат}
+                <strong>{t("step4.table.product")}:</strong> {cardData.Препарат}
               </div>
               <div className="card-modal-item">
-                <strong>Інтервал:</strong> {cardData.Інтервал}
+                <strong>{t("step4.table.interval")}:</strong> {cardData.Інтервал}
               </div>
             </div>
           </div>
 
           <div className="card-modal-section">
             <Typography variant="subtitle1" gutterBottom style={{ fontWeight: '600' }}>
-              📖 Рекомендації
+              {t("step4.table.recommendations")}
             </Typography>
             <div className="card-modal-item">
               {cardData.Рекомендація}
@@ -147,7 +162,7 @@ function CardModal({ open, onClose, cardData }) {
           {cardData["Рекомендовані години"] && cardData["Рекомендовані години"] !== "—" && (
             <div className="card-modal-section">
               <Typography variant="subtitle1" gutterBottom style={{ fontWeight: '600' }}>
-                🕒 Сприятливі години для обробки
+                {t("step4.cardModal.favorableHours")}
               </Typography>
               <div className="card-modal-item">
                 <HourTimeline
@@ -161,18 +176,18 @@ function CardModal({ open, onClose, cardData }) {
 
           <div className="card-modal-section">
             <Typography variant="subtitle1" gutterBottom style={{ fontWeight: '600' }}>
-              🌤️ Погодні умови періоду
+              {t("step4.cardModal.weatherConditions")}
             </Typography>
             <div className="weather-stats">
               <div className="weather-stat">
                 <span className="stat-value">{cardData.backData?.condHours ?? 0}</span>
-                <span className="stat-label">Сприятливі години</span>
+                <span className="stat-label">{t("step4.cardModal.favorableHoursCount")}</span>
               </div>
               <div className="weather-stat">
                 <span className="stat-value">
-                  {cardData.backData?.rain !== undefined ? cardData.backData.rain.toFixed(1) : 0} мм
+                  {cardData.backData?.rain !== undefined ? cardData.backData.rain.toFixed(1) : 0} {t("step4.cardModal.mm")}
                 </span>
-                <span className="stat-label">Опади</span>
+                <span className="stat-label">{t("step4.cardModal.precipitation")}</span>
               </div>
             </div>
           </div>
@@ -184,11 +199,13 @@ function CardModal({ open, onClose, cardData }) {
 
 // КОМПОНЕНТ ТАБЛИЦІ
 function TreatmentTable({ data, title, onCardClick }) {
+  const { t } = useTranslation();
+
   if (!data || data.length === 0) {
     return (
       <div className="treatment-table-section">
         <h3 className="table-section-title">{title}</h3>
-        <p className="no-data-message">Обробок не заплановано</p>
+        <p className="no-data-message">{t("step4.table.noTreatments")}</p>
       </div>
     );
   }
@@ -201,12 +218,12 @@ function TreatmentTable({ data, title, onCardClick }) {
           <thead>
             <tr>
               <th>№</th>
-              <th>Дата</th>
-              <th>Препарат</th>
-              <th>Норма</th>
-              <th>кг(л)/га</th>
-              <th>Рекомендації</th>
-              <th>Картка</th>
+              <th>{t("step4.table.date")}</th>
+              <th>{t("step4.table.product")}</th>
+              <th>{t("step4.table.norm")}</th>
+              <th>{t("step4.table.unit")}</th>
+              <th>{t("step4.table.recommendations")}</th>
+              <th>{t("step4.table.card")}</th>
             </tr>
           </thead>
           <tbody>
@@ -214,7 +231,7 @@ function TreatmentTable({ data, title, onCardClick }) {
               const productName = item.Препарат.split(' (')[0];
               const normMatch = item.Препарат.match(/\(([^)]+)\)/);
               const norm = normMatch ? normMatch[1] : '—';
-              const unit = norm.includes('л') ? 'л/га' : norm.includes('кг') ? 'кг/га' : '—';
+              const unit = norm.includes('л') ? t("step4.table.litersPerHa") : norm.includes('кг') ? t("step4.table.kgPerHa") : '—';
               const normValue = norm.replace('л/га', '').replace('кг/га', '').trim();
               
               return (
@@ -231,9 +248,9 @@ function TreatmentTable({ data, title, onCardClick }) {
                     <button 
                       className="card-button"
                       onClick={() => onCardClick({...item, index: index + 1})}
-                      title="Переглянути детальну інформацію"
+                      title={t("step4.table.viewDetails")}
                     >
-                      📋 Картка
+                      📋 {t("step4.table.card")}
                     </button>
                   </td>
                 </tr>
@@ -367,6 +384,16 @@ export default function Step4Results({ result, onRestart }) {
   useEffect(() => {
     if (!result) return;
 
+    console.log("🔍 Debug result:", {
+      sprayDates: result.sprayDates,
+      diseaseSummary: result.diseaseSummary,
+      rotationArrays: {
+        grayMold: rotationGrayMold,
+        alternaria: rotationAlternaria,
+        bacteriosis: rotationBacteriosis
+      }
+    });
+
     const {
       sprayDates,
       diseaseSummary,
@@ -382,7 +409,7 @@ export default function Step4Results({ result, onRestart }) {
       const cur = parseISO(d.split(".").reverse().join("-"));
       const prev = i > 0 ? parseISO(sprayDates[i - 1].split(".").reverse().join("-")) : plantingDate;
 
-      const gap = prev ? `${differenceInDays(cur, prev)} діб після попередньої` : "—";
+      const gap = prev ? t("step4.daysAfterPrevious", { days: differenceInDays(cur, prev) }) : "—";
       const product = rotationProducts[i % rotationProducts.length];
       const recommendedHours = suitableHours[d] || [];
       const backData = getAccumulatedStats(diagnostics, prev, cur, rainDaily);
@@ -392,7 +419,7 @@ export default function Step4Results({ result, onRestart }) {
         Препарат: `${product} (${productInfo[product] || "—"})`,
         Рекомендація: productLinks[product] ? (
           <a href={productLinks[product]} target="_blank" rel="noreferrer">
-            Деталі препарату
+            {t("step4.productDetails")}
           </a>
         ) : "—",
         Інтервал: gap,
@@ -409,9 +436,27 @@ export default function Step4Results({ result, onRestart }) {
         "Бактеріоз": rotationBacteriosis,
       }[name] || [];
 
+      console.log(`🔍 Processing disease: ${name}`, {
+        rotation,
+        riskDates
+      });
+
+      // Перевірка на порожній масив
+      if (!rotation || rotation.length === 0) {
+        console.warn(`⚠️ No rotation products defined for disease: ${name}`);
+        return { name, entries: [] };
+      }
+
       const treatments = getAdvancedTreatments(riskDates);
       const entries = treatments.map((item, i) => {
         const product = rotation[i % rotation.length];
+        
+        // Додаткова перевірка
+        if (!product) {
+          console.warn(`⚠️ No product found for disease ${name} at index ${i}`);
+          return null;
+        }
+        
         const dateStr = format(item.date, "dd.MM.yyyy");
         const recommendedHours = suitableHours[dateStr] || [];
         const prevDate = i === 0 ? plantingDate : treatments[i - 1].date;
@@ -422,17 +467,17 @@ export default function Step4Results({ result, onRestart }) {
           Препарат: `${product} (${productInfo[product] || "—"})`,
           Рекомендація: productLinks[product] ? (
             <a href={productLinks[product]} target="_blank" rel="noreferrer">
-              Деталі препарату
+              {t("step4.productDetails")}
             </a>
           ) : "—",
-          Інтервал: i === 0 ? "—" : `${differenceInDays(item.date, treatments[i - 1].date)} діб після попередньої`,
+          Інтервал: i === 0 ? "—" : t("step4.daysAfterPrevious", { days: differenceInDays(item.date, treatments[i - 1].date) }),
           "Рекомендовані години": recommendedHours.length ? recommendedHours.join(", ") : "—",
           backData,
         };
-      });
+      }).filter(entry => entry !== null); // Фільтруємо null значення
 
       return { name, entries };
-    });
+    }) || [];
 
     // Інтегрована система
     const integratedMap = calculatedSprayData.map((spray) => {
@@ -504,59 +549,58 @@ export default function Step4Results({ result, onRestart }) {
     });
 
     setSprayData(calculatedSprayData);
-    setDiseaseCardsGrouped(calculatedDiseaseCardsGrouped || []);
+    setDiseaseCardsGrouped(calculatedDiseaseCardsGrouped);
     setIntegratedSystem(calculatedIntegratedSystem);
     setEnrichedHourlyData(calculatedEnrichedHourlyData);
-  }, [result]);
+  }, [result, t]);
 
   const exportToExcel = () => {
     const exportData = integratedSystem.map((entry) => ({
-      Дата: entry.Дата,
-      Препарати: entry.Препарат,
-      Хвороби: entry.Хвороби,
+      [t("step4.table.date")]: entry.Дата,
+      [t("step4.table.products")]: entry.Препарат,
+      [t("step4.table.diseases")]: entry.Хвороби,
     }));
 
-    const ws = XLSX.utils.aoa_to_sheet([["Інтегрована система захисту"]]);
+    const ws = XLSX.utils.aoa_to_sheet([[t("step4.integratedSystem")]]);
     ws["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 2 } }];
     XLSX.utils.sheet_add_json(ws, exportData, { origin: "A2", skipHeader: false });
 
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Інтегрована таблиця");
-    XLSX.writeFile(wb, "Інтегрована_таблиця_захисту.xlsx");
+    XLSX.utils.book_append_sheet(wb, ws, t("step4.integratedTable"));
+    XLSX.writeFile(wb, `${t("step4.integratedSystem")}.xlsx`);
   };
 
-  if (!result) return <p>Дані відсутні</p>;
+  if (!result) return <p>{t("step4.noData")}</p>;
 
   return (
     <main ref={topRef} className="step4-results-container">
       <div className="results-content">
-        {/* Заголовок тепер вище меню дій */}
         <div className="results-header">
-  <div className="step-title-container">
-    <h2 className="step-title">{t("step4.title")}</h2>
-    <button
-      className="info-button"
-      onClick={() => setShowInfo(!showInfo)}
-      title={t("common.showInfo")}
-    >
-      <InfoOutlinedIcon />
-    </button>
-  </div>
+          <div className="step-title-container">
+            <h2 className="step-title">{t("step4.title")}</h2>
+            <button
+              className="info-button"
+              onClick={() => setShowInfo(!showInfo)}
+              title={t("step4.showInfo")}
+            >
+              <InfoOutlinedIcon />
+            </button>
+          </div>
 
-  {showInfo && (
-    <div className="info-panel">
-     <p>
-  {t("step4.period")}:{" "}
-  <strong>{format(new Date(result.plantingDate), "dd.MM.yyyy")}</strong> —{" "}
-  <strong>{format(new Date(result.harvestDate), "dd.MM.yyyy")}</strong>
-</p>
-<p>{t("step4.details")}</p>
+          {showInfo && (
+            <div className="info-panel">
+              <p>
+                {t("step4.calculationPeriod")}:{" "}
+                <strong>{format(new Date(result.plantingDate), "dd.MM.yyyy")}</strong> —{" "}
+                <strong>{format(new Date(result.harvestDate), "dd.MM.yyyy")}</strong>
+              </p>
+              <p>
+                {t("step4.infoDescription")}
+              </p>
+            </div>
+          )}
+        </div>
 
-    </div>
-  )}
-</div>
-
-        {/* Меню дій тепер під заголовком */}
         <ActionMenu
           isMobile={isMobile}
           onRestart={onRestart}
@@ -568,60 +612,56 @@ export default function Step4Results({ result, onRestart }) {
         />
 
         {showIntegrated ? (
-  <>
-    <IntegratedTableView data={integratedSystem} />
-    <div className="action-buttons">
-      <button onClick={exportToExcel} className="action-button">
-        {t("step4.export_excel")}
-      </button>
-      <PDFExporter data={integratedSystem} />
-    </div>
-  </>
-) : (
-  <>
-    {sprayData.length === 0 && 
-     (!diseaseCardsGrouped || diseaseCardsGrouped.every(g => g.entries.length === 0)) ? (
-      <div className="no-treatments-message">
-        <p>{t("step4.no_treatments")}</p>
-      </div>
-    ) : (
-      <>
-        {/* ТАБЛИЦЯ ДЛЯ ФІТОФТОРОЗУ */}
-        {sprayData.length > 0 && (
-          <TreatmentTable
-            data={sprayData}
-            title={t("step4.phytophthora_protection")}
-            onCardClick={handleCardClick}
-          />
+          <>
+            <IntegratedTableView data={integratedSystem} />
+            <div className="action-buttons">
+              <button onClick={exportToExcel} className="action-button">
+                {t("step4.exportToExcel")}
+              </button>
+              <PDFExporter data={integratedSystem} />
+            </div>
+          </>
+        ) : (
+          <>
+            {sprayData.length === 0 && 
+             (!diseaseCardsGrouped || diseaseCardsGrouped.every(g => g.entries.length === 0)) ? (
+              <div className="no-treatments-message">
+                <p>{t("step4.noTreatmentsRecommended")}</p>
+              </div>
+            ) : (
+              <>
+                {sprayData.length > 0 && (
+                  <TreatmentTable
+                    data={sprayData}
+                    title={t("step4.phytophthoraProtection")}
+                    onCardClick={handleCardClick}
+                  />
+                )}
+
+                {diseaseCardsGrouped?.map(({ name, entries }) => (
+                  entries.length > 0 && (
+                    <TreatmentTable
+                      key={name}
+                      data={entries}
+                      title={t("step4.diseaseProtection", { disease: name })}
+                      onCardClick={handleCardClick}
+                    />
+                  )
+                ))}
+              </>
+            )}
+
+            <div className="action-buttons">
+              <button
+                className="scroll-top-button"
+                onClick={() => topRef.current?.scrollIntoView({ behavior: "smooth" })}
+              >
+                ↑ {t("step4.scrollToTop")}
+              </button>
+            </div>
+          </>
         )}
 
-        {/* ТАБЛИЦІ ДЛЯ ІНШИХ ХВОРОБ */}
-        {diseaseCardsGrouped?.map(({ name, entries }) => (
-          entries.length > 0 && (
-            <TreatmentTable
-              key={name}
-              data={entries}
-              title={t("step4.disease_protection", { disease: name })}
-              onCardClick={handleCardClick}
-            />
-          )
-        ))}
-      </>
-    )}
-
-    <div className="action-buttons">
-      <button
-        className="scroll-top-button"
-        onClick={() => topRef.current?.scrollIntoView({ behavior: "smooth" })}
-      >
-        ↑ {t("step4.scroll_up")}
-      </button>
-    </div>
-  </>
-)}
-
-
-        {/* МОДАЛЬНЕ ВІКНО ДЛЯ КАРТКИ */}
         <CardModal
           open={cardModalOpen}
           onClose={handleCloseCard}
