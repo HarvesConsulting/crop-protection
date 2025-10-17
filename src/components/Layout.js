@@ -11,26 +11,31 @@ export default function Layout({ children, step, onLogout }) {
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800 font-sans">
       {/* Header */}
-      <header className="flex justify-between items-center p-4 bg-green-700 text-white shadow">
-        {/* App title & info icon */}
-        <div className="flex items-center gap-2 text-lg font-semibold">
-          🍅 Crop Protection
-          <Tooltip title="Інформація про застосунок">
-            <IconButton
-              onClick={() => setShowInfo(!showInfo)}
-              size="small"
-              sx={{ color: "white" }}
-            >
-              <InfoOutlinedIcon />
-            </IconButton>
-          </Tooltip>
+      <header className="flex flex-col gap-4 p-4 bg-green-700 text-white shadow">
+        {/* Верхній ряд: назва додатку + кнопки */}
+        <div className="flex justify-between items-center">
+          {/* App title & info icon */}
+          <div className="flex items-center gap-2 text-lg font-semibold">
+            🍅 Crop Protection
+            <Tooltip title="Інформація про застосунок">
+              <IconButton
+                onClick={() => setShowInfo(!showInfo)}
+                size="small"
+                sx={{ color: "white" }}
+              >
+                <InfoOutlinedIcon />
+              </IconButton>
+            </Tooltip>
+          </div>
+
+          {/* Language switcher + Logout */}
+          <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center sm:gap-4">
+            <LogoutButton onLogout={onLogout} />
+            <LanguageSwitcher />
+          </div>
         </div>
 
-        {/* Language switcher + Logout - адаптивний варіант */}
-        <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center sm:gap-4">
-          <LogoutButton onLogout={onLogout} />
-          <LanguageSwitcher />
-        </div>
+        {/* Тут можна додати додатковий контент, який буде під основним рядком */}
       </header>
 
       {/* Info box */}
