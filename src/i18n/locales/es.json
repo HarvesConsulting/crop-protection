@@ -44,6 +44,13 @@
   "export_excel": "Exportar a Excel",
   "disease_protection": "Medidas contra {{disease}}",
   "phytophthora_protection": "Medidas contra Tizón tardío",
-  "click_card_hint": "Haga clic en Tarjeta para obtener detalles del procesamiento."
+  "click_card_hint": "Haga clic en Tarjeta para obtener detalles del procesamiento.",
+
+"step": {
+    "city": "Ciudad",
+    "season": "Temporada",
+    "calculation": "Cálculo",
+    "results": "Resultados"
+  }
 }
 }

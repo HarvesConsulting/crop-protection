@@ -44,6 +44,13 @@
   "export_excel": "Export to Excel",
   "disease_protection": "Protection measures against {{disease}}",
   "phytophthora_protection": "Protection measures against Late Blight",
-  "click_card_hint": "Click Card for processing details."
+  "click_card_hint": "Click Card for processing details.",
+
+"step": {
+    "city": "City",
+    "season": "Season",
+    "calculation": "Calculation",
+    "results": "Results"
+  }
 }
 }

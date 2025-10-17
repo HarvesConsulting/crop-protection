@@ -1,14 +1,16 @@
-// src/components/Stepper.js
 import React from "react";
-
-const steps = [
-  { id: 1, name: "Місто" },
-  { id: 2, name: "Сезон" },
-  { id: 3, name: "Розрахунок" },
-  { id: 4, name: "Результати" },
-];
+import { useTranslation } from "react-i18next";
 
 export default function Stepper({ currentStep }) {
+  const { t } = useTranslation();
+
+  const steps = [
+    { id: 1, name: t("step.city") },
+    { id: 2, name: t("step.season") },
+    { id: 3, name: t("step.calculation") },
+    { id: 4, name: t("step.results") },
+  ];
+
   return (
     <ol className="stepper">
       {steps.map((step, index) => (

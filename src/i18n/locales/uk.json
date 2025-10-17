@@ -42,7 +42,14 @@
   "export_excel": "Експорт в Excel",
   "disease_protection": "Обприскування проти {{disease}}",
   "phytophthora_protection": "Обприскування проти Фітофторозу",
-  "click_card_hint": "Натисніть «Картка» для деталей по обробці."
+  "click_card_hint": "Натисніть «Картка» для деталей по обробці.",
+  
+  "step": {
+    "city": "Місто",
+    "season": "Сезон",
+    "calculation": "Розрахунок",
+    "results": "Результати"
+  }
 
 }
 }
