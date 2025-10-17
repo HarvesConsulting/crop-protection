@@ -23,29 +23,18 @@
   "disease_bacteriosis": "Bacteriosis",
   "button_back": "← Back",
 
-"step3_title": "Step 3: Calculation",
-"step3_region": "Selected city",
-"step3_period": "Calculation period",
-"step3_diseases": "Selected diseases",
-"run": "Run",
-"back": "Back",
-"error": "Error",
-"none": "None",
+  "step3_title": "Step 3: Calculation",
+  "step3_region": "Selected city",
+  "step3_period": "Calculation period",
+  "step3_diseases": "Selected diseases",
+  "run": "Run",
+  "back": "Back",
+  "error": "Error",
+  "none": "None",
 
-"loading_text": "Calculating protection system...",
-"loading_spray": "Spraying",
+  "loading_text": "Calculating protection system...",
+  "loading_spray": "Spraying",
 
-"step4": {
-  "title": "Step 4: Results",
-  "period": "Calculation period",
-  "details": "Click 'Card' to view detailed weather and recommendations.",
-  "no_treatments": "💡 Fungicide applications are not recommended.",
-  "scroll_up": "↑ Scroll to top",
-  "export_excel": "Export to Excel",
-  "disease_protection": "Protection measures against {{disease}}",
-  "phytophthora_protection": "Protection measures against Late Blight",
-  "click_card_hint": "Click Card for processing details.",
-  
   "app": {
     "title": "Crop Protection"
   },
@@ -58,7 +47,17 @@
     "season": "Season",
     "calculation": "Calculation",
     "results": "Results"
-  
-}
-}
+  },
+
+  "step4": {
+    "title": "Step 4: Results",
+    "period": "Calculation period",
+    "details": "Click 'Card' to view detailed weather and recommendations.",
+    "no_treatments": "💡 Fungicide applications are not recommended.",
+    "scroll_up": "↑ Scroll to top",
+    "export_excel": "Export to Excel",
+    "disease_protection": "Protection measures against {{disease}}",
+    "phytophthora_protection": "Protection measures against Late Blight",
+    "click_card_hint": "Click Card for processing details."
+  }
 }

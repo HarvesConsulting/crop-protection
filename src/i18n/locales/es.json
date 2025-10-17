@@ -24,27 +24,16 @@
   "button_back": "← Atrás",
 
   "step3_title": "Paso 3: Cálculo",
-"step3_region": "Ciudad seleccionada",
-"step3_period": "Período de cálculo",
-"step3_diseases": "Enfermedades seleccionadas",
-"run": "Calcular",
-"back": "Atrás",
-"error": "Error",
-"none": "Ninguna",
+  "step3_region": "Ciudad seleccionada",
+  "step3_period": "Período de cálculo",
+  "step3_diseases": "Enfermedades seleccionadas",
+  "run": "Calcular",
+  "back": "Atrás",
+  "error": "Error",
+  "none": "Ninguna",
 
-"loading_text": "Calculando el sistema de protección...",
-"loading_spray": "Pulverización",
-
-"step4": {
-  "title": "Paso 4: Resultados",
-  "period": "Período de cálculo",
-  "details": "Haz clic en 'Tarjeta' para ver información detallada.",
-  "no_treatments": "💡 No se recomienda la aplicación de fungicidas.",
-  "scroll_up": "↑ Subir",
-  "export_excel": "Exportar a Excel",
-  "disease_protection": "Medidas contra {{disease}}",
-  "phytophthora_protection": "Medidas contra Tizón tardío",
-  "click_card_hint": "Haga clic en Tarjeta para obtener detalles del procesamiento.",
+  "loading_text": "Calculando el sistema de protección...",
+  "loading_spray": "Pulverización",
 
   "app": {
     "title": "Protección de Cultivos"
@@ -58,6 +47,17 @@
     "season": "Temporada",
     "calculation": "Cálculo",
     "results": "Resultados"
+  },
+
+  "step4": {
+    "title": "Paso 4: Resultados",
+    "period": "Período de cálculo",
+    "details": "Haz clic en 'Tarjeta' para ver información detallada.",
+    "no_treatments": "💡 No se recomienda la aplicación de fungicidas.",
+    "scroll_up": "↑ Subir",
+    "export_excel": "Exportar a Excel",
+    "disease_protection": "Medidas contra {{disease}}",
+    "phytophthora_protection": "Medidas contra Tizón tardío",
+    "click_card_hint": "Haga clic en Tarjeta para obtener detalles del procesamiento."
   }
-}
 }
