@@ -111,7 +111,7 @@
     "hideIntegrated": "Ocultar Sistema Integrado"
   },
 
-   "weatherModal": {
+  "weatherModal": {
     "title": "Condiciones Climáticas del Período",
     "close": "Cerrar"
   },
@@ -147,9 +147,10 @@
     "table": {
       "date": "Fecha",
       "preparations": "Preparaciones"
-    },
+    }
+  },
 
-    "pdfExporter": {
+  "pdfExporter": {
     "noDataAlert": "No hay datos para exportar",
     "logoAlt": "Logo",
     "mainTitle": "SISTEMA INTEGRADO DE PROTECCIÓN DE PLANTAS",
@@ -184,6 +185,5 @@
     "noDataTooltip": "No hay datos para exportar",
     "generating": "Generando...",
     "savePdf": "Guardar PDF"
-  }
   }
 }

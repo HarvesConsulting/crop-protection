@@ -110,6 +110,7 @@
     "showIntegrated": "Сформувати інтегровану систему",
     "hideIntegrated": "Сховати інтегровану систему"
   },
+
   "weatherModal": {
     "title": "Погодні умови за період",
     "close": "Закрити"
@@ -146,9 +147,10 @@
     "table": {
       "date": "Дата",
       "preparations": "Препарати"
-    },
+    }
+  },
 
-      "pdfExporter": {
+  "pdfExporter": {
     "noDataAlert": "Немає даних для експорту",
     "logoAlt": "Логотип",
     "mainTitle": "ІНТЕГРОВАНА СИСТЕМА ЗАХИСТУ РОСЛИН",
@@ -183,6 +185,5 @@
     "noDataTooltip": "Немає даних для експорту",
     "generating": "Генерація...",
     "savePdf": "Зберегти PDF"
-  }
   }
 }

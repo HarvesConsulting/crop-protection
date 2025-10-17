@@ -125,7 +125,7 @@
     "precipitation": "☔ Precipitation (mm)"
   },
 
-   "summaryModal": {
+  "summaryModal": {
     "title": "Spray Schedule",
     "close": "Close",
     "diseaseRiskLevel": "Disease risk level",
@@ -138,7 +138,7 @@
     "fungicideDates": "Fungicide application dates"
   },
 
-   "integratedTable": {
+  "integratedTable": {
     "title": "Integrated Protection System",
     "close": "Close",
     "exportExcel": "Export to Excel",
@@ -147,8 +147,9 @@
     "table": {
       "date": "Date",
       "preparations": "Preparations"
-    },
- 
+    }
+  },
+
   "pdfExporter": {
     "noDataAlert": "No data to export",
     "logoAlt": "Logo",
@@ -168,7 +169,6 @@
       "products": "Products",
       "diseases": "Diseases"
     },
-
     "notes": "Notes",
     "note1": "Treatments should be carried out in favorable weather conditions (see treatment cards - recommended hours)",
     "note2": "Follow the product rotation schedule",
@@ -185,6 +185,5 @@
     "noDataTooltip": "No data to export",
     "generating": "Generating...",
     "savePdf": "Save PDF"
-  }
   }
 }
