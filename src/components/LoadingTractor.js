@@ -1,7 +1,10 @@
 import React from "react";
 import { Tractor } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function LoadingTractor() {
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-col items-center justify-center space-y-4 py-8 w-full">
       
@@ -13,7 +16,7 @@ export default function LoadingTractor() {
           {/* 💦 Крапелька */}
           <div
             className="w-8 h-8 animate-sprayPulse text-2xl z-10 text-blue-400"
-            title="Обприскування"
+            title={t("loading_spray")}
           >
             💦
           </div>
@@ -24,7 +27,7 @@ export default function LoadingTractor() {
       </div>
 
       <p className="text-gray-700 text-lg font-medium">
-        Обчислення системи захисту...
+        {t("loading_text")}
       </p>
     </div>
   );

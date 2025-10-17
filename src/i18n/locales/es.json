@@ -30,5 +30,8 @@
 "run": "Calcular",
 "back": "Atrás",
 "error": "Error",
-"none": "Ninguna"
+"none": "Ninguna",
+
+"loading_text": "Calculando el sistema de protección...",
+"loading_spray": "Pulverización"
 }

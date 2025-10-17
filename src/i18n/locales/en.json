@@ -30,5 +30,8 @@
 "run": "Run",
 "back": "Back",
 "error": "Error",
-"none": "None"
+"none": "None",
+
+"loading_text": "Calculating protection system...",
+"loading_spray": "Spraying"
 }
