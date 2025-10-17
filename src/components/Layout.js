@@ -26,12 +26,12 @@ export default function Layout({ children, step, onLogout }) {
           </Tooltip>
         </div>
 
-        {/* Language switcher + Logout - ВИПРАВЛЕНО */}
-        <div className="flex items-center gap-4 relative">
-          <div className="relative z-10">
+        {/* Language switcher + Logout - ВИРІВНЯНО */}
+        <div className="flex items-center gap-4">
+          <div className="flex items-center">
             <LanguageSwitcher />
           </div>
-          <div className="relative z-20">
+          <div className="flex items-center">
             <LogoutButton onLogout={onLogout} />
           </div>
         </div>
