@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import LogoutButton from "./LogoutButton";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { IconButton, Tooltip } from "@mui/material";
-import LanguageSwitcher from "./LanguageSwitcher"; // ⬅️ Додано
+import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Layout({ children, step, onLogout }) {
   const [showInfo, setShowInfo] = useState(false);
@@ -12,7 +12,7 @@ export default function Layout({ children, step, onLogout }) {
     <div className="min-h-screen bg-gray-50 text-gray-800 font-sans">
       {/* Header */}
       <header className="flex justify-between items-center p-4 bg-green-700 text-white shadow">
-        {/* App title & info icon */}
+        {/* Ліва частина: назва + іконка інфо */}
         <div className="flex items-center gap-2 text-lg font-semibold">
           🍅 Crop Protection
           <Tooltip title="Інформація про застосунок">
@@ -26,12 +26,11 @@ export default function Layout({ children, step, onLogout }) {
           </Tooltip>
         </div>
 
-        {/* Language switcher + Logout - виправлена версія */}
-<div className="flex items-center gap-4">
-  <LanguageSwitcher />
-  <LogoutButton onLogout={onLogout} />
-</div>
-
+        {/* Права частина: перемикач мови + кнопка виходу */}
+        <div className="flex items-center gap-3">
+          <LanguageSwitcher />
+          <LogoutButton onLogout={onLogout} />
+        </div>
       </header>
 
       {/* Info box */}
