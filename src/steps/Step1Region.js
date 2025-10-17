@@ -69,8 +69,7 @@ export default function Step1Region({ region, setRegion, onNext }) {
   return (
     <main className="flex justify-center items-start min-h-[70vh] px-4">
       <div className="w-full max-w-xl bg-white rounded-xl shadow-lg p-6 space-y-6">
-        <LanguageSwitcher />
-
+        
         {/* Заголовок з кнопкою info */}
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-800">{t("step1_title")}</h2>
