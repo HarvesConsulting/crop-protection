@@ -7,7 +7,9 @@
   "button_continue": "Continue",
   "info": "Enter settlement name (minimum 2 letters)...",
   "no_matches": "No matches found",
-
+  "coming_soon": "Coming soon",
+  "select_available_country": "Select available country", 
+  "enter_one_more_letter": "Enter one more letter to search",
 
   "step2_title": "Step 2: Season Details",
   "step2_info_1": "The starting point is the date when the calculation begins – sowing, transplanting, or last fungicide application.",
