@@ -1,10 +1,13 @@
 {
-  "step1_title": "Paso 1: Elige tu ciudad",
-  "step1_description": "Selecciona una ciudad para calcular la protección",
-  "placeholder_city": "por ejemplo: Lviv",
+  "step1_title": "Paso 1: Selecciona País y Ciudad",
+  "step1_description": "Selecciona país y ciudad para el cálculo de protección",
+  "step1_country": "País",
+  "step1_city": "Ciudad", 
+  "placeholder_city": "ejemplo: Leópolis",
   "button_continue": "Continuar",
-  "info": "Ingrese el nombre del asentamiento (mínimo 2 letras)...",
-  "no_matches": "Sin coincidencias",
+  "info": "Ingresa nombre del asentamiento (mínimo 2 letras)...",
+  "no_matches": "No se encontraron coincidencias",
+
 
   "step2_title": "Paso 2: Detalles de la temporada",
   "step2_info_1": "El punto de partida es la fecha en que comienza el cálculo: siembra, trasplante o última aplicación de fungicida.",
