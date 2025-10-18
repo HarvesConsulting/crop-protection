@@ -1,4 +1,4 @@
-// Step1Region.js — з перекладом назв міст
+// Step1Region.js — виправлена версія з правильним пошуком
 import React, { useState, useEffect } from "react";
 import { regions as allRegions } from "../regions";
 import { norm, searchTextFor, placeKey } from "../helpers";
@@ -10,36 +10,7 @@ const regions = allRegions.filter(
   (r, i, arr) => i === arr.findIndex((x) => x.name === r.name)
 );
 
-// Словник перекладів назв міст
-const CITY_TRANSLATIONS = {
-  // Українські міста
-  "Київ": { en: "Kyiv", es: "Kiev" },
-  "Львів": { en: "Lviv", es: "Leópolis" },
-  "Одеса": { en: "Odesa", es: "Odesa" },
-  "Харків": { en: "Kharkiv", es: "Járkov" },
-  "Дніпро": { en: "Dnipro", es: "Dnipró" },
-  "Запоріжжя": { en: "Zaporizhzhia", es: "Zaporiyia" },
-  "Вінниця": { en: "Vinnytsia", es: "Vínnitsa" },
-  "Житомир": { en: "Zhytomyr", es: "Zhytómyr" },
-  "Івано-Франківськ": { en: "Ivano-Frankivsk", es: "Ivano-Frankivsk" },
-  "Луцьк": { en: "Lutsk", es: "Lutsk" },
-  "Рівне": { en: "Rivne", es: "Rivne" },
-  "Тернопіль": { en: "Ternopil", es: "Ternópil" },
-  "Ужгород": { en: "Uzhhorod", es: "Uzhgorod" },
-  "Чернівці": { en: "Chernivtsi", es: "Chernivtsi" },
-  "Чернігів": { en: "Chernihiv", es: "Chernigov" },
-  "Суми": { en: "Sumy", es: "Sumy" },
-  "Полтава": { en: "Poltava", es: "Poltava" },
-  "Черкаси": { en: "Cherkasy", es: "Cherkasy" },
-  "Кропивницький": { en: "Kropyvnytskyi", es: "Kropyvnytsky" },
-  "Миколаїв": { en: "Mykolaiv", es: "Mykolaiv" },
-  "Херсон": { en: "Kherson", es: "Jersón" },
-  "Сімферополь": { en: "Simferopol", es: "Simferópol" },
-  "Севастополь": { en: "Sevastopol", es: "Sebastopol" },
-  // Додайте інші міста за потребою
-};
-
-// Список країн
+// Список країн (наразі тільки Україна доступна)
 const COUNTRIES = [
   { code: "UA", name: "Україна", available: true },
   { code: "PL", name: "Польща", available: false },
@@ -50,7 +21,7 @@ const COUNTRIES = [
 ];
 
 export default function Step1Region({ region, setRegion, onNext }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [inputValue, setInputValue] = useState(region?.name || "");
   const [suggestions, setSuggestions] = useState([]);
   const [active, setActive] = useState(-1);
@@ -59,33 +30,6 @@ export default function Step1Region({ region, setRegion, onNext }) {
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
 
   const availableRegions = selectedCountry.code === "UA" ? regions : [];
-
-  // Функція для отримання перекладу назви міста
-  const getTranslatedCityName = (cityName) => {
-    if (i18n.language === 'uk') return cityName; // Українська - оригінальна назва
-    
-    const translation = CITY_TRANSLATIONS[cityName];
-    if (translation) {
-      return translation[i18n.language] || cityName;
-    }
-    return cityName; // Якщо перекладу немає, повертаємо оригінальну назву
-  };
-
-  // Функція для пошуку міста по перекладній назві
-  const searchInTranslatedNames = (city, query) => {
-    const originalName = norm(city.name);
-    const translatedNames = Object.values(CITY_TRANSLATIONS[city.name] || {});
-    
-    // Шукаємо в оригінальній назві
-    if (originalName.startsWith(query)) return true;
-    
-    // Шукаємо в перекладних назвах
-    for (const translatedName of translatedNames) {
-      if (norm(translatedName).startsWith(query)) return true;
-    }
-    
-    return false;
-  };
 
   useEffect(() => {
     if (!selectedCountry.available) {
@@ -101,12 +45,15 @@ export default function Step1Region({ region, setRegion, onNext }) {
       return;
     }
     
+    // Спрощена логіка пошуку - шукаємо по першим буквам назви міста
     const seen = new Set();
     const res = [];
     
-    // Пошук за початком назви (оригінальної та перекладних)
     for (const r of availableRegions) {
-      if (searchInTranslatedNames(r, q)) {
+      const cityName = norm(r.name); // Нормалізуємо назву міста
+      
+      // Шукаємо міста, де початок назви збігається з пошуковим запитом
+      if (cityName.startsWith(q)) {
         const key = placeKey(r);
         if (!seen.has(key)) {
           seen.add(key);
@@ -115,23 +62,11 @@ export default function Step1Region({ region, setRegion, onNext }) {
       }
     }
     
-    // Якщо не знайшли за початком, шукаємо в будь-якому місці
+    // Якщо не знайшли за початком, шукаємо в будь-якому місці назви
     if (res.length === 0) {
       for (const r of availableRegions) {
         const cityName = norm(r.name);
-        const translatedNames = Object.values(CITY_TRANSLATIONS[r.name] || {});
-        
-        let found = cityName.includes(q);
-        if (!found) {
-          for (const translatedName of translatedNames) {
-            if (norm(translatedName).includes(q)) {
-              found = true;
-              break;
-            }
-          }
-        }
-        
-        if (found) {
+        if (cityName.includes(q)) {
           const key = placeKey(r);
           if (!seen.has(key)) {
             seen.add(key);
@@ -143,7 +78,7 @@ export default function Step1Region({ region, setRegion, onNext }) {
     
     setSuggestions(res.slice(0, 30));
     setActive(res.length ? 0 : -1);
-  }, [inputValue, selectedCountry, availableRegions, i18n.language]);
+  }, [inputValue, selectedCountry, availableRegions]);
 
   const handleCountrySelect = (country) => {
     if (country.available) {
@@ -162,18 +97,10 @@ export default function Step1Region({ region, setRegion, onNext }) {
     if (selectedCountry.available) {
       const q = norm(v.trim());
       
-      // Перевіряємо точне співпадіння (оригінальне та перекладне)
+      // Перевіряємо точне співпадіння
       const exact = availableRegions.find((r) => {
         const cityName = norm(r.name);
-        const translatedNames = Object.values(CITY_TRANSLATIONS[r.name] || {});
-        
-        if (cityName === q) return true;
-        
-        for (const translatedName of translatedNames) {
-          if (norm(translatedName) === q) return true;
-        }
-        
-        return false;
+        return cityName === q;
       });
       
       setRegion(exact || null);
@@ -181,7 +108,6 @@ export default function Step1Region({ region, setRegion, onNext }) {
   };
 
   const handleSuggestionClick = (city) => {
-    // Зберігаємо оригінальну назву міста
     setInputValue(city.name);
     setRegion(city);
     setSuggestions([]);
@@ -241,9 +167,7 @@ export default function Step1Region({ region, setRegion, onNext }) {
                     <div className="flex justify-between items-center">
                       <span>{country.name}</span>
                       {!country.available && (
-                        <span className="text-xs bg-gray-200 px-2 py-1 rounded">
-                          {t("coming_soon", "Скоро")}
-                        </span>
+                        <span className="text-xs bg-gray-200 px-2 py-1 rounded">Скоро</span>
                       )}
                     </div>
                   </button>
@@ -266,11 +190,11 @@ export default function Step1Region({ region, setRegion, onNext }) {
               type="text"
               value={inputValue}
               onChange={handleInputChange}
-              placeholder={selectedCountry.available ? t("placeholder_city") : t("select_available_country")}
+              placeholder={selectedCountry.available ? t("placeholder_city") : "Оберіть доступну країну"}
               disabled={!selectedCountry.available}
             />
             {selectedCountry.available && inputValue.length === 1 && (
-              <p className="text-xs text-gray-500 mt-1">{t("enter_one_more_letter")}</p>
+              <p className="text-xs text-gray-500 mt-1">Введіть ще одну букву для пошуку</p>
             )}
           </div>
         </div>
@@ -289,7 +213,7 @@ export default function Step1Region({ region, setRegion, onNext }) {
                   }`}
                   onClick={() => handleSuggestionClick(city)}
                 >
-                  {getTranslatedCityName(city.name)}
+                  {city.name}
                 </div>
               ))
             )}

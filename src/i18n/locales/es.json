@@ -7,10 +7,7 @@
   "button_continue": "Continuar",
   "info": "Ingresa nombre del asentamiento (mínimo 2 letras)...",
   "no_matches": "No se encontraron coincidencias",
-  "coming_soon": "Próximamente",
-  "select_available_country": "Selecciona país disponible",
-  "enter_one_more_letter": "Ingresa una letra más para buscar",
-
+  
   "step2_title": "Paso 2: Detalles de la temporada",
   "step2_info_1": "El punto de partida es la fecha en que comienza el cálculo: siembra, trasplante o última aplicación de fungicida.",
   "step2_info_2": "El período de cálculo no puede exceder los 15 días desde hoy para garantizar la precisión del pronóstico.",
