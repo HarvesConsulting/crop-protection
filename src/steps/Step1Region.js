@@ -1,4 +1,4 @@
-// Step1Region.js — виправлена версія
+// Step1Region.js — спрощена робоча версія
 import React, { useState, useEffect } from "react";
 import { regions as allRegions } from "../regions";
 import { norm, searchTextFor, placeKey } from "../helpers";
@@ -9,12 +9,6 @@ import { useTranslation } from "react-i18next";
 const regions = allRegions.filter(
   (r, i, arr) => i === arr.findIndex((x) => x.name === r.name)
 );
-
-// Додаємо поле country до регіонів, якщо його немає
-const regionsWithCountry = regions.map(region => ({
-  ...region,
-  country: region.country || 'UA' // Якщо country немає, вважаємо що це Україна
-}));
 
 // Список країн (наразі тільки Україна доступна)
 const COUNTRIES = [
@@ -35,12 +29,16 @@ export default function Step1Region({ region, setRegion, onNext }) {
   const [selectedCountry, setSelectedCountry] = useState(COUNTRIES[0]); // Україна за замовчуванням
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
 
-  // Фільтруємо регіони по вибраній країні
-  const filteredRegions = regionsWithCountry.filter(region => 
-    region.country === selectedCountry.code
-  );
+  // Використовуємо всі регіони для України, для інших країн - пустий масив
+  const availableRegions = selectedCountry.code === "UA" ? regions : [];
 
   useEffect(() => {
+    if (!selectedCountry.available) {
+      setSuggestions([]);
+      setActive(-1);
+      return;
+    }
+
     const q = norm(inputValue.trim());
     if (q.length < 2) {
       setSuggestions([]);
@@ -48,7 +46,7 @@ export default function Step1Region({ region, setRegion, onNext }) {
       return;
     }
     
-    const exact = filteredRegions.find((r) => searchTextFor(r) === q);
+    const exact = availableRegions.find((r) => searchTextFor(r) === q);
     if (exact) {
       setSuggestions([]);
       setActive(-1);
@@ -57,9 +55,9 @@ export default function Step1Region({ region, setRegion, onNext }) {
     
     const seen = new Set();
     const res = [];
-    for (const r of filteredRegions) {
+    for (const r of availableRegions) {
       const s = searchTextFor(r);
-      if (s.includes(q)) { // Змінив з startsWith на includes для кращого пошуку
+      if (s.includes(q)) {
         const key = placeKey(r);
         if (!seen.has(key)) {
           seen.add(key);
@@ -69,7 +67,7 @@ export default function Step1Region({ region, setRegion, onNext }) {
     }
     setSuggestions(res.slice(0, 30));
     setActive(res.length ? 0 : -1);
-  }, [inputValue, selectedCountry]);
+  }, [inputValue, selectedCountry, availableRegions]);
 
   const handleCountrySelect = (country) => {
     if (country.available) {
@@ -81,9 +79,23 @@ export default function Step1Region({ region, setRegion, onNext }) {
     }
   };
 
-  // Додамо лог для дебагу
-  console.log('Filtered regions:', filteredRegions.length);
-  console.log('Selected country:', selectedCountry.code);
+  const handleInputChange = (e) => {
+    const v = e.target.value;
+    setInputValue(v);
+    
+    if (selectedCountry.available) {
+      const q = norm(v.trim());
+      const exact = availableRegions.find((r) => searchTextFor(r) === q);
+      setRegion(exact || null);
+    }
+  };
+
+  const handleSuggestionClick = (city) => {
+    setInputValue(city.name);
+    setRegion(city);
+    setSuggestions([]);
+    setActive(-1);
+  };
 
   return (
     <main className="flex justify-center items-start min-h-[70vh] px-4">
@@ -155,24 +167,15 @@ export default function Step1Region({ region, setRegion, onNext }) {
               {t("step1_city")}
             </label>
             <input
-              className="w-full px-4 py-2 text-[16px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition"
+              className={`w-full px-4 py-2 text-[16px] border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition ${
+                !selectedCountry.available ? 'bg-gray-100 border-gray-300 text-gray-500' : 'border-gray-300'
+              }`}
               type="text"
               value={inputValue}
-              onChange={(e) => {
-                const v = e.target.value;
-                setInputValue(v);
-                const q = norm(v.trim());
-                const exact = filteredRegions.find((r) => searchTextFor(r) === q);
-                setRegion(exact || null);
-              }}
-              placeholder={t("placeholder_city")}
+              onChange={handleInputChange}
+              placeholder={selectedCountry.available ? t("placeholder_city") : "Оберіть доступну країну"}
               disabled={!selectedCountry.available}
             />
-            {!selectedCountry.available && (
-              <p className="text-sm text-gray-500 mt-1">
-                Для вибраної країни пошук тимчасово недоступний
-              </p>
-            )}
           </div>
         </div>
 
@@ -180,25 +183,17 @@ export default function Step1Region({ region, setRegion, onNext }) {
         {inputValue.trim().length >= 2 && !region && selectedCountry.available && (
           <div className="max-w-sm mx-auto mt-2 border border-gray-200 rounded-md bg-white max-h-60 overflow-y-auto shadow-md">
             {suggestions.length === 0 ? (
-              <div className="p-2 text-gray-500">
-                {filteredRegions.length === 0 
-                  ? "Немає міст для вибраної країни" 
-                  : t("no_matches")
-                }
-              </div>
+              <div className="p-2 text-gray-500">{t("no_matches")}</div>
             ) : (
-              suggestions.map((c, i) => (
+              suggestions.map((city, index) => (
                 <div
-                  key={`${c.name}-${c.lat}-${c.lon}`}
-                  className={`p-2 cursor-pointer hover:bg-blue-100 ${active === i ? "bg-blue-50" : ""}`}
-                  onClick={() => {
-                    setInputValue(c.name);
-                    setRegion(c);
-                    setSuggestions([]);
-                    setActive(-1);
-                  }}
+                  key={`${city.name}-${city.lat}-${city.lon}`}
+                  className={`p-2 cursor-pointer hover:bg-blue-100 ${
+                    active === index ? "bg-blue-50" : ""
+                  }`}
+                  onClick={() => handleSuggestionClick(city)}
                 >
-                  {c.name}
+                  {city.name}
                 </div>
               ))
             )}
