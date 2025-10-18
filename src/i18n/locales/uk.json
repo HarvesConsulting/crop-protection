@@ -49,6 +49,17 @@
     "calculation": "Розрахунок",
     "results": "Результати"
   },
+
+   "hourly": {
+    "temperature": "Температура",
+    "humidity": "Вологість",
+    "wind": "Вітер",
+    "kmh": "км/год",
+    "precipitation": "Опади",
+    "mm": "мм",
+    "recommended": "Рекомендовано",
+    "notRecommended": "Не рекомендовано"
+  },
   
   "step4": {
     "title": "Крок 4: Результати",

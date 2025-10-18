@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import "./HourTimeline.css";
 import { format, parseISO } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 export default function HourTimeline({ date, hourlyData = [] }) {
+  const { t } = useTranslation();
   const [activeHour, setActiveHour] = useState(null);
 
   const formattedDate = format(
@@ -28,7 +30,6 @@ export default function HourTimeline({ date, hourlyData = [] }) {
           {[...Array(24).keys()].map((hour) => {
             const hourData = hoursToday.find((h) => Number(h.hour) === hour);
             const isActive = activeHour === hour;
-
             const isSuitable = hourData?.suitable === true;
 
             return (
@@ -61,17 +62,17 @@ export default function HourTimeline({ date, hourlyData = [] }) {
                 {hourData && isActive && (
                   <div className="hour-details-tooltip mobile">
                     <strong>{hour}:00</strong> <br />
-                    🌡 Температура: {hourData.temperature}°C <br />
-                    💧 Вологість: {hourData.humidity ?? "—"}% <br />
-                    💨 Вітер: {hourData.windspeed} км/год <br />
-                    🌧 Опади: {hourData.precipitation ?? 0} мм <br />
+                    🌡 {t("hourly.temperature")}: {hourData.temperature}°C <br />
+                    💧 {t("hourly.humidity")}: {hourData.humidity ?? "—"}% <br />
+                    💨 {t("hourly.wind")}: {hourData.windspeed} {t("hourly.kmh")} <br />
+                    🌧 {t("hourly.precipitation")}: {hourData.precipitation ?? 0} {t("hourly.mm")} <br />
                     {isSuitable ? (
                       <span style={{ color: "green", fontWeight: "bold" }}>
-                        ✅ Рекомендовано
+                        ✅ {t("hourly.recommended")}
                       </span>
                     ) : (
                       <span style={{ color: "red", fontWeight: "bold" }}>
-                        ❌ Не рекомендовано
+                        ❌ {t("hourly.notRecommended")}
                       </span>
                     )}
                   </div>

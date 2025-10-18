@@ -50,6 +50,17 @@
     "results": "Resultados"
   },
 
+  "hourly": {
+    "temperature": "Temperatura",
+    "humidity": "Humedad",
+    "wind": "Viento",
+    "kmh": "km/h",
+    "precipitation": "Precipitación",
+    "mm": "mm",
+    "recommended": "Recomendado",
+    "notRecommended": "No recomendado"
+  },
+
   "step4": {
     "title": "Paso 4: Resultados",
     "period": "Período de cálculo",
