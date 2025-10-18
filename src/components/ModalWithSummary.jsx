@@ -114,7 +114,7 @@ export default function ModalWithSummary({
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
   data={chartData}
-  margin={{ top: 50, right: 30, left: 5, bottom: 30 }} // 👈 зменшили left
+  margin={{ top: 50, right: 5, left: 5, bottom: 20 }} // 👈 зменшили left
 >
   <CartesianGrid strokeDasharray="3 3" />
   <XAxis dataKey="date" />
