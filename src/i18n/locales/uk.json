@@ -60,6 +60,13 @@
     "recommended": "Рекомендовано",
     "notRecommended": "Не рекомендовано"
   },
+
+  "calendar": {
+    "title": "📅 Календар обробок",
+    "period": "Період: {{start}} - {{end}}",
+    "clickHint": "Натисніть на дату з крапками, щоб побачити препарати",
+    "instagramLink": "📱 Harvest Consulting в Instagram"
+  },
   
   "step4": {
     "title": "Крок 4: Результати",

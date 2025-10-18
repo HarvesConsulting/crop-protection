@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "./CalendarView.css";
 
 export default function CalendarView({ events = [], startDate, endDate }) {
+  const { t } = useTranslation();
   const [selectedDate, setSelectedDate] = useState(null);
   const [activeStartDate, setActiveStartDate] = useState(null);
   const [expandedDate, setExpandedDate] = useState(null);
@@ -41,7 +43,6 @@ export default function CalendarView({ events = [], startDate, endDate }) {
     const dayEvents = getEventsForDate(date);
     
     if (dayEvents.length > 0) {
-      // Якщо клікнули на ту саму дату - закриваємо, якщо на іншу - відкриваємо
       if (expandedDate && expandedDate.toDateString() === date.toDateString()) {
         setExpandedDate(null);
       } else {
@@ -100,14 +101,21 @@ export default function CalendarView({ events = [], startDate, endDate }) {
     return classes.join(" ");
   };
 
+  const formatPeriodText = () => {
+    if (startDate && endDate) {
+      return t("calendar.period", {
+        start: new Date(startDate).toLocaleDateString('uk-UA'),
+        end: new Date(endDate).toLocaleDateString('uk-UA')
+      });
+    }
+    return t("calendar.clickHint");
+  };
+
   return (
     <div className="calendar-wrapper">
-      <h2>📅 Календар обробок</h2>
+      <h2>{t("calendar.title")}</h2>
       <p className="calendar-subtitle">
-        {startDate && endDate 
-          ? `Період: ${new Date(startDate).toLocaleDateString('uk-UA')} - ${new Date(endDate).toLocaleDateString('uk-UA')}`
-          : 'Натисніть на дату з крапками, щоб побачити препарати'
-        }
+        {formatPeriodText()}
       </p>
 
       <div className="calendar-container">
@@ -138,7 +146,7 @@ export default function CalendarView({ events = [], startDate, endDate }) {
           rel="noopener noreferrer"
           className="instagram-link"
         >
-          📱 Harvest Consulting в Instagram
+          {t("calendar.instagramLink")}
         </a>
       </div>
     </div>

@@ -61,6 +61,13 @@
     "notRecommended": "Not recommended"
   },
 
+  "calendar": {
+    "title": "📅 Treatment Calendar",
+    "period": "Period: {{start}} - {{end}}",
+    "clickHint": "Click on a date with dots to see products",
+    "instagramLink": "📱 Harvest Consulting on Instagram"
+  },
+
   "step4": {
     "title": "Step 4: Results",
     "period": "Calculation period",
