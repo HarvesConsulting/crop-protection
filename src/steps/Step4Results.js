@@ -504,84 +504,92 @@ export default function Step4Results({ result, onRestart }) {
     console.log("✅ Final disease groups:", calculatedDiseaseCardsGrouped);
 
     // Інтегрована система
-    const integratedMap = calculatedSprayData.map((spray) => {
-      const dateObj = parseISO(spray.Дата.split(".").reverse().join("-"));
-      return {
-        Дата: spray.Дата,
-        timestamp: dateObj.getTime(),
-        Препарати: [spray.Препарат],
-        Рекомендації: [spray.Рекомендація],
-        diseases: new Set(["Фітофтороз"]),
-        backData: spray.backData,
+    // Інтегрована система - ВИПРАВЛЕНА ВЕРСІЯ БЕЗ ДУБЛІВ
+const integratedMap = calculatedSprayData.map((spray) => {
+  const dateObj = parseISO(spray.Дата.split(".").reverse().join("-"));
+  return {
+    Дата: spray.Дата,
+    timestamp: dateObj.getTime(),
+    Препарати: [spray.Препарат],
+    Рекомендації: [spray.Рекомендація],
+    diseases: new Set(["Фітофтороз"]),
+    backData: spray.backData,
+  };
+});
+
+calculatedDiseaseCardsGrouped?.forEach((group) => {
+  group.entries?.forEach((entry) => {
+    const diseaseDate = parseISO(entry.Дата.split(".").reverse().join("-"));
+    const diseaseTime = diseaseDate.getTime();
+    let merged = false;
+
+    for (const record of integratedMap) {
+      const diff = Math.abs(record.timestamp - diseaseTime);
+      if (diff <= 3 * 24 * 60 * 60 * 1000) {
+        // ПЕРЕВІРКА НА ДУБЛІ ПРЕПАРАТІВ - ДОДАЄМО ТІЛЬКИ УНІКАЛЬНІ
+        if (!record.Препарати.includes(entry.Препарат)) {
+          record.Препарати.push(entry.Препарат);
+        }
+        
+        // УНІВЕРСАЛЬНА МАПА ДЛЯ НАЗВ ХВОРОБ
+        const diseaseNameMap = {
+          "gray_mold": "Сіра гниль",
+          "alternaria": "Альтернаріоз", 
+          "bacteriosis": "Бактеріоз",
+          "Gray Mold": "Сіра гниль",
+          "Alternaria": "Альтернаріоз",
+          "Bacteriosis": "Бактеріоз",
+          "Сіра гниль": "Сіра гниль",
+          "Альтернаріоз": "Альтернаріоз",
+          "Бактеріоз": "Бактеріоз"
+        };
+        record.diseases.add(diseaseNameMap[group.name] || group.name);
+        merged = true;
+        break;
+      }
+    }
+
+    if (!merged) {
+      const diseaseNameMap = {
+        "gray_mold": "Сіра гниль",
+        "alternaria": "Альтернаріоз",
+        "bacteriosis": "Бактеріоз",
+        "Gray Mold": "Сіра гниль",
+        "Alternaria": "Альтернаріоз",
+        "Bacteriosis": "Бактеріоз",
+        "Сіра гниль": "Сіра гниль",
+        "Альтернаріоз": "Альтернаріоз",
+        "Бактеріоз": "Бактеріоз"
       };
-    });
-
-    calculatedDiseaseCardsGrouped?.forEach((group) => {
-      group.entries?.forEach((entry) => {
-        const diseaseDate = parseISO(entry.Дата.split(".").reverse().join("-"));
-        const diseaseTime = diseaseDate.getTime();
-        let merged = false;
-
-        for (const record of integratedMap) {
-          const diff = Math.abs(record.timestamp - diseaseTime);
-          if (diff <= 3 * 24 * 60 * 60 * 1000) {
-            record.Препарати.push(entry.Препарат);
-            record.Рекомендації.push(entry.Рекомендація);
-            // УНІВЕРСАЛЬНА МАПА ДЛЯ НАЗВ ХВОРОБ
-            const diseaseNameMap = {
-              "gray_mold": "Сіра гниль",
-              "alternaria": "Альтернаріоз", 
-              "bacteriosis": "Бактеріоз",
-              "Gray Mold": "Сіра гниль",
-              "Alternaria": "Альтернаріоз",
-              "Bacteriosis": "Бактеріоз",
-              "Сіра гниль": "Сіра гниль",
-              "Альтернаріоз": "Альтернаріоз",
-              "Бактеріоз": "Бактеріоз"
-            };
-            record.diseases.add(diseaseNameMap[group.name] || group.name);
-            merged = true;
-            break;
-          }
-        }
-
-        if (!merged) {
-          const diseaseNameMap = {
-            "gray_mold": "Сіра гниль",
-            "alternaria": "Альтернаріоз",
-            "bacteriosis": "Бактеріоз",
-            "Gray Mold": "Сіра гниль",
-            "Alternaria": "Альтернаріоз",
-            "Bacteriosis": "Бактеріоз",
-            "Сіра гниль": "Сіра гниль",
-            "Альтернаріоз": "Альтернаріоз",
-            "Бактеріоз": "Бактеріоз"
-          };
-          integratedMap.push({
-            Дата: entry.Дата,
-            timestamp: diseaseTime,
-            Препарати: [entry.Препарат],
-            Рекомендації: [entry.Рекомендація],
-            diseases: new Set([diseaseNameMap[group.name] || group.name]),
-            backData: entry.backData,
-          });
-        }
-      });
-    });
-
-    const calculatedIntegratedSystem = integratedMap
-      .map((entry) => ({
+      integratedMap.push({
         Дата: entry.Дата,
-        Препарат: entry.Препарати.join(", "),
-        Рекомендація: entry.Рекомендації,
+        timestamp: diseaseTime,
+        Препарати: [entry.Препарат],
+        Рекомендації: [entry.Рекомендація],
+        diseases: new Set([diseaseNameMap[group.name] || group.name]),
         backData: entry.backData,
-        Хвороби: Array.from(entry.diseases).join(", "),
-      }))
-      .sort((a, b) => {
-        const dA = parseISO(a.Дата.split(".").reverse().join("-"));
-        const dB = parseISO(b.Дата.split(".").reverse().join("-"));
-        return dA - dB;
       });
+    }
+  });
+});
+   const calculatedIntegratedSystem = integratedMap
+  .map((entry) => {
+    // ВИДАЛЯЄМО ДУБЛІКАТИ ПРЕПАРАТІВ (ДОДАТКОВИЙ ЗАХИСТ)
+    const uniqueПрепарати = [...new Set(entry.Препарати)];
+    
+    return {
+      Дата: entry.Дата,
+      Препарат: uniqueПрепарати.join(", "),
+      Рекомендація: entry.Рекомендації,
+      backData: entry.backData,
+      Хвороби: Array.from(entry.diseases).join(", "),
+    };
+  })
+  .sort((a, b) => {
+    const dA = parseISO(a.Дата.split(".").reverse().join("-"));
+    const dB = parseISO(b.Дата.split(".").reverse().join("-"));
+    return dA - dB;
+  });
 
     // Збагачені погодні дані
     const suitableMap = extractSuitableSprayHours(hourlyData);
