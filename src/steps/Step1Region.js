@@ -1,4 +1,4 @@
-// Step1Region.js — з вибором країни
+// Step1Region.js — виправлена версія
 import React, { useState, useEffect } from "react";
 import { regions as allRegions } from "../regions";
 import { norm, searchTextFor, placeKey } from "../helpers";
@@ -9,6 +9,12 @@ import { useTranslation } from "react-i18next";
 const regions = allRegions.filter(
   (r, i, arr) => i === arr.findIndex((x) => x.name === r.name)
 );
+
+// Додаємо поле country до регіонів, якщо його немає
+const regionsWithCountry = regions.map(region => ({
+  ...region,
+  country: region.country || 'UA' // Якщо country немає, вважаємо що це Україна
+}));
 
 // Список країн (наразі тільки Україна доступна)
 const COUNTRIES = [
@@ -30,7 +36,7 @@ export default function Step1Region({ region, setRegion, onNext }) {
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
 
   // Фільтруємо регіони по вибраній країні
-  const filteredRegions = regions.filter(region => 
+  const filteredRegions = regionsWithCountry.filter(region => 
     region.country === selectedCountry.code
   );
 
@@ -41,17 +47,19 @@ export default function Step1Region({ region, setRegion, onNext }) {
       setActive(-1);
       return;
     }
+    
     const exact = filteredRegions.find((r) => searchTextFor(r) === q);
     if (exact) {
       setSuggestions([]);
       setActive(-1);
       return;
     }
+    
     const seen = new Set();
     const res = [];
     for (const r of filteredRegions) {
       const s = searchTextFor(r);
-      if (s.startsWith(q)) {
+      if (s.includes(q)) { // Змінив з startsWith на includes для кращого пошуку
         const key = placeKey(r);
         if (!seen.has(key)) {
           seen.add(key);
@@ -72,6 +80,10 @@ export default function Step1Region({ region, setRegion, onNext }) {
       setSuggestions([]);
     }
   };
+
+  // Додамо лог для дебагу
+  console.log('Filtered regions:', filteredRegions.length);
+  console.log('Selected country:', selectedCountry.code);
 
   return (
     <main className="flex justify-center items-start min-h-[70vh] px-4">
@@ -156,6 +168,11 @@ export default function Step1Region({ region, setRegion, onNext }) {
               placeholder={t("placeholder_city")}
               disabled={!selectedCountry.available}
             />
+            {!selectedCountry.available && (
+              <p className="text-sm text-gray-500 mt-1">
+                Для вибраної країни пошук тимчасово недоступний
+              </p>
+            )}
           </div>
         </div>
 
@@ -163,7 +180,12 @@ export default function Step1Region({ region, setRegion, onNext }) {
         {inputValue.trim().length >= 2 && !region && selectedCountry.available && (
           <div className="max-w-sm mx-auto mt-2 border border-gray-200 rounded-md bg-white max-h-60 overflow-y-auto shadow-md">
             {suggestions.length === 0 ? (
-              <div className="p-2 text-gray-500">{t("no_matches")}</div>
+              <div className="p-2 text-gray-500">
+                {filteredRegions.length === 0 
+                  ? "Немає міст для вибраної країни" 
+                  : t("no_matches")
+                }
+              </div>
             ) : (
               suggestions.map((c, i) => (
                 <div
