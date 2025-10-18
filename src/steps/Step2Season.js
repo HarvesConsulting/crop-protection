@@ -14,8 +14,8 @@ export default function Step2Season({
   const allDiseases = ["lateBlight", "grayMold", "alternaria", "bacteriosis"];
   const [diseases, setDiseases] = useState(["lateBlight"]);
   const [showInfo, setShowInfo] = useState(false);
-  const [calculationPeriod, setCalculationPeriod] = useState("15");
-  const [maxPeriod, setMaxPeriod] = useState(45);
+  const [calculationPeriod, setCalculationPeriod] = useState(15);
+  const [maxPeriod, setMaxPeriod] = useState(15);
 
   useEffect(() => {
     const today = new Date();
@@ -28,24 +28,29 @@ export default function Step2Season({
   useEffect(() => {
     const today = new Date();
     const maxDate = new Date(today);
-    maxDate.setDate(maxDate.getDate() + 14);
+    maxDate.setDate(maxDate.getDate() + 14); // +14 днів = 15 днів включаючи сьогодні
 
     if (plantingDate) {
       const startDate = new Date(plantingDate);
       const diffTime = maxDate - startDate;
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      setMaxPeriod(Math.max(1, diffDays));
+      const calculatedMaxPeriod = Math.max(1, Math.min(120, diffDays));
+      setMaxPeriod(calculatedMaxPeriod);
+      
+      // Якщо поточне значення більше за новий максимум, зменшуємо його
+      if (calculationPeriod > calculatedMaxPeriod) {
+        setCalculationPeriod(calculatedMaxPeriod);
+      }
     } else {
-      setMaxPeriod(45);
+      setMaxPeriod(15);
     }
   }, [plantingDate]);
 
   useEffect(() => {
-    if (plantingDate && calculationPeriod && parseInt(calculationPeriod) > 0) {
-      const period = parseInt(calculationPeriod);
+    if (plantingDate && calculationPeriod > 0) {
       const startDate = new Date(plantingDate);
       const endDate = new Date(startDate);
-      endDate.setDate(endDate.getDate() + period);
+      endDate.setDate(endDate.getDate() + calculationPeriod);
       const formattedDate = endDate.toISOString().split('T')[0];
       setHarvestDate(formattedDate);
     }
@@ -67,38 +72,17 @@ export default function Step2Season({
     }
   };
 
-  const handleCalculationPeriodChange = (e) => {
-    const value = e.target.value;
-    if (value === "" || /^\d+$/.test(value)) {
-      const numValue = value === "" ? "" : parseInt(value);
-      if (numValue !== "") {
-        if (numValue < 1) {
-          setCalculationPeriod("1");
-        } else if (numValue > maxPeriod) {
-          setCalculationPeriod(maxPeriod.toString());
-        } else {
-          setCalculationPeriod(value);
-        }
-      } else {
-        setCalculationPeriod("");
-      }
-    }
-  };
-
-  const handleCalculationPeriodBlur = () => {
-    if (calculationPeriod === "" || parseInt(calculationPeriod) < 1) {
-      setCalculationPeriod("1");
-    } else if (parseInt(calculationPeriod) > maxPeriod) {
-      setCalculationPeriod(maxPeriod.toString());
-    }
+  const handleSliderChange = (e) => {
+    const value = parseInt(e.target.value);
+    setCalculationPeriod(value);
   };
 
   const setMaxPeriodToField = () => {
-    setCalculationPeriod(maxPeriod.toString());
+    setCalculationPeriod(maxPeriod);
   };
 
   const handleNext = () => {
-    if (!plantingDate || !calculationPeriod || parseInt(calculationPeriod) < 1) {
+    if (!plantingDate || calculationPeriod < 1) {
       alert(t("step2_alert_invalid"));
       return;
     }
@@ -152,29 +136,45 @@ export default function Step2Season({
               <label className="block text-sm font-semibold text-gray-800 mb-2 sm:mb-3">
                 {t("step2_label_period")}
               </label>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                <div className="flex items-center gap-3">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-lg font-bold text-green-600">
+                    {calculationPeriod} {t("step2_days")}
+                  </span>
+                  <button
+                    onClick={setMaxPeriodToField}
+                    className="bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-medium px-3 py-2 rounded-lg border border-blue-200 transition-colors whitespace-nowrap"
+                    title={t("step2_max", { days: maxPeriod })}
+                  >
+                    {t("step2_max", { days: maxPeriod })}
+                  </button>
+                </div>
+                
+                <div className="px-2">
                   <input
-                    type="number"
+                    type="range"
                     min="1"
-                    max={maxPeriod}
+                    max="120"
                     value={calculationPeriod}
-                    onChange={handleCalculationPeriodChange}
-                    onBlur={handleCalculationPeriodBlur}
-                    className="w-24 border border-gray-300 rounded-xl px-4 py-3 text-base text-center focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                    onChange={handleSliderChange}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                    style={{
+                      background: `linear-gradient(to right, #16a34a 0%, #16a34a ${(calculationPeriod / 120) * 100}%, #e5e7eb ${(calculationPeriod / 120) * 100}%, #e5e7eb 100%)`
+                    }}
                   />
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-700 whitespace-nowrap">
-                      {t("step2_days")}
-                    </span>
-                    <button
-                      onClick={setMaxPeriodToField}
-                      className="bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-medium px-3 py-2 rounded-lg border border-blue-200 transition-colors whitespace-nowrap"
-                      title={t("step2_max", { days: maxPeriod })}
-                    >
-                      {t("step2_max", { days: maxPeriod })}
-                    </button>
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>1</span>
+                    <span>120</span>
                   </div>
+                </div>
+                
+                <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+                  <p>
+                    {t("step2_period_info", {
+                      days: calculationPeriod,
+                      maxDays: maxPeriod
+                    })}
+                  </p>
                 </div>
               </div>
             </div>
@@ -225,14 +225,12 @@ export default function Step2Season({
               onClick={handleNext}
               disabled={
                 !plantingDate ||
-                !calculationPeriod ||
-                parseInt(calculationPeriod) < 1 ||
+                calculationPeriod < 1 ||
                 diseases.length === 0
               }
               className={`px-6 py-3 rounded-xl text-white font-semibold transition flex items-center justify-center gap-2 text-sm sm:text-base order-1 sm:order-2 ${
                 plantingDate &&
-                calculationPeriod &&
-                parseInt(calculationPeriod) > 0 &&
+                calculationPeriod > 0 &&
                 diseases.length > 0
                   ? "bg-green-600 hover:bg-green-700"
                   : "bg-gray-400 cursor-not-allowed"
