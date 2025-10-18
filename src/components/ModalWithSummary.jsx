@@ -113,21 +113,22 @@ export default function ModalWithSummary({
               <div className="h-96 w-full bg-white rounded-md p-4 shadow-sm border relative min-w-0">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
-                    data={chartData}
-                    margin={{ top: 50, right: 30, left: 0, bottom: 30 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#f9fafb",
-                        borderColor: "#d1d5db",
-                        color: "#000",
-                      }}
-                      labelStyle={{ color: "#000", fontWeight: "bold" }}
-                      itemStyle={{ color: "#000" }}
-                    />
+  data={chartData}
+  margin={{ top: 50, right: 30, left: 5, bottom: 30 }} // 👈 зменшили left
+>
+  <CartesianGrid strokeDasharray="3 3" />
+  <XAxis dataKey="date" />
+  <YAxis width={35} /> {/* 👈 явна ширина осі Y */}
+  <Tooltip
+    contentStyle={{
+      backgroundColor: "#f9fafb",
+      borderColor: "#d1d5db",
+      color: "#000",
+    }}
+    labelStyle={{ color: "#000", fontWeight: "bold" }}
+    itemStyle={{ color: "#000" }}
+  />
+
                     <Legend
                       verticalAlign="bottom"
                       align="center"
