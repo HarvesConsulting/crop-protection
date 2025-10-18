@@ -15,7 +15,7 @@ export default function Step2Season({
   const [diseases, setDiseases] = useState(["lateBlight"]);
   const [showInfo, setShowInfo] = useState(false);
   const [calculationPeriod, setCalculationPeriod] = useState(15);
-  const [maxPeriod, setMaxPeriod] = useState(15);
+  const [maxAllowedPeriod, setMaxAllowedPeriod] = useState(15);
 
   useEffect(() => {
     const today = new Date();
@@ -27,22 +27,22 @@ export default function Step2Season({
 
   useEffect(() => {
     const today = new Date();
-    const maxDate = new Date(today);
-    maxDate.setDate(maxDate.getDate() + 14); // +14 днів = 15 днів включаючи сьогодні
+    const maxAllowedDate = new Date(today);
+    maxAllowedDate.setDate(maxAllowedDate.getDate() + 14); // +14 днів = 15 днів включаючи сьогодні
 
     if (plantingDate) {
       const startDate = new Date(plantingDate);
-      const diffTime = maxDate - startDate;
+      const diffTime = maxAllowedDate - startDate;
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       const calculatedMaxPeriod = Math.max(1, Math.min(120, diffDays));
-      setMaxPeriod(calculatedMaxPeriod);
+      setMaxAllowedPeriod(calculatedMaxPeriod);
       
       // Якщо поточне значення більше за новий максимум, зменшуємо його
       if (calculationPeriod > calculatedMaxPeriod) {
         setCalculationPeriod(calculatedMaxPeriod);
       }
     } else {
-      setMaxPeriod(15);
+      setMaxAllowedPeriod(15);
     }
   }, [plantingDate]);
 
@@ -74,11 +74,14 @@ export default function Step2Season({
 
   const handleSliderChange = (e) => {
     const value = parseInt(e.target.value);
-    setCalculationPeriod(value);
+    // Блокуємо вибір значення більше ніж maxAllowedPeriod
+    if (value <= maxAllowedPeriod) {
+      setCalculationPeriod(value);
+    }
   };
 
   const setMaxPeriodToField = () => {
-    setCalculationPeriod(maxPeriod);
+    setCalculationPeriod(maxAllowedPeriod);
   };
 
   const handleNext = () => {
@@ -144,9 +147,8 @@ export default function Step2Season({
                   <button
                     onClick={setMaxPeriodToField}
                     className="bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-medium px-3 py-2 rounded-lg border border-blue-200 transition-colors whitespace-nowrap"
-                    title={t("step2_max", { days: maxPeriod })}
                   >
-                    {t("step2_max", { days: maxPeriod })}
+                    {t("step2_max", { days: maxAllowedPeriod })}
                   </button>
                 </div>
                 
@@ -170,10 +172,8 @@ export default function Step2Season({
                 
                 <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
                   <p>
-                    {t("step2_period_info", {
-                      days: calculationPeriod,
-                      maxDays: maxPeriod
-                    })}
+                    Період моделювання: <strong>{calculationPeriod} днів</strong>. 
+                    Максимально дозволено: <strong>{maxAllowedPeriod} днів</strong> від обраної дати.
                   </p>
                 </div>
               </div>
