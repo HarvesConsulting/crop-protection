@@ -170,12 +170,7 @@ export default function Step2Season({
                   </div>
                 </div>
                 
-                <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-                  <p>
-                    Період моделювання: <strong>{calculationPeriod} днів</strong>. 
-                    Максимально дозволено: <strong>{maxAllowedPeriod} днів</strong> від обраної дати.
-                  </p>
-                </div>
+                
               </div>
             </div>
           </div>
