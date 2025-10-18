@@ -118,7 +118,7 @@ export default function ModalWithSummary({
 >
   <CartesianGrid strokeDasharray="3 3" />
   <XAxis dataKey="date" />
-  <YAxis width={35} /> {/* 👈 явна ширина осі Y */}
+  <YAxis width={15} /> {/* 👈 явна ширина осі Y */}
   <Tooltip
     contentStyle={{
       backgroundColor: "#f9fafb",
