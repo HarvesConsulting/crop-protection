@@ -1,6 +1,6 @@
 {
  "step1_title": "Step 1: Select Country and City",
-  "step1_description": "Select country and city for protection calculation",
+  "step1_description": "Select country and city for protection calculation.In the basic version, the available country is Ukraine",
   "step1_country": "Country", 
   "step1_city": "City",
   "placeholder_city": "e.g.: Lviv",

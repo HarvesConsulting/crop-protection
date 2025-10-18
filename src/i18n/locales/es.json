@@ -1,6 +1,6 @@
 {
   "step1_title": "Paso 1: Selecciona País y Ciudad",
-  "step1_description": "Selecciona país y ciudad para el cálculo de protección",
+  "step1_description": "Selecciona país y ciudad para el cálculo de protección. En la versión básica, el país disponible es Ucrania",
   "step1_country": "País",
   "step1_city": "Ciudad", 
   "placeholder_city": "ejemplo: Leópolis",
