@@ -1,4 +1,4 @@
-// Step1Region.js — спрощена робоча версія
+// Step1Region.js — виправлена версія з правильним пошуком
 import React, { useState, useEffect } from "react";
 import { regions as allRegions } from "../regions";
 import { norm, searchTextFor, placeKey } from "../helpers";
@@ -26,10 +26,9 @@ export default function Step1Region({ region, setRegion, onNext }) {
   const [suggestions, setSuggestions] = useState([]);
   const [active, setActive] = useState(-1);
   const [showInfo, setShowInfo] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState(COUNTRIES[0]); // Україна за замовчуванням
+  const [selectedCountry, setSelectedCountry] = useState(COUNTRIES[0]);
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
 
-  // Використовуємо всі регіони для України, для інших країн - пустий масив
   const availableRegions = selectedCountry.code === "UA" ? regions : [];
 
   useEffect(() => {
@@ -46,18 +45,15 @@ export default function Step1Region({ region, setRegion, onNext }) {
       return;
     }
     
-    const exact = availableRegions.find((r) => searchTextFor(r) === q);
-    if (exact) {
-      setSuggestions([]);
-      setActive(-1);
-      return;
-    }
-    
+    // Спрощена логіка пошуку - шукаємо по першим буквам назви міста
     const seen = new Set();
     const res = [];
+    
     for (const r of availableRegions) {
-      const s = searchTextFor(r);
-      if (s.includes(q)) {
+      const cityName = norm(r.name); // Нормалізуємо назву міста
+      
+      // Шукаємо міста, де початок назви збігається з пошуковим запитом
+      if (cityName.startsWith(q)) {
         const key = placeKey(r);
         if (!seen.has(key)) {
           seen.add(key);
@@ -65,6 +61,21 @@ export default function Step1Region({ region, setRegion, onNext }) {
         }
       }
     }
+    
+    // Якщо не знайшли за початком, шукаємо в будь-якому місці назви
+    if (res.length === 0) {
+      for (const r of availableRegions) {
+        const cityName = norm(r.name);
+        if (cityName.includes(q)) {
+          const key = placeKey(r);
+          if (!seen.has(key)) {
+            seen.add(key);
+            res.push(r);
+          }
+        }
+      }
+    }
+    
     setSuggestions(res.slice(0, 30));
     setActive(res.length ? 0 : -1);
   }, [inputValue, selectedCountry, availableRegions]);
@@ -85,7 +96,13 @@ export default function Step1Region({ region, setRegion, onNext }) {
     
     if (selectedCountry.available) {
       const q = norm(v.trim());
-      const exact = availableRegions.find((r) => searchTextFor(r) === q);
+      
+      // Перевіряємо точне співпадіння
+      const exact = availableRegions.find((r) => {
+        const cityName = norm(r.name);
+        return cityName === q;
+      });
+      
       setRegion(exact || null);
     }
   };
@@ -176,6 +193,9 @@ export default function Step1Region({ region, setRegion, onNext }) {
               placeholder={selectedCountry.available ? t("placeholder_city") : "Оберіть доступну країну"}
               disabled={!selectedCountry.available}
             />
+            {selectedCountry.available && inputValue.length === 1 && (
+              <p className="text-xs text-gray-500 mt-1">Введіть ще одну букву для пошуку</p>
+            )}
           </div>
         </div>
 
