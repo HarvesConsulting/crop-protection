@@ -1,0 +1,231 @@
+/* MedicationNotebook.css */
+.notebook-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1001;
+  padding: 20px;
+  backdrop-filter: blur(8px);
+}
+
+.notebook-content {
+  background: white;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+  animation: notebookAppear 0.4s ease-out;
+}
+
+@keyframes notebookAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.notebook-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px 40px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.notebook-header h2 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.notebook-body {
+  padding: 0;
+  max-height: calc(90vh - 120px);
+  overflow-y: auto;
+}
+
+.empty-notebook {
+  padding: 60px 40px;
+  text-align: center;
+  color: #7f8c8d;
+}
+
+.empty-notebook p {
+  font-size: 1.2rem;
+  margin: 0;
+  font-style: italic;
+}
+
+.medications-table {
+  padding: 0;
+}
+
+.medications-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.medications-table thead {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.medications-table th {
+  padding: 20px 25px;
+  text-align: left;
+  font-weight: 700;
+  color: #2c3e50;
+  font-size: 1.1rem;
+  border-bottom: 2px solid #dee2e6;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.medications-table td {
+  padding: 18px 25px;
+  border-bottom: 1px solid #e9ecef;
+  vertical-align: top;
+}
+
+.medications-table tbody tr {
+  transition: all 0.3s ease;
+}
+
+.medications-table tbody tr:hover {
+  background: #f8f9fa;
+  transform: translateX(5px);
+}
+
+.date-cell {
+  color: #495057;
+  font-weight: 600;
+  white-space: nowrap;
+  min-width: 200px;
+}
+
+.medication-cell {
+  color: #2c3e50;
+  font-weight: 500;
+  max-width: 400px;
+  word-wrap: break-word;
+}
+
+.actions-cell {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.actions-cell .edit-btn {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  min-width: 80px;
+}
+
+.actions-cell .edit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+}
+
+/* Смуга прокрутки для записника */
+.notebook-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.notebook-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.notebook-body::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 4px;
+}
+
+.notebook-body::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}
+
+/* Адаптивність для записника */
+@media (max-width: 768px) {
+  .notebook-overlay {
+    padding: 10px;
+  }
+  
+  .notebook-content {
+    max-height: 95vh;
+  }
+  
+  .notebook-header {
+    padding: 20px 25px;
+  }
+  
+  .notebook-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .medications-table {
+    overflow-x: auto;
+  }
+  
+  .medications-table table {
+    min-width: 600px;
+  }
+  
+  .medications-table th,
+  .medications-table td {
+    padding: 15px 20px;
+    font-size: 0.9rem;
+  }
+  
+  .date-cell {
+    min-width: 150px;
+  }
+  
+  .actions-cell .edit-btn {
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    min-width: 70px;
+  }
+}
+
+@media (max-width: 480px) {
+  .notebook-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .notebook-header h2 {
+    font-size: 1.3rem;
+  }
+  
+  .empty-notebook {
+    padding: 40px 25px;
+  }
+  
+  .empty-notebook p {
+    font-size: 1rem;
+  }
+}

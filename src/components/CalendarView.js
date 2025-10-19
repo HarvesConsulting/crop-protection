@@ -1,16 +1,30 @@
+// CalendarView.js
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "./CalendarView.css";
+import { useMedications } from "../hooks/useMedications";
+import MedicationModal from "../components/MedicationModal";
+import MedicationNotebook from "../components/MedicationNotebook";
 
 export default function CalendarView({ events = [], startDate, endDate }) {
   const { t, i18n } = useTranslation();
   const [selectedDate, setSelectedDate] = useState(null);
   const [activeStartDate, setActiveStartDate] = useState(null);
   const [expandedDate, setExpandedDate] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isNotebookOpen, setIsNotebookOpen] = useState(false);
 
-  // Функція для отримання локалі для react-calendar
+  const {
+    medications,
+    addMedication,
+    updateMedication,
+    deleteMedication,
+    getMedicationsByDate,
+    getAllMedications
+  } = useMedications();
+
   const getCalendarLocale = () => {
     switch (i18n.language) {
       case 'es': return 'es-ES';
@@ -61,35 +75,63 @@ export default function CalendarView({ events = [], startDate, endDate }) {
     } else {
       setExpandedDate(null);
     }
+    
+    // Відкриваємо модальне вікно при кліку на дату
+    setIsModalOpen(true);
+  };
+
+  const handleAddMedication = (date, medication, id = null) => {
+    if (id) {
+      updateMedication(id, medication);
+    } else {
+      addMedication(date, medication);
+    }
+  };
+
+  const handleOpenNotebook = () => {
+    setIsNotebookOpen(true);
   };
 
   const tileContent = ({ date, view }) => {
     if (view !== "month") return null;
 
     const dayEvents = getEventsForDate(date);
+    const dayMedications = getMedicationsByDate(date);
     const isExpanded = expandedDate && expandedDate.toDateString() === date.toDateString();
 
     return (
       <div className="tile-content">
         {/* Індикатори подій */}
-        {dayEvents.length > 0 && !isExpanded && (
+        {(dayEvents.length > 0 || dayMedications.length > 0) && !isExpanded && (
           <div className="event-dots">
             {dayEvents.map((event, index) => (
               <div 
-                key={index}
+                key={`event-${index}`}
                 className={`event-dot ${event.type || 'info'}`}
                 title={event.title}
+              />
+            ))}
+            {dayMedications.map((med, index) => (
+              <div 
+                key={`med-${index}`}
+                className="event-dot medication"
+                title={med.medication}
               />
             ))}
           </div>
         )}
         
-        {/* Розгорнутий список препаратів */}
+        {/* Розгорнутий список */}
         {isExpanded && (
           <div className="events-list">
             {dayEvents.map((event, index) => (
-              <div key={index} className={`event-item ${event.type || 'info'}`}>
+              <div key={`event-${index}`} className={`event-item ${event.type || 'info'}`}>
                 <span className="event-title">{event.title}</span>
+              </div>
+            ))}
+            {dayMedications.map((med, index) => (
+              <div key={`med-${index}`} className="event-item medication">
+                <span className="event-title">{med.medication}</span>
               </div>
             ))}
           </div>
@@ -102,9 +144,10 @@ export default function CalendarView({ events = [], startDate, endDate }) {
     const classes = [];
     if (view === "month") {
       const hasEvent = getEventsForDate(date).length > 0;
+      const hasMedication = getMedicationsByDate(date).length > 0;
       const isExpanded = expandedDate && expandedDate.toDateString() === date.toDateString();
       
-      if (hasEvent) classes.push("has-event");
+      if (hasEvent || hasMedication) classes.push("has-event");
       if (isExpanded) classes.push("expanded");
       if (date.toDateString() === new Date().toDateString()) classes.push("today");
     }
@@ -123,7 +166,16 @@ export default function CalendarView({ events = [], startDate, endDate }) {
 
   return (
     <div className="calendar-wrapper">
-      <h2>{t("calendar.title")}</h2>
+      <div className="calendar-header">
+        <h2>{t("calendar.title")}</h2>
+        <button 
+          className="notebook-button"
+          onClick={handleOpenNotebook}
+        >
+          {t("calendar.notebook")}
+        </button>
+      </div>
+      
       <p className="calendar-subtitle">
         {formatPeriodText()}
       </p>
@@ -136,7 +188,7 @@ export default function CalendarView({ events = [], startDate, endDate }) {
           tileClassName={tileClassName}
           activeStartDate={activeStartDate}
           onActiveStartDateChange={({ activeStartDate }) => setActiveStartDate(activeStartDate)}
-          locale={getCalendarLocale()} // Динамічна зміна локалі
+          locale={getCalendarLocale()}
           showNeighboringMonth={false}
           tileDisabled={({ date, view }) => {
             if (view === 'month' && startDate && endDate) {
@@ -148,6 +200,27 @@ export default function CalendarView({ events = [], startDate, endDate }) {
           }}
         />
       </div>
+
+      {/* Модальне вікно для препаратів */}
+      <MedicationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        selectedDate={selectedDate}
+        onAddMedication={handleAddMedication}
+        medications={selectedDate ? getMedicationsByDate(selectedDate) : []}
+      />
+
+      {/* Модальне вікно записника */}
+      <MedicationNotebook
+        isOpen={isNotebookOpen}
+        onClose={() => setIsNotebookOpen(false)}
+        medications={getAllMedications()}
+        onEditMedication={(medication) => {
+          setSelectedDate(new Date(medication.date));
+          setIsNotebookOpen(false);
+          setIsModalOpen(true);
+        }}
+      />
 
       <div className="instagram-container">
         <a
