@@ -65,8 +65,7 @@
 
   "calendar": {
     "title": "📅 Treatment Calendar",
-    "period": "Period: {{start}} - {{end}}",
-    "clickHint": "Click on a date with dots to see products",
+    "period": "Period: {{start}} - {{end}}",    
     "instagramLink": "📱 Harvest Consulting on Instagram"
   },
 

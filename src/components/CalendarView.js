@@ -78,7 +78,7 @@ export default function CalendarView({ events = [], startDate, endDate }) {
               <div 
                 key={index}
                 className={`event-dot ${event.type || 'info'}`}
-                title={event.Препарат || event.medication || event.title} // ВИПРАВЛЕННЯ: додано Препарат
+                title={event.Препарат || event.medication || event.title}
               />
             ))}
           </div>
@@ -90,7 +90,7 @@ export default function CalendarView({ events = [], startDate, endDate }) {
             {dayEvents.map((event, index) => (
               <div key={index} className={`event-item ${event.type || 'info'}`}>
                 <span className="event-title">
-                  {event.Препарат || event.medication || event.title} // ВИПРАВЛЕННЯ: додано Препарат
+                  {event.Препарат || event.medication || event.title}
                 </span>
               </div>
             ))}
@@ -120,15 +120,20 @@ export default function CalendarView({ events = [], startDate, endDate }) {
         end: new Date(endDate).toLocaleDateString(getCalendarLocale())
       });
     }
-    return t("calendar.clickHint");
+    // ВИПРАВЛЕННЯ: повертаємо порожній рядок замість clickHint
+    return "";
   };
 
   return (
     <div className="calendar-wrapper">
       <h2>{t("calendar.title")}</h2>
-      <p className="calendar-subtitle">
-        {formatPeriodText()}
-      </p>
+      
+      {/* ВИПРАВЛЕННЯ: відображаємо subtitle тільки якщо є текст */}
+      {formatPeriodText() && (
+        <p className="calendar-subtitle">
+          {formatPeriodText()}
+        </p>
+      )}
 
       <div className="calendar-container">
         <Calendar

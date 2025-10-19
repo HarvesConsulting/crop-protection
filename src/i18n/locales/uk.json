@@ -65,8 +65,7 @@
 
   "calendar": {
     "title": "📅 Календар обробок",
-    "period": "Період: {{start}} - {{end}}",
-    "clickHint": "Натисніть на дату з крапками, щоб побачити препарати",
+    "period": "Період: {{start}} - {{end}}",    
     "instagramLink": "📱 Harvest Consulting в Instagram"
   },
   
