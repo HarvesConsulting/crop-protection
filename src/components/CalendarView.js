@@ -5,10 +5,20 @@ import "react-calendar/dist/Calendar.css";
 import "./CalendarView.css";
 
 export default function CalendarView({ events = [], startDate, endDate }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [selectedDate, setSelectedDate] = useState(null);
   const [activeStartDate, setActiveStartDate] = useState(null);
   const [expandedDate, setExpandedDate] = useState(null);
+
+  // Функція для отримання локалі для react-calendar
+  const getCalendarLocale = () => {
+    switch (i18n.language) {
+      case 'es': return 'es-ES';
+      case 'en': return 'en-US';
+      case 'uk': return 'uk-UA';
+      default: return 'en-US';
+    }
+  };
 
   useEffect(() => {
     if (startDate) {
@@ -104,8 +114,8 @@ export default function CalendarView({ events = [], startDate, endDate }) {
   const formatPeriodText = () => {
     if (startDate && endDate) {
       return t("calendar.period", {
-        start: new Date(startDate).toLocaleDateString('uk-UA'),
-        end: new Date(endDate).toLocaleDateString('uk-UA')
+        start: new Date(startDate).toLocaleDateString(getCalendarLocale()),
+        end: new Date(endDate).toLocaleDateString(getCalendarLocale())
       });
     }
     return t("calendar.clickHint");
@@ -126,7 +136,7 @@ export default function CalendarView({ events = [], startDate, endDate }) {
           tileClassName={tileClassName}
           activeStartDate={activeStartDate}
           onActiveStartDateChange={({ activeStartDate }) => setActiveStartDate(activeStartDate)}
-          locale="uk-UA"
+          locale={getCalendarLocale()} // Динамічна зміна локалі
           showNeighboringMonth={false}
           tileDisabled={({ date, view }) => {
             if (view === 'month' && startDate && endDate) {
