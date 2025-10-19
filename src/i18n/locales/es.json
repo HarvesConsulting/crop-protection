@@ -1,5 +1,5 @@
 {
-  "step1_title": "Paso 1: Selecciona País y Ciudad",
+  "step1_title": "Selecciona País y Ciudad",
   "step1_description": "Selecciona país y ciudad para el cálculo de protección. En la versión básica, el país disponible es Ucrania",
   "step1_country": "País",
   "step1_city": "Ciudad", 
@@ -8,7 +8,7 @@
   "info": "Ingresa nombre del asentamiento (mínimo 2 letras)...",
   "no_matches": "No se encontraron coincidencias",
   
-  "step2_title": "Paso 2: Detalles de la temporada",
+  "step2_title": "Detalles de la temporada",
   "step2_info_1": "El punto de partida es la fecha en que comienza el cálculo: siembra, trasplante o última aplicación de fungicida.",
   "step2_info_2": "El período de cálculo no puede exceder los 15 días desde hoy para garantizar la precisión del pronóstico.",
   "step2_label_start": "Punto de partida",
@@ -26,7 +26,7 @@
   "disease_bacteriosis": "Bacteriosis",
   "button_back": "← Atrás",
 
-  "step3_title": "Paso 3: Cálculo",
+  "step3_title": "Cálculo",
   "step3_region": "Ciudad seleccionada",
   "step3_period": "Período de cálculo",
   "step3_diseases": "Enfermedades seleccionadas",
@@ -71,7 +71,7 @@
   },
 
   "step4": {
-    "title": "Paso 4: Resultados",
+    "title": "Resultados",
     "period": "Período de cálculo",
     "details": "Haz clic en 'Tarjeta' para ver información detallada.",
     "no_treatments": "💡 No se recomienda la aplicación de fungicidas.",

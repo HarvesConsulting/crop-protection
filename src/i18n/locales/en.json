@@ -1,5 +1,5 @@
 {
- "step1_title": "Step 1: Select Country and City",
+ "step1_title": "Select Country and City",
   "step1_description": "Select country and city for protection calculation.In the basic version, the available country is Ukraine",
   "step1_country": "Country", 
   "step1_city": "City",
@@ -8,7 +8,7 @@
   "info": "Enter settlement name (minimum 2 letters)...",
   "no_matches": "No matches found",
   
-  "step2_title": "Step 2: Season Details",
+  "step2_title": "Season Details",
   "step2_info_1": "The starting point is the date when the calculation begins – sowing, transplanting, or last fungicide application.",
   "step2_info_2": "The calculation period cannot exceed 15 days from today to ensure forecast accuracy.",
   "step2_label_start": "Starting point",
@@ -26,7 +26,7 @@
   "disease_bacteriosis": "Bacteriosis",
   "button_back": "← Back",
 
-  "step3_title": "Step 3: Calculation",
+  "step3_title": "Calculation",
   "step3_region": "Selected city",
   "step3_period": "Calculation period",
   "step3_diseases": "Selected diseases",
@@ -71,7 +71,7 @@
   },
 
   "step4": {
-    "title": "Step 4: Results",
+    "title": "Results",
     "period": "Calculation period",
     "details": "Click 'Card' to view detailed information.",
     "no_treatments": "💡 Fungicide applications are not recommended.",
