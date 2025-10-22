@@ -1,21 +1,23 @@
+// pages/pay.js
+
 import { useState } from 'react';
 
 export default function PayPage() {
   const [email, setEmail] = useState('');
 
   const handleBeforeRedirect = async (event) => {
-    event.preventDefault(); // ✨ Це потрібно, щоб не редіректило одразу
+    event.preventDefault();
 
     if (!email) return;
 
     try {
-      await fetch('/api/sendEmail', {
+      await fetch('/api/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
 
-      // ✨ Після успішного запиту — перенаправлення
+      // Переадресація після успіху
       window.location.href = 'https://secure.wayforpay.com/button/bf4278ccc53ee';
     } catch (error) {
       console.error('Помилка при надсиланні email:', error);
@@ -39,26 +41,15 @@ export default function PayPage() {
       <button
         onClick={handleBeforeRedirect}
         style={{
-          display: 'inline-block',
-          background:
-            '#2B3160 url("https://s3.eu-central-1.amazonaws.com/w4p-merch/button/bg5x2.png") no-repeat center right',
-          backgroundSize: 'cover',
-          width: '256px',
-          height: '54px',
-          border: 'none',
-          borderRadius: '14px',
-          padding: '18px',
-          textDecoration: 'none',
-          boxShadow: '3px 2px 8px rgba(71,66,66,0.22)',
-          textAlign: 'left',
-          boxSizing: 'border-box',
+          backgroundColor: '#2B3160',
           color: 'white',
-          fontWeight: 'bold',
-          fontSize: '14px',
-          fontFamily: 'Verdana,Arial,sans-serif',
+          padding: '12px 24px',
+          border: 'none',
+          borderRadius: '8px',
+          cursor: 'pointer',
         }}
       >
-        Оплатити
+        Оплатити через WayForPay
       </button>
     </div>
   );
