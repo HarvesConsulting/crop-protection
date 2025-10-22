@@ -1,5 +1,5 @@
 import { useState } from "react";
-import './PayPage.css'; // ✅ Вірний шлях до нового файлу
+import './PayPage.css'; // використовуємо актуальний шлях
 
 export default function PayPage() {
   const [email, setEmail] = useState("");
@@ -23,6 +23,15 @@ export default function PayPage() {
 
   return (
     <div className="pay-wrapper">
+      {/* Декоративний фон */}
+      <div className="pay-background-elements">
+        <div className="bg-circle circle-1"></div>
+        <div className="bg-circle circle-2"></div>
+        <div className="leaf leaf-1">🍃</div>
+        <div className="leaf leaf-2">🌿</div>
+      </div>
+
+      {/* Контент */}
       <div className="pay-logo">
         <span className="logo-icon">🍅</span>
         <span className="logo-text">Crop Protection</span>
