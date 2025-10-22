@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "../styles/PayScreen.css"; // новий css для стилів
+import "../styles/SplashScreen.css";
 
 export default function PayPage() {
   const [email, setEmail] = useState("");
